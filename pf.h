@@ -1,16 +1,22 @@
+//parameters and functions for pi.cc
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <vector>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <string>
 #include <cmath>
+#include <complex>
+#include <string>
+#include <gsl/gsl_poly.h>
+
+using namespace std;
 
 typedef unsigned long int lint;
-typedef complex <double> comp;
-typedef vector <unsigned int> intVec;
-typedef vector <comp> cVec;
+typedef complex<double> comp;
+typedef vector<unsigned int> intVec;
+typedef vector<comp> cVec;
 typedef Eigen::SparseMatrix<double> spMat;
 typedef Eigen::MatrixXd mat;
 typedef Eigen::VectorXd vec;
@@ -29,8 +35,9 @@ double R = 10.0; //size of bubble
 double mass = 3.0; 
 double lambda = 0.1;
 double Tb = 1.2*R/2;
-double angle = arcsin(Tb/R); %not a primary parameter, just used to make L
+double angle = asin(Tb/R); //not a primary parameter, just used to make L
 double L = 2*(1.5*Tb*tan(angle));
+double theta = 0.0;
 
 //derived quantities
 unsigned int NT = Na + Nb + Nc;
@@ -92,7 +99,7 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 		{
 		XintCoord = locNum - x*xNt;
 		}
-	return Xintcoord;	
+	return XintCoord;	
 	}
 	
 //gives values of coordinates in whole spacetime
@@ -177,7 +184,7 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 long int neigh(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
 	{
 	long int neighLocation = -1; //this is the result if there are no neighbours for the given values of the argument
-	unsigned int c = intCoords(locNum,direction,xNt);
+	unsigned int c = intCoord(locNum,direction,xNt);
 	if (direction==0)
 		{
 		if (sign==1 and c!=(xNt-1))
@@ -211,20 +218,16 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 //print main parameters to terminal
 void printParameters()
 	{
-	fprintf("%8s","N","Na","Nb","Nc","L","Tb","R","mass","lambda","theta");
-	fprintf("\n");
-	fprintf("%8g",N,Na,Nb,Nc,L,Tb,R,mass,lambda,theta);
-	fprintf("\n");
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","mass","lambda","theta");
+	printf("%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,mass,lambda,theta);
 	}
 	
 //print action and its constituents to the terminal
 void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
 	{
 	action = Kinetic + potL + potE;
-	fprintf("%16s","kinetic","potL","potE","action");
-	fprintf("\n");
-	fprintf("%16g",Kinetic,potL,potE,action);
-	fprintf("\n");
+	printf("%16s%16s%16s%16s\n","kinetic","potL","potE","action");
+	printf("%16g%16g%16g%16s\n",Kinetic,potL,potE,action);
 	}
 	
 //print vector to file
@@ -232,12 +235,12 @@ void printVector (const string& printFile, vec vecToPrint)
 	{
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
-			for (unsigned long int j=0; j<Eucdim; j++)
+			for (unsigned long int j=0; j<N*NT; j++)
 				{
 				F << left;
-				for (int r=0; r<dim; r++)
+				for (int r=0; r<2; r++)
 					{
-					F << setw(15) << re(coord(j,r)) << setw(15) << im(coord(j,r));
+					F << setw(15) << real(coord(j,r)) << setw(15) << imag(coord(j,r)); //note using coord for full time contour
 					}
 				F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;		
 				}

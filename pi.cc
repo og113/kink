@@ -7,8 +7,10 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <complex>
+#include <string>
 #include <gsl/gsl_poly.h>
-#include "parameters.h"
+#include "pf.h"
 
 using namespace std;
 
@@ -131,6 +133,10 @@ for (int loop=0; loop<aq.totalLoops; loop++)
         p(2*((j+1)*Nb-2)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2);%final time imag
         p(2*((j+1)*Nb-1)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2);
 		}
+		
+		//defining complexified vector Cp
+		cVec Cp(Nb*N);
+		Cp = vecComplex(p,N*Nb);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
@@ -142,10 +148,9 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		runs_count ++;
 		action_last = action;
 
-		// allocating memory for DS, DDS and Cp
+		// allocating memory for DS, DDS
 		vec minusDS(2*N*Nb+1);
-		cVec Cp(Nb*N);
-		Cp = vecComplex(p,N*Nb);
+		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1);
 		spMat DDS(2*N*Nb+1,2*N*Nb+1);
 		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
 		DDS_to_reserve(0) = 2;
@@ -155,8 +160,8 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		DDS_to_reserve(2*N*Nb) = 2*N;
 		for (lint j=1;j<(N*Nb-1);j++)
 			{
-			DDS_to_reserve(2*j) = 2*(2*2+1)
-			DDS_to_reserve(2*j+1) = 2*(2*2+1)
+			DDS_to_reserve(2*j) = 2*(2*2+1);
+			DDS_to_reserve(2*j+1) = 2*(2*2+1);
 			}
 		DDS.reserve(DDS_to_reserve);
 		
@@ -179,9 +184,7 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//assigning values to minusDS and DDS and evaluating action
 		for (unsigned long int j = 0; j < N*Nb; j++)
-			{
-			minusDS(2*j) = 0.0;//initializing to zero
-			minusDS(2*j+1) = 0.0;			
+			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			unsigned int x = intCoord(j,1,Nb);
 
@@ -297,13 +300,32 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		vec delta(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		
 		solver.analyzePattern(DDS);
+		if(solver.info()!=Eigen::Success)
+			{
+			cout << "DDS pattern analysis failed" << endl;
+			return 0;
+			}
+			
 		solver.factorize(DDS);
+		if(solver.info()!=Eigen::Success) 
+			{
+			cout << "LU factorization failed" << endl;
+			return 0;
+			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
-
+		if(solver.info()!=Eigen::Success)
+			{
+			cout << "solving failed" << endl;
+			return 0;
+			}
 
 		//assigning values to phi
-		p_e += delta;
+		p += delta;
+		
+		//passing changes on to complex vector
+		Cp = vecComplex(p,N*Nb);
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//convergence issues
@@ -319,4 +341,156 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//propagating solution along minkowskian time paths
+	
+	//propagating solution back in minkowskian time
+    //A1. initialize mp==mphi using last point of ephi and zeros- use complex phi
+    cVec ap(N*Na); //phi on section "a"
+    ap = Eigen::VectorXcd::Zero(N*Na);
+    for (unsigned int j=0; j<N; j++)
+    	{
+        ap(j*Na) = Cp(j*Nb);
+    	}
 
+    //A2. initialize vel - defined at half steps, first step being at t=-1/2,
+    //vel(t+1/2) := (p(t+1)-p(t))/dt
+    cVec velA (N*Na);
+    velA = Eigen::VectorXcd::Zero(N*Na);
+    dtau = -b;
+    Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
+    for (unsigned int j=0; j<N; j++)
+    	{
+        velA(j*Na) = 0; //due to boundary condition
+    	}
+
+    
+    //A3. initialize acc using phi and expression from equation of motion and zeros-complex
+    cVec accA(N*Na);
+    accA = Eigen::VectorXcd::Zero(N*Na);
+    for (unsigned int j=0; j<N; j++)
+    	{
+        accA(j*Na) = ((Dt0/pow(a,2))*(ap(neigh(j*Na,1,1,Na))+ap(neigh(j*Na,1,-1,Na))-2.0*ap(j*Na)) \
+            -(lambda*Dt0/2.0)*ap(j*Na)*(pow(ap(j*Na),2)-pow(v,2)) - epsilon*Dt0/2/v)/dtau;
+    	}
+
+    //A7. run loop
+    for (unsigned int j=1; j<Na; j++)
+    	{
+        for (unsigned int k=0; k<N; k++)
+        	{
+            l = j+k*Na;
+            velA(l) = velA(l-1) + dtau*accA(l-1);
+            ap(l) = ap(l-1) + dtau*velA(l);
+        	}
+        for (unsigned int k=0; k<N; k++)
+        	{
+            l = j+k*Na;
+            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na))+ap(neigh(l,1,-1,Na))-2.0*ap(l)) \
+            -(lambda/2.0)*ap(l)*(pow(ap(l),2)-pow(v,2)) - epsilon/2.0/v;    
+        	}
+    	}
+
+    //now propagating forwards along c
+    //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
+    cVec cp(N*Nc); //phi on section "c"
+    cp = Eigen::VectorXcd::Zero(N*Nc);
+    for (unsigned int j=0; j<N; j++)
+    	{
+        cp(j*Nc) = Cp(j*Nb+Nb-1);
+    	}
+
+    //C3. initialize vel - defined at half steps, first step being at t=-1/2,
+    //vel(t+1/2) := (p(t+1)-p(t))/dt
+    cVec velC (N*Nc);
+    velC = Eigen::VectorXcd::Zero(N*Nc);
+    dtau = b;
+    Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
+    for (unsigned int j=0; j<N; j++)
+    	{
+        velC(j*Nc) = 0; //due to boundary condition
+    	}
+
+    //C4. initialize acc using phi and expression from equation of motion and zeros-complex
+    cVec accC(N*Na);
+    accC = Eigen::VectorXcd::Zero(N*Na);
+    for (unsigned int j=0; j<N; j++)
+    	{
+        accC(j*Nc) = ((Dt0/pow(a,2))*(cp(neigh(j*Nc,1,1,Nc))+cp(neigh(j*Nc,1,-1,Nc))-2.0*cp(j*Nc)) \
+            -(lambda*Dt0/2.0)*cp(j*Na)*(pow(cp(j*Na),2)-pow(v,2)) - epsilon*Dt0/2/v)/dtau;
+    	}
+
+    //C7. run loop
+    for (unsigned int j=1; j<Na; j++)
+		{
+		for (unsigned int k=0; k<N; k++)
+			{
+		    l = j+k*Nc;
+		    vel(l) = vel(l-1) + dtau*acc(l-1);
+		    ap(l) = ap(l-1) + dtau*vel(l);
+			}
+		for (unsigned int k=0; k<N; k++)
+			{
+		    l = j+k*Nc;
+		    acc(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc))+cp(neigh(l,1,-1,Nc))-2.0*cp(l)) \
+		    -(lambda/2.0)*ap(l)*(pow(cp(l),2)-pow(v,2)) - epsilon/2.0/v;    
+			}
+		}
+    
+
+    //12. combine phi with ap and cp and save combination to file
+    cVec tCp(NT*N);
+    for (unsigned int j=0; j<NT*N; j++)
+    	{
+        t = intCoord(j,0,NT);
+        x = intCoord(j,1,NT);
+        if (t<Na)
+        	{
+            t = Na-1-t;
+            tCp(j) = ap(t+x*Na);
+            }
+        else if (t<(Na+Nb))
+        	{
+            t = t - Na;
+            tCp(j) = Cp(t+x*Nb);
+            }
+        else
+        	{
+            t = t - Na - Nb;
+            tCp(j) = cp(t+x*Nc);
+        	}
+    	}
+    	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    	//misc end of program tasks - mostly printing
+    
+    //making real vec from complex one
+    vec t(N*NT)
+    tp = vecReal(tCp,NT*N);
+    tp.conservativeResize(N*NT+1);
+    tp(2*N*NT) = p(2*N*Nb-1);
+    
+    //stopping clock
+	time = clock() - time;
+	double realtime = time/1000000.0;
+	
+	//printing to terminal
+	if (loop==0)
+		{
+		printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","mass","lambda","re(action)","im(action)");
+		}
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,mass,lambda,real(action),imag(action));
+
+	//printing action value
+	FILE * actionfile;
+	actionfile = fopen("./data/action.dat","a");
+	fprintf(actionfile,"%8i%8g%8i%8i%8i%8i%8g%8g%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,mass,lambda,real(action),imag(action));
+	fclose(actionfile);
+
+	//printing output phi
+	string oprefix = ("./data/pi");
+	string osuffix = (".dat");
+	string outfile = oprefix+to_string(loop)+osuffix;
+	printVec(outfile,tp);
+
+} //closing parameter loop
+
+return 0;
+}
