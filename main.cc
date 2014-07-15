@@ -13,14 +13,23 @@ struct aq{
 	unsigned int fileNo;
 	double maxTheta;
 	unsigned int totalLoops;
-	string printChoice;
-	unsigned int printRun;
 };
 
 int main()
 {
 //asking questions
 aq Xaq;
-cout << "'which data/picOut#.mat file to load? (#) ";
-cin >> Xaq.
+cout << "'which data/pic#.dat file to load? (#) ";
+cin >> Xaq.fileNo;
+cout << endl << "input final value of angle (input 0 for no steps) ";
+cin >> Xaq.maxTheta;
+cout << endl << "input number of loops to get there";
+cin >> Xaq.totalLoops;
+
+//loading initial phi
+string inFile = "./data/pic"+to_string(Xaq.fileNo)+".dat";
+ofstream f;
+f.open((inFile).c_str());
+///////////
+f.close();
 

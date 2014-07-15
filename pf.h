@@ -435,7 +435,7 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //miscelaneous other functions
 	
 //function to check whether the solution has converged
-void convergence (const int& runsCount, const double& actionTest, const double& vectorTest, const clock_t& Clock, clock_t* Wait, char* printWait, char* printChoice, int* printRun, const comp& Kinetic, const comp& potL, const comp& potE, bool boolWait)
+void convergence (const int& runsCount, const double& actionTest, const double& vectorTest, const clock_t& Clock, clock_t* Wait, char* printWait, string* printChoice, unsigned int* printRun, const comp& Kinetic, const comp& potL, const comp& potE, bool boolWait)
 	{
 	//stopping newton-raphson loop if action doesn't converge after 1000 loops
 	if (runsCount > 1000)
