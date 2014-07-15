@@ -20,27 +20,26 @@ int main()
 //user interface
 printParameters();
 
-aqStruct aq{ //struct to hold user responses (answers to questions)
-aq.fileNo;
-aq.maxTheta;
+aqStruct aq; //struct to hold user responses (answers to questions)
+aq.fileNo = 0;
+aq.maxTheta = 0;
 aq.totalLoops = 1;
-aq.loopChoice = 'n';
-aq.minValue;
-aq.maxValue;
+aq.loopChoice = "n";
+aq.minValue = 0;
+aq.maxValue = 0;
 aq.printChoice = "n";
 aq.printRun = -1;
-};
 
 askQuestions(aq);
 
-loopChoice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
-printChoice = aq.printChoice;
+string loopChoice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
+string printChoice = aq.printChoice;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
 //(NB. may only be one loop)
 //and defining some quantities to be used later
-for (int loop=0; loop<aq.totalLoops; loop++)
+for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	{
 	//giving values of varying parameters
 	if (loopChoice.compare(0,1,"N") == 0)
@@ -50,7 +49,7 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		}
 	else if (loopChoice.compare("n")!=0)
 		{
-		double loopParameter = min_value + (max_value - min_value)*loop/(total_loops-1.0);
+		double loopParameter = aq.minValue + (aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1.0);
 		changeDouble (loopChoice,loopParameter);
 		}
 
@@ -65,8 +64,8 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 	int alpha = 5; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
-	comp actionLast = 1.0;
-	int runs_count = 0;
+	comp action_last = 1.0;
+	unsigned int runs_count = 0;
 	double action_test = 1.0;
 	double vector_test = 1.0;
 	unsigned int min_runs = 3;
@@ -83,9 +82,9 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
-    for (unsigned int j=0, j<N*Nb; j++)
+    for (unsigned int j=0; j<N*Nb; j++)
     	{
-		complex<double> rho1Sqrd = -pow(coordB(j,0),2) + pow(coordB(j,1)+R*cos(angle)),2);
+		complex<double> rho1Sqrd = -pow(coordB(j,0),2) + pow(coordB(j,1)+R*cos(angle),2);
 		complex<double> rho2Sqrd = -pow(coordB(j,0),2) + pow((coordB(j,1)-R*cos(angle)),2); 
 		double rho1 = sqrt(real(rho1Sqrd)); //should be real even without real()
 		double rho2 = sqrt(real(rho2Sqrd));
@@ -95,25 +94,26 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 		    }
 		else
 			{
+			p(2*j+1) = 0.0; //imaginary parts set to zero
 		    if (rho1<(R-alpha/mass) && rho2<(R-alpha/mass))
 		    	{
-		        p(2*j+1) = root(1);
+		        p(2*j) = root[0];
 		        }
 		    else if (rho1>(R+alpha/mass) || rho2>(R+alpha/mass))
 		    	{
-		        p(2*j+1) = root(3);
+		        p(2*j) = root[2];
 		        }
 		    else if (real(coordB(j,1))>0) //note that the coord should be real
 		    	{
-		        p(2*j+1) = v*tanh(mass*(rho1-R)/2);
+		        p(2*j) = v*tanh(mass*(rho1-R)/2);
 		        }
-		    else if (real(eCoord(j,1))<0)
+		    else if (real(coordB(j,1))<0)
 		    	{
-		        p(2*j+1) = v*tanh(mass*(rho2-R)/2);
+		        p(2*j) = v*tanh(mass*(rho2-R)/2);
 		        }
 		    else
 		    	{
-		        p(2*j+1) = root(1); //i.e. if eCoord(j,1) == 0
+		        p(2*j) = root(0); //i.e. if coordBj,1) == 0
 		        }
 			}
 		}
@@ -124,13 +124,13 @@ for (int loop=0; loop<aq.totalLoops; loop++)
     double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
     for (unsigned int j=0;j<N;j++)
     	{
-        p(2*j*Nb+1) = open*p(2*j*Nb+1) + (1-open)*p(2*(j*Nb+1)+1);%intiial time real
+        p(2*j*Nb+1) = open*p(2*j*Nb+1) + (1-open)*p(2*(j*Nb+1)+1); //initial time real
         p(2*(j*Nb+1)+1) = open*p(2*j*Nb+1) + (1-open)*p(2*(j*Nb+1)+1);
-        p(2*j*Nb+2) = open*p(2*j*Nb+2) + (1-open)*p(2*(j*Nb+1)+2);%initial time imag
+        p(2*j*Nb+2) = open*p(2*j*Nb+2) + (1-open)*p(2*(j*Nb+1)+2); //initial time imag
         p(2*(j*Nb+1)+2) = open*p(2*j*Nb+2) + (1-open)*p(2*(j*Nb+1)+2);
-        p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb)) + (1-open)*p(2*((j+1)*Nb-1));%final time real
+        p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb)) + (1-open)*p(2*((j+1)*Nb-1)); //final time real
         p(2*((j+1)*Nb)) = open*p(2*((j+1)*Nb)) + (1-open)*p(2*((j+1)*Nb-1));
-        p(2*((j+1)*Nb-2)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2);%final time imag
+        p(2*((j+1)*Nb-2)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2); //final time imag
         p(2*((j+1)*Nb-1)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2);
 		}
 		
@@ -172,8 +172,9 @@ for (int loop=0; loop<aq.totalLoops; loop++)
             Chi0(j) = p(2*((j+2)*Nb-1))+1i*p(2*((j+2)*Nb-1))-p(2*((j+1)*Nb-1))-1i*p(2*((j+1)*Nb-1)); //note only use real derivative - this is a fudge due to initial input
              }
         Chi0(N-1) = p(2*(Nb-1))+1i*p(2*(Nb-1))-p(2*(N*Nb-1))-1i*p(2*(N*Nb-1)); //written directly to avoid using neigh
+        comp norm;
         norm = Chi0.dot(Chi0);
-        Chi0 = Chi0/norm;
+        Chi0 /= norm;
 		
 		//initializing to zero
 		comp kinetic = 0.0;
@@ -193,7 +194,7 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				kinetic += -Dt*pow(Cp(neigh(j,k,1,Nb))-Cp(j),2)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
@@ -201,15 +202,15 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				
-				DDS.insert(2*j+1,2*N*Nb+1) = real(siteMeasure*Chi0(x+1)); //zero mode lagrange constraint
-                DDSm(2*j+2,2*N*Nb+1) = imag(siteMeasure*Chi0(x+1)); //the constraint is real but its derivative wrt phi may be complex
+				DDS.insert(2*j+1,2*N*Nb+1) = real(a*Dt*Chi0(x+1)); //zero mode lagrange constraint
+                DDS.insert(2*j+2,2*N*Nb+1) = imag(a*Dt*Chi0(x+1)); //the constraint is real but its derivative wrt phi may be complex
 				}
 			else if (t==0)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
 				kinetic += a*pow(Cp(j+1)-Cp(j),2)/dt/2.0\
-				-Dt*pow(Cp(neigh(j,k,1,Nb))-Cp(j),2.0)/a/2.0;
+				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
@@ -224,14 +225,14 @@ for (int loop=0; loop<aq.totalLoops; loop++)
 				comp dt = -b*i;
 				comp Dt = -b*i;
 				kinetic += a*pow(Cp(j+1)-Cp(j),2)/dt/2.0\
-				-Dt*pow(Cp(neigh(j,k,1,Nb))-Cp(j),2.0)/a/2.0;
+				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
-                    sign = (-1)^k;
-                    direc = floor(k/2);
+                    int sign = (-1)^k;
+                    int direc = (int)(k/2);
                     if (direc == 0)
                     	{
                         minusDS(2*j) += real(a*Cp(j+sign)/dt);
@@ -243,16 +244,17 @@ for (int loop=0; loop<aq.totalLoops; loop++)
                         }
                     else
                     	{
-                        neighb = neigh(j,direc,sign,Nb);
-                        minusDS(2*j) += - real(Dtj*Cp(neighb)/a);
-                        minusDS(2*j+1) += - imag(Dtj*Cp(neighb)/a);
+                        int neighb = neigh(j,direc,sign,Nb);
+                        
+                        minusDS(2*j) += - real(Dt*Cp(neighb)/a);
+                        minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
                         DDS.insert(2*j,2*neighb) = real(Dt/a);
                         DDS.insert(2*j,2*neighb+1) = -imag(Dt/a);
                         DDS.insert(2*j+1,2*neighb) = imag(Dt/a);
                         DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
                         }
                     }
-                comp temp0 = 2*a*dt;
+                comp temp0 = 2.0*a*dt;
                 comp temp1 = a*Dt*(2*Cp(j)/pow(a,2) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2)-pow(v,2)) + epsilon/2.0/v);
                 comp temp2 = a*Dt*(2/pow(a,2) + (lambda/2.0)*(3.0*pow(Cp(j),2) - pow(v,2)));
                     

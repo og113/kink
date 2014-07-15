@@ -114,7 +114,8 @@ comp coord(const unsigned int& locNum,const int& direction)
 			}
 		else if (intCoord(locNum,0,NT) < (Na+Nb))
 			{
-			Xcoord = i*Tb - i*b*(t-Na);
+			double temp = t-Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double)
+			Xcoord = i*Tb - i*b*temp;
 			}
 		else
 			{
@@ -123,7 +124,7 @@ comp coord(const unsigned int& locNum,const int& direction)
 		}
 	if (direction==1)
 		{
-		unsigned int x = intCoord(locNum,1,Nt);
+		unsigned int x = intCoord(locNum,1,NT);
 		Xcoord = -L/2.0 + x*a;
 		}
 	return Xcoord;
@@ -254,7 +255,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 	F << left;
 	for (int l=0; l<spmatToPrint.outerSize(); ++l)
 		{
-		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; it++)
+		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
 			F << setw(15) << it.row() << setw(15) << it.col() << setw(15) << it.value() << endl;
 			}
@@ -273,7 +274,7 @@ struct aqStruct
 	unsigned int fileNo;
 	double maxTheta;
 	unsigned int totalLoops;
-	string loopParameter;
+	string loopChoice;
 	double minValue;
 	double maxValue;
 	string printChoice;
@@ -281,28 +282,28 @@ struct aqStruct
 	};
 
 //asks initial questions to get user inputs
-void askQuestions (aqStruct * aqx )
+void askQuestions (aqStruct aqx )
 	{
 	cout << "number of loops: ";
-	cin >> *aqx.totalLoops;
+	cin >> aqx.totalLoops;
 	cout << endl;
-	if (*aqx.totalLoops !=1)
+	if (aqx.totalLoops !=1)
 		{
 		cout << "loop (main)parameter (N,Na,Nb,Nc,L,Tb,R,mass,lambda) ";
-		cin >> *aqx.loopParameter;
+		cin >> aqx.loopChoice;
 		cout << endl;
 		cout << "min value): ";
-		cin >> *aqx.minValue;
+		cin >> aqx.minValue;
 		cout << endl;
 		cout << "max value: ";
-		cin >> *aqx.maxValue;
+		cin >> aqx.maxValue;
 		cout << endl;
 		}
 	cout << "print early (m,v,p,a,n)? ";
-	cin >> *aqx.printChoice;
+	cin >> aqx.printChoice;
 	cout << endl;
 	cout << "which run to print? ";
-	cin >> *aqx.printRun	
+	cin >> aqx.printRun;
 	}
 
 //changes parameters according to user inputs (integer)
@@ -414,7 +415,7 @@ cVec vecComplex(vec realVec, const unsigned int & tDim)
 //make a complex vector real
 vec vecReal(cVec complexVec, const unsigned int &  tDim)
 	{
-	vec real(2*tDim);
+	vec realVec(2*tDim);
 	if (complexVec.size() == tDim)
 		{
 		for (unsigned int l=0; l<tDim; l++)
@@ -453,7 +454,7 @@ void convergence (const int& runsCount, const double& actionTest, const double& 
 		cin >> *printWait;
 		if (*printWait == 'y')
 			{
-			double Action = Kinetic+potL+potE;
+			comp Action = Kinetic+potL+potE;
 			*printChoice = 'p';
 			*printRun = runsCount+1;
 			cout << left;
