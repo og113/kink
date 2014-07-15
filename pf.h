@@ -16,7 +16,6 @@ using namespace std;
 typedef unsigned long int lint;
 typedef complex<double> comp;
 typedef vector<unsigned int> intVec;
-typedef vector<comp> cVec;
 typedef Eigen::SparseMatrix<double> spMat;
 typedef Eigen::MatrixXd mat;
 typedef Eigen::VectorXd vec;
@@ -103,17 +102,17 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 	}
 	
 //gives values of coordinates in whole spacetime
-complex<double> coord(const unsigned& int locNum,const int& direction)
+comp coord(const unsigned int& locNum,const int& direction)
 	{
-	complex<double> Xcoord;
+	comp Xcoord;
 	if (direction==0)
 		{
-		unsigned int t = intCoords(locNum,0,Nt);
+		unsigned int t = intCoord(locNum,0,NT);
 		if ( t < Na)
 			{
 			Xcoord = b*(t-Na) + i*Tb;
 			}
-		else if (intCoords(locNum,0) < (Na+Nb))
+		else if (intCoord(locNum,0,NT) < (Na+Nb))
 			{
 			Xcoord = i*Tb - i*b*(t-Na);
 			}
@@ -124,7 +123,7 @@ complex<double> coord(const unsigned& int locNum,const int& direction)
 		}
 	if (direction==1)
 		{
-		unsigned int x = intCoords(locNum,1,Nt);
+		unsigned int x = intCoord(locNum,1,Nt);
 		Xcoord = -L/2.0 + x*a;
 		}
 	return Xcoord;
@@ -136,12 +135,12 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 	complex<double> XcoordA;
 	if (direction==0)
 		{
-		unsigned int t = intCoords(locNum,0,Na);
+		unsigned int t = intCoord(locNum,0,Na);
 		XcoordA = b*(t-Na) + i*Tb;
 		}
 	if (direction==1)
 		{
-		unsigned int x = intCoords(locNum,1,Na);
+		unsigned int x = intCoord(locNum,1,Na);
 		XcoordA = -L/2.0 + x*a;
 		}
 	return XcoordA;
@@ -153,12 +152,12 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 	complex<double> XcoordB;
 	if (direction==0)
 		{
-		unsigned int t = intCoords(locNum,0,Nb);
+		unsigned int t = intCoord(locNum,0,Nb);
 		XcoordB = i*(Tb - b*t);
 		}
 	if (direction==1)
 		{
-		unsigned int x = intCoords(locNum,1,Nb);
+		unsigned int x = intCoord(locNum,1,Nb);
 		XcoordB = -L/2.0 + x*a;
 		}
 	return XcoordB;
@@ -170,12 +169,12 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 	complex<double> XcoordC;
 	if (direction==0)
 		{
-		unsigned int t = intCoords(locNum,0,Nc);
+		unsigned int t = intCoord(locNum,0,Nc);
 		XcoordC = b*t;
 		}
 	if (direction==1)
 		{
-		unsigned int x = intCoords(locNum,1,Nc);
+		unsigned int x = intCoord(locNum,1,Nc);
 		XcoordC = -L/2.0 + x*a;
 		}
 	return XcoordC;
@@ -225,9 +224,9 @@ void printParameters()
 //print action and its constituents to the terminal
 void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
 	{
-	action = Kinetic + potL + potE;
-	printf("%16s%16s%16s%16s\n","kinetic","potL","potE","action");
-	printf("%16g%16g%16g%16s\n",Kinetic,potL,potE,action);
+	comp action = Kinetic + potL + potE;
+	printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","re(kinetic)","im(kinetic)","re(potL)","im(potL)","re(potE)","im(potE)","re(action)","im(action)");
+	printf("%16g%16g%16g%16g%16g%16g%16g%16g\n",real(Kinetic),imag(Kinetic),real(potL),imag(potL),real(potE),imag(potE),real(action),imag(action));
 	}
 	
 //print vector to file
@@ -253,9 +252,9 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
 	F << left;
-	for (unsigned int l=0; l<spmatToPrint.outerSize(); l++)
+	for (int l=0; l<spmatToPrint.outerSize(); ++l)
 		{
-		for (SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; it++)
+		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; it++)
 			{
 			F << setw(15) << it.row() << setw(15) << it.col() << setw(15) << it.value() << endl;
 			}
@@ -285,60 +284,60 @@ struct aqStruct
 void askQuestions (aqStruct * aqx )
 	{
 	cout << "number of loops: ";
-	cin >> aqx.totalLoops;
+	cin >> *aqx.totalLoops;
 	cout << endl;
-	if aqx.totalLoops !=1
+	if (*aqx.totalLoops !=1)
 		{
 		cout << "loop (main)parameter (N,Na,Nb,Nc,L,Tb,R,mass,lambda) ";
-		cin >> aqx.loopParameter;
-		cout << end;
+		cin >> *aqx.loopParameter;
+		cout << endl;
 		cout << "min value): ";
-		cin >> aqx.minValue;
-		cout << end;
+		cin >> *aqx.minValue;
+		cout << endl;
 		cout << "max value: ";
-		cin >> aqx.maxValue;
-		cout << end;
+		cin >> *aqx.maxValue;
+		cout << endl;
 		}
 	cout << "print early (m,v,p,a,n)? ";
-	cin >> aqx.printChoice;
-	cout << end;
+	cin >> *aqx.printChoice;
+	cout << endl;
 	cout << "which run to print? ";
-	cin >> aqx.printRun	
+	cin >> *aqx.printRun	
 	}
 
 //changes parameters according to user inputs (integer)
 void changeInt (const string & parameterLabel, const int & newParameter)
 	{
-	if ( paramLabel.compare("N")==0)
+	if ( parameterLabel.compare("N")==0)
 		{
 		Na = (int)newParameter*Na/N;
 		Nb = (int)newParameter*Nb/N;
 		Nc = (int)newParameter*Nc/N;
-		Nt = Na + Nb + Nc;
+		NT = Na + Nb + Nc;
 		N = newParameter;
 		a = L/(N-1);
 		b = Tb/(Nb-1);
 		Ta = b*(Na-1.0);
 		Tc = b*(Nc-1.0);
 		}
-	elseif ( paramLabel.compare("Na")==0)
+	else if ( parameterLabel.compare("Na")==0)
 		{
 		Na = newParameter;
-		Nt = Na + Nb + Nc;
+		NT = Na + Nb + Nc;
 		Ta = b*(Na-1.0);
 		}
-	elseif ( paramLabel.compare("Nb")==0)
+	else if ( parameterLabel.compare("Nb")==0)
 		{
 		Nb = newParameter;
-		Nt = Na + Nb + Nc;
+		NT = Na + Nb + Nc;
 		b = Tb/(Nb-1.0);
 		Ta = b*(Na-1.0);
 		Tc = b*(Nc-1.0);
 		}
-	elseif ( paramLabel.compare("Nc")==0)
+	else if ( parameterLabel.compare("Nc")==0)
 		{
 		Nc = newParameter;
-		Nt = Nc + Nb + Nc;
+		NT = Nc + Nb + Nc;
 		Tc = b*(Nc-1.0);
 		}
 	else
@@ -350,36 +349,36 @@ void changeInt (const string & parameterLabel, const int & newParameter)
 //changes parameters according to user inputs (double)
 void changeDouble (const string & parameterLabel, const double & newParameter)
 	{
-	if ( paramLabel.compare("L")==0)
+	if ( parameterLabel.compare("L")==0)
 		{
 		L = newParameter;
 		a = L/(N-1);
 		}
-	else if ( paramLabel.compare("Tb")==0)
+	else if ( parameterLabel.compare("Tb")==0)
 		{
 		Tb = newParameter;
 		b = Tb/(Nb-1.0);
 		Ta = b*(Na-1.0);
 		Tc = b*(Nc-1.0);
-		angle = arcsin(Tb/R);
+		angle = asin(Tb/R);
 		L = 2*(1.5*Tb*tan(angle));
 		}
-	else if ( paramLabel.compare("R")==0)
+	else if ( parameterLabel.compare("R")==0)
 		{
 		R = newParameter;
 		X = mass*R;
 		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
-		angle = arcsin(Tb/R);
+		angle = asin(Tb/R);
 		L = 2*(1.5*Tb*tan(angle));
 		}
-	else if ( paramLabel.compare("mass")==0)
+	else if ( parameterLabel.compare("mass")==0)
 		{
 		mass = newParameter;
 		v =  mass*pow(lambda,-0.5);
 		X = mass*R;
 		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
 		}
-	else if ( paramLabel.compare("lambda")==0)
+	else if ( parameterLabel.compare("lambda")==0)
 		{
 		lambda = newParameter;
 		v =  mass*pow(lambda,-0.5);
