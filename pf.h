@@ -302,8 +302,12 @@ void askQuestions (aqStruct aqx )
 	cout << "print early (m,v,p,a,n)? ";
 	cin >> aqx.printChoice;
 	cout << endl;
-	cout << "which run to print? ";
-	cin >> aqx.printRun;
+	string temp = aqx.printChoice;
+	if (temp.compare("n")!=0)
+		{
+		cout << "which run to print? ";
+		cin >> aqx.printRun;
+		}
 	}
 
 //changes parameters according to user inputs (integer)

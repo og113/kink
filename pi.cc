@@ -206,8 +206,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				
-				DDS.insert(2*j+1,2*N*Nb+1) = real(a*Dt*Chi0(x+1)); //zero mode lagrange constraint
-                DDS.insert(2*j+2,2*N*Nb+1) = imag(a*Dt*Chi0(x+1)); //the constraint is real but its derivative wrt phi may be complex
+				DDS.insert(2*j,2*N*Nb) = real(a*Dt*Chi0(x)); //zero mode lagrange constraint
+                DDS.insert(2*j+1,2*N*Nb) = imag(a*Dt*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
 				}
 			else if (t==0)
 				{
@@ -235,7 +235,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
-                    int sign = (-1)^k;
+                    int sign = pow(-1,k);
                     int direc = (int)(k/2);
                     if (direc == 0)
                     	{
@@ -262,8 +262,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2)-pow(v,2)) + epsilon/2.0/v);
                 comp temp2 = a*Dt*(2.0/pow(a,2) + (lambda/2.0)*(3.0*pow(Cp(j),2) - pow(v,2)));
                     
-                minusDS(2*j+1) += real(temp1 - temp0*Cp(j+1));
-                minusDS(2*j+2) += imag(temp1 - temp0*Cp(j+1));
+                minusDS(2*j) += real(temp1 - temp0*Cp(j));
+                minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
                 DDS.insert(2*j,2*j) = real(-temp2 + temp0);
                 DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
                 DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
@@ -274,8 +274,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
         	{
             minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(a*b*Chi0(j)*Cp((j+1)*Nb-1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j+1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j+1));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j));
             }
         action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
