@@ -32,8 +32,8 @@ aq.printRun = -1;
 
 askQuestions(aq);
 
-string loopChoice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
-string printChoice = aq.printChoice;
+string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
+string print_choice = aq.printChoice;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -42,25 +42,29 @@ string printChoice = aq.printChoice;
 for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	{
 	//giving values of varying parameters
-	if (loopChoice.compare(0,1,"N") == 0)
+	if (loop_choice.compare(0,1,"N") == 0)
 		{
 		int loopParameter = aq.minValue + (int)(aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1);
-		changeInt (loopChoice,loopParameter);
+		changeInt (loop_choice,loopParameter);
 		}
-	else if (loopChoice.compare("n")!=0)
+	else if (loop_choice.compare("n")!=0)
 		{
 		double loopParameter = aq.minValue + (aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1.0);
-		changeDouble (loopChoice,loopParameter);
+		changeDouble (loop_choice,loopParameter);
 		}
 
 	//defining a time
 	clock_t time;
 	clock_t wait;
 	
+	//starting the clock
+	time = clock();
+	wait = clock();
+	
 	//defining some important scalar quantities
 	complex<double> action = 2.0;
-	double S_1 = 2.0*pow(mass,3)/3.0/lambda;
-	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
+	//double S_1 = 2.0*pow(mass,3)/3.0/lambda;
+	//double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
 	int alpha = 5; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -113,7 +117,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		        }
 		    else
 		    	{
-		        p(2*j) = root(0); //i.e. if coordBj,1) == 0
+		        p(2*j) = root[0]; //i.e. if coordBj,1) == 0
 		        }
 			}
 		}
@@ -169,9 +173,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		cVec Chi0(N);
 		for (unsigned int j=0; j<(N-1); j++)
 			{
-            Chi0(j) = p(2*((j+2)*Nb-1))+1i*p(2*((j+2)*Nb-1))-p(2*((j+1)*Nb-1))-1i*p(2*((j+1)*Nb-1)); //note only use real derivative - this is a fudge due to initial input
+            Chi0(j) = p(2*((j+2)*Nb-1))+i*p(2*((j+2)*Nb-1))-p(2*((j+1)*Nb-1))-i*p(2*((j+1)*Nb-1)); //note only use real derivative - this is a fudge due to initial input
              }
-        Chi0(N-1) = p(2*(Nb-1))+1i*p(2*(Nb-1))-p(2*(N*Nb-1))-1i*p(2*(N*Nb-1)); //written directly to avoid using neigh
+        Chi0(N-1) = p(2*(Nb-1))+i*p(2*(Nb-1))-p(2*(N*Nb-1))-i*p(2*(N*Nb-1)); //written directly to avoid using neigh
         comp norm;
         norm = Chi0.dot(Chi0);
         Chi0 /= norm;
@@ -202,8 +206,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				
-				DDS.insert(2*j+1,2*N*Nb+1) = real(a*Dt*Chi0(x+1)); //zero mode lagrange constraint
-                DDS.insert(2*j+2,2*N*Nb+1) = imag(a*Dt*Chi0(x+1)); //the constraint is real but its derivative wrt phi may be complex
+				DDS.insert(2*j,2*N*Nb) = real(a*Dt*Chi0(x)); //zero mode lagrange constraint
+                DDS.insert(2*j+1,2*N*Nb) = imag(a*Dt*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
 				}
 			else if (t==0)
 				{
@@ -231,7 +235,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
-                    int sign = (-1)^k;
+                    int sign = pow(-1,k);
                     int direc = (int)(k/2);
                     if (direc == 0)
                     	{
@@ -255,11 +259,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a*dt;
-                comp temp1 = a*Dt*(2*Cp(j)/pow(a,2) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2)-pow(v,2)) + epsilon/2.0/v);
-                comp temp2 = a*Dt*(2/pow(a,2) + (lambda/2.0)*(3.0*pow(Cp(j),2) - pow(v,2)));
+                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2)-pow(v,2)) + epsilon/2.0/v);
+                comp temp2 = a*Dt*(2.0/pow(a,2) + (lambda/2.0)*(3.0*pow(Cp(j),2) - pow(v,2)));
                     
-                minusDS(2*j+1) += real(temp1 - temp0*Cp(j+1));
-                minusDS(2*j+2) += imag(temp1 - temp0*Cp(j+1));
+                minusDS(2*j) += real(temp1 - temp0*Cp(j));
+                minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
                 DDS.insert(2*j,2*j) = real(-temp2 + temp0);
                 DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
                 DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
@@ -270,10 +274,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
         	{
             minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(a*b*Chi0(j)*Cp((j+1)*Nb-1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j+1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j+1));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j));
             }
-        action = kinetic + potL + potE;
+        action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -343,11 +347,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		vector_test = minusDS.maxCoeff();
 		vector_test = absolute(vector_test);
 		
-		char stop_wait;
 		char print_wait;
-		clock_t stop_time = clock();
 		bool bool_wait = false; //set to false if you want program to stop if the looping is slow and ask the user whether or not they want to print
-		convergence(runs_count,action_test,vector_test,time,&wait,&print_wait,&print_choice, &print_run, kinetic, pot_l, pot_e, bool_wait);
+		convergence(runs_count,action_test,vector_test,time,&wait,&print_wait,&print_choice, &aq.printRun, kinetic, pot_l, pot_e, bool_wait);
 		} //closing "runs" while loop
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -366,8 +368,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //vel(t+1/2) := (p(t+1)-p(t))/dt
     cVec velA (N*Na);
     velA = Eigen::VectorXcd::Zero(N*Na);
-    dtau = -b;
-    Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
+    double dtau = -b;
+    double Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
     for (unsigned int j=0; j<N; j++)
     	{
         velA(j*Na) = 0; //due to boundary condition
@@ -388,13 +390,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
         for (unsigned int k=0; k<N; k++)
         	{
-            l = j+k*Na;
+            unsigned int l = j+k*Na;
             velA(l) = velA(l-1) + dtau*accA(l-1);
             ap(l) = ap(l-1) + dtau*velA(l);
         	}
         for (unsigned int k=0; k<N; k++)
         	{
-            l = j+k*Na;
+            unsigned int l = j+k*Na;
             accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na))+ap(neigh(l,1,-1,Na))-2.0*ap(l)) \
             -(lambda/2.0)*ap(l)*(pow(ap(l),2)-pow(v,2)) - epsilon/2.0/v;    
         	}
@@ -434,14 +436,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		{
 		for (unsigned int k=0; k<N; k++)
 			{
-		    l = j+k*Nc;
-		    vel(l) = vel(l-1) + dtau*acc(l-1);
-		    ap(l) = ap(l-1) + dtau*vel(l);
+		    unsigned int l = j+k*Nc;
+		    velC(l) = velC(l-1) + dtau*accC(l-1);
+		    ap(l) = ap(l-1) + dtau*velC(l);
 			}
 		for (unsigned int k=0; k<N; k++)
 			{
-		    l = j+k*Nc;
-		    acc(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc))+cp(neigh(l,1,-1,Nc))-2.0*cp(l)) \
+		    unsigned int l = j+k*Nc;
+		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc))+cp(neigh(l,1,-1,Nc))-2.0*cp(l)) \
 		    -(lambda/2.0)*ap(l)*(pow(cp(l),2)-pow(v,2)) - epsilon/2.0/v;    
 			}
 		}
@@ -451,8 +453,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     cVec tCp(NT*N);
     for (unsigned int j=0; j<NT*N; j++)
     	{
-        t = intCoord(j,0,NT);
-        x = intCoord(j,1,NT);
+        unsigned int t = intCoord(j,0,NT);
+        unsigned int x = intCoord(j,1,NT);
         if (t<Na)
         	{
             t = Na-1-t;
@@ -473,7 +475,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    	//misc end of program tasks - mostly printing
     
     //making real vec from complex one
-    vec t(N*NT)
+    vec tp(N*NT);
     tp = vecReal(tCp,NT*N);
     tp.conservativeResize(N*NT+1);
     tp(2*N*NT) = p(2*N*Nb-1);
@@ -499,7 +501,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string oprefix = ("./data/pi");
 	string osuffix = (".dat");
 	string outfile = oprefix+to_string(loop)+osuffix;
-	printVec(outfile,tp);
+	printVector(outfile,tp);
 
 } //closing parameter loop
 
