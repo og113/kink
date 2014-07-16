@@ -30,8 +30,8 @@ unsigned int N = 80; //number of points in each spatial dimension
 unsigned int Na = (int)(1.2*N);
 unsigned int Nb = (int)(1.0*N);
 unsigned int Nc = 2;
-double R = 10.0; //size of bubble
-double mass = 3.0; 
+double R = 32.0; //size of bubble
+double mass = 1.0; 
 double lambda = 0.1;
 double Tb = 1.2*R/2;
 double angle = asin(Tb/R); //not a primary parameter, just used to make L
@@ -249,6 +249,7 @@ void printVectorB (const string& printFile, vec vecToPrint)
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
 	double x0 = intCoord(0,1,Nb);
+	F.precision(16);
 	for (unsigned long int j=0; j<N*Nb; j++)
 		{
 		double x = intCoord(j,1,Nb);
@@ -260,9 +261,9 @@ void printVectorB (const string& printFile, vec vecToPrint)
 		F << left;
 		for (int r=0; r<2; r++)
 			{
-			F << setw(15) << real(coordB(j,r)) << setw(15) << imag(coordB(j,r)); //note using coord for full time contour
+			F << setw(25) << real(coordB(j,r)) << setw(25) << imag(coordB(j,r)); //note using coord for full time contour
 			}
-		F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;
+		F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
 		}
 	F.close();
 	}
@@ -273,6 +274,7 @@ void printVector (const string& printFile, vec vecToPrint)
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
 	double x0 = intCoord(0,1,NT);
+	F.precision(16);
 	for (unsigned long int j=0; j<N*NT; j++)
 		{
 		double x = intCoord(j,1,NT);
@@ -282,9 +284,9 @@ void printVector (const string& printFile, vec vecToPrint)
 			x0 = x;
 			}
 		F << left;
-		F << setw(15) << real(coord(j,0)) << setw(15) << imag(coord(j,0)); //note using coord for full time contour
-		F << setw(15) << real(coord(j,1)) << setw(15) << imag(coord(j,1));
-		F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;
+		F << setw(25) << real(coord(j,0)) << setw(25) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(25) << real(coord(j,1)) << setw(25) << imag(coord(j,1));
+		F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
 		}
 	F.close();
 	}
@@ -295,11 +297,12 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
 	F << left;
+	F.precision(16);
 	for (int l=0; l<spmatToPrint.outerSize(); ++l)
 		{
 		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
-			F << setw(15) << it.row() << setw(15) << it.col() << setw(15) << it.value() << endl;
+			F << setw(25) << it.row() << setw(15) << it.col() << setw(25) << it.value() << endl;
 			}
 		}
 	F.close();
@@ -334,7 +337,7 @@ void askQuestions (aqStruct & aqx )
 		cout << "loop (main)parameter (N,Na,Nb,Nc,L,Tb,R,mass,lambda) ";
 		cin >> aqx.loopChoice;
 		cout << endl;
-		cout << "min value): ";
+		cout << "min value: ";
 		cin >> aqx.minValue;
 		cout << endl;
 		cout << "max value: ";

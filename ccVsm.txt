@@ -1,0 +1,2 @@
+input phi differs at order 1e-3 on final timeslice - can't see why
+minusDs disagreements of order 1 - i actually think that they are both independently wrong

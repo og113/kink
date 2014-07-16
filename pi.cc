@@ -129,9 +129,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
     for (unsigned int j=0;j<N;j++)
     	{
-        p(2*j*Nb) = open*p(2*j*Nb) + (1.0-open)*p(2*(j*Nb+1)); //initial time real
+        p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
         p(2*(j*Nb+1)) = p(2*j*Nb);
-        p(2*j*Nb+1) = open*p(2*j*Nb+1) + (1.0-open)*p(2*(j*Nb+1)+1); //initial time imag
+        p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
         p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
         p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
         p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
@@ -158,7 +158,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 		// allocating memory for DS, DDS
 		vec minusDS(2*N*Nb+1);
-		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1);
+		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
 		spMat DDS(2*N*Nb+1,2*N*Nb+1);
 		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
 		DDS_to_reserve(0) = 2;
@@ -262,7 +262,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
                         }
                     }
-                comp temp0 = 2.0*a*dt;
+                comp temp0 = 2.0*a/dt;
                 comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2.0)-pow(v,2.0)) + epsilon/2.0/v);
                 comp temp2 = a*Dt*(2.0/pow(a,2.0) + (lambda/2.0)*(3.0*pow(Cp(j),2.0) - pow(v,2.0)));
                     
