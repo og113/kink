@@ -76,6 +76,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
+	p = Eigen::VectorXd::Zero(2*N*Nb+1);
 	
 	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
 	double b_parameter = -pow(v,2.0);
@@ -117,12 +118,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		        }
 		    else
 		    	{
-		        p(2*j) = root[0]; //i.e. if coordBj,1) == 0
+		        p(2*j) = root[0]; //i.e. if coordB(j,1) == 0
 		        }
 			}
 		}
 		
-	p(N*Nb+1) = v; //initializing Lagrange parameter for removing dp/dx zero mode
+	p(N*Nb) = v; //initializing Lagrange parameter for removing dp/dx zero mode
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
@@ -138,9 +139,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
 		}
 		
-		//defining complexified vector Cp
-		cVec Cp(Nb*N);
-		Cp = vecComplex(p,N*Nb);
+	//very early vector print
+	printVectorB("data/piEarly00.dat",p);
+		
+	//defining complexified vector Cp
+	cVec Cp(Nb*N);
+	Cp = vecComplex(p,N*Nb);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
@@ -313,6 +317,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//solving for delta using the Newton-Raphson method
 		vec delta(2*N*Nb+1);
+		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
 		

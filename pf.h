@@ -248,16 +248,23 @@ void printVectorB (const string& printFile, vec vecToPrint)
 	{
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
-			for (unsigned long int j=0; j<N*Nb; j++)
-				{
-				F << left;
-				for (int r=0; r<2; r++)
-					{
-					F << setw(15) << real(coordB(j,r)) << setw(15) << imag(coordB(j,r)); //note using coord for full time contour
-					}
-				F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;		
-				}
-			F.close();
+	double x0 = intCoord(0,1,Nb);
+	for (unsigned long int j=0; j<N*Nb; j++)
+		{
+		double x = intCoord(j,1,Nb);
+		if (x!=x0) //this is put in for gnuplot
+			{
+			F << endl;
+			x0 = x;
+			}
+		F << left;
+		for (int r=0; r<2; r++)
+			{
+			F << setw(15) << real(coordB(j,r)) << setw(15) << imag(coordB(j,r)); //note using coord for full time contour
+			}
+		F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;
+		}
+	F.close();
 	}
 	
 //print vector to file
@@ -265,16 +272,21 @@ void printVector (const string& printFile, vec vecToPrint)
 	{
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
-			for (unsigned long int j=0; j<N*NT; j++)
-				{
-				F << left;
-				for (int r=0; r<2; r++)
-					{
-					F << setw(15) << real(coord(j,r)) << setw(15) << imag(coord(j,r)); //note using coord for full time contour
-					}
-				F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;		
-				}
-			F.close();
+	double x0 = intCoord(0,1,NT);
+	for (unsigned long int j=0; j<N*NT; j++)
+		{
+		double x = intCoord(j,1,NT);
+		if (x!=x0) //this is put in for gnuplot
+			{
+			F << endl;
+			x0 = x;
+			}
+		F << left;
+		F << setw(15) << real(coord(j,0)) << setw(15) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(15) << real(coord(j,1)) << setw(15) << imag(coord(j,1));
+		F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;
+		}
+	F.close();
 	}
 	
 //print sparse matrix to file
