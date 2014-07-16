@@ -65,7 +65,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	complex<double> action = 2.0;
 	//double S_1 = 2.0*pow(mass,3)/3.0/lambda;
 	//double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
-	int alpha = 5; //gives span over which tanh is used
+	double alpha = 5.0; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = 1.0;
@@ -88,8 +88,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//assigning input phi
     for (unsigned int j=0; j<N*Nb; j++)
     	{
-		complex<double> rho1Sqrd = -pow(coordB(j,0),2) + pow(coordB(j,1)+R*cos(angle),2);
-		complex<double> rho2Sqrd = -pow(coordB(j,0),2) + pow((coordB(j,1)-R*cos(angle)),2); 
+		complex<double> rho1Sqrd = -pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0);
+		complex<double> rho2Sqrd = -pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0); 
 		double rho1 = sqrt(real(rho1Sqrd)); //should be real even without real()
 		double rho2 = sqrt(real(rho2Sqrd));
 		if (R<alpha/mass)
@@ -109,11 +109,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		        }
 		    else if (real(coordB(j,1))>0) //note that the coord should be real
 		    	{
-		        p(2*j) = v*tanh(mass*(rho1-R)/2);
+		        p(2*j) = v*tanh(mass*(rho1-R)/2.0);
 		        }
 		    else if (real(coordB(j,1))<0)
 		    	{
-		        p(2*j) = v*tanh(mass*(rho2-R)/2);
+		        p(2*j) = v*tanh(mass*(rho2-R)/2.0);
 		        }
 		    else
 		    	{
@@ -128,14 +128,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
     for (unsigned int j=0;j<N;j++)
     	{
-        p(2*j*Nb+1) = open*p(2*j*Nb+1) + (1-open)*p(2*(j*Nb+1)+1); //initial time real
-        p(2*(j*Nb+1)+1) = open*p(2*j*Nb+1) + (1-open)*p(2*(j*Nb+1)+1);
-        p(2*j*Nb+2) = open*p(2*j*Nb+2) + (1-open)*p(2*(j*Nb+1)+2); //initial time imag
-        p(2*(j*Nb+1)+2) = open*p(2*j*Nb+2) + (1-open)*p(2*(j*Nb+1)+2);
-        p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb)) + (1-open)*p(2*((j+1)*Nb-1)); //final time real
-        p(2*((j+1)*Nb)) = open*p(2*((j+1)*Nb)) + (1-open)*p(2*((j+1)*Nb-1));
-        p(2*((j+1)*Nb-2)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2); //final time imag
-        p(2*((j+1)*Nb-1)+2) = open*p(2*((j+1)*Nb-1)+2) + (1-open)*p(2*((j+1)*Nb-2)+2);
+        p(2*j*Nb) = open*p(2*j*Nb) + (1.0-open)*p(2*(j*Nb+1)); //initial time real
+        p(2*(j*Nb+1)) = p(2*j*Nb);
+        p(2*j*Nb+1) = open*p(2*j*Nb+1) + (1.0-open)*p(2*(j*Nb+1)+1); //initial time imag
+        p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
+        p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
+        p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
+        p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
+        p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
 		}
 		
 		//defining complexified vector Cp
@@ -198,8 +198,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
+				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
@@ -213,9 +213,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2)/dt/2.0\
+				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
 				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
+				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
 				DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
@@ -228,15 +228,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2)/dt/2.0\
+				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
 				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2)-pow(v,2),2)/8.0;
+				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
                     int sign = pow(-1,k);
-                    int direc = (int)(k/2);
+                    int direc = (int)(k/2.0);
                     if (direc == 0)
                     	{
                         minusDS(2*j) += real(a*Cp(j+sign)/dt);
@@ -259,8 +259,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a*dt;
-                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2)-pow(v,2)) + epsilon/2.0/v);
-                comp temp2 = a*Dt*(2.0/pow(a,2) + (lambda/2.0)*(3.0*pow(Cp(j),2) - pow(v,2)));
+                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2.0)-pow(v,2.0)) + epsilon/2.0/v);
+                comp temp2 = a*Dt*(2.0/pow(a,2.0) + (lambda/2.0)*(3.0*pow(Cp(j),2.0) - pow(v,2.0)));
                     
                 minusDS(2*j) += real(temp1 - temp0*Cp(j));
                 minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
@@ -283,25 +283,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//printing early if desired
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
-			if (printChoice.compare("a") || printChoice.compare("e"))
+			if (print_choice.compare("a")==0 || print_choice.compare("e")==0)
 				{
-				printAction(kinetic,potL,potE)
+				printAction(kinetic,pot_l,pot_e);
 				}
-			else if (printChoice.compare("v") || printChoice.compare("e"))
+			if (print_choice.compare("v")==0 || print_choice.compare("e")==0)
 				{
 				string minusDSprefix = ("./data/minusDS");
 				string minusDSsuffix = (".dat");
 				string minusDSfile = minusDSprefix+to_string(loop)+to_string(runs_count)+minusDSsuffix;
-				printVector(minusDSfile,minusDS);
+				printVectorB(minusDSfile,minusDS);
 				}
-			else if (printChoice.compare("p") || printChoice.compare("e"))
+			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
 				{
 				string piEarlyPrefix = ("./data/piEarly");
 				string piEarlySuffix = (".dat");
 				string piEarlyFile = piEarlyPrefix+to_string(loop)+to_string(runs_count)+piEarlySuffix;
-				printVector(piEarlyFile,p);
+				printVectorB(piEarlyFile,p);
 				}
-			else if (printChoice.compare("m") || printChoice.compare("e"))
+			if (print_choice.compare("m")==0 || print_choice.compare("e")==0)
 				{
 				string DDSprefix = ("./data/DDS");
 				string DDSsuffix = (".dat");

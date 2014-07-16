@@ -110,22 +110,29 @@ comp coord(const unsigned int& locNum,const int& direction)
 		unsigned int t = intCoord(locNum,0,NT);
 		if ( t < Na)
 			{
-			Xcoord = b*(t-Na) + i*Tb;
+			double temp = (double)t;
+			temp -= (double)Na;
+			Xcoord = b*temp + i*Tb;
 			}
 		else if (intCoord(locNum,0,NT) < (Na+Nb))
 			{
-			double temp = t-Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double)
+			double temp = (double)t;
+			temp -= Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
 			Xcoord = i*Tb - i*b*temp;
 			}
 		else
 			{
-			Xcoord = b*(t-Na-Nb);
+			double temp = (double)t;
+			temp -= (double)Na;
+			temp -= (double)Nb;
+			Xcoord = b*temp;
 			}
 		}
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,NT);
-		Xcoord = -L/2.0 + x*a;
+		double temp = (double)x;
+		Xcoord = -L/2.0 + temp*a;
 		}
 	return Xcoord;
 	}
@@ -137,12 +144,15 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 	if (direction==0)
 		{
 		unsigned int t = intCoord(locNum,0,Na);
-		XcoordA = b*(t-Na) + i*Tb;
+		double temp = (double)t;
+		temp -= (double)Na;
+		XcoordA = b*temp + i*Tb;
 		}
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Na);
-		XcoordA = -L/2.0 + x*a;
+		double temp = (double)x;
+		XcoordA = -L/2.0 + temp*a;
 		}
 	return XcoordA;
 	}
@@ -154,12 +164,14 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 	if (direction==0)
 		{
 		unsigned int t = intCoord(locNum,0,Nb);
-		XcoordB = i*(Tb - b*t);
+		double temp = (double)t;
+		XcoordB = i*(Tb - b*temp);
 		}
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nb);
-		XcoordB = -L/2.0 + x*a;
+		double temp = (double)x;
+		XcoordB = -L/2.0 + temp*a;
 		}
 	return XcoordB;
 	}
@@ -176,7 +188,8 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nc);
-		XcoordC = -L/2.0 + x*a;
+		double temp = (double)x;
+		XcoordC = -L/2.0 + temp*a;
 		}
 	return XcoordC;
 	}
@@ -228,6 +241,23 @@ void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
 	comp action = Kinetic + potL + potE;
 	printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","re(kinetic)","im(kinetic)","re(potL)","im(potL)","re(potE)","im(potE)","re(action)","im(action)");
 	printf("%16g%16g%16g%16g%16g%16g%16g%16g\n",real(Kinetic),imag(Kinetic),real(potL),imag(potL),real(potE),imag(potE),real(action),imag(action));
+	}
+	
+//print vector from time path B to file
+void printVectorB (const string& printFile, vec vecToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+			for (unsigned long int j=0; j<N*Nb; j++)
+				{
+				F << left;
+				for (int r=0; r<2; r++)
+					{
+					F << setw(15) << real(coordB(j,r)) << setw(15) << imag(coordB(j,r)); //note using coord for full time contour
+					}
+				F << setw(15) << vecToPrint(2*j) << setw(15) << vecToPrint(2*j+1)  << endl;		
+				}
+			F.close();
 	}
 	
 //print vector to file
@@ -282,7 +312,7 @@ struct aqStruct
 	};
 
 //asks initial questions to get user inputs
-void askQuestions (aqStruct aqx )
+void askQuestions (aqStruct & aqx )
 	{
 	cout << "number of loops: ";
 	cin >> aqx.totalLoops;
@@ -305,7 +335,7 @@ void askQuestions (aqStruct aqx )
 	string temp = aqx.printChoice;
 	if (temp.compare("n")!=0)
 		{
-		cout << "which run to print?  (0 for every run)";
+		cout << "which run to print (0 for every run)? ";
 		cin >> aqx.printRun;
 		}
 	}
