@@ -299,10 +299,10 @@ void askQuestions (aqStruct aqx )
 		cin >> aqx.maxValue;
 		cout << endl;
 		}
-	cout << "print early (m,v,p,a,n)? ";
+	cout << "print early (m,v,p,a,e,n)? ";
 	cin >> aqx.printChoice;
 	cout << endl;
-	cout << "which run to print? ";
+	cout << "which run to print? (0 for every run)";
 	cin >> aqx.printRun;
 	}
 

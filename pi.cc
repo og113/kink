@@ -277,23 +277,32 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
-		if (runs_count == aq.printRun)
+		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
-			if (printChoice.compare("a"))
+			if (printChoice.compare("a") || printChoice.compare("e"))
 				{
 				printAction(kinetic,potL,potE)
 				}
-			else if (printChoice.compare("v"))
+			else if (printChoice.compare("v") || printChoice.compare("e"))
 				{
-				printVector("data/minusDS.dat",minusDS);
+				string minusDSprefix = ("./data/minusDS");
+				string minusDSsuffix = (".dat");
+				string minusDSfile = minusDSprefix+to_string(loop)+to_string(runs_count)+minusDSsuffix;
+				printVector(minusDSfile,minusDS);
 				}
-			else if (printChoice.compare("p"))
+			else if (printChoice.compare("p") || printChoice.compare("e"))
 				{
-				printVector("data/piEarly.dat",p);
+				string piEarlyPrefix = ("./data/piEarly");
+				string piEarlySuffix = (".dat");
+				string piEarlyFile = piEarlyPrefix+to_string(loop)+to_string(runs_count)+piEarlySuffix;
+				printVector(piEarlyFile,p);
 				}
-			else if (printChoice.compare("m"))
+			else if (printChoice.compare("m") || printChoice.compare("e"))
 				{
-				printSpmat("data/DDS.dat",DDS);
+				string DDSprefix = ("./data/DDS");
+				string DDSsuffix = (".dat");
+				string DDSfile = DDSprefix+to_string(loop)+to_string(runs_count)+DDSsuffix;
+				printSpmat(DDSfile,DDS);
 				}
 			}
 		
