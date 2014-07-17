@@ -18,6 +18,11 @@ int main()
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //user interface
+if ( L > Ltemp ) //making sure to use the smaller of the two possible Ls
+	{
+	L = Ltemp;
+	a = L/(N-1.0);
+	}
 printParameters();
 
 aqStruct aq; //struct to hold user responses (answers to questions)
@@ -65,7 +70,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	complex<double> action = 2.0;
 	//double S_1 = 2.0*pow(mass,3)/3.0/lambda;
 	//double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
-	double alpha = 5.0; //gives span over which tanh is used
+	double alpha = 8.0; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = 1.0;
@@ -127,16 +132,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
-    for (unsigned int j=0;j<N;j++)
+    if (false)
     	{
-        p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
-        p(2*(j*Nb+1)) = p(2*j*Nb);
-        p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
-        p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
-        p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
-        p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
-        p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
-        p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
+		for (unsigned int j=0;j<N;j++)
+			{
+		    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
+		    p(2*(j*Nb+1)) = p(2*j*Nb);
+		    p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
+		    p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
+		    p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
+		    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
+		    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
+		    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
+			}
 		}
 		
 	//very early vector print
@@ -182,6 +190,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         Chi0(N-1) = p(2*(Nb-1))+i*p(2*(Nb-1))-p(2*(N*Nb-1))-i*p(2*(N*Nb-1)); //written directly to avoid using neigh
         comp norm;
         norm = Chi0.dot(Chi0);
+        norm = pow(norm,0.5);
         Chi0 /= norm;
 		
 		//initializing to zero
@@ -210,8 +219,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				
-				DDS.insert(2*j,2*N*Nb) = real(a*Dt*Chi0(x)); //zero mode lagrange constraint
-                DDS.insert(2*j+1,2*N*Nb) = imag(a*Dt*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
+				DDS.insert(2*j,2*N*Nb) = real(a*Chi0(x)); //zero mode lagrange constraint - 1/2 is due to siteMeasure
+                DDS.insert(2*j+1,2*N*Nb) = imag(a*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
 				}
 			else if (t==0)
 				{
@@ -277,9 +286,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
         for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
         	{
-            minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(a*b*Chi0(j)*Cp((j+1)*Nb-1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j));
+            minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(a*Chi0(j)*Cp((j+1)*Nb-1));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*Chi0(j));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*Chi0(j));
             }
         action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

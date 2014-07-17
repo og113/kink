@@ -30,12 +30,13 @@ unsigned int N = 80; //number of points in each spatial dimension
 unsigned int Na = (int)(1.2*N);
 unsigned int Nb = (int)(1.0*N);
 unsigned int Nc = 2;
-double R = 32.0; //size of bubble
+double R = 50.0; //size of bubble
 double mass = 1.0; 
 double lambda = 0.1;
-double Tb = 1.2*R/2;
+double Tb = R;
 double angle = asin(Tb/R); //not a primary parameter, just used to make L
-double L = 2*(1.5*Tb*tan(angle));
+double L = 3.0*R;
+double Ltemp = 2.0*(1.5*Tb*tan(angle));
 double theta = 0.0;
 
 //derived quantities
@@ -302,7 +303,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 		{
 		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
-			F << setw(25) << it.row() << setw(15) << it.col() << setw(25) << it.value() << endl;
+			F << setw(25) << it.row()+1 << setw(15) << it.col()+1 << setw(25) << it.value() << endl;
 			}
 		}
 	F.close();
@@ -411,15 +412,19 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Ta = b*(Na-1.0);
 		Tc = b*(Nc-1.0);
 		angle = asin(Tb/R);
-		L = 2*(1.5*Tb*tan(angle));
+		L = 3*R;
+		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
+		a = L/(N-1.0);
 		}
 	else if ( parameterLabel.compare("R")==0)
 		{
+		Tb = newParameter*Tb/R;
 		R = newParameter;
 		X = mass*R;
 		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
-		angle = asin(Tb/R);
-		L = 2*(1.5*Tb*tan(angle));
+		L = 3*R;
+		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
+		a = L/(N-1);
 		}
 	else if ( parameterLabel.compare("mass")==0)
 		{

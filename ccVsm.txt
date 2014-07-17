@@ -1,2 +1,5 @@
-input phi differs at order 1e-3 on final timeslice - can't see why
-minusDs disagreements of order 1 - i actually think that they are both independently wrong
+1) input euclidean phi agree to order 1e-14
+
+2) minusDs agree to order 1e-14 before newton-raphson
+
+3) DDS agree to machine precision in bulk and on lagrange multipliers
