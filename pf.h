@@ -50,7 +50,7 @@ double epsilon = 2.0*pow(mass,3)/lambda/R/3.0; //energy difference
 
 //determining number of runs
 double closenessA = pow(10,-4.0);
-double closenessV = v*pow(10,-3.0);
+double closenessV = v*pow(10,-4.0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //simple generic functions

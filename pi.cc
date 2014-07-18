@@ -153,6 +153,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		{
 		//quantities used to stop newton-raphson loop
 		action_test = abs(action - action_last)/abs(action_last);
+		if (action_test < closenessA)
+			{
+			break;
+			}
 		runs_count ++;
 		action_last = action;
 
@@ -175,13 +179,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 		//defining the zero mode at the final time boundary
 		cVec Chi0(N);
-		for (unsigned int j=0; j<(N-1); j++)
+		for (unsigned int j=1; j<(N-1); j++)
 			{
-            Chi0(j) = p(2*((j+2)*Nb-1))+i*p(2*((j+2)*Nb-1))-p(2*((j+1)*Nb-1))-i*p(2*((j+1)*Nb-1)); //note only use real derivative - this is a fudge due to initial input
+            Chi0(j) = p(2*((j+2)*Nb-1))+i*p(2*((j+2)*Nb-1))-p(2*((j)*Nb-1))-i*p(2*((j)*Nb-1)); //note only use real derivative - this is a fudge due to initial input - note this is the ((j+1)-(j-1))/2 derivative
              }
-        Chi0(N-1) = p(2*(Nb-1))+i*p(2*(Nb-1))-p(2*(N*Nb-1))-i*p(2*(N*Nb-1)); //written directly to avoid using neigh
+        Chi0(N-1) = p(2*(Nb-1))+i*p(2*(Nb-1))-p(2*((N-1)*Nb-1))-i*p(2*((N-1)*Nb-1)); //written directly to avoid using neigh
+        Chi0(0) = p(2*(2*Nb-1))+i*p(2*(2*Nb-1))-p(2*(N*Nb-1))-i*p(2*(N*Nb-1));
         comp norm;
         norm = Chi0.dot(Chi0);
+        norm = pow(norm,0.5);
         Chi0 /= norm;
 		
 		//initializing to zero
@@ -210,8 +216,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				
-				DDS.insert(2*j,2*N*Nb) = real(a*Dt*Chi0(x)); //zero mode lagrange constraint
-                DDS.insert(2*j+1,2*N*Nb) = imag(a*Dt*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
+				DDS.insert(2*j,2*N*Nb) = real(i*a*Chi0(x)); //zero mode lagrange constraint
+                DDS.insert(2*j+1,2*N*Nb) = imag(i*a*Chi0(x)); //the constraint is real but its derivative wrt phi may be complex
+                minusDS(2*j) = - real(i*a*Chi0(x)*p(2*Bdim));
+                minusDS(2*j+1) = - imag(i*a*Chi0(x)*p(2*Bdim));
 				}
 			else if (t==0)
 				{
@@ -277,9 +285,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
         for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
         	{
-            minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(a*b*Chi0(j)*Cp((j+1)*Nb-1));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(a*b*Chi0(j));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(a*b*Chi0(j));
+            minusDS(2*N*Nb) = minusDS(2*N*Nb) - real(i*a*Chi0(j)*Cp((j+1)*Nb-1));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = real(i*a*Chi0(j));
+            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)+1) = -imag(i*a*Chi0(j));
             }
         action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +324,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//solving for delta using the Newton-Raphson method
+		double small = minusDS.dot(minusDS);
+		small = pow(small,0.5);
+		vector_test = small/(2*Bdim+1); //gives average size of elements of minusDS
+		if (vector_test < closenessV)
+			{
+			break; //solution has been found
+			}
+		
 		vec delta(2*N*Nb+1);
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
