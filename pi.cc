@@ -131,8 +131,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	p(N*Nb) = v; //initializing Lagrange parameter for removing dp/dx zero mode
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
-    double open = 0.5;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
-    if (false)
+    double open = 1.0;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
+    if (true)
     	{
 		for (unsigned int j=0;j<N;j++)
 			{
@@ -185,18 +185,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		DDS.reserve(DDS_to_reserve);
 		
-		//defining the zero mode at the final time boundary
+		//defining the zero mode at the final time boundary and the time step before
 		vec Chi0(N);
 		for (unsigned int j=1; j<(N-1); j++)
 			{
-            Chi0(j) = p(2*((j+2)*Nb-1))-p(2*(j*Nb-1));
-             }
+			unsigned int pos = (j+1)*Nb-1;
+            Chi0(j) = p(2*(pos+Nb))-p(2*(pos-Nb)); //final time slice
+            //Chi0(j+N) = p(2*((j+2)*Nb-2))-p(2*(j*Nb-2)); //penultimate time slice
+            }
         Chi0(N-1) = p(2*(Nb-1))-p(2*((N-1)*Nb-1)); //written directly to avoid using neigh
         Chi0(0) = p(2*(2*Nb-1))-p(2*(N*Nb-1));
-        comp norm;
+        //Chi0(2*N-1) = p(2*(Nb-2))-p(2*((N-1)*Nb-2));
+        //Chi0(N) = p(2*(2*Nb-2))-p(2*(N*Nb-2));
+        double norm; //normalizing
         norm = Chi0.dot(Chi0);
         norm = pow(norm,0.5);
         Chi0 /= norm;
+        Chi0 *= v;
 		
 		//initializing to zero
 		comp kinetic = 0.0;
@@ -251,6 +256,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
 				
+				//if (t==(Nb-2)) //zero mode lagrange constraint on penultimate time slice
+					//{
+					//DDS.insert(2*j,2*N*Nb) = a*Chi0(x+N); 
+                	//minusDS(2*j) = -a*Chi0(x+N)*p(2*N*Nb);
+					//}
+				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
                     int sign = pow(-1,k);
@@ -291,8 +302,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
         for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
         	{
-            minusDS(2*N*Nb) = minusDS(2*N*Nb) - a*Chi0(j)*Cp((j+1)*Nb-1);
+            minusDS(2*N*Nb) = minusDS(2*N*Nb) - a*Chi0(j)*p(2*((j+1)*Nb-1));// - a*Chi0(j+N)*p(2*((j+1)*Nb-2));
             DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = a*Chi0(j);
+            //DDS.insert(2*N*Nb,2*((j+1)*Nb-2)) = a*Chi0(j+N);
             }
         action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
