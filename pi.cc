@@ -167,31 +167,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		runs_count ++;
 		action_last = action;
-
-		// allocating memory for DS, DDS
-		vec minusDS(2*N*Nb+1);
-		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
-		spMat DDS(2*N*Nb+1,2*N*Nb+1);
-		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
-		DDS_to_reserve(0) = 2;
-		DDS_to_reserve(1) = 2;
-		DDS_to_reserve(2*N*Nb-2) = 2;
-		DDS_to_reserve(2*N*Nb-1) = 2;
-		DDS_to_reserve(2*N*Nb) = 2*N;
-		for (lint j=1;j<(N*Nb-1);j++)
-			{
-			DDS_to_reserve(2*j) = 2*(2*2+1);
-			DDS_to_reserve(2*j+1) = 2*(2*2+1);
-			}
-		DDS.reserve(DDS_to_reserve);
 		
 		//defining the zero mode at the final time boundary and the time step before
 		vec Chi0(Nb*N);
 		Chi0 = Eigen::VectorXd::Zero(N*Nb);
+		unsigned int nnzChi0 = 0;
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
             Chi0(pos) = p(2*neigh(pos,1,1,Nb))-p(2*neigh(pos,1,-1,Nb)); //final time slice
+            nnzChi0 += 1;
             //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb))-p(2*neigh(pos-1,1,-1,Nb)); //penultimate time slice
             }
         //double norm; //normalizing
@@ -199,6 +184,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         //norm = pow(norm,0.5);
         //Chi0 /= norm;
         //Chi0 *= v;
+
+		// allocating memory for DS, DDS
+		vec minusDS(2*N*Nb+1);
+		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
+		spMat DDS(2*N*Nb+1,2*N*Nb+1);
+		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
+		DDS_to_reserve(0) = 3;
+		DDS_to_reserve(1) = 3;
+		DDS_to_reserve(2*N*Nb-2) = 3;
+		DDS_to_reserve(2*N*Nb-1) = 3;
+		DDS_to_reserve(2*N*Nb) = nnzChi0;
+		for (lint j=1;j<(N*Nb-1);j++)
+			{
+			DDS_to_reserve(2*j) = 2*(2*2+1)+1;
+			DDS_to_reserve(2*j+1) = 2*(2*2+1)+1;
+			}
+		DDS.reserve(DDS_to_reserve);
 		
 		//initializing to zero
 		comp kinetic = 0.0;
