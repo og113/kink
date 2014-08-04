@@ -30,12 +30,12 @@ unsigned int N = 80; //number of points in each spatial dimension
 unsigned int Na = (int)(1.2*N);
 unsigned int Nb = (int)(1.0*N);
 unsigned int Nc = 2;
-double R = 50.0; //size of bubble
-double mass = 1.0; 
+double R = 32.0; //size of bubble
+double mass = 0.5; 
 double lambda = 0.1;
 double Tb = R;
 double angle = asin(Tb/R); //not a primary parameter, just used to make L
-double L = 3.0*R;
+double L = 3.5*R;
 double Ltemp = 2.0*(1.5*Tb*tan(angle));
 double theta = 0.0;
 
@@ -205,7 +205,7 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 			{
 			neighLocation = locNum+1;
 			}
-		if (sign==-1 and c!=0)
+		else if (sign==-1 and c!=0)
 			{
 			neighLocation = locNum-1;
 			}
@@ -216,11 +216,11 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 		}
 	else if (c==(N-1) and sign==1)
 		{
-		neighLocation = locNum-(N-1)*xNt;
+		neighLocation = locNum-(N-1)*(int)xNt;
 		}
 	else
 		{
-		neighLocation = locNum+sign*xNt;
+		neighLocation = locNum+sign*(int)xNt;
 		}
 	return neighLocation;
 	}

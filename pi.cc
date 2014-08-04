@@ -115,11 +115,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		        }
 		    else if (real(coordB(j,1))>0) //note that the coord should be real
 		    	{
-		        p(2*j) = v*tanh(mass*(rho1-R)/2.0);
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh(mass*(rho1-R)/2.0)/2.0;
 		        }
 		    else if (real(coordB(j,1))<0)
 		    	{
-		        p(2*j) = v*tanh(mass*(rho2-R)/2.0);
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh(mass*(rho2-R)/2.0)/2.0;
 		        }
 		    else
 		    	{
@@ -186,22 +186,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		DDS.reserve(DDS_to_reserve);
 		
 		//defining the zero mode at the final time boundary and the time step before
-		vec Chi0(N);
-		for (unsigned int j=1; j<(N-1); j++)
+		vec Chi0(Nb*N);
+		Chi0 = Eigen::VectorXd::Zero(N*Nb);
+		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
-            Chi0(j) = p(2*(pos+Nb))-p(2*(pos-Nb)); //final time slice
-            //Chi0(j+N) = p(2*((j+2)*Nb-2))-p(2*(j*Nb-2)); //penultimate time slice
+            Chi0(pos) = p(2*neigh(pos,1,1,Nb))-p(2*neigh(pos,1,-1,Nb)); //final time slice
+            //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb))-p(2*neigh(pos-1,1,-1,Nb)); //penultimate time slice
             }
-        Chi0(N-1) = p(2*(Nb-1))-p(2*((N-1)*Nb-1)); //written directly to avoid using neigh
-        Chi0(0) = p(2*(2*Nb-1))-p(2*(N*Nb-1));
-        //Chi0(2*N-1) = p(2*(Nb-2))-p(2*((N-1)*Nb-2));
-        //Chi0(N) = p(2*(2*Nb-2))-p(2*(N*Nb-2));
-        double norm; //normalizing
-        norm = Chi0.dot(Chi0);
-        norm = pow(norm,0.5);
-        Chi0 /= norm;
-        Chi0 *= v;
+        //double norm; //normalizing
+        //norm = Chi0.dot(Chi0);
+        //norm = pow(norm,0.5);
+        //Chi0 /= norm;
+        //Chi0 *= v;
 		
 		//initializing to zero
 		comp kinetic = 0.0;
@@ -214,7 +211,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned long int j = 0; j < N*Nb; j++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
-			unsigned int x = intCoord(j,1,Nb);
+			//unsigned int x = intCoord(j,1,Nb); //currently unused
+			
+			if (Chi0(j)>1.0e-16) //zero mode lagrange constraint
+				{
+				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
+				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
+		    	minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
+		    	minusDS(2*N*Nb) +=- a*Chi0(j)*p(2*j-1);
+		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//boundaries			
@@ -228,9 +233,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
-				
-				DDS.insert(2*j,2*N*Nb) = a*Chi0(x); //zero mode lagrange constraint - 1/2 is due to siteMeasure
-                minusDS(2*j) = -a*Chi0(x)*p(2*N*Nb);
 				}
 			else if (t==0)
 				{
@@ -255,12 +257,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
 				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
-				
-				//if (t==(Nb-2)) //zero mode lagrange constraint on penultimate time slice
-					//{
-					//DDS.insert(2*j,2*N*Nb) = a*Chi0(x+N); 
-                	//minusDS(2*j) = -a*Chi0(x+N)*p(2*N*Nb);
-					//}
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -298,13 +294,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
-            }
-
-        for (unsigned int j=0; j<N; j++) //lagrange multiplier terms
-        	{
-            minusDS(2*N*Nb) = minusDS(2*N*Nb) - a*Chi0(j)*p(2*((j+1)*Nb-1));// - a*Chi0(j+N)*p(2*((j+1)*Nb-2));
-            DDS.insert(2*N*Nb,2*((j+1)*Nb-1)) = a*Chi0(j);
-            //DDS.insert(2*N*Nb,2*((j+1)*Nb-2)) = a*Chi0(j+N);
             }
         action = kinetic + pot_l + pot_l;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
