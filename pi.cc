@@ -16,13 +16,12 @@ using namespace std;
 
 int main()
 {
+if (2.0*(1.5*Tb*tan(angle))<L) //making sure to use the smaller of the two possible Ls
+	{
+	L=2.0*(1.5*Tb*tan(angle));
+	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //user interface
-if ( L > Ltemp ) //making sure to use the smaller of the two possible Ls
-	{
-	L = Ltemp;
-	a = L/(N-1.0);
-	}
 printParameters();
 
 aqStruct aq; //struct to hold user responses (answers to questions)
@@ -70,7 +69,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	complex<double> action = 2.0;
 	//double S_1 = 2.0*pow(mass,3)/3.0/lambda;
 	//double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
-	double alpha = 8.0; //gives span over which tanh is used
+	double alpha = R/3; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = 1.0;
@@ -84,8 +83,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	p = Eigen::VectorXd::Zero(2*N*Nb+1);
 	
 	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
-	double b_parameter = -pow(v,2.0);
-	double c_parameter = epsilon/v/lambda;
+	double b_parameter = -1.0;
+	double c_parameter = epsilon;
 	vector<double> root(3);
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
@@ -98,28 +97,28 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		complex<double> rho2Sqrd = -pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0); 
 		double rho1 = sqrt(real(rho1Sqrd)); //should be real even without real()
 		double rho2 = sqrt(real(rho2Sqrd));
-		if (R<alpha/mass)
+		if (R<alpha)
 			{
-		    cout << "X = R*mass is too small. not possible to give thinwall input. it should be less that " << alpha;
+		    cout << "R is too small. not possible to give thinwall input. it should be more that " << alpha;
 		    }
 		else
 			{
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-		    if (rho1<(R-alpha/mass) && rho2<(R-alpha/mass))
+		    if (rho1<(R-alpha) && rho2<(R-alpha))
 		    	{
 		        p(2*j) = root[0];
 		        }
-		    else if (rho1>(R+alpha/mass) || rho2>(R+alpha/mass))
+		    else if (rho1>(R+alpha) || rho2>(R+alpha))
 		    	{
 		        p(2*j) = root[2];
 		        }
 		    else if (real(coordB(j,1))>0) //note that the coord should be real
 		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh(mass*(rho1-R)/2.0)/2.0;
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh((rho1-R)/2.0)/2.0;
 		        }
 		    else if (real(coordB(j,1))<0)
 		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh(mass*(rho2-R)/2.0)/2.0;
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh((rho2-R)/2.0)/2.0;
 		        }
 		    else
 		    	{
@@ -128,7 +127,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		}
 		
-	p(N*Nb) = v; //initializing Lagrange parameter for removing dp/dx zero mode
+	p(N*Nb) = 0.2; //initializing Lagrange parameter for removing dp/dx zero mode
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     double open = 1.0;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
@@ -183,7 +182,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         //norm = Chi0.dot(Chi0);
         //norm = pow(norm,0.5);
         //Chi0 /= norm;
-        //Chi0 *= v;
 
 		// allocating memory for DS, DDS
 		vec minusDS(2*N*Nb+1);
@@ -220,7 +218,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
 		    	minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
-		    	minusDS(2*N*Nb) +=- a*Chi0(j)*p(2*j-1);
+		    	minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j-1);
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -229,8 +227,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp Dt = -b*i/2.0;
 				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
-				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
+				pot_l += Dt*a*Va(Cp(j));
+				pot_e += Dt*a*Vb(Cp(j));
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -242,8 +240,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i/2.0;
 				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
 				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
-				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
+				pot_l += Dt*a*Va(Cp(j));
+				pot_e += Dt*a*Vb(Cp(j));
 				
 				DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j+1)) = 1.0/b;
@@ -257,8 +255,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i;
 				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
 				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += -Dt*a*lambda*pow(pow(Cp(j),2.0)-pow(v,2.0),2.0)/8.0;
-				pot_e += -Dt*a*epsilon*(Cp(j)-v)/v/2.0;
+				pot_l += Dt*a*Va(Cp(j));
+				pot_e += Dt*a*Vb(Cp(j));
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -275,7 +273,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     else
                     	{
-                        int neighb = neigh(j,direc,sign,Nb);
+                        unsigned int neighb = neigh(j,direc,sign,Nb);
                         
                         minusDS(2*j) += - real(Dt*Cp(neighb)/a);
                         minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
@@ -286,8 +284,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a/dt;
-                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + (lambda/2.0)*Cp(j)*(pow(Cp(j),2.0)-pow(v,2.0)) + epsilon/2.0/v);
-                comp temp2 = a*Dt*(2.0/pow(a,2.0) + (lambda/2.0)*(3.0*pow(Cp(j),2.0) - pow(v,2.0)));
+                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
+                comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
                     
                 minusDS(2*j) += real(temp1 - temp0*Cp(j));
                 minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
@@ -297,7 +295,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
             }
-        action = kinetic + pot_l + pot_l;
+        action = kinetic - pot_l - pot_e;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -343,25 +341,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		vec delta(2*N*Nb+1);
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
-		Eigen::SparseLU<spMat> solver;
+		Eigen::SimplicialLLT<spMat> solver;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
 			{
 			cout << "DDS pattern analysis failed" << endl;
 			return 0;
-			}
-			
+			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
-			cout << "LU factorization failed" << endl;
+			cout << "Factorization failed" << endl;
 			return 0;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "solving failed" << endl;
+			cout << "Solving failed" << endl;
 			return 0;
 			}
 
@@ -411,7 +408,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
         accA(j*Na) = ((Dt0/pow(a,2))*(ap(neigh(j*Na,1,1,Na))+ap(neigh(j*Na,1,-1,Na))-2.0*ap(j*Na)) \
-            -(lambda*Dt0/2.0)*ap(j*Na)*(pow(ap(j*Na),2)-pow(v,2)) - epsilon*Dt0/2/v)/dtau;
+            -dV(ap(j*Na)))/dtau;
     	}
 
     //A7. run loop
@@ -427,7 +424,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	{
             unsigned int l = j+k*Na;
             accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na))+ap(neigh(l,1,-1,Na))-2.0*ap(l)) \
-            -(lambda/2.0)*ap(l)*(pow(ap(l),2)-pow(v,2)) - epsilon/2.0/v;    
+            -dV(ap(l));    
         	}
     	}
 
@@ -457,7 +454,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
         accC(j*Nc) = ((Dt0/pow(a,2))*(cp(neigh(j*Nc,1,1,Nc))+cp(neigh(j*Nc,1,-1,Nc))-2.0*cp(j*Nc)) \
-            -(lambda*Dt0/2.0)*cp(j*Na)*(pow(cp(j*Na),2)-pow(v,2)) - epsilon*Dt0/2/v)/dtau;
+            -dV(cp(j*Na)))/dtau;
     	}
 
     //C7. run loop
@@ -473,7 +470,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 		    unsigned int l = j+k*Nc;
 		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc))+cp(neigh(l,1,-1,Nc))-2.0*cp(l)) \
-		    -(lambda/2.0)*ap(l)*(pow(cp(l),2)-pow(v,2)) - epsilon/2.0/v;    
+		    -dV(cp(l));    
 			}
 		}
     
@@ -516,14 +513,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing to terminal
 	if (loop==0)
 		{
-		printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","mass","lambda","re(action)","im(action)");
+		printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","re(action)","im(action)");
 		}
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,mass,lambda,real(action),imag(action));
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,real(action),imag(action));
 
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8g%8i%8i%8i%8i%8g%8g%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,mass,lambda,real(action),imag(action));
+	fprintf(actionfile,"%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,real(action),imag(action));
 	fclose(actionfile);
 
 	//printing output phi

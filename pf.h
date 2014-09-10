@@ -26,32 +26,27 @@ complex<double> i(0.0,1.0);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //primary parameters
-unsigned int N = 80; //number of points in each spatial dimension
-unsigned int Na = (int)(1.2*N);
-unsigned int Nb = (int)(1.0*N);
-unsigned int Nc = 2;
-double R = 32.0; //size of bubble
-double mass = 0.5; 
-double lambda = 0.1;
-double Tb = R;
-double angle = asin(Tb/R); //not a primary parameter, just used to make L
-double L = 3.5*R;
-double Ltemp = 2.0*(1.5*Tb*tan(angle));
+unsigned int N = 100; //number of points in each spatial dimension
+unsigned int Na = 80;
+unsigned int Nb = 80;
+unsigned int Nc = 32;
+double epsilon = 0.05;
 double theta = 0.0;
 
 //derived quantities
 unsigned int NT = Na + Nb + Nc;
+double R = 2.0/3.0/epsilon; //size of bubble
+double Tb = 1.5*R;
+double angle = asin(Tb/R); //not a primary parameter, just used to make L
+double L = 3.0*R;
 double a = L/(N-1.0); //step sizes in each spatial dimension
 double b = Tb/(Nb-1.0); //step sizes in time
 double Ta = b*(Na-1.0);
 double Tc = b*(Nc-1.0);
-double v =  mass*pow(lambda,-0.5); //vacuum phi
-double X = mass*R; //the large thin-wall parameter, the ratio of the size of the bubble to the size of the wall
-double epsilon = 2.0*pow(mass,3)/lambda/R/3.0; //energy difference
 
 //determining number of runs
 double closenessA = pow(10,-4.0);
-double closenessV = v*pow(10,-4.0);
+double closenessV = pow(10,-4.0);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //simple generic functions
@@ -81,6 +76,42 @@ double absolute (const double& amplitude)
 		}
 	return abs_amplitude;
 	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//potential related functions
+comp V (const comp & phi)
+	{
+	comp Vphi = pow(pow(phi,2)-1.0,2)/8.0 + epsilon*(phi-1.0)/2.0;
+	return Vphi;
+	}
+	
+//potential with degenerate minima
+comp Va (const comp & phi)
+	{
+	comp Vaphi = pow(pow(phi,2)-1.0,2)/8.0;
+	return Vaphi;
+	}
+	
+//change to degenerate potential
+comp Vb (const comp & phi)
+	{
+	comp Vbphi = epsilon*(phi-1.0)/2.0;
+	return Vbphi;
+	}
+
+//first derivative of V
+comp dV (const comp & phi)
+	{
+	comp dVphi = phi*(pow(phi,2)-1.0)/2.0 + epsilon/2.0;
+	return dVphi;
+	}
+	
+//second derivative of V
+comp ddV (const comp & phi)
+	{
+	comp ddVphi = (3.0*pow(phi,2)-1.0)/2.0;
+	return ddVphi;
+	}	
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -232,8 +263,8 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","mass","lambda","theta");
-	printf("%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,mass,lambda,theta);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","theta");
+	printf("%8i%8i%8i%8i%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,theta);
 	}
 	
 //print action and its constituents to the terminal
@@ -400,44 +431,44 @@ void changeInt (const string & parameterLabel, const int & newParameter)
 //changes parameters according to user inputs (double)
 void changeDouble (const string & parameterLabel, const double & newParameter)
 	{
-	if ( parameterLabel.compare("L")==0)
+	if ( parameterLabel.compare("L")==0) //this does not changes the physics but simply the size of the box in space
 		{
 		L = newParameter;
 		a = L/(N-1);
 		}
-	else if ( parameterLabel.compare("Tb")==0)
+	else if ( parameterLabel.compare("Tb")==0) //this paramter changes the physics for the periodic instanton,
+												//as Tb/R changes where R = R(epsilon)
 		{
+		b = b*newParameter/Tb;
+		Ta = Ta*newParameter/Tb;
+		Tc = Tc*newParameter/Tb;
 		Tb = newParameter;
-		b = Tb/(Nb-1.0);
-		Ta = b*(Na-1.0);
-		Tc = b*(Nc-1.0);
 		angle = asin(Tb/R);
 		L = 3*R;
 		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
 		a = L/(N-1.0);
 		}
-	else if ( parameterLabel.compare("R")==0)
+	else if ( parameterLabel.compare("R")==0) //this parameter changes the initial guess
 		{
-		Tb = newParameter*Tb/R;
+		L = L*newParameter/R; //all length scales scale with R
+		a = a*newParameter/R;
+		b = b*newParameter/R;
+		Ta = Ta*newParameter/R;
+		Tb = Tb*newParameter/R;
+		Tc = Tc*newParameter/R;
 		R = newParameter;
-		X = mass*R;
-		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
-		L = 3*R;
-		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
-		a = L/(N-1);
 		}
-	else if ( parameterLabel.compare("mass")==0)
+	else if ( parameterLabel.compare("epsilon")==0) //this parameter changes the physics of the potential
+													//but it does not change Tb/R, where R(epsilon)
 		{
-		mass = newParameter;
-		v =  mass*pow(lambda,-0.5);
-		X = mass*R;
-		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
-		}
-	else if ( parameterLabel.compare("lambda")==0)
-		{
-		lambda = newParameter;
-		v =  mass*pow(lambda,-0.5);
-		epsilon = 2.0*pow(mass,3)/lambda/R/3.0;
+		R = R*epsilon/newParameter; //R scales with 1/epsilon and the other length scales scale with R
+		L = L*epsilon/newParameter;
+		a = a*epsilon/newParameter;
+		b = b*epsilon/newParameter;
+		Ta = Ta*epsilon/newParameter;
+		Tb = Tb*epsilon/newParameter;
+		Tc = Tc*epsilon/newParameter;
+		epsilon = newParameter;
 		}
 	else
 		{
