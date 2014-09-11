@@ -25,28 +25,33 @@ complex<double> i(0.0,1.0);
 #define pi 3.14159265359
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//primary parameters
-unsigned int N = 100; //number of points in each spatial dimension
-unsigned int Na = 80;
-unsigned int Nb = 80;
-unsigned int Nc = 32;
-double epsilon = 0.05;
-double theta = 0.0;
 
-//derived quantities
-unsigned int NT = Na + Nb + Nc;
-double R = 2.0/3.0/epsilon; //size of bubble
-double Tb = 1.5*R;
-double angle = asin(Tb/R); //not a primary parameter, just used to make L
-double L = 3.0*R;
-double a = L/(N-1.0); //step sizes in each spatial dimension
-double b = Tb/(Nb-1.0); //step sizes in time
-double Ta = b*(Na-1.0);
-double Tc = b*(Nc-1.0);
+//primary parameters
+unsigned int N;
+unsigned int Na;
+unsigned int Nb;
+unsigned int Nc;
+double dE;
+double theta;
+
+//derived parameters
+unsigned int NT;
+double epsilon;
+double R; //size of bubble
+double Tb;
+double angle; //not a primary parameter, just used to make L
+double L;
+double a; //step sizes in each spatial dimension
+double b; //step sizes in time
+double Ta;
+double Tc;
 
 //determining number of runs
-double closenessA = pow(10,-4.0);
-double closenessV = pow(10,-4.0);
+double closenessA; //action
+double closenessS; //solution (i.e. minusDS)
+double closenessD; //delta
+double closenessC; //calculation
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //simple generic functions
@@ -81,7 +86,7 @@ double absolute (const double& amplitude)
 //potential related functions
 comp V (const comp & phi)
 	{
-	comp Vphi = pow(pow(phi,2)-1.0,2)/8.0 + epsilon*(phi-1.0)/2.0;
+	comp Vphi = pow(pow(phi,2)-1.0,2)/8.0 - epsilon*(phi-1.0)/2.0;
 	return Vphi;
 	}
 	
@@ -95,14 +100,14 @@ comp Va (const comp & phi)
 //change to degenerate potential
 comp Vb (const comp & phi)
 	{
-	comp Vbphi = epsilon*(phi-1.0)/2.0;
+	comp Vbphi = -epsilon*(phi-1.0)/2.0;
 	return Vbphi;
 	}
 
 //first derivative of V
 comp dV (const comp & phi)
 	{
-	comp dVphi = phi*(pow(phi,2)-1.0)/2.0 + epsilon/2.0;
+	comp dVphi = phi*(pow(phi,2)-1.0)/2.0 - epsilon/2.0;
 	return dVphi;
 	}
 	
@@ -263,8 +268,8 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","theta");
-	printf("%8i%8i%8i%8i%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,theta);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
+	printf("%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
 	}
 	
 //print action and its constituents to the terminal
@@ -293,7 +298,7 @@ void printVectorB (const string& printFile, vec vecToPrint)
 		F << left;
 		for (int r=0; r<2; r++)
 			{
-			F << setw(25) << real(coordB(j,r)) << setw(25) << imag(coordB(j,r)); //note using coord for full time contour
+			F << setw(25) << real(coordB(j,r)) << setw(25) << imag(coordB(j,r));
 			}
 		F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
 		}
@@ -348,6 +353,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 //struct to hold answers to questions
 struct aqStruct
 	{
+	string inputChoice;
 	unsigned int fileNo;
 	double maxTheta;
 	unsigned int totalLoops;
@@ -358,7 +364,7 @@ struct aqStruct
 	unsigned int printRun;
 	};
 
-//asks initial questions to get user inputs
+//asks initial questions to get user inputs - now defunct
 void askQuestions (aqStruct & aqx )
 	{
 	cout << "number of loops: ";
@@ -517,37 +523,3 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//miscelaneous other functions
-	
-//function to check whether the solution has converged
-void convergence (const int& runsCount, const double& actionTest, const double& vectorTest, const clock_t& Clock, clock_t* Wait, char* printWait, string* printChoice, unsigned int* printRun, const comp& Kinetic, const comp& potL, const comp& potE, bool boolWait)
-	{
-	//stopping newton-raphson loop if action doesn't converge after 1000 loops
-	if (runsCount > 1000)
-		{
-		cout << "over 1000 runs without convergence" << endl;
-		cout << "action_test = " << actionTest << ", closennesA = " << closenessA << endl;
-		cout << "vector_test = " << vectorTest << ", closennesV = " << closenessV << endl;
-		}
-
-//prints runs_count if looping is taking ages
-	if((Clock-*Wait)/1.0e6>600 and not(boolWait))
-		{
-		cout << "number of newton-raphson loops = " << runsCount << endl;
-		*Wait = Clock;
-		cout << "print phi and action on the next loop? (y/n)" << endl;
-		cin >> *printWait;
-		if (*printWait == 'y')
-			{
-			comp Action = Kinetic+potL+potE;
-			*printChoice = 'p';
-			*printRun = runsCount+1;
-			cout << left;
-			cout << "kinetic = " << Kinetic << endl;
-			cout << "pot_lambda = " << potL << endl;
-			cout << "pot_epsilon = " << potE << endl;
-			cout << "action = " << Action << endl;
-			}
-		}
-	}
-	

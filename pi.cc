@@ -16,28 +16,63 @@ using namespace std;
 
 int main()
 {
-if (2.0*(1.5*Tb*tan(angle))<L) //making sure to use the smaller of the two possible Ls
-	{
-	L=2.0*(1.5*Tb*tan(angle));
-	}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//user interface
-printParameters();
+//getting variables and user inputs from inputs
 
-aqStruct aq; //struct to hold user responses (answers to questions)
-aq.fileNo = 0;
-aq.maxTheta = 0;
-aq.totalLoops = 1;
-aq.loopChoice = "n";
-aq.minValue = 0;
-aq.maxValue = 0;
-aq.printChoice = "n";
-aq.printRun = -1;
+aqStruct aq; //struct to hold user responses
 
-askQuestions(aq);
+ifstream fin;
+fin.open("inputs", ios::in);
+string line;
+int firstLine = 0;
+while(getline(fin,line))
+	{
+	if(line[0] == '#')
+		{
+		continue;
+		}
+	if (firstLine==0)
+		{
+		istringstream ss1(line);
+		ss1 >> N >> Na >> Nb >> Nc >> dE >> theta;
+		firstLine = 1;
+		}
+	else
+		{
+		istringstream ss2(line);
+		ss2 >> aq.inputChoice >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		}
+	}
+fin.close();
+string inP = aq.inputChoice; //just because I write this a lot
+
+//derived quantities
+NT = Na + Nb + Nc;
+epsilon = dE;
+R = 2.0/3.0/epsilon;
+Tb = 1.0*R;
+angle = asin(Tb/R);
+L = 3.0*R;
+double Ltemp = 1.5*(1.5*Tb*tan(angle));
+if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+	{
+	L=Ltemp;
+	}
+a = L/(N-1.0);
+b = Tb/(Nb-1.0);
+Ta = b*(Na-1.0);
+Tc = b*(Nc-1.0);
+
+//determining number of runs
+closenessA = 1.0;
+closenessS = 1.0e-4;
+closenessD = 1.0;
+closenessC = 1.0e-14;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
+
+printParameters();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -46,7 +81,7 @@ string print_choice = aq.printChoice;
 for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	{
 	//giving values of varying parameters
-	if (loop_choice.compare(0,1,"N") == 0)
+	if (loop_choice.compare("N") == 0)
 		{
 		int loopParameter = aq.minValue + (int)(aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1);
 		changeInt (loop_choice,loopParameter);
@@ -57,26 +92,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		changeDouble (loop_choice,loopParameter);
 		}
 
-	//defining a time
+	//defining a time and starting the clock
 	clock_t time;
-	clock_t wait;
-	
-	//starting the clock
 	time = clock();
-	wait = clock();
 	
 	//defining some important scalar quantities
-	complex<double> action = 2.0;
-	//double S_1 = 2.0*pow(mass,3)/3.0/lambda;
-	//double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S_1;
+	double S1 = 2.0/3.0;
+	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
+	complex<double> action = twaction;
 	double alpha = R/3; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = 1.0;
 	unsigned int runs_count = 0;
-	double action_test = 1.0;
-	double vector_test = 1.0;
 	unsigned int min_runs = 3;
+	vector<double> action_test(1);	action_test[0] = 1.0;
+	vector<double> sol_test(1);	sol_test[0] = 1.0;
+	vector<double> delta_test(1); delta_test[0] = 1.0;
+	vector<double> calc_test(1); calc_test[0] = 1.0;
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
@@ -84,7 +117,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
 	double b_parameter = -1.0;
-	double c_parameter = epsilon;
+	double c_parameter = -epsilon;
 	vector<double> root(3);
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
@@ -92,11 +125,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
     for (unsigned int j=0; j<N*Nb; j++)
-    	{
-		complex<double> rho1Sqrd = -pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0);
-		complex<double> rho2Sqrd = -pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0); 
-		double rho1 = sqrt(real(rho1Sqrd)); //should be real even without real()
-		double rho2 = sqrt(real(rho2Sqrd));
+    	{ 
+		double rho1 = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0))); //should be real even without real()
+		double rho2 = real(sqrt(-pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0)));
 		if (R<alpha)
 			{
 		    cout << "R is too small. not possible to give thinwall input. it should be more that " << alpha;
@@ -106,23 +137,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			p(2*j+1) = 0.0; //imaginary parts set to zero
 		    if (rho1<(R-alpha) && rho2<(R-alpha))
 		    	{
-		        p(2*j) = root[0];
+		        p(2*j) = root[2];
 		        }
 		    else if (rho1>(R+alpha) || rho2>(R+alpha))
 		    	{
-		        p(2*j) = root[2];
+		        p(2*j) = root[0];
 		        }
 		    else if (real(coordB(j,1))>0) //note that the coord should be real
 		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh((rho1-R)/2.0)/2.0;
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
 		        }
 		    else if (real(coordB(j,1))<0)
 		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[2]-root[0])*tanh((rho2-R)/2.0)/2.0;
+		        p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
 		        }
 		    else
 		    	{
-		        p(2*j) = root[0]; //i.e. if coordB(j,1) == 0
+		        p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
 		        }
 			}
 		}
@@ -155,33 +186,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
-	bool Xwait = true;
-	while ((action_test > closenessA || runs_count<min_runs || vector_test>closenessV) && Xwait )
+	while ((sol_test.back()>closenessS || runs_count<min_runs))
 		{
-		//quantities used to stop newton-raphson loop
-		action_test = abs(action - action_last)/abs(action_last);
-		if (action_test < closenessA)
-			{
-			break;
-			}
 		runs_count ++;
-		action_last = action;
 		
 		//defining the zero mode at the final time boundary and the time step before
 		vec Chi0(Nb*N);
 		Chi0 = Eigen::VectorXd::Zero(N*Nb);
-		unsigned int nnzChi0 = 0;
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
             Chi0(pos) = p(2*neigh(pos,1,1,Nb))-p(2*neigh(pos,1,-1,Nb)); //final time slice
-            nnzChi0 += 1;
             //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb))-p(2*neigh(pos-1,1,-1,Nb)); //penultimate time slice
             }
-        //double norm; //normalizing
-        //norm = Chi0.dot(Chi0);
-        //norm = pow(norm,0.5);
-        //Chi0 /= norm;
+        double norm; //normalizing
+        norm = Chi0.dot(Chi0);
+        norm = pow(norm/N/Nb,0.5);
+        Chi0 /= norm;
 
 		// allocating memory for DS, DDS
 		vec minusDS(2*N*Nb+1);
@@ -192,7 +213,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		DDS_to_reserve(1) = 3;
 		DDS_to_reserve(2*N*Nb-2) = 3;
 		DDS_to_reserve(2*N*Nb-1) = 3;
-		DDS_to_reserve(2*N*Nb) = nnzChi0;
+		DDS_to_reserve(2*N*Nb) = N;
 		for (lint j=1;j<(N*Nb-1);j++)
 			{
 			DDS_to_reserve(2*j) = 2*(2*2+1)+1;
@@ -213,7 +234,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			//unsigned int x = intCoord(j,1,Nb); //currently unused
 			
-			if (Chi0(j)>1.0e-16) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>2.0e-16) //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -238,8 +259,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
-				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -253,8 +273,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0\
-				-Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -296,6 +315,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 }
             }
         action = kinetic - pot_l - pot_e;
+        
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -329,15 +349,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		//solving for delta using the Newton-Raphson method
-		double small = minusDS.dot(minusDS);
-		small = pow(small,0.5);
-		vector_test = small/(2*N*Nb+1); //gives average size of elements of minusDS
-		if (vector_test < closenessV)
-			{
-			break; //solution has been found
-			}
-		
+
+	//solving for delta in DDS*delta=minusDS, where p' = p + delta		
 		vec delta(2*N*Nb+1);
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
@@ -361,6 +374,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			cout << "Solving failed" << endl;
 			return 0;
 			}
+		
+		//independent check on whether calculation worked
+		vec diff(2*N*Nb+1);
+		diff = DDS*delta-minusDS;
+		double maxDiff = diff.maxCoeff();
+		maxDiff = absolute(maxDiff);
+		calc_test.push_back(maxDiff);
+		if (calc_test.back()>closenessC)
+			{
+			cout << "Calculation failed" << endl;
+			cout << "calc_test = " << calc_test.back() << endl;
+			return 0;
+			}
 
 		//assigning values to phi
 		p += delta;
@@ -370,12 +396,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//convergence issues
-		vector_test = minusDS.maxCoeff();
-		vector_test = absolute(vector_test);
+		//evaluating norms
+		double normDS = minusDS.dot(minusDS);
+		normDS = pow(normDS,0.5);
+		double normP = p.dot(p);
+		normP = pow(normP,0.5);
+		double normDelta = delta.dot(delta);
+		normDelta = pow(normDelta,0.5);
 		
-		char print_wait;
-		bool bool_wait = false; //set to false if you want program to stop if the looping is slow and ask the user whether or not they want to print
-		convergence(runs_count,action_test,vector_test,time,&wait,&print_wait,&print_choice, &aq.printRun, kinetic, pot_l, pot_e, bool_wait);
+		//assigning test values
+		//quantities used to stop newton-raphson loop
+		action_test.push_back(abs(action - action_last)/abs(action_last));
+		action_last = action;
+		sol_test.push_back(normDS/normP);
+		delta_test.push_back(normDelta/normP);
+			
+		//printing tests to see convergence
+		printf("%16s%16s%16s\n","aTest","sTest","dTest");
+		printf("%16g%16g%16g\n",action_test.back(),sol_test.back(),delta_test.back());
+		
 		} //closing "runs" while loop
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	

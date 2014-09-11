@@ -1,5 +1,5 @@
 #gnuplot program to plot vector output from pi.cc
-#to plot from command line type gnuplot -e "f='data/.....dat'" pi.gp
+#to plot from command line type gnuplot -e "f='data/.....dat'" pic.gp
 #where the .... denotes the relevant filename
 #plots magnitude versus phase
 

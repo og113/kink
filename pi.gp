@@ -7,8 +7,6 @@
 #set terminal postscript eps color enhanced size 10,5
 #set output 'figure.eps';
 
-
-
 set multiplot layout 1, 2 title "phi(x,t)";
 set xtics rotate
 set bmargin 5
