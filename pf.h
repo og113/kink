@@ -52,6 +52,10 @@ double closenessS; //solution (i.e. minusDS)
 double closenessD; //delta
 double closenessC; //calculation
 
+//parameters determining input phi
+double alpha; //gives span over which tanh is used
+double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //simple generic functions

@@ -41,6 +41,7 @@ while(getline(fin,line))
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss2 >> alpha >> open;
 		}
 	}
 fin.close();
@@ -50,6 +51,7 @@ string inP = aq.inputChoice; //just because I write this a lot
 NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
+alpha *= R;
 Tb = 1.0*R;
 angle = asin(Tb/R);
 L = 3.0*R;
@@ -65,9 +67,9 @@ Tc = b*(Nc-1.0);
 
 //determining number of runs
 closenessA = 1.0;
-closenessS = 1.0e-4;
+closenessS = 1.0e-5;
 closenessD = 1.0;
-closenessC = 1.0e-14;
+closenessC = 5.0e-14;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -100,10 +102,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double S1 = 2.0/3.0;
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
 	complex<double> action = twaction;
-	double alpha = R/3; //gives span over which tanh is used
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
-	comp action_last = 1.0;
+	comp action_last = action;
 	unsigned int runs_count = 0;
 	unsigned int min_runs = 3;
 	vector<double> action_test(1);	action_test[0] = 1.0;
@@ -161,7 +162,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
-    double open = 1.0;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
     if (true)
     	{
 		for (unsigned int j=0;j<N;j++)
@@ -227,7 +227,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned long int j = 0; j < N*Nb; j++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
-			//unsigned int x = intCoord(j,1,Nb); //currently unused
 			
 			if (absolute(Chi0(j))>2.0e-16) //zero mode lagrange constraint
 				{
@@ -315,7 +314,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//printing early if desired
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
-			if (print_choice.compare("a")==0 || print_choice.compare("e")==0)
+			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
 				{
 				printAction(kinetic,pot_l,pot_e);
 				}
@@ -348,24 +347,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		vec delta(2*N*Nb+1);
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
-		Eigen::SimplicialLLT<spMat> solver;
+		Eigen::SparseLU<spMat> solver;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "DDS pattern analysis failed" << endl;
+			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
 			return 0;
 			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
-			cout << "Factorization failed" << endl;
+			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
 			return 0;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "Solving failed" << endl;
+			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
 			return 0;
 			}
 		
@@ -406,8 +405,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta_test.push_back(normDelta/normP);
 			
 		//printing tests to see convergence
-		printf("%16s%16s%16s\n","aTest","sTest","dTest");
-		printf("%16g%16g%16g\n",action_test.back(),sol_test.back(),delta_test.back());
+		if (runs_count==1)
+			{
+			printf("%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","deltaTest");
+			}
+		printf("%16i%16i%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),delta_test.back());
 		
 		} //closing "runs" while loop
 		
