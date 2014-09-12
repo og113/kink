@@ -209,16 +209,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
 		spMat DDS(2*N*Nb+1,2*N*Nb+1);
 		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
-		DDS_to_reserve(0) = 3;
+		DDS_to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
 		DDS_to_reserve(1) = 3;
 		DDS_to_reserve(2*N*Nb-2) = 3;
 		DDS_to_reserve(2*N*Nb-1) = 3;
 		DDS_to_reserve(2*N*Nb) = N;
-		for (lint j=1;j<(N*Nb-1);j++)
-			{
-			DDS_to_reserve(2*j) = 2*(2*2+1)+1;
-			DDS_to_reserve(2*j+1) = 2*(2*2+1)+1;
-			}
 		DDS.reserve(DDS_to_reserve);
 		
 		//initializing to zero
@@ -314,8 +309,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
             }
-        action = kinetic - pot_l - pot_e;
-        
+        action = kinetic - pot_l - pot_e;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
