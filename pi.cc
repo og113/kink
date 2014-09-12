@@ -130,7 +130,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		double rho2 = real(sqrt(-pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0)));
 		if (R<alpha)
 			{
-		    cout << "R is too small. not possible to give thinwall input. it should be more that " << alpha;
+		    cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
 		    }
 		else
 			{
@@ -158,7 +158,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		}
 		
-	p(N*Nb) = 0.2; //initializing Lagrange parameter for removing dp/dx zero mode
+	p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     double open = 1.0;//value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
@@ -199,10 +199,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             Chi0(pos) = p(2*neigh(pos,1,1,Nb))-p(2*neigh(pos,1,-1,Nb)); //final time slice
             //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb))-p(2*neigh(pos-1,1,-1,Nb)); //penultimate time slice
             }
-        double norm; //normalizing
-        norm = Chi0.dot(Chi0);
-        norm = pow(norm/N/Nb,0.5);
-        Chi0 /= norm;
+        if (runs_count==1) //printing Chi0
+        	{
+        	printVectorB("data/Chi0.dat",Chi0);
+        	}
 
 		// allocating memory for DS, DDS
 		vec minusDS(2*N*Nb+1);
@@ -239,7 +239,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
 		    	minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
-		    	minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j-1);
+		    	minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j);
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -300,7 +300,14 @@ void printVectorB (const string& printFile, vec vecToPrint)
 			{
 			F << setw(25) << real(coordB(j,r)) << setw(25) << imag(coordB(j,r));
 			}
-		F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
+		if (vecToPrint.size()>N*Nb)
+			{
+			F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
+			}
+		else
+			{
+			F << setw(25) << vecToPrint(j) << endl;
+			}
 		}
 	F.close();
 	}
