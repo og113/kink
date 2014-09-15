@@ -1,4 +1,5 @@
 //program to generate the periodic instantons
+//#define NDEBUG //NDEBUG is to remove error and bounds checking on vectors in SparseLU, for speed - only include once everything works
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <vector>
@@ -52,14 +53,22 @@ NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
-Tb = 1.0*R;
-angle = asin(Tb/R);
-L = 3.0*R;
-double Ltemp = 1.5*(1.5*Tb*tan(angle));
-if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+if (inP.compare("p") == 0)
 	{
-	L=Ltemp;
+	Tb = 1.0*R;
+	L = 3.0*R;
+	double Ltemp = 1.5*(1.5*Tb*tan(angle));
+	if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+		{
+		L=Ltemp;
+		}	
 	}
+else if (inP.compare("b") == 0)
+	{
+	Tb = 1.5*R;
+	L = 3.0*R;
+	}
+angle = asin(Tb/R);
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
 Ta = b*(Na-1.0);
@@ -126,9 +135,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
     for (unsigned int j=0; j<N*Nb; j++)
-    	{ 
-		double rho1 = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0))); //should be real even without real()
-		double rho2 = real(sqrt(-pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0)));
+    	{
 		if (R<alpha)
 			{
 		    cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
@@ -136,26 +143,47 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		else
 			{
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-		    if (rho1<(R-alpha) && rho2<(R-alpha))
-		    	{
-		        p(2*j) = root[2];
-		        }
-		    else if (rho1>(R+alpha) || rho2>(R+alpha))
-		    	{
-		        p(2*j) = root[0];
-		        }
-		    else if (real(coordB(j,1))>0) //note that the coord should be real
-		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
-		        }
-		    else if (real(coordB(j,1))<0)
-		    	{
-		        p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
-		        }
-		    else
-		    	{
-		        p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
-		        }
+			if (inP.compare("b")==0)
+				{
+				double rho = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1),2.0))); //should be real even without real()
+				if ((rho-R)<-alpha)
+					{
+					p(2*j) = root[2];
+					}
+				else if ((rho-R)>alpha)
+					{
+					p(2*j) = root[0];
+					}
+				else
+					{
+					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
+					}
+				}
+			else if (inP.compare("p")==0)
+				{
+				double rho1 = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0)));
+				double rho2 = real(sqrt(-pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0)));
+				if ((rho1-R)<-alpha && (rho2-R)<-alpha)
+					{
+				    p(2*j) = root[2];
+				    }
+				else if ((rho1-R)>alpha || (rho2-R)>alpha)
+					{
+				    p(2*j) = root[0];
+				    }
+				else if (real(coordB(j,1))>0) //note that the coord should be real
+					{
+				    p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
+				    }
+				else if (real(coordB(j,1))<0)
+					{
+				    p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
+				    }
+				else
+					{
+				    p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
+				    }
+				}
 			}
 		}
 		
@@ -257,9 +285,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
-				DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
-				DDS.insert(2*j,2*(j+1)) = 1.0/b;
-				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+				if (inP.compare("b")==0)
+					{
+					DDS.insert(2*j,2*j) = 1.0; //zero change (initial input satisfies b.c.s)
+					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+					}
+				else if (inP.compare("p")==0)
+					{
+					DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
+					DDS.insert(2*j,2*(j+1)) = 1.0/b;
+					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+					}
 				}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//bulk
@@ -365,6 +401,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if(solver.info()!=Eigen::Success)
 			{
 			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
+			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
 			return 0;
 			}
 		
