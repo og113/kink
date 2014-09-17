@@ -115,7 +115,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = action;
 	unsigned int runs_count = 0;
-	unsigned int min_runs = 3;
+	unsigned int min_runs = 2;
 	vector<double> action_test(1);	action_test[0] = 1.0;
 	vector<double> sol_test(1);	sol_test[0] = 1.0;
 	vector<double> delta_test(1); delta_test[0] = 1.0;
@@ -236,7 +236,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		vec minusDS(2*N*Nb+1);
 		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
 		spMat DDS(2*N*Nb+1,2*N*Nb+1);
+		DDS.setZero(); //just making sure
 		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
+		DDS_to_reserve = Eigen::VectorXi::Constant(2*N*Nb+1,11);
 		DDS_to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
 		DDS_to_reserve(1) = 3;
 		DDS_to_reserve(2*N*Nb-2) = 3;
