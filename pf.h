@@ -38,7 +38,7 @@ double theta;
 unsigned int NT;
 double epsilon;
 double R; //size of bubble
-double Tb;
+double Tb;  //b section includes both corner points
 double angle; //not a primary parameter, just used to make L
 double L;
 double a; //step sizes in each spatial dimension
@@ -304,15 +304,15 @@ void printVectorB (const string& printFile, vec vecToPrint)
 		F << left;
 		for (int r=0; r<2; r++)
 			{
-			F << setw(25) << real(coordB(j,r)) << setw(25) << imag(coordB(j,r));
+			F << setw(20) << real(coordB(j,r)) << setw(20) << imag(coordB(j,r));
 			}
 		if (vecToPrint.size()>N*Nb)
 			{
-			F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
+			F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
 			}
 		else
 			{
-			F << setw(25) << vecToPrint(j) << endl;
+			F << setw(20) << vecToPrint(j) << endl;
 			}
 		}
 	F.close();
@@ -334,9 +334,9 @@ void printVector (const string& printFile, vec vecToPrint)
 			x0 = x;
 			}
 		F << left;
-		F << setw(25) << real(coord(j,0)) << setw(25) << imag(coord(j,0)); //note using coord for full time contour
-		F << setw(25) << real(coord(j,1)) << setw(25) << imag(coord(j,1));
-		F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
+		F << setw(20) << real(coord(j,0)) << setw(20) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(20) << real(coord(j,1)) << setw(20) << imag(coord(j,1));
+		F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
 		}
 	F.close();
 	}
@@ -352,13 +352,41 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 		{
 		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
-			F << setw(25) << it.row()+1 << setw(15) << it.col()+1 << setw(25) << it.value() << endl;
+			F << setw(20) << it.row()+1 << setw(20) << it.col()+1 << setw(20) << it.value() << endl;
 			}
 		}
 	F.close();
 	}
 
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//loading functions
+
+//load vector from file
+vec loadVector (const string& printFile, const unsigned int& Nt)
+	{
+	vec outputVec(2*Nt*N);
+	fstream F;
+	F.open((printFile).c_str(), ios::in);
+	string line;
+	unsigned int j = 0;
+	while (getline(f, line))
+		{
+		if (!line.empty())
+			{
+			std::string col1, col3;
+
+			std::istringstream ss(line);
+			ss >> >> >> >>;
+			ss >> outputVec(2*j) >> outputVec(2*j+1);
+			j++;
+			}
+		}
+	F.close();
+	}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //askQuestions and changeParameters

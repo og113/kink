@@ -15,9 +15,9 @@ set xtic auto
 set ytic auto
 set title "re(phi)"
 set xlabel "x"
-set ylabel "t"
+set ylabel "re(t)-im(t)"
 set zlabel "re(phi)"
 set grid
-splot f using 3:($2-$1):5 with points
+splot f using 3:($1-$2):5 with points
 
 pause -1

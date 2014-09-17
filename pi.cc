@@ -71,8 +71,8 @@ else if (inP.compare("b") == 0)
 angle = asin(Tb/R);
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
-Ta = b*(Na-1.0);
-Tc = b*(Nc-1.0);
+Ta = b*Na;
+Tc = b*Nc;
 
 //determining number of runs
 closenessA = 1.0;
@@ -467,93 +467,95 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//propagating solution back in minkowskian time
     //A1. initialize mp==mphi using last point of ephi and zeros- use complex phi
-    cVec ap(N*Na); //phi on section "a"
-    ap = Eigen::VectorXcd::Zero(N*Na);
+    cVec ap(N*(Na+1)); //phi on section "a"
+    ap = Eigen::VectorXcd::Zero(N*(Na+1));
     for (unsigned int j=0; j<N; j++)
     	{
-        ap(j*Na) = Cp(j*Nb);
+        ap(j*(Na+1)) = Cp(j*Nb);
     	}
 
     //A2. initialize vel - defined at half steps, first step being at t=-1/2,
     //vel(t+1/2) := (p(t+1)-p(t))/dt
-    cVec velA (N*Na);
-    velA = Eigen::VectorXcd::Zero(N*Na);
+    cVec velA (N*(Na+1));
+    velA = Eigen::VectorXcd::Zero(N*(Na+1));
     double dtau = -b;
-    double Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
+    double Dt0 = dtau; //b/2*(-1+1i); - this is surely wrong!!
     for (unsigned int j=0; j<N; j++)
     	{
-        velA(j*Na) = 0; //due to boundary condition
+        velA(j*(Na+1)) = 0; //due to boundary condition
     	}
 
     
     //A3. initialize acc using phi and expression from equation of motion and zeros-complex
-    cVec accA(N*Na);
-    accA = Eigen::VectorXcd::Zero(N*Na);
+    cVec accA(N*(Na+1));
+    accA = Eigen::VectorXcd::Zero(N*(Na+1));
     for (unsigned int j=0; j<N; j++)
     	{
-        accA(j*Na) = ((Dt0/pow(a,2))*(ap(neigh(j*Na,1,1,Na))+ap(neigh(j*Na,1,-1,Na))-2.0*ap(j*Na)) \
-            -dV(ap(j*Na)))/dtau;
+    	unsigned int l = j*(Na+1);
+        accA(l) = ((Dt0/pow(a,2))*(ap(neigh(l,1,1,(Na+1)))+ap(neigh(l,1,-1,(Na+1)))-2.0*ap(l)) \
+            -Dt0*dV(ap(l)))/dtau;
     	}
 
     //A7. run loop
-    for (unsigned int j=1; j<Na; j++)
+    for (unsigned int j=1; j<(Na+1); j++)
     	{
         for (unsigned int k=0; k<N; k++)
         	{
-            unsigned int l = j+k*Na;
+            unsigned int l = j+k*(Na+1);
             velA(l) = velA(l-1) + dtau*accA(l-1);
             ap(l) = ap(l-1) + dtau*velA(l);
         	}
         for (unsigned int k=0; k<N; k++)
         	{
-            unsigned int l = j+k*Na;
-            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na))+ap(neigh(l,1,-1,Na))-2.0*ap(l)) \
+            unsigned int l = j+k*(Na+1);
+            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,(Na+1)))+ap(neigh(l,1,-1,(Na+1)))-2.0*ap(l)) \
             -dV(ap(l));    
         	}
     	}
 
     //now propagating forwards along c
     //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
-    cVec cp(N*Nc); //phi on section "c"
-    cp = Eigen::VectorXcd::Zero(N*Nc);
+    cVec cp(N*(Nc+1)); //phi on section "c"
+    cp = Eigen::VectorXcd::Zero(N*(Nc+1));
     for (unsigned int j=0; j<N; j++)
     	{
-        cp(j*Nc) = Cp(j*Nb+Nb-1);
+        cp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
     	}
 
     //C3. initialize vel - defined at half steps, first step being at t=-1/2,
     //vel(t+1/2) := (p(t+1)-p(t))/dt
-    cVec velC (N*Nc);
-    velC = Eigen::VectorXcd::Zero(N*Nc);
+    cVec velC (N*(Nc+1));
+    velC = Eigen::VectorXcd::Zero(N*(Nc+1));
     dtau = b;
-    Dt0 = dtau; //b/2*(-1+1i*up); - this is surely wrong!!
+    Dt0 = dtau; //b/2*(1-1i); - this is surely wrong!!
     for (unsigned int j=0; j<N; j++)
     	{
-        velC(j*Nc) = 0; //due to boundary condition
+        velC(j*(Nc+1)) = 0; //due to boundary condition
     	}
 
     //C4. initialize acc using phi and expression from equation of motion and zeros-complex
-    cVec accC(N*Nc);
-    accC = Eigen::VectorXcd::Zero(N*Nc);
+    cVec accC(N*(Nc+1));
+    accC = Eigen::VectorXcd::Zero(N*(Nc+1));
     for (unsigned int j=0; j<N; j++)
     	{
-        accC(j*Nc) = ((Dt0/pow(a,2))*(cp(neigh(j*Nc,1,1,Nc))+cp(neigh(j*Nc,1,-1,Nc))-2.0*cp(j*Nc)) \
-            -dV(cp(j*Nc)))/dtau;
+    	unsigned int l = j*(Nc+1);
+        accC(l) = ((Dt0/pow(a,2))*(cp(neigh(l,1,1,(Nc+1)))+cp(neigh(l,1,-1,(Nc+1)))-2.0*cp(l)) \
+            -Dt0*dV(cp(l)))/dtau;
     	}
 
     //C7. run loop
-    for (unsigned int j=1; j<Nc; j++)
+    for (unsigned int j=1; j<(Nc+1); j++)
 		{
 		for (unsigned int k=0; k<N; k++)
 			{
-		    unsigned int l = j+k*Nc;
+		    unsigned int l = j+k*(Nc+1);
 		    velC(l) = velC(l-1) + dtau*accC(l-1);
 		    ap(l) = ap(l-1) + dtau*velC(l);
 			}
 		for (unsigned int k=0; k<N; k++)
 			{
-		    unsigned int l = j+k*Nc;
-		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc))+cp(neigh(l,1,-1,Nc))-2.0*cp(l)) \
+		    unsigned int l = j+k*(Nc+1);
+		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,(Nc+1)))+cp(neigh(l,1,-1,(Nc+1)))-2.0*cp(l)) \
 		    -dV(cp(l));    
 			}
 		}
@@ -567,8 +569,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         unsigned int x = intCoord(j,1,NT);
         if (t<Na)
         	{
-            t = Na-1-t;
-            tCp(j) = ap(t+x*Na);
+            t = Na-t;
+            tCp(j) = ap(t+x*(Na+1));
             }
         else if (t<(Na+Nb))
         	{
@@ -577,8 +579,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             }
         else
         	{
-            t = t - Na - Nb;
-            tCp(j) = cp(t+x*Nc);
+            t = t - Na - Nb + 1;
+            tCp(j) = cp(t+x*(Nc+1));
         	}
     	}
     	
