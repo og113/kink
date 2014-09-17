@@ -49,10 +49,12 @@ double Tc;
 //determining number of runs
 double closenessA; //action
 double closenessS; //solution (i.e. minusDS)
+double closenessSM; //solution max
 double closenessD; //delta
 double closenessC; //calculation
 
 //parameters determining input phi
+string inP; //b for bubble, p for periodic instaton, f for from file
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 
@@ -272,8 +274,8 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
-	printf("%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
 	}
 	
 //print action and its constituents to the terminal

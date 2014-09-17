@@ -46,7 +46,7 @@ while(getline(fin,line))
 		}
 	}
 fin.close();
-string inP = aq.inputChoice; //just because I write this a lot
+inP = aq.inputChoice; //just because I write this a lot
 
 //derived quantities
 NT = Na + Nb + Nc;
@@ -77,6 +77,7 @@ Tc = b*(Nc-1.0);
 //determining number of runs
 closenessA = 1.0;
 closenessS = 1.0e-5;
+closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 5.0e-14;
 
@@ -118,6 +119,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	unsigned int min_runs = 2;
 	vector<double> action_test(1);	action_test[0] = 1.0;
 	vector<double> sol_test(1);	sol_test[0] = 1.0;
+	vector<double> solM_test(1);	solM_test[0] = 1.0;
 	vector<double> delta_test(1); delta_test[0] = 1.0;
 	vector<double> calc_test(1); calc_test[0] = 1.0;
 
@@ -214,7 +216,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
-	while ((sol_test.back()>closenessS || runs_count<min_runs))
+	while ((sol_test.back()>closenessS || solM_test.back()>closenessSM || runs_count<min_runs))
 		{
 		runs_count ++;
 		
@@ -432,6 +434,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//evaluating norms
 		double normDS = minusDS.dot(minusDS);
 		normDS = pow(normDS,0.5);
+		double maxDS = minusDS.maxCoeff();
+		double minDS = minusDS.minCoeff();
+		if (-minDS>maxDS)
+			{
+			maxDS = -minDS;
+			}
 		double normP = p.dot(p);
 		normP = pow(normP,0.5);
 		double normDelta = delta.dot(delta);
@@ -442,14 +450,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		action_test.push_back(abs(action - action_last)/abs(action_last));
 		action_last = action;
 		sol_test.push_back(normDS/normP);
+		solM_test.push_back(maxDS);
 		delta_test.push_back(normDelta/normP);
 			
 		//printing tests to see convergence
 		if (runs_count==1)
 			{
-			printf("%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","deltaTest");
+			printf("%16s%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest");
 			}
-		printf("%16i%16i%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),delta_test.back());
+		printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
 		
 		} //closing "runs" while loop
 		
@@ -524,16 +533,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
 
     //C4. initialize acc using phi and expression from equation of motion and zeros-complex
-    cVec accC(N*Na);
-    accC = Eigen::VectorXcd::Zero(N*Na);
+    cVec accC(N*Nc);
+    accC = Eigen::VectorXcd::Zero(N*Nc);
     for (unsigned int j=0; j<N; j++)
     	{
         accC(j*Nc) = ((Dt0/pow(a,2))*(cp(neigh(j*Nc,1,1,Nc))+cp(neigh(j*Nc,1,-1,Nc))-2.0*cp(j*Nc)) \
-            -dV(cp(j*Na)))/dtau;
+            -dV(cp(j*Nc)))/dtau;
     	}
 
     //C7. run loop
-    for (unsigned int j=1; j<Na; j++)
+    for (unsigned int j=1; j<Nc; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
 			{
@@ -576,10 +585,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    	//misc end of program tasks - mostly printing
     
     //making real vec from complex one
-    vec tp(N*NT);
+    vec tp(2*N*NT);
     tp = vecReal(tCp,NT*N);
-    tp.conservativeResize(N*NT+1);
-    tp(2*N*NT) = p(2*N*Nb-1);
+    tp.conservativeResize(2*N*NT+1);
+    tp(2*N*NT) = p(2*N*Nb);
     
     //stopping clock
 	time = clock() - time;
