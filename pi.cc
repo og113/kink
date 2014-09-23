@@ -533,11 +533,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
     //now propagating forwards along c
     //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
-    cVec cp(N*(Nc+1)); //phi on section "c"
-    cp = Eigen::VectorXcd::Zero(N*(Nc+1));
+    cVec ccp(N*(Nc+1)); //phi on section "c"
+    ccp = Eigen::VectorXcd::Zero(N*(Nc+1));
     for (unsigned int j=0; j<N; j++)
     	{
-        cp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
+        ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
     	}
 
     //C3. initialize vel - defined at half steps, first step being at t=-1/2,
@@ -557,8 +557,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2))*(cp(neigh(l,1,1,Nc+1))+cp(neigh(l,1,-1,Nc+1))-2.0*cp(l)) \
-            -Dt0*dV(cp(l)))/dtau;
+        accC(l) = ((Dt0/pow(a,2))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+            -Dt0*dV(ccp(l)))/dtau;
     	}
 
     //C7. run loop
@@ -568,13 +568,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 		    unsigned int l = j+k*(Nc+1);
 		    velC(l) = velC(l-1) + dtau*accC(l-1);
-		    ap(l) = ap(l-1) + dtau*velC(l);
+		    ccp(l) = ccp(l-1) + dtau*velC(l);
 			}
 		for (unsigned int k=0; k<N; k++)
 			{
 		    unsigned int l = j+k*(Nc+1);
-		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc+1))+cp(neigh(l,1,-1,Nc+1))-2.0*cp(l)) \
-		    -dV(cp(l));    
+		    accC(l) = (1.0/pow(a,2))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+		    -dV(ccp(l));    
 			}
 		}
     
@@ -598,7 +598,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         else
         	{
             t = t - Na - Nb + 1;
-            tCp(j) = cp(t+x*(Nc+1));
+            tCp(j) = ccp(t+x*(Nc+1));
         	}
     	}
     	
