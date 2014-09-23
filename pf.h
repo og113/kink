@@ -9,7 +9,10 @@
 #include <cmath>
 #include <complex>
 #include <string>
+#include <stdlib.h>
+#include <stdio.h>
 #include <gsl/gsl_poly.h>
+#include "gnuplot_i.hpp"
 
 using namespace std;
 
@@ -55,6 +58,7 @@ double closenessC; //calculation
 
 //parameters determining input phi
 string inP; //b for bubble, p for periodic instaton, f for from file
+int loadNumber;
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 
@@ -276,6 +280,7 @@ void printParameters()
 	{
 	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
 	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
+	printf("\n");
 	}
 	
 //print action and its constituents to the terminal
@@ -357,6 +362,18 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 		}
 	F.close();
 	}
+	
+//print repi via gnuplot
+void gp(const string & readFile, const string & gnuplotFile) 
+	{
+	string prefix = "gnuplot -e \"f='";
+	string middle = "'\" ";
+	string suffix = " -persistent";
+	string commandStr = prefix + readFile + middle + gnuplotFile + suffix;
+	const char * command = commandStr.c_str();
+	FILE * gnuplotPipe = popen (command,"w");
+	fprintf(gnuplotPipe, "%s \n", " ");
+	}
 
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,26 +381,31 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 //loading functions
 
 //load vector from file
-vec loadVector (const string& printFile, const unsigned int& Nt)
+vec loadVector (const string& loadFile, const unsigned int& Nt)
 	{
-	vec outputVec(2*Nt*N);
+	vec outputVec(2*Nt*N+1);
 	fstream F;
-	F.open((printFile).c_str(), ios::in);
+	F.open((loadFile).c_str(), ios::in);
 	string line;
 	unsigned int j = 0;
-	while (getline(f, line))
+	while (getline(F, line))
 		{
 		if (!line.empty())
 			{
-			std::string col1, col3;
-
-			std::istringstream ss(line);
-			ss >> >> >> >>;
+			double temp;
+			istringstream ss(line);
+			ss >> temp >> temp >> temp >> temp;
 			ss >> outputVec(2*j) >> outputVec(2*j+1);
 			j++;
 			}
 		}
+	if (j!=Nt*N)
+		{
+		cout << "loadVector error" << endl;
+		}
+	outputVec(2*Nt*N) = 0.5; //lagrange multiplier to remove zero mode
 	F.close();
+	return outputVec;
 	}
 
 
@@ -483,8 +505,7 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		L = newParameter;
 		a = L/(N-1);
 		}
-	else if ( parameterLabel.compare("Tb")==0) //this paramter changes the physics for the periodic instanton,
-												//as Tb/R changes where R = R(epsilon)
+	else if ( parameterLabel.compare("Tb")==0) //this paramter changes the physics for the periodic instanton,											//as Tb/R changes where R = R(epsilon)
 		{
 		b = b*newParameter/Tb;
 		Ta = Ta*newParameter/Tb;
@@ -505,17 +526,18 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Tc = Tc*newParameter/R;
 		R = newParameter;
 		}
-	else if ( parameterLabel.compare("epsilon")==0) //this parameter changes the physics of the potential
+	else if ( parameterLabel.compare("dE")==0) //this parameter changes the physics of the potential
 													//but it does not change Tb/R, where R(epsilon)
 		{
-		R = R*epsilon/newParameter; //R scales with 1/epsilon and the other length scales scale with R
-		L = L*epsilon/newParameter;
-		a = a*epsilon/newParameter;
-		b = b*epsilon/newParameter;
-		Ta = Ta*epsilon/newParameter;
-		Tb = Tb*epsilon/newParameter;
-		Tc = Tc*epsilon/newParameter;
-		epsilon = newParameter;
+		R = R*dE/newParameter; //R scales with 1/dE and the other length scales scale with R
+		L = L*dE/newParameter;
+		a = a*dE/newParameter;
+		b = b*dE/newParameter;
+		Ta = Ta*dE/newParameter;
+		Tb = Tb*dE/newParameter;
+		Tc = Tc*dE/newParameter;
+		epsilon = epsilon*newParameter/dE;
+		dE = newParameter;
 		}
 	else
 		{

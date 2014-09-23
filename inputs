@@ -3,5 +3,5 @@
 #N		Na		Nb		Nc		dE		theta
 100		64		64		32		0.05	0.0
 #
-#inputChoice	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open
-b				1			n			0			0			e				0			0.4			0.0
+#inputChoice	load#	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open
+p				0		3			Tb			10.0		16.0		e				0			0.4			0.0

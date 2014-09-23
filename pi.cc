@@ -10,7 +10,10 @@
 #include <cmath>
 #include <complex>
 #include <string>
+#include <stdlib.h>
+#include <stdio.h>
 #include <gsl/gsl_poly.h>
+#include "gnuplot_i.hpp"
 #include "pf.h"
 
 using namespace std;
@@ -41,7 +44,7 @@ while(getline(fin,line))
 	else
 		{
 		istringstream ss2(line);
-		ss2 >> aq.inputChoice >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss2 >> aq.inputChoice >> loadNumber >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 		ss2 >> alpha >> open;
 		}
 	}
@@ -55,20 +58,27 @@ R = 2.0/3.0/epsilon;
 alpha *= R;
 if (inP.compare("p") == 0)
 	{
-	Tb = 1.0*R;
+	Tb = 0.8*R;
 	L = 3.0*R;
-	double Ltemp = 1.5*(1.5*Tb*tan(angle));
-	if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+	if (Tb<R)
 		{
-		L=Ltemp;
-		}	
+		angle = asin(Tb/R);
+		double Ltemp = 1.5*(1.5*Tb*tan(angle));
+		if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+			{
+			L=Ltemp;
+			}
+		}
+	else
+		{
+		cout << "Tb>R, cannot define angle" << endl;
+		}
 	}
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
 	L = 3.0*R;
 	}
-angle = asin(Tb/R);
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
 Ta = b*Na;
@@ -83,8 +93,6 @@ closenessC = 5.0e-14;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
-
-printParameters();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -103,6 +111,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		double loopParameter = aq.minValue + (aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1.0);
 		changeDouble (loop_choice,loopParameter);
 		}
+		
+	printParameters();
 
 	//defining a time and starting the clock
 	clock_t time;
@@ -136,18 +146,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
-    for (unsigned int j=0; j<N*Nb; j++)
-    	{
+	if (inP.compare("f")!=0)
+		{
 		if (R<alpha)
 			{
-		    cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
-		    }
-		else
+			cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
+			}
+		for (unsigned int j=0; j<N*Nb; j++)
 			{
+			comp t = coordB(j,0);
+			comp x = coordB(j,1);
 			p(2*j+1) = 0.0; //imaginary parts set to zero
 			if (inP.compare("b")==0)
 				{
-				double rho = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1),2.0))); //should be real even without real()
+				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
 				if ((rho-R)<-alpha)
 					{
 					p(2*j) = root[2];
@@ -163,33 +175,39 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (inP.compare("p")==0)
 				{
-				double rho1 = real(sqrt(-pow(coordB(j,0),2.0) + pow(coordB(j,1)+R*cos(angle),2.0)));
-				double rho2 = real(sqrt(-pow(coordB(j,0),2.0) + pow((coordB(j,1)-R*cos(angle)),2.0)));
+				double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
+				double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
 				if ((rho1-R)<-alpha && (rho2-R)<-alpha)
 					{
-				    p(2*j) = root[2];
-				    }
+					p(2*j) = root[2];
+					}
 				else if ((rho1-R)>alpha || (rho2-R)>alpha)
 					{
-				    p(2*j) = root[0];
-				    }
-				else if (real(coordB(j,1))>0) //note that the coord should be real
+					p(2*j) = root[0];
+					}
+				else if (real(x)>0) //note that the coord should be real
 					{
-				    p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
-				    }
-				else if (real(coordB(j,1))<0)
+					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
+					}
+				else if (real(x)<0)
 					{
-				    p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
-				    }
+					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
+					}
 				else
 					{
-				    p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
-				    }
+					p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
+					}
 				}
 			}
+		p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
 		}
-		
-	p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
+	else
+		{		
+		string prefix = ("./data/pi");
+		string suffix = (".dat");
+		string loadfile = prefix+to_string(loadNumber)+suffix;
+		p = loadVector(loadfile,Nb);
+		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     if (true)
@@ -492,7 +510,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Na+1);
-        accA(l) = ((Dt0/pow(a,2))*(ap(neigh(l,1,1,(Na+1)))+ap(neigh(l,1,-1,(Na+1)))-2.0*ap(l)) \
+        accA(l) = ((Dt0/pow(a,2))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
             -Dt0*dV(ap(l)))/dtau;
     	}
 
@@ -508,7 +526,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         for (unsigned int k=0; k<N; k++)
         	{
             unsigned int l = j+k*(Na+1);
-            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,(Na+1)))+ap(neigh(l,1,-1,(Na+1)))-2.0*ap(l)) \
+            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
             -dV(ap(l));    
         	}
     	}
@@ -539,7 +557,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2))*(cp(neigh(l,1,1,(Nc+1)))+cp(neigh(l,1,-1,(Nc+1)))-2.0*cp(l)) \
+        accC(l) = ((Dt0/pow(a,2))*(cp(neigh(l,1,1,Nc+1))+cp(neigh(l,1,-1,Nc+1))-2.0*cp(l)) \
             -Dt0*dV(cp(l)))/dtau;
     	}
 
@@ -555,7 +573,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int k=0; k<N; k++)
 			{
 		    unsigned int l = j+k*(Nc+1);
-		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,(Nc+1)))+cp(neigh(l,1,-1,(Nc+1)))-2.0*cp(l)) \
+		    accC(l) = (1.0/pow(a,2))*(cp(neigh(l,1,1,Nc+1))+cp(neigh(l,1,-1,Nc+1))-2.0*cp(l)) \
 		    -dV(cp(l));    
 			}
 		}
@@ -597,11 +615,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double realtime = time/1000000.0;
 	
 	//printing to terminal
-	if (loop==0)
-		{
-		printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","re(action)","im(action)");
-		}
+	printf("\n");
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","re(action)","im(action)");
 	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,real(action),imag(action));
+	printf("\n");
+	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 	//printing action value
 	FILE * actionfile;
@@ -614,6 +632,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string osuffix = (".dat");
 	string outfile = oprefix+to_string(loop)+osuffix;
 	printVector(outfile,tp);
+	gp(outfile,"repi.gp");
 
 } //closing parameter loop
 
