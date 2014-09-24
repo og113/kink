@@ -58,7 +58,6 @@ double closenessC; //calculation
 
 //parameters determining input phi
 string inP; //b for bubble, p for periodic instaton, f for from file
-int loadNumber;
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 
@@ -148,40 +147,54 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 	return XintCoord;	
 	}
 	
+//simple time
+comp simpleTime (const unsigned int& time)
+	{
+	comp xTime;
+	if ( time < Na)
+		{
+		double temp = (double)time;
+		temp -= (double)Na;
+		xTime = b*temp + i*Tb;
+		}
+	else if (time < (Na+Nb))
+		{
+		double temp = (double)time;
+		temp -= Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
+		xTime = i*Tb - i*b*temp;
+		}
+	else
+		{
+		double temp = (double)time;
+		temp -= (double)Na;
+		temp -= (double)Nb;
+		xTime = b*temp;
+		}
+	return xTime;
+	}
+	
+//simple space
+double simpleSpace (const unsigned int& space)
+	{
+	double xSpace = -L/2.0 + space*a;
+	return xSpace;
+	}
+	
 //gives values of coordinates in whole spacetime
 comp coord(const unsigned int& locNum,const int& direction)
 	{
-	comp Xcoord;
+	comp xCoord;
 	if (direction==0)
 		{
 		unsigned int t = intCoord(locNum,0,NT);
-		if ( t < Na)
-			{
-			double temp = (double)t;
-			temp -= (double)Na;
-			Xcoord = b*temp + i*Tb;
-			}
-		else if (intCoord(locNum,0,NT) < (Na+Nb))
-			{
-			double temp = (double)t;
-			temp -= Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
-			Xcoord = i*Tb - i*b*temp;
-			}
-		else
-			{
-			double temp = (double)t;
-			temp -= (double)Na;
-			temp -= (double)Nb;
-			Xcoord = b*temp;
-			}
+		xCoord = simpleTime(t);
 		}
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,NT);
-		double temp = (double)x;
-		Xcoord = -L/2.0 + temp*a;
+		xCoord = simpleSpace(x);
 		}
-	return Xcoord;
+	return xCoord;
 	}
 
 //gives values of coordinates on section AB
@@ -271,6 +284,38 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 	return neighLocation;
 	}
 	
+comp dtFn (const unsigned int& time)
+	{
+	comp xdt;
+	if (time<(NT-1))
+		{
+		xdt = simpleTime(time+1)-simpleTime(time);
+		}
+	else
+		{
+		xdt = 0;
+		}
+	return xdt;
+	}
+	
+comp DtFn (const unsigned int& time)
+	{
+	comp xDt;
+	if (time==(NT-1))
+		{
+		xDt = (simpleTime(time)-simpleTime(time-1))/2.0;
+		}
+	else if (time==0)
+		{
+		xDt = (simpleTime(time+1) - simpleTime(time))/2.0;
+		}
+	else
+		{
+		xDt = (simpleTime(time+1)-simpleTime(time-1))/2.0;
+		}
+	return xDt;
+	}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //printing functions
@@ -341,7 +386,14 @@ void printVector (const string& printFile, vec vecToPrint)
 		F << left;
 		F << setw(20) << real(coord(j,0)) << setw(20) << imag(coord(j,0)); //note using coord for full time contour
 		F << setw(20) << real(coord(j,1)) << setw(20) << imag(coord(j,1));
-		F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
+		if (vecToPrint.size()>N*NT)
+			{
+			F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
+			}
+		else
+			{
+			F << setw(20) << vecToPrint(j) << endl;
+			}
 		}
 	F.close();
 	}

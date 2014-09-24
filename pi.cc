@@ -38,7 +38,7 @@ while(getline(fin,line))
 	if (firstLine==0)
 		{
 		istringstream ss1(line);
-		ss1 >> N >> Na >> Nb >> Nc >> dE >> theta;
+		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
 		firstLine = 1;
 		}
 	else
@@ -58,7 +58,6 @@ R = 2.0/3.0/epsilon;
 alpha *= R;
 if (inP.compare("p") == 0)
 	{
-	Tb = 0.8*R;
 	L = 3.0*R;
 	if (Tb<R)
 		{
@@ -119,7 +118,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	time = clock();
 	
 	//defining some important scalar quantities
-	double S1 = 2.0/3.0;
+	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
 	complex<double> action = twaction;
 
