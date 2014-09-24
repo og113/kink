@@ -82,7 +82,7 @@ string loop_choice = aq.loopChoice; //just so that we don't have two full stops 
 string print_choice = aq.printChoice;
 
 //loading initial phi
-vec p(2*NT+1);
+vec p(2*NT+2);
 string inPrefix = ("./data/pi");
 string inSuffix = (".dat");
 string inFile = inPrefix + to_string(aq.fileNo) + inSuffix;
@@ -154,10 +154,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			unsigned int posC = j*NT+(Na+Nb-1);
 			unsigned int posA = j*NT;
-			unsigned int posD = j*NT+(NT-1);
+			unsigned int posDm = j*NT+(NT-2);
             chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
             chiT(posA) = p(2*(posA+1))-p(2*posA);
-            chiT(posD) = p(2*posD)-p(2*(posD-1));
+            chiT(posD) = p(2*(posDm+1))-p(2*posDm);
             }
         if (runs_count==1) //printing chis
         	{
@@ -180,7 +180,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		DDS.reserve(DDS_to_reserve);
 		
 		//initializing to zero
-		comp kinetic = 0.0;
+		comp kineticS = 0.0;
+		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
 
@@ -195,27 +196,40 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			
 			if (absolute(chiX(j))>2.0e-16) //spatial zero mode lagrange constraint
 				{
-				DDS.insert(2*j,2*N*NT) = a*Chi0(j); 
-				DDS.insert(2*N*NT,2*j) = a*Chi0(j);
+				DDS.insert(2*j,2*N*NT) = a*chiX(j); 
+				DDS.insert(2*N*NT,2*j) = a*chiX(j);
 		    	minusDS(2*j) += -a*chiX(j)*p(2*N*NT);
 		    	minusDS(2*N*NT) += -a*chiX(j)*p(2*j);
+		    	}
+		    	
+		    if (absolute(chiT(j))>2.0e-16)
+		    	{
+		    	DDS.insert(2*(j+1),2*N*NT) = a*chiT(j); 
+		    	DDSm(c3) = 2*(j+1)+1; DDSn(c3) = 2*Tdim+2; DDSv(c3) = a*chiT(2*j+1); %there should be no chiT on the final time slice or this line will go wrong
+                DDSm(c3) = 2*Tdim+2; DDSn(c3) = 2*(j+1)+1; DDSv(c3) = a*chiT(2*j+1);
+                DDSm(c3) = 2*j+1; DDSn(c3) = 2*Tdim+2; DDSv(c3) = -a*chiT(2*j+1);
+                DDSm(c3) = 2*Tdim+2; DDSn(c3) = 2*j+1; DDSv(c3) = -a*chiT(2*j+1);
+                minusDS(2*(j+1)+1) = minusDS(2*(j+1)+1) - a*chiT(2*j+1)*p(2*Tdim+2);
+                minusDS(2*Tdim+2) = minusDS(2*Tdim+2) - a*chiT(2*j+1)*p(2*j+1);
+                minusDS(2*j+1) = minusDS(2*j+1) + a*chiT(2*j+1)*p(2*Tdim+2);
+                minusDS(2*Tdim+2) = minusDS(2*Tdim+2) + a*chiT(2*j+1)*p(2*j+1);
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//boundaries			
 			if (t==(NT-1))
 				{
-				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
-				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
-				DDS.insert(2*j,2*(j-1)) = -1.0/b;
+				DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time  at final time boundary
 				DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 				}
 			else if (t==0)
 				{
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+				kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -235,7 +249,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			//bulk
 			else
 				{
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+				kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -276,7 +291,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
             }
-        action = kinetic - pot_l - pot_e;   
+        action = kineticT - kineticS - pot_l - pot_e;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
