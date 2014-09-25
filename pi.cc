@@ -150,7 +150,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	cMat Eomega(N,N); 	Eomega = Eigen::MatrixXcd::Zero(N,N);
 	cVec eigenValues(N);
 	cMat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
-	Eigen::EigenSolver<mat> eigensolver(h);
+	Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
 	if (eigensolver.info() != Eigen::Success)
 		{
 		cout << "h eigensolver failed" << endl;
@@ -398,7 +398,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
             }
-        action = kineticT - kineticS - pot_l - pot_e;   
+        action = kineticT - kineticS - pot_l - pot_e;
+        
+        spMat check(2*N*Nb+1,2*N*Nb+1);
+        check -= DDS;
+        cout << DDS.nonZeros() << " " << check.nonZeros() << endl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
