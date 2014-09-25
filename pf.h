@@ -21,6 +21,7 @@ typedef complex<double> comp;
 typedef vector<unsigned int> intVec;
 typedef Eigen::SparseMatrix<double> spMat;
 typedef Eigen::MatrixXd mat;
+typedef Eigen::MatrixXcd cMat;
 typedef Eigen::VectorXd vec;
 typedef Eigen::VectorXcd cVec;
 
@@ -42,12 +43,14 @@ unsigned int NT;
 double epsilon;
 double R; //size of bubble
 double Tb;  //b section includes both corner points
+double Gamma; //equals exp(-theta)
 double angle; //not a primary parameter, just used to make L
 double L;
 double a; //step sizes in each spatial dimension
 double b; //step sizes in time
 double Ta;
 double Tc;
+vector<double> root(3);
 
 //determining number of runs
 double closenessA; //action
@@ -638,3 +641,32 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//fourier transform type functions
+
+//h the matrix from dl[7]
+mat hFn(const unsigned int & xN, const double & xa)
+	{
+	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
+	double diag = 1.0 + 2.0/pow(xa,2.0); //diagonal terms
+	double offDiag = -1.0/pow(xa,2.0); //off diagonal terms
+	for (unsigned int l=0; l<xN; l++)
+		{
+		if (l==0)
+			{
+			xh(l,l) = diag;
+			xh(l,l+1) = offDiag;			
+			}
+		else if (l==(xN-1))
+			{
+			xh(l,l) = diag;
+			xh(l,l-1) = offDiag;
+			}
+		else
+			{
+			xh(l,l) = diag;
+			xh(l,l+1) = offDiag;
+			xh(l,l-1) = offDiag;	
+			}
+		}
+	return xh;
+	}

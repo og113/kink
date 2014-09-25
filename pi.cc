@@ -44,7 +44,7 @@ while(getline(fin,line))
 	else
 		{
 		istringstream ss2(line);
-		ss2 >> aq.inputChoice >> loadNumber >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 		ss2 >> alpha >> open;
 		}
 	}
@@ -82,6 +82,7 @@ a = L/(N-1.0);
 b = Tb/(Nb-1.0);
 Ta = b*Na;
 Tc = b*Nc;
+Gamma = exp(-theta);
 
 //determining number of runs
 closenessA = 1.0;
@@ -139,9 +140,38 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
 	double b_parameter = -1.0;
 	double c_parameter = -epsilon;
-	vector<double> root(3);
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
+
+	//deterimining omega matrices for fourier transforms in spatial direction
+	mat h(N,N);
+	h = hFn(N,a);
+	cMat omega(N,N); 	omega = Eigen::MatrixXcd::Zero(N,N);
+	cMat Eomega(N,N); 	Eomega = Eigen::MatrixXcd::Zero(N,N);
+	cVec eigenValues(N);
+	cMat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
+	Eigen::EigenSolver<mat> eigensolver(h);
+	if (eigensolver.info() != Eigen::Success)
+		{
+		cout << "h eigensolver failed" << endl;
+		}
+	else
+		{
+		eigenValues = eigensolver.eigenvalues();
+		eigenVectors = eigensolver.eigenvectors();
+		}
+		
+	for (unsigned int j=0; j<N; j++)
+		{
+		for (unsigned int k=0; k<N; k++)
+			{
+			for (unsigned int l=0; l<N; l++)
+				{
+				omega(j,k) += a*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				Eomega(j,k) += a*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				}
+			}
+		}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
@@ -204,7 +234,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		{		
 		string prefix = ("./data/pi");
 		string suffix = (".dat");
-		string loadfile = prefix+to_string(loadNumber)+suffix;
+		string loadfile = prefix+to_string(aq.fileNo)+suffix;
 		p = loadVector(loadfile,Nb);
 		}
 	
@@ -266,7 +296,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		DDS.reserve(DDS_to_reserve);
 		
 		//initializing to zero
-		comp kinetic = 0.0;
+		comp kineticS = 0.0;
+		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
 
@@ -290,7 +321,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				kinetic += -Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -302,7 +333,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
+				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -324,7 +356,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
-				kinetic += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0 - Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
+				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
 				
@@ -365,7 +398,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
                 }
             }
-        action = kinetic - pot_l - pot_e;   
+        action = kineticT - kineticS - pot_l - pot_e;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -373,7 +406,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
 				{
-				printAction(kinetic,pot_l,pot_e);
+				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
 			if (print_choice.compare("v")==0 || print_choice.compare("e")==0)
 				{
@@ -509,24 +542,61 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Na+1);
-        accA(l) = ((Dt0/pow(a,2))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
+        accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
             -Dt0*dV(ap(l)))/dtau;
     	}
+    	
+    //A4.5 starting the energy and that off
+    #define eta(m) ap(m)-root[0]
+    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na+1); //no energy defined on initial time slice
+	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
+	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
+	comp bound = 0.0;
+	for (unsigned int j=0; j<N; j++)
+		{
+		for (unsigned int k=0; k<N; k++)
+			{
+			if (absolute(theta)<2.0e-16)
+				{
+				bound += 0.0;
+				}
+			else
+				{
+				bound += (1.0-Gamma)*omega(j,k)*eta(2*(Na+1)*j)*eta(2*(Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ap(2*(Na+1)*j)*ap(2*(Na+1)*k)/(1.0-Gamma);
+				}
+			}
+		}
 
     //A7. run loop
     for (unsigned int j=1; j<(Na+1); j++)
     	{
         for (unsigned int k=0; k<N; k++)
         	{
-            unsigned int l = j+k*(Na+1);
-            velA(l) = velA(l-1) + dtau*accA(l-1);
-            ap(l) = ap(l-1) + dtau*velA(l);
+            unsigned int m = j+k*(Na+1);
+            velA(m) = velA(m-1) + dtau*accA(m-1);
+            ap(m) = ap(m-1) + dtau*velA(m);
         	}
         for (unsigned int k=0; k<N; k++)
         	{
-            unsigned int l = j+k*(Na+1);
-            accA(l) = (1.0/pow(a,2))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
-            -dV(ap(l));    
+            unsigned int m = j+k*(Na+1);
+            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
+            -dV(ap(m));
+            ergA (m-1) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
+            for (unsigned int l=0; l<N; l++)
+            	{
+            	unsigned int l1 = j-1 + k*(Na+1);
+            	unsigned int l2 = j-1 + l*(Na+1);
+		        if (absolute(theta)<2.0e-16)
+					{
+		        	linErgA(j-1) += Eomega(k,l)*eta(2*l1)*eta(2*l2) - Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1);
+					linNumA (j-1) += omega(k,l)*eta(2*l1)*eta(2*l2) - omega(k,l)*ap(2*l1+1)*ap(2*l2+1);
+		        	}
+				else
+					{
+					linErgA(j-1) += 2.0*Gamma*omega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
+					linNumA(j-1) += 2.0*Gamma*Eomega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
+					}
+				}
         	}
     	}
 
@@ -556,7 +626,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+        accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
             -Dt0*dV(ccp(l)))/dtau;
     	}
 
@@ -572,7 +642,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int k=0; k<N; k++)
 			{
 		    unsigned int l = j+k*(Nc+1);
-		    accC(l) = (1.0/pow(a,2))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
 		    -dV(ccp(l));    
 			}
 		}
