@@ -462,6 +462,33 @@ vec loadVector (const string& loadFile, const unsigned int& Nt)
 	F.close();
 	return outputVec;
 	}
+	
+//load DDS from file
+spMat loadSpmat (const string & loadFile, const unsigned int & nnzGuess)
+	{
+	vector<Eigen::Triplet<double>> triplet;
+	vec columns(nnzGuess);
+	vec values(nnzGuess);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line;
+	unsigned int nnz = 0;
+	unsigned int length;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			double temp;
+			istringstream ss(line);
+			ss >> rows(nnz) >> columns(nnz) >> values(nnz);
+			nnz++;
+			}
+		nnz++;
+		}
+	spMat outputMat(,)
+	
+	return outputMat;
+	}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
