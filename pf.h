@@ -24,6 +24,7 @@ typedef Eigen::MatrixXd mat;
 typedef Eigen::MatrixXcd cMat;
 typedef Eigen::VectorXd vec;
 typedef Eigen::VectorXcd cVec;
+typedef Eigen::Triplet<double> triplet;
 
 complex<double> i(0.0,1.0);
 #define pi 3.14159265359
@@ -466,27 +467,40 @@ vec loadVector (const string& loadFile, const unsigned int& Nt)
 //load DDS from file
 spMat loadSpmat (const string & loadFile, const unsigned int & nnzGuess)
 	{
-	vector<Eigen::Triplet<double>> triplet;
-	vec columns(nnzGuess);
-	vec values(nnzGuess);
+	vector<triplet> tripletList;
+	tripletList.reserve(nnzGuess);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
 	string line;
 	unsigned int nnz = 0;
-	unsigned int length;
+	unsigned int length = 1;
+	unsigned int row;
+	unsigned int column;
+	double value;
 	while (getline(F, line))
 		{
 		if (!line.empty())
 			{
-			double temp;
 			istringstream ss(line);
-			ss >> rows(nnz) >> columns(nnz) >> values(nnz);
-			nnz++;
+			ss >> row >> column >> value;
+			if (absolute(value)>2.0e-16)
+				{
+				tripletList.push_back(triplet(row,column,value));
+				nnz++;
+				}
+			if (row>length) 
+				{
+				length = row;
+				}
+			else if (column>length)
+				{
+				length = column;
+				}
 			}
-		nnz++;
-		}
-	spMat outputMat(,)
-	
+		}	
+	spMat outputMat(length,length);
+	outputMat.setFromTriplets(tripletList.begin(), tripletList.end());
+	outputMat.makeCompressed();
 	return outputMat;
 	}
 

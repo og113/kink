@@ -414,21 +414,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			if (print_choice.compare("v")==0 || print_choice.compare("e")==0)
 				{
-				string minusDSprefix = ("./data/minusDS");
+				string minusDSprefix = ("./data/minusDSE");
 				string minusDSsuffix = (".dat");
 				string minusDSfile = minusDSprefix+to_string(loop)+to_string(runs_count)+minusDSsuffix;
 				printVectorB(minusDSfile,minusDS);
 				}
 			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
 				{
-				string piEarlyPrefix = ("./data/piEarly");
+				string piEarlyPrefix = ("./data/pE");
 				string piEarlySuffix = (".dat");
 				string piEarlyFile = piEarlyPrefix+to_string(loop)+to_string(runs_count)+piEarlySuffix;
 				printVectorB(piEarlyFile,p);
 				}
 			if (print_choice.compare("m")==0 || print_choice.compare("e")==0)
 				{
-				string DDSprefix = ("./data/DDS");
+				string DDSprefix = ("./data/DDSE");
 				string DDSsuffix = (".dat");
 				string DDSfile = DDSprefix+to_string(loop)+to_string(runs_count)+DDSsuffix;
 				printSpmat(DDSfile,DDS);
@@ -706,6 +706,18 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string outfile = oprefix+to_string(loop)+osuffix;
 	printVector(outfile,tp);
 	gp(outfile,"repi.gp");
+	
+	//printing output minusDS				
+	string minusDSprefix = ("./data/minusDS");
+	string minusDSsuffix = (".dat");
+	string minusDSfile = minusDSprefix+to_string(loop)+minusDSsuffix;
+	printVectorB(minusDSfile,minusDS);
+				
+	//printing output DDS
+	string DDSprefix = ("./data/DDS");
+	string DDSsuffix = (".dat");
+	string DDSfile = DDSprefix+to_string(loop)+DDSsuffix;
+	printSpmat(DDSfile,DDS);
 
 } //closing parameter loop
 
