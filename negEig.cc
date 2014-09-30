@@ -33,35 +33,94 @@ typedef Eigen::Triplet<double> triplet;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
-//load DDS from file into matrix M
-unsigned int Nt, zeroModes, fileNo;
+//loading parameters
+aqStruct aq; //struct to hold user responses
+
+//define the numbers P and c
+unsigned int P; //number of times multiplied
+double c;//small number in exponent
 
 ifstream fin;
-fin.open("negEigInputs", ios::in);
+fin.open("inputs", ios::in);
 string line;
+int firstLine = 0;
 while(getline(fin,line))
 	{
 	if(line[0] == '#')
 		{
 		continue;
 		}
-	istringstream ss(line);
-	ss >> N >> Nt >> zeroModes >> fileNo;
+	if (firstLine==0)
+		{
+		istringstream ss1(line);
+		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+		firstLine++;
+		}
+	else if (firstLine==1)
+		{
+		istringstream ss2(line);
+		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss2 >> alpha >> open;
+		firstLine++;
+		}
+	else
+		{
+		istringstream ss3(line);
+		ss3 >> P >> c;
+		}
 	}
 fin.close();
+inP = aq.inputChoice; //just because I write this a lot
+//derived quantities
+NT = Na + Nb + Nc;
+epsilon = dE;
+R = 2.0/3.0/epsilon;
+alpha *= R;
+if (inP.compare("p") == 0)
+	{
+	L = 3.0*R;
+	if (Tb<R)
+		{
+		angle = asin(Tb/R);
+		double Ltemp = 1.5*(1.5*Tb*tan(angle));
+		if (Ltemp<L) //making sure to use the smaller of the two possible Ls
+			{
+			L=Ltemp;
+			}
+		}
+	else
+		{
+		cout << "Tb>R, cannot define angle" << endl;
+		}
+	}
+else if (inP.compare("b") == 0)
+	{
+	Tb = 1.5*R;
+	L = 3.0*R;
+	}
+a = L/(N-1.0);
+b = Tb/(Nb-1.0);
+Ta = b*Na;
+Tc = b*Nc;
+Gamma = exp(-theta);
 
-unsigned int matSize = 2*N*Nt+zeroModes;
-unsigned int nnzGuess = (Nt-2)*(2*N*11) + 6 + 6 + N*zeroModes; //change Nt to suit, and change 6 to a maximum of 2*N for more complicated boundaries
-string loadFile = "./data/DDS0" + to_string(fileNo) + ".dat";
 
-spMat M = loadSpmat(loadFile,nnzGuess);
+//load DDS from file into matrix M
+unsigned int zeroModes = 1;
+unsigned int matSize = 2*N*Nb+zeroModes;
+Eigen::VectorXi to_reserve(matSize);
+to_reserve = Eigen::VectorXi::Constant(matSize,11);
+to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
+to_reserve(1) = 3;
+to_reserve(2*N*Nb-2) = 3;
+to_reserve(2*N*Nb-1) = 3;
+to_reserve(2*N*Nb) = N;
+string loadFile = "./data/DDS0" + to_string(aq.fileNo) + ".dat";
+
+spMat M = loadSpmat(loadFile,to_reserve);
 
 //define a random vector r
 vec r = Eigen::VectorXd::Random(matSize);
-
-//define the numbers P and c
-unsigned int P = 100; //number of times multiplied
-double c = 0.01;
 
 //define the matrix A = (1-c*M)
 spMat A(matSize,matSize);
@@ -95,10 +154,10 @@ error = temp.dot(temp);
 error = pow(error,0.5);
 
 //checking that epsilon*lambda*N<1 - is this really what we need
-double check = c*eigenvalue*N;
-if (check<1)
+double check = absolute(c*eigenvalue*N);
+if (check>1)
 	{
-	cout << "check<1" << endl;
+	//cout << "check>1" << endl;//not sure about the relevance of this
 	}
 
 //printing error, and eigenvalue to file
