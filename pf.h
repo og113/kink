@@ -435,7 +435,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 	F.close();
 	}
 	
-//print repi via gnuplot
+//print p via gnuplot, using repi or pi or some such like
 void gp(const string & readFile, const string & gnuplotFile) 
 	{
 	string prefix = "gnuplot -e \"f='";
@@ -445,6 +445,22 @@ void gp(const string & readFile, const string & gnuplotFile)
 	const char * command = commandStr.c_str();
 	FILE * gnuplotPipe = popen (command,"w");
 	fprintf(gnuplotPipe, "%s \n", " ");
+	pclose(gnuplotPipe);
+	}
+	
+//print repi via gnuplot
+void gpSimple(const string & readFile) 
+	{
+	string commandOpenStr = "gnuplot -persistent";
+	const char * commandOpen = commandOpenStr.c_str();
+	FILE * gnuplotPipe = popen (command,"w");
+	string command1Str = "plot \"" + readFile + "\" with lines";
+	string command2Str = "pause -1";
+	const char * command1 = command1Str.c_str();
+	const char * command2 = command2Str.c_str();
+	fprintf(gnuplotPipe, "%s \n", command1);
+	fprintf(gnuplotPipe, "%s \n", command2);
+	pclose(gnuplotPipe);
 	}
 
 	

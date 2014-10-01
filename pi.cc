@@ -132,7 +132,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
-	complex<double> action = twaction;
+	comp action = twaction;
+	cVec ergVec(Nb);
+	double erg;
+	
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = action;
@@ -318,6 +321,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
+		ergVec = Eigen::VectorXcd::Zero(Nb);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,9 +343,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -351,10 +357,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
 				if (inP.compare("b")==0)
 					{
@@ -374,10 +382,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -566,7 +576,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	
     //A4.5 starting the energy and that off
     #define eta(m) ap(m)-root[0]
-    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na+1); //no energy defined on initial time slice
+    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na); //no energy defined on initial time slice
 	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
 	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
 	comp bound = 0.0;
@@ -715,23 +725,22 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	fclose(actionfile);
 
 	//printing output phi
-	string oprefix = ("./data/pi");
-	string osuffix = (".dat");
-	string outfile = oprefix+inP+to_string(loop)+osuffix;
-	printVector(outfile,tp);
-	gp(outfile,"repi.gp");
+	string pifile = "./data/pi"+inP+to_string(loop)+".dat";
+	printVector(pifile,tp);
+	gp(pifile,"repi.gp");
 	
 	//printing output minusDS				
-	string minusDSprefix = ("./data/minusDS");
-	string minusDSsuffix = (".dat");
-	string minusDSfile = minusDSprefix+inP+to_string(loop)+minusDSsuffix;
+	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
 	printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
-	string DDSprefix = ("./data/DDS");
-	string DDSsuffix = (".dat");
-	string DDSfile = DDSprefix+inP+to_string(loop)+DDSsuffix;
+	string DDSfile = "./data/DDS"+inP+to_string(loop)+".dat";
 	printSpmat(DDSfile,DDS);
+	
+	//printing output ergVec
+	string ergfile = "./data/DDS"+inP+to_string(loop)+".dat";
+	printSpmat(ergfile,linErgVec);
+	gpSimple(ergFile);
 
 } //closing parameter loop
 
