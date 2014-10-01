@@ -39,13 +39,14 @@ while(getline(fin,line))
 		{
 		istringstream ss1(line);
 		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
-		firstLine = 1;
+		firstLine++;
 		}
-	else
+	else if (firstLine==1)
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 		ss2 >> alpha >> open;
+		firstLine++;
 		}
 	}
 fin.close();

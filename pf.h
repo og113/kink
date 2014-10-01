@@ -345,11 +345,11 @@ void printVectorB (const string& printFile, vec vecToPrint)
 	{
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
-	double x0 = intCoord(0,1,Nb);
+	unsigned int x0 = intCoord(0,1,Nb);
 	F.precision(16);
 	for (unsigned long int j=0; j<N*Nb; j++)
 		{
-		double x = intCoord(j,1,Nb);
+		unsigned int x = intCoord(j,1,Nb);
 		if (x!=x0) //this is put in for gnuplot
 			{
 			F << endl;
@@ -377,26 +377,26 @@ void printVector (const string& printFile, vec vecToPrint)
 	{
 	fstream F;
 	F.open((printFile).c_str(), ios::out);
-	double x0 = intCoord(0,1,NT);
+	unsigned int x0 = intCoord(0,1,NT);
 	F.precision(16);
 	for (unsigned long int j=0; j<N*NT; j++)
 		{
-		double x = intCoord(j,1,NT);
+		unsigned int x = intCoord(j,1,NT);
 		if (x!=x0) //this is put in for gnuplot
 			{
 			F << endl;
 			x0 = x;
 			}
 		F << left;
-		F << setw(20) << real(coord(j,0)) << setw(20) << imag(coord(j,0)); //note using coord for full time contour
-		F << setw(20) << real(coord(j,1)) << setw(20) << imag(coord(j,1));
+		F << setw(22) << real(coord(j,0)) << setw(22) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(22) << real(coord(j,1)) << setw(22) << imag(coord(j,1));
 		if (vecToPrint.size()>N*NT)
 			{
-			F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
+			F << setw(22) << vecToPrint(2*j) << setw(22) << vecToPrint(2*j+1)  << endl;
 			}
 		else
 			{
-			F << setw(20) << vecToPrint(j) << endl;
+			F << setw(22) << vecToPrint(j) << endl;
 			}
 		}
 	F.close();
@@ -413,7 +413,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 		{
 		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
-			F << setw(20) << it.row()+1 << setw(20) << it.col()+1 << setw(20) << it.value() << endl;
+			F << setw(22) << it.row()+1 << setw(22) << it.col()+1 << setw(22) << it.value() << endl;
 			}
 		}
 	F.close();
@@ -465,15 +465,16 @@ vec loadVector (const string& loadFile, const unsigned int& Nt)
 	}
 	
 //load DDS from file
-spMat loadSpmat (const string & loadFile, const unsigned int & nnzGuess)
+spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 	{
-	vector<triplet> tripletList;
-	tripletList.reserve(nnzGuess);
+	unsigned int length = to_reserve.size();
+	spMat M(length,length);
+	M.setZero(); //just making sure
+	M.reserve(to_reserve);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
 	string line;
 	unsigned int nnz = 0;
-	unsigned int length = 1;
 	unsigned int row;
 	unsigned int column;
 	double value;
@@ -485,23 +486,13 @@ spMat loadSpmat (const string & loadFile, const unsigned int & nnzGuess)
 			ss >> row >> column >> value;
 			if (absolute(value)>2.0e-16)
 				{
-				tripletList.push_back(triplet(row,column,value));
+				M.insert(row-1,column-1) = value;
 				nnz++;
-				}
-			if (row>length) 
-				{
-				length = row;
-				}
-			else if (column>length)
-				{
-				length = column;
 				}
 			}
 		}	
-	spMat outputMat(length,length);
-	outputMat.setFromTriplets(tripletList.begin(), tripletList.end());
-	outputMat.makeCompressed();
-	return outputMat;
+	M.makeCompressed();
+	return M;
 	}
 
 
