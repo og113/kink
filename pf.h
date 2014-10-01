@@ -483,7 +483,7 @@ void gpSimple(const string & readFile)
 	{
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
-	FILE * gnuplotPipe = popen (command,"w");
+	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string command1Str = "plot \"" + readFile + "\" using 1 with lines";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();

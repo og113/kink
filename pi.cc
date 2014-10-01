@@ -84,7 +84,7 @@ if (inP.compare("p") == 0)
 		ss >> temp >> temp >> temp >> temp >> negVal;
 		}
 	}
-else if (inP.compare("b") == 0
+else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
 	L = 3.2*R;
@@ -133,9 +133,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
 	comp action = twaction;
-	cVec ergVec(NT);
-	double erg;
-	
+	cVec ergVec(NT);	
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = action;
@@ -466,6 +464,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -575,7 +574,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
     	
     //A4.5 starting the energy and that off
-    #define eta(m) ap(m)-root[0]
+    #define eta(m) real(ap(m))-root[0]
+    #define ieta(m) imag(ap(m))
     cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na); //no energy defined on initial time slice
 	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
 	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
@@ -590,7 +590,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else
 				{
-				bound += (1.0-Gamma)*omega(j,k)*eta(2*(Na+1)*j)*eta(2*(Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ap(2*(Na+1)*j)*ap(2*(Na+1)*k)/(1.0-Gamma);
+				bound += (1.0-Gamma)*omega(j,k)*eta((Na+1)*j)*eta((Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta((Na+1)*j)*ieta((Na+1)*k)/(1.0-Gamma);
 				}
 			}
 		}
@@ -609,20 +609,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             unsigned int m = j+k*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
             -dV(ap(m));
-            ergA (m-1) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
+            ergA (Na-j) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
             for (unsigned int l=0; l<N; l++)
             	{
             	unsigned int l1 = j-1 + k*(Na+1);
             	unsigned int l2 = j-1 + l*(Na+1);
 		        if (absolute(theta)<2.0e-16)
 					{
-		        	linErgA(j-1) += Eomega(k,l)*eta(2*l1)*eta(2*l2) - Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1);
-					linNumA (j-1) += omega(k,l)*eta(2*l1)*eta(2*l2) - omega(k,l)*ap(2*l1+1)*ap(2*l2+1);
+		        	linErgA(Na-j) += Eomega(k,l)*eta(l1)*eta(l2) - Eomega(k,l)*ap(l1)*ap(l2);
+					linNumA (Na-j) += omega(k,l)*eta(l1)*eta(l2) - omega(k,l)*ap(l1)*ap(l2);
 		        	}
 				else
 					{
-					linErgA(j-1) += 2.0*Gamma*omega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
-					linNumA(j-1) += 2.0*Gamma*Eomega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
+					linErgA(Na-j) += 2.0*Gamma*omega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linNumA(Na-j) += 2.0*Gamma*Eomega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
 					}
 				}
         	}
@@ -739,7 +739,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing linErgVec
 	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
-	simplePrintVector(linErgFile,linErgVec);
+	simplePrintCVector(linErgFile,linErgA);
 	gpSimple(linErgFile);
 	
 	//printing ergVec
