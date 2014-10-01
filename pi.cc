@@ -146,10 +146,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
 	h = hFn(N,a);
-	cMat omega(N,N); 	omega = Eigen::MatrixXcd::Zero(N,N);
-	cMat Eomega(N,N); 	Eomega = Eigen::MatrixXcd::Zero(N,N);
-	cVec eigenValues(N);
-	cMat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
+	mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
+	mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
+	vec eigenValues(N);
+	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
 	Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
 	if (eigensolver.info() != Eigen::Success)
 		{
@@ -261,6 +261,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	cVec Cp(Nb*N);
 	Cp = vecComplex(p,N*Nb);
 	
+	//defining DDS and minusDS
+	spMat DDS(2*N*Nb+1,2*N*Nb+1);
+	vec minusDS(2*N*Nb+1);
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
 	while ((sol_test.back()>closenessS || solM_test.back()>closenessSM || runs_count<min_runs))
@@ -282,9 +286,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	}
 
 		// allocating memory for DS, DDS
-		vec minusDS(2*N*Nb+1);
 		minusDS = Eigen::VectorXd::Zero(2*N*Nb+1); //initializing to zero
-		spMat DDS(2*N*Nb+1,2*N*Nb+1);
 		DDS.setZero(); //just making sure
 		Eigen::VectorXi DDS_to_reserve(2*N*Nb+1);//number of non-zero elements per column
 		DDS_to_reserve = Eigen::VectorXi::Constant(2*N*Nb+1,11);
@@ -399,10 +401,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 }
             }
         action = kineticT - kineticS - pot_l - pot_e;
-        
-        spMat check(2*N*Nb+1,2*N*Nb+1);
-        check -= DDS;
-        cout << DDS.nonZeros() << " " << check.nonZeros() << endl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
