@@ -356,6 +356,36 @@ void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
 	printf("%16g%16g%16g%16g%16g%16g%16g%16g\n",real(Kinetic),imag(Kinetic),real(potL),imag(potL),real(potE),imag(potE),real(action),imag(action));
 	}
 	
+//simply print a real vector
+void simplePrintVector(const string& printFile, vec vecToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F.precision(16);
+	F << left;
+	unsigned int length = vecToPrint.size();
+	for (unsigned int j=0; j<length; j++)
+		{
+		F << setw(22) << vecToPrint(j) << endl;
+		}
+	F.close();
+	}
+
+//simply print a complex vector
+void simplePrintCVector(const string& printFile, cVec vecToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F.precision(16);
+	F << left;
+	unsigned int length = vecToPrint.size();
+	for (unsigned int j=0; j<length; j++)
+		{
+		F << setw(22) << real(vecToPrint(j)) << setw(22) << imag(vecToPrint(j)) << endl;
+		}
+	F.close();
+	}
+	
 //print vector from time path B to file
 void printVectorB (const string& printFile, vec vecToPrint)
 	{
@@ -454,7 +484,7 @@ void gpSimple(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (command,"w");
-	string command1Str = "plot \"" + readFile + "\" with lines";
+	string command1Str = "plot \"" + readFile + "\" using 1 with lines";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();

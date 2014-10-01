@@ -133,7 +133,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
 	comp action = twaction;
-	cVec ergVec(Nb);
+	cVec ergVec(NT);
 	double erg;
 	
 
@@ -321,7 +321,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
-		ergVec = Eigen::VectorXcd::Zero(Nb);
+		ergVec = Eigen::VectorXcd::Zero(NT);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,7 +347,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
+				ergVec(t+Na) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -362,7 +362,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
 				if (inP.compare("b")==0)
 					{
@@ -387,7 +387,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -737,9 +737,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string DDSfile = "./data/DDS"+inP+to_string(loop)+".dat";
 	printSpmat(DDSfile,DDS);
 	
-	//printing output ergVec
-	string ergfile = "./data/DDS"+inP+to_string(loop)+".dat";
-	printSpmat(ergfile,linErgVec);
+	//printing linErgVec
+	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
+	simplePrintVector(linErgFile,linErgVec);
+	gpSimple(linErgFile);
+	
+	//printing ergVec
+	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
+	simplePrintCVector(ergFile,ergVec);
 	gpSimple(ergFile);
 
 } //closing parameter loop
