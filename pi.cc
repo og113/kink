@@ -12,6 +12,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 #include "pf.h"
@@ -22,8 +23,6 @@ int main()
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
-
-aqStruct aq; //struct to hold user responses
 
 ifstream fin;
 fin.open("inputs", ios::in);
@@ -45,7 +44,7 @@ while(getline(fin,line))
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss2 >> alpha >> open;
+		ss2 >> alpha >> open >> amp;
 		firstLine++;
 		}
 	}
@@ -57,9 +56,11 @@ NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
+vec negVec(2*N*Nb+1);
+double negVal;
 if (inP.compare("p") == 0)
 	{
-	L = 3.0*R;
+	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -71,13 +72,22 @@ if (inP.compare("p") == 0)
 		}
 	else
 		{
-		cout << "Tb>R, cannot define angle" << endl;
+		cout << "Tb>R so running negEig, need to have run pi with inP='b'" << endl;
+		system("./negEig");
+		cout << "negEig run" << endl;
+		negVec = loadVector("./data/eigVec.dat",Nb);
+		ifstream eigFile;
+		eigFile.open("./data/eigVal.dat", ios::in);
+		string lastLine = getLastLine(eigFile);
+		istringstream ss(lastLine);
+		double temp;
+		ss >> temp >> temp >> temp >> temp >> negVal;
 		}
 	}
-else if (inP.compare("b") == 0)
+else if (inP.compare("b") == 0
 	{
 	Tb = 1.5*R;
-	L = 3.0*R;
+	L = 3.2*R;
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
@@ -187,7 +197,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp t = coordB(j,0);
 			comp x = coordB(j,1);
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-			if (inP.compare("b")==0)
+			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 				{
 				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
 				if ((rho-R)<-alpha)
@@ -202,8 +212,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
 					}
+				if (Tb>R)
+					{
+					p(2*j) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j);
+					p(2*j+1) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j+1);
+					}
 				}
-			else if (inP.compare("p")==0)
+			else if (inP.compare("p")==0 && Tb<R)
 				{
 				double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
 				double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
@@ -415,21 +430,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				string minusDSprefix = ("./data/minusDSE");
 				string minusDSsuffix = (".dat");
-				string minusDSfile = minusDSprefix+to_string(loop)+to_string(runs_count)+minusDSsuffix;
+				string minusDSfile = minusDSprefix+inP+to_string(loop)+to_string(runs_count)+minusDSsuffix;
 				printVectorB(minusDSfile,minusDS);
 				}
 			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
 				{
 				string piEarlyPrefix = ("./data/pE");
 				string piEarlySuffix = (".dat");
-				string piEarlyFile = piEarlyPrefix+to_string(loop)+to_string(runs_count)+piEarlySuffix;
+				string piEarlyFile = piEarlyPrefix+inP+to_string(loop)+to_string(runs_count)+piEarlySuffix;
 				printVectorB(piEarlyFile,p);
 				}
 			if (print_choice.compare("m")==0 || print_choice.compare("e")==0)
 				{
 				string DDSprefix = ("./data/DDSE");
 				string DDSsuffix = (".dat");
-				string DDSfile = DDSprefix+to_string(loop)+to_string(runs_count)+DDSsuffix;
+				string DDSfile = DDSprefix+inP+to_string(loop)+to_string(runs_count)+DDSsuffix;
 				printSpmat(DDSfile,DDS);
 				}
 			}
@@ -702,20 +717,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing output phi
 	string oprefix = ("./data/pi");
 	string osuffix = (".dat");
-	string outfile = oprefix+to_string(loop)+osuffix;
+	string outfile = oprefix+inP+to_string(loop)+osuffix;
 	printVector(outfile,tp);
 	gp(outfile,"repi.gp");
 	
 	//printing output minusDS				
 	string minusDSprefix = ("./data/minusDS");
 	string minusDSsuffix = (".dat");
-	string minusDSfile = minusDSprefix+to_string(loop)+minusDSsuffix;
+	string minusDSfile = minusDSprefix+inP+to_string(loop)+minusDSsuffix;
 	printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
 	string DDSprefix = ("./data/DDS");
 	string DDSsuffix = (".dat");
-	string DDSfile = DDSprefix+to_string(loop)+DDSsuffix;
+	string DDSfile = DDSprefix+inP+to_string(loop)+DDSsuffix;
 	printSpmat(DDSfile,DDS);
 
 } //closing parameter loop

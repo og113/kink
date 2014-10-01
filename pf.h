@@ -11,6 +11,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 
@@ -61,9 +62,24 @@ double closenessD; //delta
 double closenessC; //calculation
 
 //parameters determining input phi
+//struct to hold answers to questions
+struct aqStruct
+	{
+	string inputChoice;
+	unsigned int fileNo;
+	double maxTheta;
+	unsigned int totalLoops;
+	string loopChoice;
+	double minValue;
+	double maxValue;
+	string printChoice;
+	unsigned int printRun;
+	};
+aqStruct aq; //struct to hold user responses
 string inP; //b for bubble, p for periodic instaton, f for from file
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
+double amp; //ammount of negative eigenvector added to bubble for Tb>R
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -495,24 +511,22 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 	return M;
 	}
 
+//get last line of a file
+string getLastLine(ifstream& inStream)
+	{
+    string xLine;
+    while (inStream >> ws && getline(inStream, xLine)) // skip empty lines
+    	{
+        ;
+		}
+		
+    return xLine;
+	}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //askQuestions and changeParameters
-
-//struct to hold answers to questions
-struct aqStruct
-	{
-	string inputChoice;
-	unsigned int fileNo;
-	double maxTheta;
-	unsigned int totalLoops;
-	string loopChoice;
-	double minValue;
-	double maxValue;
-	string printChoice;
-	unsigned int printRun;
-	};
 
 //asks initial questions to get user inputs - now defunct
 void askQuestions (aqStruct & aqx )
