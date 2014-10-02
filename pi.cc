@@ -12,6 +12,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 #include "pf.h"
@@ -22,8 +23,6 @@ int main()
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
-
-aqStruct aq; //struct to hold user responses
 
 ifstream fin;
 fin.open("inputs", ios::in);
@@ -45,7 +44,7 @@ while(getline(fin,line))
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss2 >> alpha >> open;
+		ss2 >> alpha >> open >> amp;
 		firstLine++;
 		}
 	}
@@ -57,9 +56,11 @@ NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
+vec negVec(2*N*Nb+1);
+double negVal;
 if (inP.compare("p") == 0)
 	{
-	L = 3.0*R;
+	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -71,13 +72,22 @@ if (inP.compare("p") == 0)
 		}
 	else
 		{
-		cout << "Tb>R, cannot define angle" << endl;
+		cout << "Tb>R so running negEig, need to have run pi with inP='b'" << endl;
+		system("./negEig");
+		cout << "negEig run" << endl;
+		negVec = loadVector("./data/eigVec.dat",Nb);
+		ifstream eigFile;
+		eigFile.open("./data/eigVal.dat", ios::in);
+		string lastLine = getLastLine(eigFile);
+		istringstream ss(lastLine);
+		double temp;
+		ss >> temp >> temp >> temp >> temp >> negVal;
 		}
 	}
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
-	L = 3.0*R;
+	L = 3.2*R;
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
@@ -122,7 +132,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
-	complex<double> action = twaction;
+	comp action = twaction;
+	cVec ergVec(NT);	
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = action;
@@ -187,7 +198,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp t = coordB(j,0);
 			comp x = coordB(j,1);
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-			if (inP.compare("b")==0)
+			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 				{
 				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
 				if ((rho-R)<-alpha)
@@ -202,8 +213,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
 					}
+				if (Tb>R)
+					{
+					p(2*j) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j);
+					p(2*j+1) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j+1);
+					}
 				}
-			else if (inP.compare("p")==0)
+			else if (inP.compare("p")==0 && Tb<R)
 				{
 				double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
 				double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
@@ -263,8 +279,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	Cp = vecComplex(p,N*Nb);
 	
 	//defining DDS and minusDS
-	vec minusDS(2*N*Nb+1);
 	spMat DDS(2*N*Nb+1,2*N*Nb+1);
+	vec minusDS(2*N*Nb+1);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop
@@ -303,6 +319,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
+		ergVec = Eigen::VectorXcd::Zero(NT);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -324,9 +341,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t+Na) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -336,10 +355,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
 				if (inP.compare("b")==0)
 					{
@@ -359,10 +380,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
+				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
+				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -415,21 +438,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				string minusDSprefix = ("./data/minusDSE");
 				string minusDSsuffix = (".dat");
-				string minusDSfile = minusDSprefix+to_string(loop)+to_string(runs_count)+minusDSsuffix;
+				string minusDSfile = minusDSprefix+inP+to_string(loop)+to_string(runs_count)+minusDSsuffix;
 				printVectorB(minusDSfile,minusDS);
 				}
 			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
 				{
 				string piEarlyPrefix = ("./data/pE");
 				string piEarlySuffix = (".dat");
-				string piEarlyFile = piEarlyPrefix+to_string(loop)+to_string(runs_count)+piEarlySuffix;
+				string piEarlyFile = piEarlyPrefix+inP+to_string(loop)+to_string(runs_count)+piEarlySuffix;
 				printVectorB(piEarlyFile,p);
 				}
 			if (print_choice.compare("m")==0 || print_choice.compare("e")==0)
 				{
 				string DDSprefix = ("./data/DDSE");
 				string DDSsuffix = (".dat");
-				string DDSfile = DDSprefix+to_string(loop)+to_string(runs_count)+DDSsuffix;
+				string DDSfile = DDSprefix+inP+to_string(loop)+to_string(runs_count)+DDSsuffix;
 				printSpmat(DDSfile,DDS);
 				}
 			}
@@ -441,6 +464,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -550,8 +574,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
     	
     //A4.5 starting the energy and that off
-    #define eta(m) ap(m)-root[0]
-    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na+1); //no energy defined on initial time slice
+    #define eta(m) real(ap(m))-root[0]
+    #define ieta(m) imag(ap(m))
+    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na); //no energy defined on initial time slice
 	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
 	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
 	comp bound = 0.0;
@@ -565,7 +590,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else
 				{
-				bound += (1.0-Gamma)*omega(j,k)*eta(2*(Na+1)*j)*eta(2*(Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ap(2*(Na+1)*j)*ap(2*(Na+1)*k)/(1.0-Gamma);
+				bound += (1.0-Gamma)*omega(j,k)*eta((Na+1)*j)*eta((Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta((Na+1)*j)*ieta((Na+1)*k)/(1.0-Gamma);
 				}
 			}
 		}
@@ -584,20 +609,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             unsigned int m = j+k*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
             -dV(ap(m));
-            ergA (m-1) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
+            ergA (Na-j) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
             for (unsigned int l=0; l<N; l++)
             	{
             	unsigned int l1 = j-1 + k*(Na+1);
             	unsigned int l2 = j-1 + l*(Na+1);
 		        if (absolute(theta)<2.0e-16)
 					{
-		        	linErgA(j-1) += Eomega(k,l)*eta(2*l1)*eta(2*l2) - Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1);
-					linNumA (j-1) += omega(k,l)*eta(2*l1)*eta(2*l2) - omega(k,l)*ap(2*l1+1)*ap(2*l2+1);
+		        	linErgA(Na-j) += Eomega(k,l)*eta(l1)*eta(l2) - Eomega(k,l)*ap(l1)*ap(l2);
+					linNumA (Na-j) += omega(k,l)*eta(l1)*eta(l2) - omega(k,l)*ap(l1)*ap(l2);
 		        	}
 				else
 					{
-					linErgA(j-1) += 2.0*Gamma*omega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
-					linNumA(j-1) += 2.0*Gamma*Eomega(k,l)*eta(2*l1)*eta(2*l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ap(2*l1+1)*ap(2*l2+1)/pow(1.0-Gamma,2.0);
+					linErgA(Na-j) += 2.0*Gamma*omega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linNumA(Na-j) += 2.0*Gamma*Eomega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
 					}
 				}
         	}
@@ -700,23 +725,27 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	fclose(actionfile);
 
 	//printing output phi
-	string oprefix = ("./data/pi");
-	string osuffix = (".dat");
-	string outfile = oprefix+to_string(loop)+osuffix;
-	printVector(outfile,tp);
-	gp(outfile,"repi.gp");
+	string pifile = "./data/pi"+inP+to_string(loop)+".dat";
+	printVector(pifile,tp);
+	gp(pifile,"repi.gp");
 	
 	//printing output minusDS				
-	string minusDSprefix = ("./data/minusDS");
-	string minusDSsuffix = (".dat");
-	string minusDSfile = minusDSprefix+to_string(loop)+minusDSsuffix;
+	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
 	printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
-	string DDSprefix = ("./data/DDS");
-	string DDSsuffix = (".dat");
-	string DDSfile = DDSprefix+to_string(loop)+DDSsuffix;
+	string DDSfile = "./data/DDS"+inP+to_string(loop)+".dat";
 	printSpmat(DDSfile,DDS);
+	
+	//printing linErgVec
+	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
+	simplePrintCVector(linErgFile,linErgA);
+	gpSimple(linErgFile);
+	
+	//printing ergVec
+	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
+	simplePrintCVector(ergFile,ergVec);
+	gpSimple(ergFile);
 
 } //closing parameter loop
 

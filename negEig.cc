@@ -20,25 +20,11 @@
 
 using namespace std;
 
-typedef unsigned long int lint;
-typedef complex<double> comp;
-typedef vector<unsigned int> intVec;
-typedef Eigen::SparseMatrix<double> spMat;
-typedef Eigen::MatrixXd mat;
-typedef Eigen::MatrixXcd cMat;
-typedef Eigen::VectorXd vec;
-typedef Eigen::VectorXcd cVec;
-typedef Eigen::Triplet<double> triplet;
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
-//loading parameters
-aqStruct aq; //struct to hold user responses
-
-//define the numbers P and c
-unsigned int P; //number of times multiplied
-double c;//small number in exponent
+//load parameters
+//getting variables and user inputs from inputs
 
 ifstream fin;
 fin.open("inputs", ios::in);
@@ -60,25 +46,23 @@ while(getline(fin,line))
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss2 >> alpha >> open;
+		ss2 >> alpha >> open >> amp;
 		firstLine++;
-		}
-	else
-		{
-		istringstream ss3(line);
-		ss3 >> P >> c;
 		}
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
+
 //derived quantities
 NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
+vec negVec(2*N*Nb+1);
+double negVal;
 if (inP.compare("p") == 0)
 	{
-	L = 3.0*R;
+	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -88,22 +72,24 @@ if (inP.compare("p") == 0)
 			L=Ltemp;
 			}
 		}
-	else
-		{
-		cout << "Tb>R, cannot define angle" << endl;
-		}
 	}
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
-	L = 3.0*R;
+	L = 3.2*R;
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
-Ta = b*Na;
-Tc = b*Nc;
-Gamma = exp(-theta);
 
+//define the numbers P and c
+unsigned int P; //number of times multiplied
+double c;//small number in exponent
+
+ifstream inputs;
+inputs.open("inputs", ios::in);
+string lastLine = getLastLine(inputs);
+istringstream ss(lastLine);
+ss >> P >> c;
 
 //load DDS from file into matrix M
 unsigned int zeroModes = 1;
@@ -115,12 +101,14 @@ to_reserve(1) = 3;
 to_reserve(2*N*Nb-2) = 3;
 to_reserve(2*N*Nb-1) = 3;
 to_reserve(2*N*Nb) = N;
-string loadFile = "./data/DDS0" + to_string(aq.fileNo) + ".dat";
+string loadFile = "./data/DDSb" + to_string(aq.fileNo) + ".dat";
 
 spMat M = loadSpmat(loadFile,to_reserve);
 
-//define a random vector r
+//define random vectors r, s, t
 vec r = Eigen::VectorXd::Random(matSize);
+vec s = Eigen::VectorXd::Random(matSize);
+vec t = Eigen::VectorXd::Random(matSize);
 
 //define the matrix A = (1-c*M)
 spMat A(matSize,matSize);
@@ -130,11 +118,27 @@ A += M;
 M = -M/c;
 
 //apply A to r N times in a loop - scaling in each interation
-for (unsigned int j=0;j<P;j++)
+unsigned int P1 = floor(P/10);
+for (unsigned int j=0;j<P1;j++)
 	{
 	r = A*r;
-	double scale = r.maxCoeff();
-	r /= scale;
+	s = A*s;
+	t = A*t;
+	double scaleR = r.maxCoeff();
+	double scaleS = s.maxCoeff();
+	double scaleT = t.maxCoeff();
+	r /= scaleR;
+	s /= scaleS;
+	t /= scaleT;
+	}
+r += s + t;
+r /= 3.0;
+
+for (unsigned int j=P1; j<P;j++)
+	{
+	r = A*r;
+	double scaleR = r.maxCoeff();
+	r /= scaleR;
 	}
 
 //normalising r to get approximation to eigenvector v
@@ -149,7 +153,7 @@ eigenvalue = r.dot(temp);
 
 //evaluating error as |lambda*v-M*v|
 double error;
-temp = eigenvalue*r - temp;
+temp += -eigenvalue*r;
 error = temp.dot(temp);
 error = pow(error,0.5);
 
@@ -163,7 +167,7 @@ if (check>1)
 //printing error, and eigenvalue to file
 FILE * scalarFile;
 scalarFile = fopen("./data/eigValue.dat","a");
-fprintf(scalarFile,"%16g%16g%16g\n",check,error,eigenvalue);
+fprintf(scalarFile,"%16i%16g%16g%16g%16g\n",P,c,check,error,eigenvalue);
 fclose(scalarFile);
 
 //printing eigenvector to file

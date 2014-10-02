@@ -11,6 +11,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstdlib>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 
@@ -61,9 +62,24 @@ double closenessD; //delta
 double closenessC; //calculation
 
 //parameters determining input phi
+//struct to hold answers to questions
+struct aqStruct
+	{
+	string inputChoice;
+	unsigned int fileNo;
+	double maxTheta;
+	unsigned int totalLoops;
+	string loopChoice;
+	double minValue;
+	double maxValue;
+	string printChoice;
+	unsigned int printRun;
+	};
+aqStruct aq; //struct to hold user responses
 string inP; //b for bubble, p for periodic instaton, f for from file
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
+double amp; //ammount of negative eigenvector added to bubble for Tb>R
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -340,6 +356,36 @@ void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
 	printf("%16g%16g%16g%16g%16g%16g%16g%16g\n",real(Kinetic),imag(Kinetic),real(potL),imag(potL),real(potE),imag(potE),real(action),imag(action));
 	}
 	
+//simply print a real vector
+void simplePrintVector(const string& printFile, vec vecToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F.precision(16);
+	F << left;
+	unsigned int length = vecToPrint.size();
+	for (unsigned int j=0; j<length; j++)
+		{
+		F << setw(22) << vecToPrint(j) << endl;
+		}
+	F.close();
+	}
+
+//simply print a complex vector
+void simplePrintCVector(const string& printFile, cVec vecToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F.precision(16);
+	F << left;
+	unsigned int length = vecToPrint.size();
+	for (unsigned int j=0; j<length; j++)
+		{
+		F << setw(22) << real(vecToPrint(j)) << setw(22) << imag(vecToPrint(j)) << endl;
+		}
+	F.close();
+	}
+	
 //print vector from time path B to file
 void printVectorB (const string& printFile, vec vecToPrint)
 	{
@@ -419,7 +465,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 	F.close();
 	}
 	
-//print repi via gnuplot
+//print p via gnuplot, using repi or pi or some such like
 void gp(const string & readFile, const string & gnuplotFile) 
 	{
 	string prefix = "gnuplot -e \"f='";
@@ -429,6 +475,22 @@ void gp(const string & readFile, const string & gnuplotFile)
 	const char * command = commandStr.c_str();
 	FILE * gnuplotPipe = popen (command,"w");
 	fprintf(gnuplotPipe, "%s \n", " ");
+	pclose(gnuplotPipe);
+	}
+	
+//print repi via gnuplot
+void gpSimple(const string & readFile) 
+	{
+	string commandOpenStr = "gnuplot -persistent";
+	const char * commandOpen = commandOpenStr.c_str();
+	FILE * gnuplotPipe = popen (commandOpen,"w");
+	string command1Str = "plot \"" + readFile + "\" using 1 with lines";
+	string command2Str = "pause -1";
+	const char * command1 = command1Str.c_str();
+	const char * command2 = command2Str.c_str();
+	fprintf(gnuplotPipe, "%s \n", command1);
+	fprintf(gnuplotPipe, "%s \n", command2);
+	pclose(gnuplotPipe);
 	}
 
 	
@@ -495,24 +557,22 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 	return M;
 	}
 
+//get last line of a file
+string getLastLine(ifstream& inStream)
+	{
+    string xLine;
+    while (inStream >> ws && getline(inStream, xLine)) // skip empty lines
+    	{
+        ;
+		}
+		
+    return xLine;
+	}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //askQuestions and changeParameters
-
-//struct to hold answers to questions
-struct aqStruct
-	{
-	string inputChoice;
-	unsigned int fileNo;
-	double maxTheta;
-	unsigned int totalLoops;
-	string loopChoice;
-	double minValue;
-	double maxValue;
-	string printChoice;
-	unsigned int printRun;
-	};
 
 //asks initial questions to get user inputs - now defunct
 void askQuestions (aqStruct & aqx )

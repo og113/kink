@@ -1,11 +1,11 @@
 #the following are input to pi.cc:
 #
 #N		Na		Nb		Nc		dE		Tb		theta
-100		64		64		32		0.05	10.0	0.0
+100		64		64		32		0.05	16.0	0.0
 #
-#inputChoice	load#	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open
-p				1		7			Tb			9.0			12.0		e				0			0.4			0.0
+#inputChoice	load#	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open	amp
+p				0		1			n			16.0		18.0		e				0			0.4			0.0		0.2
 #
 #negEig inputs
 #P			c
-10000		0.005
+10000		0.0036
