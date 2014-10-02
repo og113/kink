@@ -81,7 +81,13 @@ if (inP.compare("p") == 0)
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		double temp;
-		ss >> temp >> temp >> temp >> temp >> negVal;
+		double eigError; //should be <<1
+		ss >> temp >> temp >> temp >> eigError >> negVal;
+		if (eigError>1.0)
+			{
+			cout << "error in negEig = " << eigError << endl;
+			cout << "consider restarting with different values of P and c" << endl;
+			}
 		}
 	}
 else if (inP.compare("b") == 0)
@@ -133,7 +139,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
 	comp action = twaction;
-	cVec ergVec(NT);	
+	cVec erg(NT);	
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 	comp action_last = action;
@@ -319,7 +325,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
-		ergVec = Eigen::VectorXcd::Zero(NT);
+		erg = Eigen::VectorXcd::Zero(NT);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,7 +351,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t+Na) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
+				erg(t+Na) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -360,7 +366,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				erg(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
 				if (inP.compare("b")==0)
 					{
@@ -385,7 +391,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				ergVec(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				erg(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -575,9 +581,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //A4.5 starting the energy and that off
     #define eta(m) real(ap(m))-root[0]
     #define ieta(m) imag(ap(m))
-    cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na); //no energy defined on initial time slice
-	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
-	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
+	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na);
+	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na);
 
     //A7. run loop
     for (unsigned int t=1; t<(Na+1); t++)
@@ -593,7 +598,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             unsigned int m = t+x*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
             -dV(ap(m));
-            ergA (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m,1,1,Nb))-ap(m),2.0)/a/2.0 + Dt0*a*V(ap(m));
+            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/dtau/2.0 + dtau*pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + dtau*a*V(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int l1 = t + x*(Na+1);
@@ -678,7 +683,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    -dV(ccp(l));
 		    if (t>1)
 		    	{
-		    	ergA (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/dtau/2.0 + Dt0*pow(ccp(neigh(l-1,1,1,Nb))-ccp(l-1),2.0)/a/2.0 + Dt0*a*V(ccp(l-1));
+		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/dtau/2.0 + dtau*pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0 + dtau*a*V(ccp(l-1));
 		    	}
 			}
 		}
@@ -750,9 +755,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	simplePrintCVector(linErgFile,linErgA);
 	gpSimple(linErgFile);
 	
-	//printing ergVec
+	//printing erg
 	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
-	simplePrintCVector(ergFile,ergVec);
+	simplePrintCVector(ergFile,erg);
 	gpSimple(ergFile);
 
 } //closing parameter loop

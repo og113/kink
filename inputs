@@ -4,7 +4,7 @@
 100		64		64		32		0.05	16.0	0.0
 #
 #inputChoice	load#	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open	amp
-b				0		1			n			16.0		18.0		e				0			0.4			0.0		0.2
+p				0		1			n			16.0		18.0		e				0			0.4			0.0		0.2
 #
 #negEig inputs
 #P			c
