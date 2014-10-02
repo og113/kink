@@ -464,7 +464,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
-		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -579,54 +578,59 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     cVec ergA(Na);	ergA = Eigen::VectorXcd::Zero(Na); //no energy defined on initial time slice
 	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na+1);
 	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na+1);
-	comp bound = 0.0;
+
+    //A7. run loop
+    for (unsigned int t=1; t<(Na+1); t++)
+    	{
+        for (unsigned int x=0; x<N; x++)
+        	{
+            unsigned int m = t+x*(Na+1);
+            velA(m) = velA(m-1) + dtau*accA(m-1);
+            ap(m) = ap(m-1) + dtau*velA(m);
+        	}
+        for (unsigned int x=0; x<N; x++)
+        	{
+            unsigned int m = t+x*(Na+1);
+            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
+            -dV(ap(m));
+            ergA (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m,1,1,Nb))-ap(m),2.0)/a/2.0 + Dt0*a*V(ap(m));
+            for (unsigned int y=0; y<N; y++)
+            	{
+            	unsigned int l1 = t + x*(Na+1);
+            	unsigned int l2 = t + y*(Na+1);
+		        if (absolute(theta)<2.0e-16)
+					{
+		        	linErgA(Na-t) += Eomega(x,y)*eta(l1)*eta(l2) - Eomega(x,y)*ap(l1)*ap(l2);
+					linNumA (Na-t) += omega(x,y)*eta(l1)*eta(l2) - omega(x,y)*ap(l1)*ap(l2);
+		        	}
+				else
+					{
+					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					}
+				}
+        	}
+    	}
+    	
+    //computing boundary term, at initial time
+    comp bound = 0.0;
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
 			{
+			
 			if (absolute(theta)<2.0e-16)
 				{
 				bound += 0.0;
 				}
 			else
 				{
-				bound += (1.0-Gamma)*omega(j,k)*eta((Na+1)*j)*eta((Na+1)*k)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta((Na+1)*j)*ieta((Na+1)*k)/(1.0-Gamma);
+				unsigned int l = Na + j*(Na+1);
+				unsigned int m = Na + k*(Na+1);
+				bound += (1.0-Gamma)*omega(j,k)*eta(l)*eta(m)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta(l)*ieta(m)/(1.0-Gamma);
 				}
 			}
 		}
-
-    //A7. run loop
-    for (unsigned int j=1; j<(Na+1); j++)
-    	{
-        for (unsigned int k=0; k<N; k++)
-        	{
-            unsigned int m = j+k*(Na+1);
-            velA(m) = velA(m-1) + dtau*accA(m-1);
-            ap(m) = ap(m-1) + dtau*velA(m);
-        	}
-        for (unsigned int k=0; k<N; k++)
-        	{
-            unsigned int m = j+k*(Na+1);
-            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
-            -dV(ap(m));
-            ergA (Na-j) += a*pow(ap(m)-ap(m-1),2.0)/dtau/2.0 + Dt0*pow(ap(neigh(m-1,1,1,Nb))-ap(m-1),2.0)/a/2.0 + Dt0*a*V(ap(m-1));
-            for (unsigned int l=0; l<N; l++)
-            	{
-            	unsigned int l1 = j-1 + k*(Na+1);
-            	unsigned int l2 = j-1 + l*(Na+1);
-		        if (absolute(theta)<2.0e-16)
-					{
-		        	linErgA(Na-j) += Eomega(k,l)*eta(l1)*eta(l2) - Eomega(k,l)*ap(l1)*ap(l2);
-					linNumA (Na-j) += omega(k,l)*eta(l1)*eta(l2) - omega(k,l)*ap(l1)*ap(l2);
-		        	}
-				else
-					{
-					linErgA(Na-j) += 2.0*Gamma*omega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
-					linNumA(Na-j) += 2.0*Gamma*Eomega(k,l)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(k,l)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
-					}
-				}
-        	}
-    	}
 
     //now propagating forwards along c
     //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
@@ -659,19 +663,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
 
     //C7. run loop
-    for (unsigned int j=1; j<(Nc+1); j++)
+    for (unsigned int t=1; t<(Nc+1); t++)
 		{
-		for (unsigned int k=0; k<N; k++)
+		for (unsigned int x=0; x<N; x++)
 			{
-		    unsigned int l = j+k*(Nc+1);
+		    unsigned int l = t+x*(Nc+1);
 		    velC(l) = velC(l-1) + dtau*accC(l-1);
 		    ccp(l) = ccp(l-1) + dtau*velC(l);
 			}
-		for (unsigned int k=0; k<N; k++)
+		for (unsigned int x=0; x<N; x++)
 			{
-		    unsigned int l = j+k*(Nc+1);
+		    unsigned int l = t+x*(Nc+1);
 		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
-		    -dV(ccp(l));    
+		    -dV(ccp(l));
+		    if (t>1)
+		    	{
+		    	ergA (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/dtau/2.0 + Dt0*pow(ccp(neigh(l-1,1,1,Nb))-ccp(l-1),2.0)/a/2.0 + Dt0*a*V(ccp(l-1));
+		    	}
 			}
 		}
     

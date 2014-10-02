@@ -57,9 +57,6 @@ inP = aq.inputChoice; //just because I write this a lot
 NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
-alpha *= R;
-vec negVec(2*N*Nb+1);
-double negVal;
 if (inP.compare("p") == 0)
 	{
 	L = 3.2*R;
