@@ -18,6 +18,7 @@ set xlabel "x"
 set ylabel "re(t)-im(t)"
 set zlabel "re(phi)"
 set grid
-splot f using 3:($1-$2):5 with points
+set hidden3d
+splot f using 3:($1-$2):5 with lines
 
 pause -1

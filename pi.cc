@@ -149,7 +149,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-	double twaction = -2.0*pi*epsilon*pow(R,2)/2.0 + 2.0*pi*R*S1;
+	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	comp action = twaction;
 	cVec erg(NT);	
 
