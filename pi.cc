@@ -273,6 +273,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if (inP.compare("f")==0)
 			{
 			toLoad = aq.fileNo;
+			inP = "p";
 			}
 		else
 			{
@@ -299,7 +300,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	printVectorB("data/piE00.dat",p);
+	string earlyPrintFile = "data/piE"+inP+"00.dat";
+	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
 	cVec Cp(Nb*N);
