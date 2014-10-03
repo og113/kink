@@ -611,7 +611,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		        	}
 				else
 					{
-					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2*Gamma*omega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
 					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
 					}
 				}
