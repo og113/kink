@@ -27,25 +27,33 @@ int main()
 ifstream fin;
 fin.open("inputs", ios::in);
 string line;
-int firstLine = 0;
+int lineNumber = 0;
+unsigned int negEigDone;
 while(getline(fin,line))
 	{
 	if(line[0] == '#')
 		{
 		continue;
 		}
-	if (firstLine==0)
+	if (lineNumber==0)
 		{
-		istringstream ss1(line);
-		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
-		firstLine++;
+		istringstream ss(line);
+		ss >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+		lineNumber++;
 		}
-	else if (firstLine==1)
+	else if (lineNumber==1)
 		{
-		istringstream ss2(line);
-		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss2 >> alpha >> open >> amp;
-		firstLine++;
+		istringstream ss(line);
+		ss >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss >> alpha >> open >> amp;
+		lineNumber++;
+		}
+	else if(lineNumber==2)
+		{
+		istringstream ss(line);
+		double temp;
+		ss >> temp >> temp >> negEigDone;
+		lineNumber++;
 		}
 	}
 fin.close();
@@ -72,9 +80,12 @@ if (inP.compare("p") == 0)
 		}
 	else
 		{
-		cout << "Tb>R so running negEig, need to have run pi with inP='b'" << endl;
-		system("./negEig");
-		cout << "negEig run" << endl;
+		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
+		if (negEigDone==0)
+			{
+			system("./negEig");
+			cout << "negEig run" << endl;
+			}
 		negVec = loadVector("./data/eigVec.dat",Nb);
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
@@ -160,6 +171,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double c_parameter = -epsilon;
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
+	comp ergZero = N*a*V(root[0]);
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -278,7 +290,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	printVectorB("data/piEarly00.dat",p);
+	printVectorB("data/pE00.dat",p);
 		
 	//defining complexified vector Cp
 	cVec Cp(Nb*N);
@@ -325,7 +337,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
-		erg = Eigen::VectorXcd::Zero(NT);
+		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +482,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
-		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -599,7 +610,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             unsigned int m = t+x*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
             -dV(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/(-dtau)/2.0 + (-dtau)*pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + (-dtau)*a*V(ap(m));
+            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + a*V(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int l1 = t + x*(Na+1);
@@ -684,7 +695,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    -dV(ccp(l));
 		    if (t>1)
 		    	{
-		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/dtau/2.0 + dtau*pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0 + dtau*a*V(ccp(l-1));
+		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0 + a*V(ccp(l-1));
 		    	}
 			}
 		}
