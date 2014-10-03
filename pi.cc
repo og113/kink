@@ -176,7 +176,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	else
 		{
 		eigenValues = eigensolver.eigenvalues();
-		eigenVectors = eigensolver.eigenvectors();
+		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
 		
 	for (unsigned int j=0; j<N; j++)
@@ -470,6 +470,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -598,15 +599,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             unsigned int m = t+x*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
             -dV(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/dtau/2.0 + dtau*pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + dtau*a*V(ap(m));
+            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/(-dtau)/2.0 + (-dtau)*pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + (-dtau)*a*V(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int l1 = t + x*(Na+1);
             	unsigned int l2 = t + y*(Na+1);
 		        if (absolute(theta)<2.0e-16)
 					{
-		        	linErgA(Na-t) += Eomega(x,y)*eta(l1)*eta(l2) - Eomega(x,y)*ap(l1)*ap(l2);
-					linNumA (Na-t) += omega(x,y)*eta(l1)*eta(l2) - omega(x,y)*ap(l1)*ap(l2);
+		        	linErgA(Na-t) += Eomega(x,y)*eta(l1)*eta(l2) - Eomega(x,y)*ieta(l1)*ieta(l2);
+					linNumA (Na-t) += omega(x,y)*eta(l1)*eta(l2) - omega(x,y)*ieta(l1)*ieta(l2);
 		        	}
 				else
 					{
