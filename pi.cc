@@ -118,7 +118,7 @@ closenessS = 1.0e-5;
 closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 5.0e-14;
-closenessE = 1.0e-4;
+closenessE = 1.0e-2;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -207,7 +207,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
-	if (inP.compare("f")!=0)
+	if (inP.compare("f")!=0 || loop>0)
 		{
 		if (R<alpha)
 			{
@@ -268,10 +268,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
 		}
 	else
-		{		
-		string prefix = ("./data/pi");
-		string suffix = (".dat");
-		string loadfile = prefix+to_string(aq.fileNo)+suffix;
+		{
+		unsigned int toLoad;
+		if (inP.compare("f")==0)
+			{
+			toLoad = aq.fileNo;
+			}
+		else
+			{
+			toLoad = loop-1;
+			}
+		string loadfile = "./data/pi"+inP+to_string(toLoad)+".dat";
 		p = loadVector(loadfile,Nb);
 		}
 	
@@ -292,7 +299,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	printVectorB("data/pE00.dat",p);
+	printVectorB("data/piE00.dat",p);
 		
 	//defining complexified vector Cp
 	cVec Cp(Nb*N);
@@ -454,7 +461,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
-			if (print_choice.compare("v")==0 || print_choice.compare("e")==0)
+			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				string minusDSprefix = ("./data/minusDSE");
 				string minusDSsuffix = (".dat");
@@ -463,12 +470,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
 				{
-				string piEarlyPrefix = ("./data/pE");
+				string piEarlyPrefix = ("./data/piE");
 				string piEarlySuffix = (".dat");
 				string piEarlyFile = piEarlyPrefix+inP+to_string(loop)+to_string(runs_count)+piEarlySuffix;
 				printVectorB(piEarlyFile,p);
 				}
-			if (print_choice.compare("m")==0 || print_choice.compare("e")==0)
+			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				string DDSprefix = ("./data/DDSE");
 				string DDSsuffix = (".dat");
@@ -763,7 +770,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8i%8g%8g%8g%16g%16g%16g%16g%16g%16g\n",N,NT,L,Tb,dE,real(erg(0)),real(action)\
+	fprintf(actionfile,"%8i%8i%8g%8g%8g%14g%14g%12g%14g%14g%14g\n",N,NT,L,Tb,dE,real(erg(0)),real(action)\
 	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 	fclose(actionfile);
 
