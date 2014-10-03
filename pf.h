@@ -60,6 +60,7 @@ double closenessS; //solution (i.e. minusDS)
 double closenessSM; //solution max
 double closenessD; //delta
 double closenessC; //calculation
+double closenessE; //energy change
 
 //parameters determining input phi
 //struct to hold answers to questions

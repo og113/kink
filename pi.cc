@@ -118,6 +118,7 @@ closenessS = 1.0e-5;
 closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 5.0e-14;
+closenessE = 1.0e-4;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -161,6 +162,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	vector<double> solM_test(1);	solM_test[0] = 1.0;
 	vector<double> delta_test(1); delta_test[0] = 1.0;
 	vector<double> calc_test(1); calc_test[0] = 1.0;
+	vector<double> erg_test(1); erg_test[0] = 1.0;
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
@@ -699,6 +701,18 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    	}
 			}
 		}
+		
+	//checking energy conserved
+	double energyChange = 0.0;
+	if (absolute(real(erg(0)))>2.0e-16)
+		{
+		energyChange = absolute(real(erg(0))-real(erg(NT-2))/real(erg(0)));
+		}
+	erg_test.push_back(energyChange);
+	if (erg_test.back()>closenessE)
+		{
+		cout << "realtive energy change = " << erg_test.back() << endl;
+		}
     
 
     //12. combine phi with ap and cp and save combination to file
@@ -738,15 +752,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","R","re(action)","im(action)");
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,real(action),imag(action));
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","R","Tb","erg","re(action)","im(action)");
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,R,Tb,real(erg(0)),real(action),imag(action));
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,R,real(action),imag(action));
+	fprintf(actionfile,"%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,R,Tb,real(erg(0)),real(action),imag(action));
 	fclose(actionfile);
 
 	//printing output phi
