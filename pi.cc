@@ -207,7 +207,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//assigning input phi
-	if (inP.compare("f")!=0 || loop>0)
+	if (inP.compare("f")!=0 && loop==0)
 		{
 		if (R<alpha)
 			{
@@ -796,12 +796,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing linErgVec
 	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(linErgFile,linErgA);
-	gpSimple(linErgFile);
+	//gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
-	gpSimple(ergFile);
+	//gpSimple(ergFile);
 
 } //closing parameter loop
 
