@@ -760,7 +760,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8i%8g%8g%8g%16g%16g%16g%16g%16g%16g\n",N,NT,L,Tb,dE,real(erg(0)),real(action),imag(action),sol_test.back(),solM_test.back(),erg_test()));
+	fprintf(actionfile,"%8i%8i%8g%8g%8g%16g%16g%16g%16g%16g%16g\n",N,NT,L,Tb,dE,real(erg(0)),real(action)\
+	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 	fclose(actionfile);
 
 	//printing output phi
