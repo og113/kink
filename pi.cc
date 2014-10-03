@@ -300,7 +300,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/piE"+inP+"00.dat";
+	string earlyPrintFile = "data/piE"+inP+ to_string(loop) + "0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
@@ -776,10 +776,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 	fclose(actionfile);
 
-	//printing output phi
+	//printing output phi on Euclidean time part
 	string pifile = "./data/pi"+inP+to_string(loop)+".dat";
-	printVector(pifile,tp);
-	gp(pifile,"repi.gp");
+	printVectorB(pifile,p);
+	
+	//printing output phi on whole time contour
+	string tpifile = "./data/tpi"+inP+to_string(loop)+".dat";
+	printVector(tpifile,tp);
+	gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
 	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
