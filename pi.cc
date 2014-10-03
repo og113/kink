@@ -703,15 +703,18 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//checking energy conserved
-	double energyChange = 0.0;
+	double ergChange = 0.0;
+	double relErgChange = 0.0;
 	if (absolute(real(erg(0)))>2.0e-16)
 		{
-		energyChange = absolute(real(erg(0))-real(erg(NT-2))/real(erg(0)));
+		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
+		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
 		}
-	erg_test.push_back(energyChange);
+	erg_test.push_back(ergChange);
 	if (erg_test.back()>closenessE)
 		{
-		cout << "realtive energy change = " << erg_test.back() << endl;
+		cout << "energy change = " << ergChange << endl;
+		cout << "relative energy change = " << relErgChange << endl;
 		}
     
 
