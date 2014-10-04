@@ -763,3 +763,28 @@ mat hFn(const unsigned int & xN, const double & xa)
 		}
 	return xh;
 	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//misc functions
+
+//getting the date and time
+const string currentDateTime()
+	{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%y%m%d-%H%M%S", &tstruct);
+    return buf;
+	}
+	
+//copy a file
+void copyFile(const string & inputFile, const string & outputFile)
+	{
+	ifstream  src(inputFile, ios::binary);
+	ofstream  dst(outputFile, ios::binary);
+
+	dst << src.rdbuf();
+	}

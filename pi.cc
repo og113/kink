@@ -146,6 +146,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining a time and starting the clock
 	clock_t time;
 	time = clock();
+	string timeNumber = currentDateTime();
 	
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
@@ -300,7 +301,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/piE"+inP+ to_string(loop) + "0.dat";
+	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ to_string(loop) + "0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
@@ -328,7 +329,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             }
         if (runs_count==1) //printing Chi0
         	{
-        	printVectorB("data/Chi0.dat",Chi0);
+        	printVectorB("data/" + timeNumber + "Chi0.dat",Chi0);
         	}
 
 		// allocating memory for DS, DDS
@@ -465,23 +466,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string minusDSprefix = ("./data/minusDSE");
-				string minusDSsuffix = (".dat");
-				string minusDSfile = minusDSprefix+inP+to_string(loop)+to_string(runs_count)+minusDSsuffix;
+				string minusDSfile = "./data/" + timeNumber + "minusDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(minusDSfile,minusDS);
 				}
-			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
 				{
-				string piEarlyPrefix = ("./data/piE");
-				string piEarlySuffix = (".dat");
-				string piEarlyFile = piEarlyPrefix+inP+to_string(loop)+to_string(runs_count)+piEarlySuffix;
+				string piEarlyFile = "./data/" + timeNumber + "piE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(piEarlyFile,p);
 				}
 			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string DDSprefix = ("./data/DDSE");
-				string DDSsuffix = (".dat");
-				string DDSfile = DDSprefix+inP+to_string(loop)+to_string(runs_count)+DDSsuffix;
+				string DDSfile = "./data/" + timeNumber + "DDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printSpmat(DDSfile,DDS);
 				}
 			}
@@ -493,6 +488,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -772,34 +768,38 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8i%8g%8g%8g%14g%14g%12g%14g%14g%14g\n",N,NT,L,Tb,dE,real(erg(0)),real(action)\
+	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,real(erg(0))\
 	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 	fclose(actionfile);
+	
+	//copying a version of inputs with timeNumber
+	string runInputs = "./data/" + timeNumber + "inputs";
+	copyFile("inputs",runInputs);
 
 	//printing output phi on Euclidean time part
-	string pifile = "./data/pi"+inP+to_string(loop)+".dat";
+	string pifile = "./data/" + timeNumber + "pi"+inP+to_string(loop)+".dat";
 	printVectorB(pifile,p);
 	
 	//printing output phi on whole time contour
-	string tpifile = "./data/tpi"+inP+to_string(loop)+".dat";
+	string tpifile = "./data/" + timeNumber + "tpi"+inP+to_string(loop)+".dat";
 	printVector(tpifile,tp);
 	gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
-	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
+	string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
 	printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
-	string DDSfile = "./data/DDS"+inP+to_string(loop)+".dat";
+	string DDSfile = "./data/" + timeNumber + "DDS"+inP+to_string(loop)+".dat";
 	printSpmat(DDSfile,DDS);
 	
 	//printing linErgVec
-	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
+	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(linErgFile,linErgA);
 	//gpSimple(linErgFile);
 	
 	//printing erg
-	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
+	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
 	//gpSimple(ergFile);
 
