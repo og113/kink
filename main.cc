@@ -31,11 +31,12 @@ while(getline(fData,line))
 		}
 	}
 fData.close();
+vector<unsigned long long int> filenumbers;
 
 ifstream fmainin;
 fmainin.open("mainInputs", ios::in);
-lint minFile;
-lint maxFile;
+unsigned long long int minFile;
+unsigned long long int maxFile;
 while(getline(fmainin,line))
 	{
 	if(line[0] == '#')
