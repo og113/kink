@@ -27,7 +27,7 @@ int main()
 ifstream fin;
 fin.open("inputs", ios::in);
 string line;
-int lineNumber = 0;
+unsigned int lineNumber = 0;
 unsigned int negEigDone;
 while(getline(fin,line))
 	{

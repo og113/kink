@@ -10,26 +10,66 @@
 
 int main()
 {
+system("dir ./data/* > dataFiles");
+ifstream fData;
+fData.open("dataFiles", ios::in);
+string line;
+vector<string> filenames;
+while(getline(fData,line))
+	{
+	if(line[0] == '#')
+		{
+		continue;
+		}
+	if (!line.empty())
+		{
+		string temp1, temp2;
+		istringstream ss(line);
+		ss >> temp1 >> temp2;
+		filenames.push_back(temp1);
+		filenames.push_back(temp2);
+		}
+	}
+fData.close();
+
+ifstream fmainin;
+fmainin.open("mainInputs", ios::in);
+lint minFile;
+lint maxFile;
+while(getline(fmainin,line))
+	{
+	if(line[0] == '#')
+		{
+		continue;
+		}
+	if (!line.empty())
+		{
+		istringstream ss(line);
+		ss >> minFile >> maxFile;
+		}
+	}
+fmainin.close();
+
+
 aqStruct aq; //struct to hold user responses
 
 //taking in information from inputs
 ifstream fin;
 fin.open("inputs", ios::in);
-string line;
-int firstLine = 0;
+unsigned int lineInt = 0;
 while(getline(fin,line))
 	{
 	if(line[0] == '#')
 		{
 		continue;
 		}
-	if (firstLine==0)
+	if (lineInt==0 && !line.empty())
 		{
 		istringstream ss1(line);
 		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
-		firstLine = 1;
+		lineInt++;
 		}
-	else
+	else if (!line.empty())
 		{
 		istringstream ss2(line);
 		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
