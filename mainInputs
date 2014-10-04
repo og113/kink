@@ -1,0 +1,7 @@
+#the following are input to main.cc:
+#
+#range of times and dates to loop over
+#in the format yymmdd-hhmmss
+#
+#min				max
+141004-130000		141004-140000
