@@ -141,12 +141,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		changeDouble (loop_choice,loopParameter);
 		}
 		
-	printParameters();
-
 	//defining a time and starting the clock
 	clock_t time;
 	time = clock();
 	string timeNumber = currentDateTime();
+	
+	//printing loop name and parameters
+	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
+	printParameters();
 	
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
