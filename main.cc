@@ -31,8 +31,10 @@ fmainin.close();
 
 
 system("dir ./data/* > dataFiles");
-vector<string> filenames;
+vector<string> filenames, piFiles, inputsFiles;
 filenames = readDataFiles(minFile,maxFile);
+piFiles = findStrings(filenames,"tpip");
+inputsFiles = findStrings(filenames,"inputs");
 
 return 0;
 }

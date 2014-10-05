@@ -572,7 +572,7 @@ string getLastLine(ifstream& inStream)
 	
 //read dataFiles into filenames and filenumbers
 vector<string> readDataFiles(const unsigned long long int & minFileNo, const unsigned long long int & maxFileNo)
-{
+	{
 	vector<string> fileNames;
 	unsigned long long int fileNumber;
     ifstream file;
@@ -592,13 +592,27 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 					if (fileNumber>minFileNo && fileNumber<maxFileNo)
 						{
 						fileNames.push_back(fileName);
-						cout << fileName << endl;
 						}
 					}
 				fileName.clear();
 				}
     		}
     return fileNames;
+	}
+	
+//get elements of string vector that have a given string in them
+vector<string> findStrings(const vector <string> & fullVector, const string & search)
+	{
+	vector <string> subVector;
+	for (unsigned int l=0;l<fullVector.size();l++)
+		{
+		if(fullVector[l].find(search)!=string::npos)
+			{
+			subVector.push_back(fullVector[l]);
+			cout << fullVector[l] << endl;
+			}
+		}
+	return subVector;
 	}
 
 
