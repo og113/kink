@@ -25,7 +25,7 @@ int main()
 //getting variables and user inputs from inputs
 
 ifstream fin;
-fin.open("inputs", ios::in);
+fin.open("inputs");
 string line;
 unsigned int lineNumber = 0;
 unsigned int negEigDone;

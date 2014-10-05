@@ -569,6 +569,37 @@ string getLastLine(ifstream& inStream)
 		
     return xLine;
 	}
+	
+//read dataFiles into filenames and filenumbers
+vector<string> readDataFiles(const unsigned long long int & minFileNo, const unsigned long long int & maxFileNo)
+{
+	vector<string> fileNames;
+	unsigned long long int fileNumber;
+    ifstream file;
+    file.open ("dataFiles");
+    string fileName;
+    string strNumber;
+    fileName.clear();
+		while ( !file.eof() )
+			{
+			file >> fileName;
+			if (fileName.size()>19)
+				{
+				if (fileName[7]=='1')
+					{
+					strNumber = fileName.substr(7,12);
+					fileNumber = stoull(strNumber);
+					if (fileNumber>minFileNo && fileNumber<maxFileNo)
+						{
+						fileNames.push_back(fileName);
+						cout << fileName << endl;
+						}
+					}
+				fileName.clear();
+				}
+    		}
+    return fileNames;
+	}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
