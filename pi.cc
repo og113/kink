@@ -65,7 +65,10 @@ epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
 vec negVec(2*N*Nb+1);
-double negVal;
+unsigned int negP;
+double negc;
+double negcheck;
+double negerror; //should be <<1
 if (inP.compare("p") == 0)
 	{
 	L = 3.2*R;
@@ -91,12 +94,11 @@ if (inP.compare("p") == 0)
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
-		double temp;
-		double eigError; //should be <<1
-		ss >> temp >> temp >> temp >> eigError >> negVal;
-		if (eigError>1.0)
+		ss >> negP >> negc >> negcheck >> negerror >> negVal;
+		eigFile.close();
+		if (negerror>1.0)
 			{
-			cout << "error in negEig = " << eigError << endl;
+			cout << "error in negEig = " << negerror << endl;
 			cout << "consider restarting with different values of P and c" << endl;
 			}
 		}
@@ -119,6 +121,9 @@ closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 5.0e-14;
 closenessE = 1.0e-2;
+
+//defining the time to label output
+string timeNumber = currentDateTime();
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -144,7 +149,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining a time and starting the clock
 	clock_t time;
 	time = clock();
-	string timeNumber = currentDateTime();
 	
 	//printing loop name and parameters
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
@@ -282,7 +286,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			toLoad = loop-1;
 			}
-		string loadfile = "./data/pi"+inP+to_string(toLoad)+".dat";
+		string loadfile = "./data/" + timeNumber + "pi"+inP+to_string(toLoad)+".dat";
 		p = loadVector(loadfile,Nb);
 		}
 	
@@ -804,6 +808,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
 	//gpSimple(ergFile);
+	
+	//printing error, and eigenvalue to file
+	FILE * eigenvalueFile;
+	string eigValueFile = "./data/" + timeNumber + "eigValue.dat";
+	eigenvalueFile = fopen(eigValueFile.c_str(),"w");
+	fprintf(eigenvalueFile,"%16i%16g%16g%16g%16g\n",negP,negc,negcheck,negerror,negVal);
+	fclose(eigenvalueFile);
+
+	//printing eigenvector to file
+	string eigenvectorFile = "./data/" + timeNumber + "eigVec.dat";
+	printVectorB(eigenvectorFile,negVec);
 
 } //closing parameter loop
 

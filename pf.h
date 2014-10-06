@@ -81,6 +81,8 @@ string inP; //b for bubble, p for periodic instaton, f for from file
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
+double negVal; //the negative eigenvalue
+unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -609,10 +611,29 @@ vector<string> findStrings(const vector <string> & fullVector, const string & se
 		if(fullVector[l].find(search)!=string::npos)
 			{
 			subVector.push_back(fullVector[l]);
-			cout << fullVector[l] << endl;
 			}
 		}
 	return subVector;
+	}
+	
+//get vector of unsigned long long int from vector of strings
+vector<unsigned long long int> getInts(const vector <string> & strVector)
+	{
+	vector <unsigned long long int> intVector;
+	for (unsigned int l=0; l<strVector.size(); l++)
+		{
+		string temp = strVector[l];
+		if (temp[7]=='1')
+			{
+			temp = temp.substr(7,12);
+			intVector.push_back(stoull(temp));
+			}
+		else
+			{
+			cout << "getInts error, filename not as expected" << endl;
+			}
+		}
+	return intVector;
 	}
 
 
