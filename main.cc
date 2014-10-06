@@ -24,6 +24,13 @@ istringstream ss(lastLine);
 ss >> minFile >> maxFile >> minTheta >> maxTheta >> loops;
 fmainin.close();
 
+//defining the timeNumber
+string timeNumber = currentDateTime();
+
+//copying a version of mainInputs with timeNumber
+string runInputs = "./data/" + timeNumber + "mainInputs";
+copyFile("mainInputs",runInputs);
+
 //getting list of relevant data files
 system("dir ./data/* > dataFiles");
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
@@ -179,9 +186,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			}
 		}
-		
-	//defining the timeNumber
-	string timeNumber = currentDateTime();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning theta loop
@@ -219,7 +223,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vector<double> erg_test(1); erg_test[0] = 1.0;
 
 		//initializing phi (=p)
-		vec p(2*N*NT+1);
+		vec p(2*N*NT+2);
 		if (loop==0)
 			{
 			p = loadVector(piFiles[fileLoop],NT);
@@ -232,7 +236,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(loop) + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(fileLoop) + to_string(loop) + "0.dat";
 		printVectorB(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -240,8 +244,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		Cp = vecComplex(p,N*NT);
 	
 		//defining DDS and minusDS
-		spMat DDS(2*N*NT+1,2*N*NT+1);
-		vec minusDS(2*N*NT+1);
+		spMat DDS(2*N*NT+2,2*N*NT+2);
+		vec minusDS(2*N*NT+2);
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop	
@@ -387,9 +391,162 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		    action = kineticT - kineticS - pot_l - pot_e;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-        	break;			
+		//printing early if desired
+		if (runs_count == aq.printRun || aq.printRun == 0)
+			{
+			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
+				{
+				printAction(kineticT-kineticS,pot_l,pot_e);
+				}
+			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
+				{
+				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printVector(minusDSfile,minusDS);
+				}
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
+				{
+				string piEarlyFile = "./data/" + timeNumber + "mainpE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printVector(piEarlyFile,p);
+				}
+			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
+				{
+				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printSpmat(DDSfile,DDS);
+				}
+			}
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	//solving for delta in DDS*delta=minusDS, where p' = p + delta		
+		vec delta(2*N*NT+2);
+		delta = Eigen::VectorXd::Zero(2*N*NT+2);
+		DDS.makeCompressed();
+		Eigen::SparseLU<spMat> solver;
+		break;
+		
+		solver.analyzePattern(DDS);
+		if(solver.info()!=Eigen::Success)
+			{
+			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
+			return 0;
+			}		
+		solver.factorize(DDS);
+		if(solver.info()!=Eigen::Success) 
+			{
+			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
+			return 0;
+			}
+		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
+		if(solver.info()!=Eigen::Success)
+			{
+			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
+			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
+			return 0;
+			}
+		
+		//independent check on whether calculation worked
+		vec diff(2*N*NT+2);
+		diff = DDS*delta-minusDS;
+		double maxDiff = diff.maxCoeff();
+		maxDiff = absolute(maxDiff);
+		calc_test.push_back(maxDiff);
+		if (calc_test.back()>closenessC)
+			{
+			cout << "Calculation failed" << endl;
+			cout << "calc_test = " << calc_test.back() << endl;
+			return 0;
+			}
+
+		//assigning values to phi
+		p += delta;
+		
+		//passing changes on to complex vector
+		Cp = vecComplex(p,N*NT);
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+		//convergence issues
+		//evaluating norms
+		double normDS = minusDS.dot(minusDS);
+		normDS = pow(normDS,0.5);
+		double maxDS = minusDS.maxCoeff();
+		double minDS = minusDS.minCoeff();
+		if (-minDS>maxDS)
+			{
+			maxDS = -minDS;
+			}
+		double normP = p.dot(p);
+		normP = pow(normP,0.5);
+		double normDelta = delta.dot(delta);
+		normDelta = pow(normDelta,0.5);
+		
+		//assigning test values
+		//quantities used to stop newton-raphson loop
+		action_test.push_back(abs(action - action_last)/abs(action_last));
+		action_last = action;
+		sol_test.push_back(normDS/normP);
+		solM_test.push_back(maxDS);
+		delta_test.push_back(normDelta/normP);
+			
+		//printing tests to see convergence
+		if (runs_count==1)
+			{
+			printf("%16s%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest");
+			}
+		printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+			
 			} //ending while loop
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
+		
+		//stopping clock
+		time = clock() - time;
+		double realtime = time/1000000.0;
+	
+		//printing to terminal
+		printf("\n");
+		printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","NT","L","dE","Tb","erg","re(action)","im(action)");
+		printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,real(erg(0)),real(action),imag(action));
+		printf("\n");
+		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+		//printing action value
+		FILE * actionfile;
+		actionfile = fopen("./data/mainAction.dat","a");
+		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,real(erg(0))\
+		,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
+		fclose(actionfile);
+	
+		//copying a version of inputs with timeNumber
+		string runInputs = "./data/" + timeNumber + "inputs";
+		copyFile("inputs",runInputs);
+	
+		//printing output phi on whole time contour
+		string tpifile = "./data/" + timeNumber + "mainp"+to_string(fileLoop)+to_string(loop)+".dat";
+		printVector(tpifile,p);
+		gp(tpifile,"repi.gp");
+	
+		//printing output minusDS				
+		string minusDSfile = "./data/" + timeNumber + "mainminusDS"+to_string(fileLoop)+to_string(loop)+".dat";
+		printVector(minusDSfile,minusDS);
+				
+		//printing output DDS
+		string DDSfile = "./data/" + timeNumber + "mainDDS"+to_string(fileLoop)+to_string(loop)+".dat";
+		printSpmat(DDSfile,DDS);
+	
+		//printing linErgVec
+		//string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
+		//simplePrintCVector(linErgFile,linErgA);
+		//gpSimple(linErgFile);
+	
+		//printing erg
+		string ergFile = "./data/" + timeNumber + "erg"+to_string(fileLoop)+to_string(loop)+".dat";
+		simplePrintCVector(ergFile,erg);
+		//gpSimple(ergFile);
+		
 		} //ending theta loop
 	} //ending file loop
 

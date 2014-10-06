@@ -766,8 +766,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","R","Tb","erg","re(action)","im(action)");
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,R,Tb,real(erg(0)),real(action),imag(action));
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","dE","Tb","erg","re(action)","im(action)");
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,dE,Tb,real(erg(0)),real(action),imag(action));
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
