@@ -39,7 +39,7 @@ piFiles = findStrings(filenames,"tpip");
 inputsFiles = findStrings(filenames,"inputs");
 eigenvectorFiles = findStrings(filenames,"eigVec");
 eigenvalueFiles = findStrings(filenames,"eigValue");
-if (piFiles.size()!=inputsFiles.size() || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size())
+if (piFiles.size()!=inputsFiles.size() || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size() || piFiles.size()==0)
 	{
 	cout << "required files not available" << endl;
 	return 0;
@@ -207,11 +207,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
 		printParameters();
 	
-		//defining the energy vector
+		//defining energy and number vectors
 		cVec erg(NT);
+		vec linErg(NT);
+		vec linNum(NT);
 		
-		//defining the action
+		//defining the action and bound and W
 		comp action = twaction;
+		comp bound = 0.0;
+		comp W = 0.0; //or should this be real??
+		double E;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 		comp action_last = action;
@@ -286,7 +291,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			comp kineticT = 0.0;
 			comp pot_l = 0.0;
 			comp pot_e = 0.0;
+			bound = 0.0;
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+			linErg = Eigen::VectorXd::Zero(NT);
+			linNum = Eigen::VectorXd::Zero(NT);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +324,25 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		            minusDS(2*N*NT+1) += - a*chiT(j)*p(2*j);
 		            minusDS(2*j) += a*chiT(j)*p(2*N*NT+1);
 		            minusDS(2*N*NT+1) += a*chiT(j)*p(2*j);
+					}
+					
+				if (absolute(theta)>2.0e-16)
+					{
+					for (unsigned int k=0;k<N;k++)
+						{
+						unsigned int l = k*NT+t;
+						linErg(t) += Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1);
+						linNum(t) += omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + omega(x,k)*p(2*j+1)*p(2*l+1);
+						}
+					}
+				else
+					{
+					for (unsigned int k=0;k<N;k++)
+						{
+						unsigned int l = k*NT+t;
+						linErg(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						linNum(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						}
 					}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -374,8 +401,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         	//dropped two terms here, as had imag(real()) or vice versa
                         	DDS.insert(2*j,2*k*NT+1) = -omega(x,k)*(1.0-Gamma)/(1.0+Gamma);
                         	DDS.insert(2*j+1,2*k*NT) = omega(x,k)*(1.0+Gamma)/(1.0-Gamma);
+							unsigned int m = x*NT;
+							unsigned int n = k*NT;
+							bound += (1.0-Gamma)*omega(m,n)*(p(2*m)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*p(2*m+1)*p(2*n+1)/(1.0-Gamma);
                         	}
-                        }
+						}
 					}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				//bulk
@@ -453,9 +483,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-			//computing linErg, linNum, bound, W
-
-
+			//checking linErg, linNum, bound, computing W, E
+			
+			//checking linearisation of energy
+			
+				
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
@@ -562,16 +594,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//printing to terminal
 		printf("\n");
-		printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","NT","L","dE","Tb","erg","im(action)");
-		printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,real(erg(0)),imag(action));
+		printf("%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s%16s\n","runs","time","N","NT","L","Tb","dE","theta","E","im(action)","bound","W");
+		printf("%8i%8g%8i%8i%8g%8g%8g%8g%16g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,E,imag(action),real(bound),real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,real(erg(0))\
-		,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
+		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%8g%14g%12g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E\
+		,imag(action),real(W),sol_test.back(),solM_test.back(),erg_test.back());
 		fclose(actionfile);
 	
 		//copying a version of inputs with timeNumber and theta changed
