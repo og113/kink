@@ -862,3 +862,36 @@ void copyFile(const string & inputFile, const string & outputFile)
 
 	dst << src.rdbuf();
 	}
+	
+//copy inputs with a change
+void changeInputs(const string & outputFile, const string & search, const string & replace)
+	{ 
+	ifstream fin;
+	ofstream fout;
+	fin.open("inputs");
+	fout.open(outputFile.c_str());
+	string line;
+	size_t pos;
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line[0] == '#' && line[1] == '#')
+			{
+			fout << line << endl;
+			continue;
+			}
+		if (line[0] == '#')
+			{
+			pos = line.find(search);
+			fout << line << endl;
+			getline(fin,line);
+			if (pos != string::npos)
+				{
+				line.replace(pos, search.length(), replace);
+				}
+			}
+		fout << line << endl;
+		}
+	fin.close();
+	fout.close();
+	}

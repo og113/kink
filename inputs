@@ -1,11 +1,13 @@
-#the following are input to pi.cc:
-#
-#N		Na		Nb		Nc		dE		Tb		theta
-100		64		64		2		0.05	20.0	0.0
-#
-#inputChoice	load#	totalLoops	loopChoice	minValue	maxValue	printChoice		printRun	alpha/R		open	amp
-p				0		1			n			17.1		16.0		e				0			0.4			0.0		0.1
-#
-#negEig inputs
-#P			c			done
-10000		0.0036		1
+##two hashes means comments, one means titles, use spaces not tabs
+##the following are input to pi.cc:
+##
+#N      Na      Nb      Nc      dE      Tb      theta
+100     64      64      2       0.05    20.0    0.5
+##
+#inputChoice    fileNo  totalLoops  loopChoice  minValue    maxValue    printChoice     printRun    alpha   open    amp
+p               0       1           n           17.1        16.0        e               0           0.4     0.0     0.1
+##
+##negEig inputs
+#P          c           done
+10000       0.0036      1
+

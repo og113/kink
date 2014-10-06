@@ -536,9 +536,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 		fclose(actionfile);
 	
-		//copying a version of inputs with timeNumber
+		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = "./data/" + timeNumber + "inputs";
-		copyFile("inputs",runInputs);
+		changeInputs(runInputs, "theta", to_string(theta));
 	
 		//printing output phi on whole time contour
 		string tpifile = "./data/" + timeNumber + "mainp"+to_string(fileLoop)+to_string(loop)+".dat";
@@ -559,7 +559,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//gpSimple(linErgFile);
 	
 		//printing erg
-		string ergFile = "./data/" + timeNumber + "erg"+to_string(fileLoop)+to_string(loop)+".dat";
+		string ergFile = "./data/" + timeNumber + "erg" + to_string(fileLoop)+to_string(loop)+".dat";
 		simplePrintCVector(ergFile,erg);
 		//gpSimple(ergFile);
 		
