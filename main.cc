@@ -245,6 +245,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//beginning newton-raphson loop	
+		while ((sol_test.back()>closenessS || solM_test.back()>closenessSM || runs_count<min_runs))
+			{
+			runs_count++;
+			
+			}
 		}
 	}
 
