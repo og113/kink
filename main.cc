@@ -294,6 +294,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			for (unsigned long int j = 0; j < N*NT; j++)
 				{		
 				unsigned int t = intCoord(j,0,NT); //coordinates
+				unsigned int x = intCoord(j,1,NT);
 				comp Dt = DtFn(t);
 				comp dt = dtFn(t);
 			
@@ -339,9 +340,42 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					pot_e += Dt*a*Vb(Cp(j));
 					erg(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
 					
-					DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
-					DDS.insert(2*j,2*(j+1)) = 1.0/b;
-					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+					if (absolute(theta)<2.0e-16)
+						{
+						DDS.insert(2*j,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
+						DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+						}
+					else
+						{
+						for (unsigned int k=1; k<2*2; k++)
+				        	{
+				            int sign = pow(-1,k+1);
+				            int direc = (int)(k/2.0);
+				            if (direc == 0)
+				            	{
+				                minusDS(2*j) += real(a*Cp(j+sign)/dt);
+				                minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
+				                }
+				            else
+				            	{
+				                unsigned int neighb = neigh(j,direc,sign,NT);
+				                minusDS(2*j) += - real(Dt*Cp(neighb)/a);
+				                minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
+				                }
+				            }
+                        comp temp0 = a/dt;
+		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0));//dropped this last term, as linearised + dV(Cp(j)));
+
+				        minusDS(2*j) += real(temp1 - temp0*Cp(j));
+				        minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
+
+                        for (unsigned int k=0; k<N; k++)
+                        	{
+                        	//dropped two terms here, as had imag(real()) or vice versa
+                        	DDS.insert(2*j,2*k*NT+1) = -omega(x,k)*(1.0-Gamma)/(1.0+Gamma);
+                        	DDS.insert(2*j+1,2*k*NT) = omega(x,k)*(1.0+Gamma)/(1.0-Gamma);
+                        	}
+                        }
 					}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				//bulk

@@ -646,8 +646,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
-			{
-			
+			{		
 			if (absolute(theta)<2.0e-16)
 				{
 				bound += 0.0;
