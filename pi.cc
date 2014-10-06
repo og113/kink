@@ -24,6 +24,9 @@ int main()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
 
+//defining the time to label output
+string timeNumber = currentDateTime();
+
 ifstream fin;
 fin.open("inputs");
 string line;
@@ -87,9 +90,10 @@ if (inP.compare("p") == 0)
 		if (negEigDone==0)
 			{
 			system("./negEig");
+			system(timeNumber.c_str());
 			cout << "negEig run" << endl;
 			}
-		negVec = loadVector("./data/eigVec.dat",Nb);
+		negVec = loadVector("./data/eigVec.dat",Nb,1);
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
@@ -121,9 +125,6 @@ closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 5.0e-14;
 closenessE = 1.0e-2;
-
-//defining the time to label output
-string timeNumber = currentDateTime();
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -287,7 +288,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			toLoad = loop-1;
 			}
 		string loadfile = "./data/" + timeNumber + "pi"+inP+to_string(toLoad)+".dat";
-		p = loadVector(loadfile,Nb);
+		p = loadVector(loadfile,Nb,1);
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries

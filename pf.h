@@ -191,7 +191,7 @@ comp simpleTime (const unsigned int& time)
 		double temp = (double)time;
 		temp -= (double)Na;
 		temp -= (double)Nb;
-		xTime = b*temp;
+		xTime = b*(temp+1.0); //the 1.0 is because the corner is part of the vertical contour
 		}
 	return xTime;
 	}
@@ -502,9 +502,9 @@ void gpSimple(const string & readFile)
 //loading functions
 
 //load vector from file
-vec loadVector (const string& loadFile, const unsigned int& Nt)
+vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned int zeroModes)
 	{
-	vec outputVec(2*Nt*N+1);
+	vec outputVec(2*Nt*N+zeroModes);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
 	string line;
@@ -524,7 +524,10 @@ vec loadVector (const string& loadFile, const unsigned int& Nt)
 		{
 		cout << "loadVector error" << endl;
 		}
-	outputVec(2*Nt*N) = 0.5; //lagrange multiplier to remove zero mode
+	for (j=0;j<zeroModes;j++)
+		{
+		outputVec(2*Nt*N+j) = 0.5; //lagrange multiplier to remove zero modes
+		}
 	F.close();
 	return outputVec;
 	}
@@ -555,7 +558,11 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 				nnz++;
 				}
 			}
-		}	
+		}
+	if (nnz==0)
+		{
+		cout << "loadSpMat failed, no data in file" << endl;
+		}
 	M.makeCompressed();
 	return M;
 	}
@@ -599,6 +606,7 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 				fileName.clear();
 				}
     		}
+    file.close();
     return fileNames;
 	}
 	
@@ -766,7 +774,7 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 cVec vecComplex(vec realVec, const unsigned int & tDim)
 	{
 	cVec complexVec(tDim);
-	if (realVec.size() == (2*tDim+1) || realVec.size() == 2*tDim)
+	if (realVec.size() >= (2*tDim) && realVec.size() < (2*tDim+3))
 		{
 		for (unsigned int l=0; l<tDim; l++)
 			{

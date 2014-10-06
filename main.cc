@@ -90,6 +90,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		}
 	fin.close();
+	inP = aq.inputChoice;
 
 	//derived quantities
 	NT = Na + Nb + Nc;
@@ -116,7 +117,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			system("./negEig");
 			cout << "negEig run" << endl;
 			}
-		negVec = loadVector(eigenvectorFiles[fileLoop],Nb);
+		negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
 		ifstream eigFile;
 		eigFile.open(eigenvalueFiles[fileLoop]);
 		string lastLine = getLastLine(eigFile);
@@ -206,7 +207,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printParameters();
 	
 		//defining the energy vector
-		cVec erg(NT-1);
+		cVec erg(NT);
 		
 		//defining the action
 		comp action = twaction;
@@ -226,13 +227,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vec p(2*N*NT+2);
 		if (loop==0)
 			{
-			p = loadVector(piFiles[fileLoop],NT);
+			p = loadVector(piFiles[fileLoop],NT,2);
 			}
 		else
 			{
 			unsigned int toLoad = loop-1;
 			string loadfile = "./data/" + timeNumber + "main" + to_string(toLoad)+".dat";
-			p = loadVector(loadfile,NT);
+			p = loadVector(loadfile,NT,2);
 			}
 			
 		//very early vector print
@@ -267,15 +268,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			
 			// allocating memory for DS, DDS
-			minusDS = Eigen::VectorXd::Zero(2*N*NT+1); //initializing to zero
+			minusDS = Eigen::VectorXd::Zero(2*N*NT+2); //initializing to zero
 			DDS.setZero(); //just making sure
-			Eigen::VectorXi DDS_to_reserve(2*N*NT+1);//number of non-zero elements per column
-			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+1,11);
+			Eigen::VectorXi DDS_to_reserve(2*N*NT+2);//number of non-zero elements per column
+			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+2,11);
 			DDS_to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
 			DDS_to_reserve(1) = 3;
 			DDS_to_reserve(2*N*NT-2) = 3;
 			DDS_to_reserve(2*N*NT-1) = 3;
 			DDS_to_reserve(2*N*NT) = N;
+			DDS_to_reserve(2*N*NT+1) = 2*N;
 			DDS.reserve(DDS_to_reserve);
 			
 			//initializing to zero
@@ -319,7 +321,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				if (t==(NT-1))
 					{
 					comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
-					kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					pot_l += Dt*a*Va(Cp(j));
 					pot_e += Dt*a*Vb(Cp(j));
 					erg(t) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
@@ -419,88 +421,102 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
-	//solving for delta in DDS*delta=minusDS, where p' = p + delta		
-		vec delta(2*N*NT+2);
-		delta = Eigen::VectorXd::Zero(2*N*NT+2);
-		DDS.makeCompressed();
-		Eigen::SparseLU<spMat> solver;
-		break;
+			//solving for delta in DDS*delta=minusDS, where p' = p + delta		
+			vec delta(2*N*NT+2);
+			delta = Eigen::VectorXd::Zero(2*N*NT+2);
+			DDS.makeCompressed();
+			Eigen::SparseLU<spMat> solver;
+			break;
 		
-		solver.analyzePattern(DDS);
-		if(solver.info()!=Eigen::Success)
-			{
-			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
-			return 0;
-			}		
-		solver.factorize(DDS);
-		if(solver.info()!=Eigen::Success) 
-			{
-			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
-			return 0;
-			}
-		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
-		if(solver.info()!=Eigen::Success)
-			{
-			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
-			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
-			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
-			return 0;
-			}
+			solver.analyzePattern(DDS);
+			if(solver.info()!=Eigen::Success)
+				{
+				cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
+				return 0;
+				}		
+			solver.factorize(DDS);
+			if(solver.info()!=Eigen::Success) 
+				{
+				cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
+				return 0;
+				}
+			delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
+			if(solver.info()!=Eigen::Success)
+				{
+				cout << "Solving failed, solver.info() = "<< solver.info() << endl;
+				cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+				cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
+				return 0;
+				}
 		
-		//independent check on whether calculation worked
-		vec diff(2*N*NT+2);
-		diff = DDS*delta-minusDS;
-		double maxDiff = diff.maxCoeff();
-		maxDiff = absolute(maxDiff);
-		calc_test.push_back(maxDiff);
-		if (calc_test.back()>closenessC)
-			{
-			cout << "Calculation failed" << endl;
-			cout << "calc_test = " << calc_test.back() << endl;
-			return 0;
-			}
+			//independent check on whether calculation worked
+			vec diff(2*N*NT+2);
+			diff = DDS*delta-minusDS;
+			double maxDiff = diff.maxCoeff();
+			maxDiff = absolute(maxDiff);
+			calc_test.push_back(maxDiff);
+			if (calc_test.back()>closenessC)
+				{
+				cout << "Calculation failed" << endl;
+				cout << "calc_test = " << calc_test.back() << endl;
+				return 0;
+				}
 
-		//assigning values to phi
-		p += delta;
+			//assigning values to phi
+			p += delta;
 		
-		//passing changes on to complex vector
-		Cp = vecComplex(p,N*NT);
-		
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		//convergence issues
-		//evaluating norms
-		double normDS = minusDS.dot(minusDS);
-		normDS = pow(normDS,0.5);
-		double maxDS = minusDS.maxCoeff();
-		double minDS = minusDS.minCoeff();
-		if (-minDS>maxDS)
-			{
-			maxDS = -minDS;
-			}
-		double normP = p.dot(p);
-		normP = pow(normP,0.5);
-		double normDelta = delta.dot(delta);
-		normDelta = pow(normDelta,0.5);
-		
-		//assigning test values
-		//quantities used to stop newton-raphson loop
-		action_test.push_back(abs(action - action_last)/abs(action_last));
-		action_last = action;
-		sol_test.push_back(normDS/normP);
-		solM_test.push_back(maxDS);
-		delta_test.push_back(normDelta/normP);
-			
-		//printing tests to see convergence
-		if (runs_count==1)
-			{
-			printf("%16s%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest");
-			}
-		printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
+			//passing changes on to complex vector
+			Cp = vecComplex(p,N*NT);
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+			//convergence issues
+			//evaluating norms
+			double normDS = minusDS.dot(minusDS);
+			normDS = pow(normDS,0.5);
+			double maxDS = minusDS.maxCoeff();
+			double minDS = minusDS.minCoeff();
+			if (-minDS>maxDS)
+				{
+				maxDS = -minDS;
+				}
+			double normP = p.dot(p);
+			normP = pow(normP,0.5);
+			double normDelta = delta.dot(delta);
+			normDelta = pow(normDelta,0.5);
+		
+			//assigning test values
+			//quantities used to stop newton-raphson loop
+			action_test.push_back(abs(action - action_last)/abs(action_last));
+			action_last = action;
+			sol_test.push_back(normDS/normP);
+			solM_test.push_back(maxDS);
+			delta_test.push_back(normDelta/normP);
 			
+			//printing tests to see convergence
+			if (runs_count==1)
+				{
+				printf("%16s%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest");
+				}
+			printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
+			
+			break;
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
+
+		//checking energy conserved
+		double ergChange = 0.0;
+		double relErgChange = 0.0;
+		if (absolute(real(erg(0)))>2.0e-16)
+			{
+			ergChange = absolute(real(erg(0))-real(erg(NT-2)));
+			relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
+			}
+		erg_test.push_back(ergChange);
+		if (erg_test.back()>closenessE)
+			{
+			cout << "energy change = " << ergChange << endl;
+			cout << "relative energy change = " << relErgChange << endl;
+			}
 		
 		//stopping clock
 		time = clock() - time;
