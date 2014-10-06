@@ -53,6 +53,7 @@ double b; //step sizes in time
 double Ta;
 double Tc;
 vector<double> root(3);
+double mass2; //as derived from V''
 
 //determining number of runs
 double closenessA; //action
@@ -811,10 +812,10 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //fourier transform type functions
 
 //h the matrix from dl[7]
-mat hFn(const unsigned int & xN, const double & xa)
+mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
-	double diag = 1.0 + 2.0/pow(xa,2.0); //diagonal terms
+	double diag = mass2 + 2.0/pow(xa,2.0); //diagonal terms
 	double offDiag = -1.0/pow(xa,2.0); //off diagonal terms
 	for (unsigned int l=0; l<xN; l++)
 		{

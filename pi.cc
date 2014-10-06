@@ -182,10 +182,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
 	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
-	h = hFn(N,a);
+	h = hFn(N,a,mass2);
 	mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
 	mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
@@ -605,10 +606,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
     	
     //A4.5 starting the energy and that off
-    #define eta(m) real(ap(m))-root[0]
-    #define ieta(m) imag(ap(m))
-	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na);
-	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na);
+	vec linErgA(Na); linErgA = Eigen::VectorXd::Zero(Na);
+	vec linNumA(Na); linNumA = Eigen::VectorXd::Zero(Na);
 
     //A7. run loop
     for (unsigned int t=1; t<(Na+1); t++)
@@ -627,17 +626,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + a*V(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
-            	unsigned int l1 = t + x*(Na+1);
-            	unsigned int l2 = t + y*(Na+1);
+            	unsigned int n = t + y*(Na+1);
 		        if (absolute(theta)<2.0e-16)
 					{
-		        	linErgA(Na-t) += Eomega(x,y)*eta(l1)*eta(l2) - Eomega(x,y)*ieta(l1)*ieta(l2);
-					linNumA (Na-t) += omega(x,y)*eta(l1)*eta(l2) - omega(x,y)*ieta(l1)*ieta(l2);
+		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
+					linNumA (Na-t) += omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
 		        	}
 				else
 					{
-					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
-					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
 					}
 				}
         	}
@@ -656,9 +654,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else
 				{
-				unsigned int l = Na + j*(Na+1);
-				unsigned int m = Na + k*(Na+1);
-				bound += (1.0-Gamma)*omega(j,k)*eta(l)*eta(m)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta(l)*ieta(m)/(1.0-Gamma);
+				unsigned int m = Na + j*(Na+1);
+				unsigned int n = Na + k*(Na+1);
+				bound += (1.0-Gamma)*omega(m,n)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*imag(ap(m))*imag(ap(n))/(1.0-Gamma);
 				}
 			}
 		}
@@ -767,8 +765,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","dE","Tb","erg","re(action)","im(action)");
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,dE,Tb,real(erg(0)),real(action),imag(action));
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","dE","erg","re(action)","im(action)");
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,dE,real(erg(0)),real(action),imag(action));
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
@@ -790,7 +788,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing output phi on whole time contour
 	string tpifile = "./data/" + timeNumber + "tpi"+inP+to_string(loop)+".dat";
 	printVector(tpifile,tp);
-	gp(tpifile,"repi.gp");
+	//gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
 	string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
@@ -802,8 +800,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing linErgVec
 	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
-	simplePrintCVector(linErgFile,linErgA);
-	//gpSimple(linErgFile);
+	simplePrintVector(linErgFile,linErgA);
+	gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";

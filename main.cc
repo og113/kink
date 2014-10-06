@@ -157,10 +157,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
 	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
-	h = hFn(N,a);
+	h = hFn(N,a,mass2);
 	mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
 	mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
@@ -524,8 +525,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//printing to terminal
 		printf("\n");
-		printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","NT","L","dE","Tb","erg","re(action)","im(action)");
-		printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,real(erg(0)),real(action),imag(action));
+		printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","NT","L","dE","Tb","erg","im(action)");
+		printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,real(erg(0)),imag(action));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
