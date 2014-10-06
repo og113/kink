@@ -143,6 +143,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessD = 1.0;
 	closenessC = 5.0e-14;
 	closenessE = 1.0e-2;
+	closenessL = 1.0e-2;
+	closenessI = 1.0e-5;
 
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
@@ -215,7 +217,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//defining the action and bound and W
 		comp action = twaction;
 		comp bound = 0.0;
-		comp W = 0.0; //or should this be real??
+		double W = 0.0;
 		double E;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -487,7 +489,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			
 			//checking linearisation of energy
 			
-				
+			//defining E and cW
+			E = real(erg(0));
+			comp cW;
+			
+			//checking reality of cW, and its constituents, defining W, should have closenessI for this
+			
+			//checking conservation of E
+			
+			//checking lattice small enough for E, should have parameter for this
+			
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
