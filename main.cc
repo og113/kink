@@ -139,11 +139,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
 	
-		//defining some important scalar quantities
+	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	
-		//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
+	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
 	double b_parameter = -1.0;
 	double c_parameter = -epsilon;
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
@@ -249,9 +249,149 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			runs_count++;
 			
-			}
-		}
-	}
+			//defining the zero mode at the final time boundary and the time step before
+			vec chiX(NT*N);	chiX = Eigen::VectorXd::Zero(N*NT); //to fix spatial zero mode
+			vec chiT(NT*N);	chiT = Eigen::VectorXd::Zero(N*NT); //to fix real time zero mode
+			for (unsigned int j=0; j<N; j++)
+				{
+				unsigned int posC = j*NT+(Na+Nb-1);
+				unsigned int posA = j*NT;
+				unsigned int posDm = j*NT+(NT-2);
+				chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
+				chiT(posA) = p(2*(posA+1))-p(2*posA); //could also fix against negVec if this doesn't work
+				chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
+				}
+			
+			// allocating memory for DS, DDS
+			minusDS = Eigen::VectorXd::Zero(2*N*NT+1); //initializing to zero
+			DDS.setZero(); //just making sure
+			Eigen::VectorXi DDS_to_reserve(2*N*NT+1);//number of non-zero elements per column
+			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+1,11);
+			DDS_to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
+			DDS_to_reserve(1) = 3;
+			DDS_to_reserve(2*N*NT-2) = 3;
+			DDS_to_reserve(2*N*NT-1) = 3;
+			DDS_to_reserve(2*N*NT) = N;
+			DDS.reserve(DDS_to_reserve);
+			
+			//initializing to zero
+			comp kineticS = 0.0;
+			comp kineticT = 0.0;
+			comp pot_l = 0.0;
+			comp pot_e = 0.0;
+			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//assigning values to minusDS and DDS and evaluating action
+			for (unsigned long int j = 0; j < N*NT; j++)
+				{		
+				unsigned int t = intCoord(j,0,NT); //coordinates
+				comp Dt = DtFn(t);
+				comp dt = dtFn(t);
+			
+				if (absolute(chiX(j))>2.0e-16) //spatial zero mode lagrange constraint
+					{
+					DDS.insert(2*j,2*N*NT) = a*chiX(j); 
+					DDS.insert(2*N*NT,2*j) = a*chiX(j);
+					minusDS(2*j) += -a*chiX(j)*p(2*N*NT);
+					minusDS(2*N*NT) += -a*chiX(j)*p(2*j);
+					}
+					
+				if (absolute(chiT(j))>2.0e-16)
+					{
+					DDS.insert(2*(j+1),2*N*NT+1) = a*chiT(j); //there should be no chiT on the final time slice or this line will go wrong
+					DDS.insert(2*N*NT+1,2*(j+1)) = a*chiT(j);
+					DDS.insert(2*j,2*N*NT+1) = -a*chiT(j);
+					DDS.insert(2*N*NT+1,2*j) = -a*chiT(j);
+		            minusDS(2*(j+1)) += - a*chiT(j)*p(2*N*NT+1);
+		            minusDS(2*N*NT+1) += - a*chiT(j)*p(2*j);
+		            minusDS(2*j) += a*chiT(j)*p(2*N*NT+1);
+		            minusDS(2*N*NT+1) += a*chiT(j)*p(2*j);
+					}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//boundaries			
+				if (t==(NT-1))
+					{
+					comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
+					kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+					pot_l += Dt*a*Va(Cp(j));
+					pot_e += Dt*a*Vb(Cp(j));
+					erg(t) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
+				
+					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
+					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+					}
+				else if (t==0)
+					{
+					comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
+					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
+					pot_l += Dt*a*Va(Cp(j));
+					pot_e += Dt*a*Vb(Cp(j));
+					erg(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+					
+					DDS.insert(2*j,2*j) = -1.0/b; //zero time derivative
+					DDS.insert(2*j,2*(j+1)) = 1.0/b;
+					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+					}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//bulk
+				else
+					{
+					comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
+					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
+					pot_l += Dt*a*Va(Cp(j));
+					pot_e += Dt*a*Vb(Cp(j));
+					erg(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				
+		            for (unsigned int k=0; k<2*2; k++)
+		            	{
+		                int sign = pow(-1,k);
+		                int direc = (int)(k/2.0);
+		                if (direc == 0)
+		                	{
+		                    minusDS(2*j) += real(a*Cp(j+sign)/dt);
+		                    minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
+		                    DDS.insert(2*j,2*(j+sign)) = -real(a/dt);
+		                    DDS.insert(2*j,2*(j+sign)+1) = imag(a/dt);
+		                    DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dt);
+		                    DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dt);
+		                    }
+		                else
+		                	{
+		                    unsigned int neighb = neigh(j,direc,sign,NT);
+		                    
+		                    minusDS(2*j) += - real(Dt*Cp(neighb)/a);
+		                    minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
+		                    DDS.insert(2*j,2*neighb) = real(Dt/a);
+		                    DDS.insert(2*j,2*neighb+1) = -imag(Dt/a);
+		                    DDS.insert(2*j+1,2*neighb) = imag(Dt/a);
+		                    DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
+		                    }
+		                }
+		            comp temp0 = 2.0*a/dt;
+		            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
+		            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
+		                
+		            minusDS(2*j) += real(temp1 - temp0*Cp(j));
+		            minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
+		            DDS.insert(2*j,2*j) = real(-temp2 + temp0);
+		            DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
+		            DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
+		            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
+		            }
+		        }
+		    action = kineticT - kineticS - pot_l - pot_e;   
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+        	break;			
+			} //ending while loop
+		} //ending theta loop
+	} //ending file loop
 
 return 0;
 }
