@@ -37,7 +37,7 @@ vector<string> filenames, piFiles, inputsFiles;//, eigenvectorFiles, eigenvalueF
 filenames = readDataFiles(minFile,maxFile);
 piFiles = findStrings(filenames,"tpip");
 inputsFiles = findStrings(filenames,"inputsPi");
-//eigenvectorFiles = findStrings(filenames,"eigVec");
+eigenvectorFiles = findStrings(filenames,"eigVec");
 //eigenvalueFiles = findStrings(filenames,"eigValue");
 vector <unsigned long long int> piNumbers = getInts(piFiles);
 vector <unsigned long long int> inputsNumbers = getInts(inputsFiles);
@@ -300,10 +300,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				unsigned int posC = j*NT+(Na+Nb-1);
 				unsigned int posA = j*NT;
-				//unsigned int posDm = j*NT+(NT-2);
+				unsigned int posDm = j*NT+(NT-2);
 				chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
 				chiT(posA) = p(2*(posA+1))-p(2*posA); //could also fix against negVec if this doesn't work
-				//chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
+				chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
 				}
 			
 			// allocating memory for DS, DDS
