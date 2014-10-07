@@ -63,7 +63,8 @@ double closenessD; //delta
 double closenessC; //calculation
 double closenessE; //energy change
 double closenessL; //linearisation of energy
-double closenessI; //imaginary parts of real quantities
+double closenessT; //true energy versus linear energy
+double closenessP; //checking lattice small enough for momenta
 
 //parameters determining input phi
 //struct to hold answers to questions

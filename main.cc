@@ -144,7 +144,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessC = 5.0e-14;
 	closenessE = 1.0e-2;
 	closenessL = 1.0e-2;
-	closenessI = 1.0e-5;
+	closenessT = 1.0e-5;
+	closenessP = 0.5;
 
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
@@ -216,9 +217,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		
 		//defining the action and bound and W
 		comp action = twaction;
-		comp bound = 0.0;
+		double bound = 0.0;
 		double W = 0.0;
 		double E;
+		double Num;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 		comp action_last = action;
@@ -230,6 +232,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vector<double> delta_test(1); delta_test[0] = 1.0;
 		vector<double> calc_test(1); calc_test[0] = 1.0;
 		vector<double> erg_test(1); erg_test[0] = 1.0;
+		vector<double> lin_test(1); lin_test[0] = 1.0;
+		vector<double> true_test(1); true_test[0] = 1.0;
+		vector<double> mom_test(1); mom_test[0] = 1.0;
 
 		//initializing phi (=p)
 		vec p(2*N*NT+2);
@@ -328,12 +333,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		            minusDS(2*N*NT+1) += a*chiT(j)*p(2*j);
 					}
 					
-				if (absolute(theta)>2.0e-16)
+				if (absolute(theta)<2.0e-16)
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErg(t) += Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1);
+						linErg(t) += Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1); //middle sign may be negative - check this
 						linNum(t) += omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + omega(x,k)*p(2*j+1)*p(2*l+1);
 						}
 					}
@@ -405,7 +410,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         	DDS.insert(2*j+1,2*k*NT) = omega(x,k)*(1.0+Gamma)/(1.0-Gamma);
 							unsigned int m = x*NT;
 							unsigned int n = k*NT;
-							bound += (1.0-Gamma)*omega(m,n)*(p(2*m)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*p(2*m+1)*p(2*n+1)/(1.0-Gamma);
+							bound += -(1.0-Gamma)*omega(m,n)*(p(2*m)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*p(2*m+1)*p(2*n+1)/(1.0-Gamma);
                         	}
 						}
 					}
@@ -487,18 +492,67 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
 			
-			//checking linearisation of energy
-			
-			//defining E and cW
-			E = real(erg(0));
-			comp cW;
-			
-			//checking reality of cW, and its constituents, defining W, should have closenessI for this
+			//checking linearisation of linErg and linNum
+			double linTestE;	double linTestN;
+			double linEMax = 0.0;	double linEMin = 1.0e6; //surely it's going to be less than this
+			double linNMax = 0.0;	double linNMin = 1.0e6;
+			unsigned int linearInt = (int)(Na/6);
+			for (unsigned int j=1;j<(linearInt+1);j++)
+				{
+				if (absolute(linErg(j))>linEMax)
+					{
+					linEMax = absolute(linErg(j));
+					}
+				if (absolute(linErg(j))<linEMin)
+					{
+					linEMin = absolute(linErg(j));
+					}
+				if (absolute(linNum(j))>linNMax)
+					{
+					linNMax = absolute(linNum(j));
+					}
+				if (absolute(linNum(j))<linNMin)
+					{
+					linNMin = absolute(linNum(j));
+					}
+				}
+			linTestE = (linEMax-linEMin)*2.0/(linEMax+linEMin);
+			linTestN = (linNMax-linNMin)*2.0/(linNMax+linNMin);
+			lin_test.push_back(linTestE);
+			if (linTestN>linTestE)
+				{
+				lin_test.back() = linTestN;
+				}
+				
+			//checking agreement between erg and linErg
+			double trueTest = real(erg(1))-linErg(1); //not using zero as boundaries are funny
+			trueTest = trueTest*2.0/(real(erg(1))+linErg(1));
+			trueTest = absolute(trueTest);
+			true_test.push_back(trueTest);
 			
 			//checking conservation of E
-			
+			double ergTest = real(erg(1)-erg(NT-2));
+			ergTest = ergTest*2.0/(real(erg(1)+erg(NT-2)));
+			ergTest = absolute(ergTest);
+			erg_test.push_back(ergTest);
+			if (ergTest>closenessE)
+				{
+				cout << "ergTest = " << ergTest << endl;
+				}
+							
 			//checking lattice small enough for E, should have parameter for this
-			
+			double momTest = E*a/Num*pi;
+			mom_test.push_back(momTest);
+			if (momTest>closenessP)
+				{
+				cout << "lattice not small enough for momenta" << endl;
+				cout << "momTest = " << momTest << endl;
+				}
+						
+			//defining E, Num and cW
+			E = real(erg(1));
+			Num = linNum(1);
+			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
@@ -576,9 +630,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%16s%16s%16s%16s%16s%16s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest");
+				printf("%6s%6s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
 				}
-			printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
+			printf("%6i%6i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
 			
 			break;
 			} //ending while loop
@@ -606,7 +660,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing to terminal
 		printf("\n");
 		printf("%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s%16s\n","runs","time","N","NT","L","Tb","dE","theta","E","im(action)","bound","W");
-		printf("%8i%8g%8i%8i%8g%8g%8g%8g%16g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,E,imag(action),real(bound),real(W));
+		printf("%8i%8g%8i%8i%8g%8g%8g%8g%16g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,E,imag(action),bound,real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
@@ -614,7 +668,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
 		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%8g%14g%12g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E\
-		,imag(action),real(W),sol_test.back(),solM_test.back(),erg_test.back());
+		,imag(action),real(W),sol_test.back(),solM_test.back(),lin_test.back());
 		fclose(actionfile);
 	
 		//copying a version of inputs with timeNumber and theta changed
