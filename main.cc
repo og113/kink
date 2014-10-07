@@ -36,7 +36,7 @@ system("dir ./data/* > dataFiles");
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 piFiles = findStrings(filenames,"tpip");
-inputsFiles = findStrings(filenames,"inputs");
+inputsFiles = findStrings(filenames,"inputsPi");
 eigenvectorFiles = findStrings(filenames,"eigVec");
 eigenvalueFiles = findStrings(filenames,"eigValue");
 if (piFiles.size()!=inputsFiles.size() || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size() || piFiles.size()==0)
@@ -672,7 +672,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 	
 		//copying a version of inputs with timeNumber and theta changed
-		string runInputs = "./data/" + timeNumber + "inputs";
+		string runInputs = "./data/" + timeNumber + "inputsM";
 		changeInputs(runInputs, "theta", to_string(theta));
 	
 		//printing output phi on whole time contour

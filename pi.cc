@@ -777,7 +777,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	fclose(actionfile);
 	
 	//copying a version of inputs with timeNumber
-	string runInputs = "./data/" + timeNumber + "inputs";
+	string runInputs = "./data/" + timeNumber + "inputsPi";
 	copyFile("inputs",runInputs);
 
 	//printing output phi on Euclidean time part
@@ -800,7 +800,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing linErgVec
 	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
 	simplePrintVector(linErgFile,linErgA);
-	gpSimple(linErgFile);
+	//gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
