@@ -173,7 +173,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double c_parameter = -epsilon;
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
+	double falseErg = real(N*a*V(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -348,7 +348,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
-		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+		erg = Eigen::VectorXcd::Constant(NT,-falseErg);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,7 +470,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				string minusDSfile = minusDSprefix+inP+to_string(loop)+to_string(runs_count)+minusDSsuffix;
 				printVectorB(minusDSfile,minusDS);
 				}
-			if (print_choice.compare("p")==0 || print_choice.compare("e")==0)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
 				{
 				string piEarlyPrefix = ("./data/piE");
 				string piEarlySuffix = (".dat");
@@ -783,7 +783,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing output phi on whole time contour
 	string tpifile = "./data/tpi"+inP+to_string(loop)+".dat";
 	printVector(tpifile,tp);
-	gp(tpifile,"repi.gp");
+	//gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
 	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
