@@ -24,10 +24,13 @@ int main()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
 
+//defining the time to label output
+string timeNumber = currentDateTime();
+
 ifstream fin;
-fin.open("inputs", ios::in);
+fin.open("inputs");
 string line;
-int lineNumber = 0;
+unsigned int lineNumber = 0;
 unsigned int negEigDone;
 while(getline(fin,line))
 	{
@@ -65,7 +68,10 @@ epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
 vec negVec(2*N*Nb+1);
-double negVal;
+unsigned int negP;
+double negc;
+double negcheck;
+double negerror; //should be <<1
 if (inP.compare("p") == 0)
 	{
 	L = 3.2*R;
@@ -84,19 +90,19 @@ if (inP.compare("p") == 0)
 		if (negEigDone==0)
 			{
 			system("./negEig");
+			system(timeNumber.c_str());
 			cout << "negEig run" << endl;
 			}
-		negVec = loadVector("./data/eigVec.dat",Nb);
+		negVec = loadVector("./data/eigVec.dat",Nb,1);
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
-		double temp;
-		double eigError; //should be <<1
-		ss >> temp >> temp >> temp >> eigError >> negVal;
-		if (eigError>1.0)
+		ss >> negP >> negc >> negcheck >> negerror >> negVal;
+		eigFile.close();
+		if (negerror>1.0)
 			{
-			cout << "error in negEig = " << eigError << endl;
+			cout << "error in negEig = " << negerror << endl;
 			cout << "consider restarting with different values of P and c" << endl;
 			}
 		}
@@ -141,11 +147,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		changeDouble (loop_choice,loopParameter);
 		}
 		
-	printParameters();
-
 	//defining a time and starting the clock
 	clock_t time;
 	time = clock();
+	
+	//printing loop name and parameters
+	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
+	printParameters();
 	
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
@@ -173,11 +181,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double c_parameter = -epsilon;
 	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
 	sort(root.begin(),root.end());
-	double falseErg = real(N*a*V(root[0]));
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
-	h = hFn(N,a);
+	h = hFn(N,a,mass2);
 	mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
 	mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
@@ -279,8 +288,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			toLoad = loop-1;
 			}
-		string loadfile = "./data/pi"+inP+to_string(toLoad)+".dat";
-		p = loadVector(loadfile,Nb);
+		string loadfile = "./data/" + timeNumber + "pi"+inP+to_string(toLoad)+".dat";
+		p = loadVector(loadfile,Nb,1);
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
@@ -300,7 +309,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/piE"+inP+ to_string(loop) + "0.dat";
+	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ to_string(loop) + "0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
@@ -328,7 +337,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             }
         if (runs_count==1) //printing Chi0
         	{
-        	printVectorB("data/Chi0.dat",Chi0);
+        	printVectorB("data/" + timeNumber + "Chi0.dat",Chi0);
         	}
 
 		// allocating memory for DS, DDS
@@ -348,7 +357,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
-		erg = Eigen::VectorXcd::Constant(NT,-falseErg);
+		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,23 +474,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string minusDSprefix = ("./data/minusDSE");
-				string minusDSsuffix = (".dat");
-				string minusDSfile = minusDSprefix+inP+to_string(loop)+to_string(runs_count)+minusDSsuffix;
+				string minusDSfile = "./data/" + timeNumber + "minusDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(minusDSfile,minusDS);
 				}
 			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
 				{
-				string piEarlyPrefix = ("./data/piE");
-				string piEarlySuffix = (".dat");
-				string piEarlyFile = piEarlyPrefix+inP+to_string(loop)+to_string(runs_count)+piEarlySuffix;
+				string piEarlyFile = "./data/" + timeNumber + "piE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(piEarlyFile,p);
 				}
 			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string DDSprefix = ("./data/DDSE");
-				string DDSsuffix = (".dat");
-				string DDSfile = DDSprefix+inP+to_string(loop)+to_string(runs_count)+DDSsuffix;
+				string DDSfile = "./data/" + timeNumber + "DDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printSpmat(DDSfile,DDS);
 				}
 			}
@@ -493,6 +496,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
+		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -602,10 +606,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	}
     	
     //A4.5 starting the energy and that off
-    #define eta(m) real(ap(m))-root[0]
-    #define ieta(m) imag(ap(m))
-	cVec linErgA(Na); linErgA = Eigen::VectorXcd::Zero(Na);
-	cVec linNumA(Na); linNumA = Eigen::VectorXcd::Zero(Na);
+	vec linErgA(Na); linErgA = Eigen::VectorXd::Zero(Na);
+	vec linNumA(Na); linNumA = Eigen::VectorXd::Zero(Na);
 
     //A7. run loop
     for (unsigned int t=1; t<(Na+1); t++)
@@ -624,17 +626,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + a*V(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
-            	unsigned int l1 = t + x*(Na+1);
-            	unsigned int l2 = t + y*(Na+1);
+            	unsigned int n = t + y*(Na+1);
 		        if (absolute(theta)<2.0e-16)
 					{
-		        	linErgA(Na-t) += Eomega(x,y)*eta(l1)*eta(l2) - Eomega(x,y)*ieta(l1)*ieta(l2);
-					linNumA (Na-t) += omega(x,y)*eta(l1)*eta(l2) - omega(x,y)*ieta(l1)*ieta(l2);
+		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
+					linNumA (Na-t) += omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
 		        	}
 				else
 					{
-					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
-					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*eta(l1)*eta(l2)/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*ieta(l1)*ieta(l2)/pow(1.0-Gamma,2.0);
+					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
 					}
 				}
         	}
@@ -645,17 +646,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
-			{
-			
+			{		
 			if (absolute(theta)<2.0e-16)
 				{
 				bound += 0.0;
 				}
 			else
 				{
-				unsigned int l = Na + j*(Na+1);
-				unsigned int m = Na + k*(Na+1);
-				bound += (1.0-Gamma)*omega(j,k)*eta(l)*eta(m)/(1.0+Gamma) + (1.0+Gamma)*omega(j,k)*ieta(l)*ieta(m)/(1.0-Gamma);
+				unsigned int m = Na + j*(Na+1);
+				unsigned int n = Na + k*(Na+1);
+				bound += (1.0-Gamma)*omega(m,n)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*imag(ap(m))*imag(ap(n))/(1.0-Gamma);
 				}
 			}
 		}
@@ -764,44 +764,59 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","R","Tb","erg","re(action)","im(action)");
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,R,Tb,real(erg(0)),real(action),imag(action));
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","dE","erg","re(action)","im(action)");
+	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,dE,real(erg(0)),real(action),imag(action));
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%8i%8i%8g%8g%8g%14g%14g%12g%14g%14g%14g\n",N,NT,L,Tb,dE,real(erg(0)),real(action)\
+	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,real(erg(0))\
 	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
 	fclose(actionfile);
+	
+	//copying a version of inputs with timeNumber
+	string runInputs = "./data/" + timeNumber + "inputsPi";
+	copyFile("inputs",runInputs);
 
 	//printing output phi on Euclidean time part
-	string pifile = "./data/pi"+inP+to_string(loop)+".dat";
+	string pifile = "./data/" + timeNumber + "pi"+inP+to_string(loop)+".dat";
 	printVectorB(pifile,p);
 	
 	//printing output phi on whole time contour
-	string tpifile = "./data/tpi"+inP+to_string(loop)+".dat";
+	string tpifile = "./data/" + timeNumber + "tpi"+inP+to_string(loop)+".dat";
 	printVector(tpifile,tp);
 	//gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
-	string minusDSfile = "./data/minusDS"+inP+to_string(loop)+".dat";
+	string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
 	printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
-	string DDSfile = "./data/DDS"+inP+to_string(loop)+".dat";
+	string DDSfile = "./data/" + timeNumber + "DDS"+inP+to_string(loop)+".dat";
 	printSpmat(DDSfile,DDS);
 	
 	//printing linErgVec
-	string linErgFile = "./data/linErg"+inP+to_string(loop)+".dat";
-	simplePrintCVector(linErgFile,linErgA);
+	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
+	simplePrintVector(linErgFile,linErgA);
 	//gpSimple(linErgFile);
 	
 	//printing erg
-	string ergFile = "./data/erg"+inP+to_string(loop)+".dat";
+	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
 	//gpSimple(ergFile);
+	
+	//printing error, and eigenvalue to file
+	FILE * eigenvalueFile;
+	string eigValueFile = "./data/" + timeNumber + "eigValue.dat";
+	eigenvalueFile = fopen(eigValueFile.c_str(),"w");
+	fprintf(eigenvalueFile,"%16i%16g%16g%16g%16g\n",negP,negc,negcheck,negerror,negVal);
+	fclose(eigenvalueFile);
+
+	//printing eigenvector to file
+	string eigenvectorFile = "./data/" + timeNumber + "eigVec.dat";
+	printVectorB(eigenvectorFile,negVec);
 
 } //closing parameter loop
 

@@ -53,6 +53,7 @@ double b; //step sizes in time
 double Ta;
 double Tc;
 vector<double> root(3);
+double mass2; //as derived from V''
 
 //determining number of runs
 double closenessA; //action
@@ -61,6 +62,9 @@ double closenessSM; //solution max
 double closenessD; //delta
 double closenessC; //calculation
 double closenessE; //energy change
+double closenessL; //linearisation of energy
+double closenessT; //true energy versus linear energy
+double closenessP; //checking lattice small enough for momenta
 
 //parameters determining input phi
 //struct to hold answers to questions
@@ -81,6 +85,8 @@ string inP; //b for bubble, p for periodic instaton, f for from file
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
+double negVal; //the negative eigenvalue
+unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -189,7 +195,7 @@ comp simpleTime (const unsigned int& time)
 		double temp = (double)time;
 		temp -= (double)Na;
 		temp -= (double)Nb;
-		xTime = b*temp;
+		xTime = b*(temp+1.0); //the 1.0 is because the corner is part of the vertical contour
 		}
 	return xTime;
 	}
@@ -500,9 +506,9 @@ void gpSimple(const string & readFile)
 //loading functions
 
 //load vector from file
-vec loadVector (const string& loadFile, const unsigned int& Nt)
+vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned int zeroModes)
 	{
-	vec outputVec(2*Nt*N+1);
+	vec outputVec(2*Nt*N+zeroModes);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
 	string line;
@@ -522,7 +528,10 @@ vec loadVector (const string& loadFile, const unsigned int& Nt)
 		{
 		cout << "loadVector error" << endl;
 		}
-	outputVec(2*Nt*N) = 0.5; //lagrange multiplier to remove zero mode
+	for (j=0;j<zeroModes;j++)
+		{
+		outputVec(2*Nt*N+j) = 0.5; //lagrange multiplier to remove zero modes
+		}
 	F.close();
 	return outputVec;
 	}
@@ -553,7 +562,11 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 				nnz++;
 				}
 			}
-		}	
+		}
+	if (nnz==0)
+		{
+		cout << "loadSpMat failed, no data in file" << endl;
+		}
 	M.makeCompressed();
 	return M;
 	}
@@ -568,6 +581,71 @@ string getLastLine(ifstream& inStream)
 		}
 		
     return xLine;
+	}
+	
+//read dataFiles into filenames and filenumbers
+vector<string> readDataFiles(const unsigned long long int & minFileNo, const unsigned long long int & maxFileNo)
+	{
+	vector<string> fileNames;
+	unsigned long long int fileNumber;
+    ifstream file;
+    file.open ("dataFiles");
+    string fileName;
+    string strNumber;
+    fileName.clear();
+		while ( !file.eof() )
+			{
+			file >> fileName;
+			if (fileName.size()>19)
+				{
+				if (fileName[7]=='1')
+					{
+					strNumber = fileName.substr(7,12);
+					fileNumber = stoull(strNumber);
+					if (fileNumber>minFileNo && fileNumber<maxFileNo)
+						{
+						fileNames.push_back(fileName);
+						}
+					}
+				fileName.clear();
+				}
+    		}
+    file.close();
+    return fileNames;
+	}
+	
+//get elements of string vector that have a given string in them
+vector<string> findStrings(const vector <string> & fullVector, const string & search)
+	{
+	vector <string> subVector;
+	for (unsigned int l=0;l<fullVector.size();l++)
+		{
+		if(fullVector[l].find(search)!=string::npos)
+			{
+			subVector.push_back(fullVector[l]);
+			}
+		}
+	return subVector;
+	}
+	
+//get vector of unsigned long long int from vector of strings
+vector<unsigned long long int> getInts(const vector <string> & strVector)
+	{
+	vector <unsigned long long int> intVector;
+	for (unsigned int l=0; l<strVector.size(); l++)
+		{
+		string temp = strVector[l];
+		if (temp[7]=='1')
+			{
+			temp = temp.substr(7,12);
+			intVector.push_back(stoull(temp));
+			}
+		else
+			{
+			cout << "getInts error, filename not as expected" << endl;
+			}
+		}
+	return intVector;
 	}
 
 
@@ -700,7 +778,7 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 cVec vecComplex(vec realVec, const unsigned int & tDim)
 	{
 	cVec complexVec(tDim);
-	if (realVec.size() == (2*tDim+1) || realVec.size() == 2*tDim)
+	if (realVec.size() >= (2*tDim) && realVec.size() < (2*tDim+3))
 		{
 		for (unsigned int l=0; l<tDim; l++)
 			{
@@ -737,10 +815,10 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //fourier transform type functions
 
 //h the matrix from dl[7]
-mat hFn(const unsigned int & xN, const double & xa)
+mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
-	double diag = 1.0 + 2.0/pow(xa,2.0); //diagonal terms
+	double diag = mass2 + 2.0/pow(xa,2.0); //diagonal terms
 	double offDiag = -1.0/pow(xa,2.0); //off diagonal terms
 	for (unsigned int l=0; l<xN; l++)
 		{
@@ -762,4 +840,62 @@ mat hFn(const unsigned int & xN, const double & xa)
 			}
 		}
 	return xh;
+	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//misc functions
+
+//getting the date and time
+const string currentDateTime()
+	{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%y%m%d%H%M%S", &tstruct);
+    return buf;
+	}
+	
+//copy a file
+void copyFile(const string & inputFile, const string & outputFile)
+	{
+	ifstream  src(inputFile, ios::binary);
+	ofstream  dst(outputFile, ios::binary);
+
+	dst << src.rdbuf();
+	}
+	
+//copy inputs with a change
+void changeInputs(const string & outputFile, const string & search, const string & replace)
+	{ 
+	ifstream fin;
+	ofstream fout;
+	fin.open("inputs");
+	fout.open(outputFile.c_str());
+	string line;
+	size_t pos;
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line[0] == '#' && line[1] == '#')
+			{
+			fout << line << endl;
+			continue;
+			}
+		if (line[0] == '#')
+			{
+			pos = line.find(search);
+			fout << line << endl;
+			getline(fin,line);
+			if (pos != string::npos)
+				{
+				line.replace(pos, search.length(), replace);
+				}
+			}
+		fout << line << endl;
+		}
+	fin.close();
+	fout.close();
 	}

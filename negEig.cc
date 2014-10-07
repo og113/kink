@@ -23,6 +23,10 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
+string timeNumber;
+cout << "input timeNumber: ";
+cin >> timeNumber;
+
 //load parameters
 //getting variables and user inputs from inputs
 
@@ -98,7 +102,7 @@ to_reserve(1) = 3;
 to_reserve(2*N*Nb-2) = 3;
 to_reserve(2*N*Nb-1) = 3;
 to_reserve(2*N*Nb) = N;
-string loadFile = "./data/DDSb" + to_string(aq.fileNo) + ".dat";
+string loadFile = "./data/" + timeNumber + "DDSb" + to_string(aq.fileNo) + ".dat";
 
 spMat M = loadSpmat(loadFile,to_reserve);
 
