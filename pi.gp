@@ -22,7 +22,7 @@ set xlabel "x"
 set ylabel "t"
 set zlabel "re(phi)"
 set grid
-splot f using 3:($2-$1):5 with points
+splot f using 3:($2-$1):4 with points
 
 unset log
 unset label
@@ -35,7 +35,7 @@ set xlabel "x"
 set ylabel "t"
 set zlabel "im(phi)"
 set grid
-splot f using 3:($2-$1):6 with points
+splot f using 3:($2-$1):5 with points
 
 unset multiplot
 

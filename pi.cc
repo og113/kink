@@ -496,7 +496,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
-		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
@@ -787,7 +786,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing output phi on whole time contour
 	string tpifile = "./data/" + timeNumber + "tpi"+inP+to_string(loop)+".dat";
 	printVector(tpifile,tp);
-	//gp(tpifile,"repi.gp");
+	gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
 	string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
@@ -800,12 +799,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing linErgVec
 	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
 	simplePrintVector(linErgFile,linErgA);
-	//gpSimple(linErgFile);
+	gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
-	//gpSimple(ergFile);
+	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
 	FILE * eigenvalueFile;

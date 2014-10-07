@@ -409,17 +409,23 @@ void printVectorB (const string& printFile, vec vecToPrint)
 			x0 = x;
 			}
 		F << left;
-		for (int r=0; r<2; r++)
-			{
-			F << setw(20) << real(coordB(j,r)) << setw(20) << imag(coordB(j,r));
-			}
+		F << setw(22) << real(coordB(j,0)) << setw(22) << imag(coordB(j,0));
+		F << setw(22) << real(coordB(j,1));
 		if (vecToPrint.size()>N*Nb)
 			{
-			F << setw(20) << vecToPrint(2*j) << setw(20) << vecToPrint(2*j+1)  << endl;
+			F << setw(22) << vecToPrint(2*j) << setw(22) << vecToPrint(2*j+1)  << endl;
 			}
 		else
 			{
-			F << setw(20) << vecToPrint(j) << endl;
+			F << setw(22) << vecToPrint(j) << endl;
+			}
+		}
+	if (vecToPrint.size()>2*N*Nb)
+		{
+		F << endl;
+		for (unsigned int k=0; k<(vecToPrint.size()-2*N*Nb);k++)
+			{
+			F << setw(22) << vecToPrint(2*N*Nb+k) << endl;
 			}
 		}
 	F.close();
@@ -442,7 +448,7 @@ void printVector (const string& printFile, vec vecToPrint)
 			}
 		F << left;
 		F << setw(22) << real(coord(j,0)) << setw(22) << imag(coord(j,0)); //note using coord for full time contour
-		F << setw(22) << real(coord(j,1)) << setw(22) << imag(coord(j,1));
+		F << setw(22) << real(coord(j,1));
 		if (vecToPrint.size()>N*NT)
 			{
 			F << setw(22) << vecToPrint(2*j) << setw(22) << vecToPrint(2*j+1)  << endl;
@@ -450,6 +456,14 @@ void printVector (const string& printFile, vec vecToPrint)
 		else
 			{
 			F << setw(22) << vecToPrint(j) << endl;
+			}
+		}
+	if (vecToPrint.size()>2*N*NT)
+		{
+		F << endl;
+		for (unsigned int j=0; j<(vecToPrint.size()-2*N*NT);j++)
+			{
+			F << setw(22) << vecToPrint(2*N*NT+j) << endl;
 			}
 		}
 	F.close();
@@ -513,24 +527,35 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 	F.open((loadFile).c_str(), ios::in);
 	string line;
 	unsigned int j = 0;
+	unsigned int k = 0;
 	while (getline(F, line))
 		{
 		if (!line.empty())
 			{
-			double temp;
-			istringstream ss(line);
-			ss >> temp >> temp >> temp >> temp;
-			ss >> outputVec(2*j) >> outputVec(2*j+1);
-			j++;
+			if (j<Nt*N)
+				{
+				double temp;
+				istringstream ss(line);
+				ss >> temp >> temp >> temp;
+				ss >> outputVec(2*j) >> outputVec(2*j+1);
+				j++;
+				}
+			else
+				{
+				istringstream ss(line);
+				ss >> outputVec(2*j+k);
+				k++;
+				}
 			}
 		}
-	if (j!=Nt*N)
+	if (j==Nt*N && k==(zeroModes-1))
+		{
+		outputVec(2*j+k) = 0.01; //obviously a random guess
+		k++;
+		}
+	if ((j+k)!=(Nt*N+zeroModes))
 		{
 		cout << "loadVector error" << endl;
-		}
-	for (j=0;j<zeroModes;j++)
-		{
-		outputVec(2*Nt*N+j) = 0.5; //lagrange multiplier to remove zero modes
 		}
 	F.close();
 	return outputVec;
@@ -602,7 +627,7 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 					{
 					strNumber = fileName.substr(7,12);
 					fileNumber = stoull(strNumber);
-					if (fileNumber>minFileNo && fileNumber<maxFileNo)
+					if (fileNumber>=minFileNo && fileNumber<=maxFileNo)
 						{
 						fileNames.push_back(fileName);
 						}

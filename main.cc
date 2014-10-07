@@ -33,19 +33,45 @@ copyFile("mainInputs",runInputs);
 
 //getting list of relevant data files
 system("dir ./data/* > dataFiles");
-vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
+vector<string> filenames, piFiles, inputsFiles;//, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 piFiles = findStrings(filenames,"tpip");
 inputsFiles = findStrings(filenames,"inputsPi");
-eigenvectorFiles = findStrings(filenames,"eigVec");
-eigenvalueFiles = findStrings(filenames,"eigValue");
-if (piFiles.size()!=inputsFiles.size() || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size() || piFiles.size()==0)
+//eigenvectorFiles = findStrings(filenames,"eigVec");
+//eigenvalueFiles = findStrings(filenames,"eigValue");
+vector <unsigned long long int> piNumbers = getInts(piFiles);
+vector <unsigned long long int> inputsNumbers = getInts(inputsFiles);
+if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)//|| piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size())
 	{
-	cout << "required files not available" << endl;
-	return 0;
+	if (piFiles.size()<inputsFiles.size() && piFiles.size()>0)
+		{
+		for (unsigned int j=0;j<inputsFiles.size();j++)
+			{
+			if(find(piNumbers.begin(), piNumbers.end(), inputsNumbers[j]) == piNumbers.end())
+				{
+				inputsFiles.erase(inputsFiles.begin()+j);
+				inputsNumbers.erase(inputsNumbers.begin()+j);
+				}
+			}
+		}
+	else if (piFiles.size()>inputsFiles.size() && inputsFiles.size()>0)
+		{
+		for (unsigned int j=0;j<piFiles.size();j++)
+			{
+			if(find(inputsNumbers.begin(), inputsNumbers.end(), piNumbers[j]) == inputsNumbers.end())
+				{
+				piFiles.erase(piFiles.begin()+j);
+				piNumbers.erase(piNumbers.begin()+j);
+				}
+			}
+		}
+	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
+		{
+		cout << "required files not available" << endl;
+		return 0;
+		}
 	}
-vector <unsigned long long int> fileNumbers;
-fileNumbers = getInts(piFiles);
+vector <unsigned long long int> fileNumbers = piNumbers;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //beginning file loop
 for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
@@ -81,13 +107,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			ss >> alpha >> open >> amp;
 			lineNumber++;
 			}
-		else if(lineNumber==2)
-			{
-			istringstream ss(line);
-			double temp;
-			ss >> temp >> temp >> negEigDone;
-			lineNumber++;
-			}
+		//else if(lineNumber==2) //not needed yet
+			//{
+			//istringstream ss(line);
+			//double temp;
+			//ss >> temp >> temp >> negEigDone;
+			//lineNumber++;
+			//}
 		}
 	fin.close();
 	inP = aq.inputChoice;
@@ -98,7 +124,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	R = 2.0/3.0/epsilon;
 	alpha *= R;
 	Gamma = exp(-theta);
-	vec negVec(2*N*Nb+1);
+	//vec negVec(2*N*Nb+1);
 	L = 3.2*R;
 	if (Tb<R)
 		{
@@ -112,24 +138,24 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	else
 		{
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
-		if (negEigDone==0)
-			{
-			system("./negEig");
-			cout << "negEig run" << endl;
-			}
-		negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
-		ifstream eigFile;
-		eigFile.open(eigenvalueFiles[fileLoop]);
-		string lastLine = getLastLine(eigFile);
-		istringstream ss(lastLine);
-		double temp;
-		double eigError; //should be <<1
-		ss >> temp >> temp >> temp >> eigError >> negVal;
-		if (eigError>1.0)
-			{
-			cout << "error in negEig = " << eigError << endl;
-			cout << "consider restarting with different values of P and c" << endl;
-			}
+		//if (negEigDone==0 && 1==0) //not using negEig so not necesasary
+		//	{
+		//	system("./negEig");
+		//	cout << "negEig run" << endl;
+		//	}
+		//negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
+		//ifstream eigFile;
+		//eigFile.open(eigenvalueFiles[fileLoop]);
+		//string lastLine = getLastLine(eigFile);
+		//istringstream ss(lastLine);
+		//double temp;
+		//double eigError; //should be <<1
+		//ss >> temp >> temp >> temp >> eigError >> negVal;
+		//if (eigError>1.0)
+		//	{
+		//	cout << "error in negEig = " << eigError << endl;
+		//	cout << "consider restarting with different values of P and c" << endl;
+		//	}
 		}
 	a = L/(N-1.0);
 	b = Tb/(Nb-1.0);
@@ -141,7 +167,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessS = 1.0e-5;
 	closenessSM = 1.0e-4;
 	closenessD = 1.0;
-	closenessC = 5.0e-14;
+	closenessC = 5.0e-13;
 	closenessE = 1.0e-2;
 	closenessL = 1.0e-2;
 	closenessT = 1.0e-5;
@@ -216,7 +242,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vec linNum(NT);
 		
 		//defining the action and bound and W
-		comp action = twaction;
+		comp action = i*twaction;
 		double bound = 0.0;
 		double W = 0.0;
 		double E;
@@ -250,8 +276,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(fileLoop) + to_string(loop) + "0.dat";
-		printVectorB(earlyPrintFile,p);
+		string earlyPrintFile = "data/" + timeNumber + "mainpE"+ to_string(fileLoop) + to_string(loop) + "0.dat";
+		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
 		cVec Cp(NT*N);
@@ -274,10 +300,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				unsigned int posC = j*NT+(Na+Nb-1);
 				unsigned int posA = j*NT;
-				unsigned int posDm = j*NT+(NT-2);
+				//unsigned int posDm = j*NT+(NT-2);
 				chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
 				chiT(posA) = p(2*(posA+1))-p(2*posA); //could also fix against negVec if this doesn't work
-				chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
+				//chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
 				}
 			
 			// allocating memory for DS, DDS
@@ -464,31 +490,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		        }
 		    action = kineticT - kineticS - pot_l - pot_e;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//printing early if desired
-		if (runs_count == aq.printRun || aq.printRun == 0)
-			{
-			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
-				{
-				printAction(kineticT-kineticS,pot_l,pot_e);
-				}
-			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
-				{
-				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
-				printVector(minusDSfile,minusDS);
-				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
-				{
-				string piEarlyFile = "./data/" + timeNumber + "mainpE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
-				printVector(piEarlyFile,p);
-				}
-			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
-				{
-				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
-				printSpmat(DDSfile,DDS);
-				}
-			}
-		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
 			
@@ -535,19 +536,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			ergTest = ergTest*2.0/(real(erg(1)+erg(NT-2)));
 			ergTest = absolute(ergTest);
 			erg_test.push_back(ergTest);
-			if (ergTest>closenessE)
-				{
-				cout << "ergTest = " << ergTest << endl;
-				}
 							
 			//checking lattice small enough for E, should have parameter for this
 			double momTest = E*a/Num*pi;
 			mom_test.push_back(momTest);
-			if (momTest>closenessP)
-				{
-				cout << "lattice not small enough for momenta" << endl;
-				cout << "momTest = " << momTest << endl;
-				}
 						
 			//defining E, Num and cW
 			E = real(erg(1));
@@ -555,13 +547,49 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
+		//printing early if desired
+		if (runs_count == aq.printRun || aq.printRun == 0)
+			{
+			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
+				{
+				printAction(kineticT-kineticS,pot_l,pot_e);
+				}
+			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
+				{
+				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printVector(minusDSfile,minusDS);
+				}
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0))// && delta_test.back()>0.2)
+				{
+				string piEarlyFile = "./data/" + timeNumber + "mainpE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printVector(piEarlyFile,p);
+				gp(piEarlyFile,"repi.gp");
+				}
+			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
+				{
+				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				printSpmat(DDSfile,DDS);
+				}
+			if (print_choice.compare("e")==0 || print_choice.compare("e")==0)
+				{
+				//printing linErgVec
+				string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
+				simplePrintVector(earlyLinErgFile,linErg);
+				//gpSimple(earlyLinErgFile);
+				//printing erg
+				string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
+				simplePrintCVector(earlyErgFile,erg);
+				//gpSimple(earlyErgFile);
+				}
+			}
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
 			//solving for delta in DDS*delta=minusDS, where p' = p + delta		
 			vec delta(2*N*NT+2);
 			delta = Eigen::VectorXd::Zero(2*N*NT+2);
 			DDS.makeCompressed();
 			Eigen::SparseLU<spMat> solver;
-			break;
 		
 			solver.analyzePattern(DDS);
 			if(solver.info()!=Eigen::Success)
@@ -634,23 +662,19 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			printf("%6i%6i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
 			
-			break;
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
 
 		//checking energy conserved
-		double ergChange = 0.0;
-		double relErgChange = 0.0;
-		if (absolute(real(erg(0)))>2.0e-16)
-			{
-			ergChange = absolute(real(erg(0))-real(erg(NT-2)));
-			relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
-			}
-		erg_test.push_back(ergChange);
 		if (erg_test.back()>closenessE)
+				{
+				cout << "ergTest = " << erg_test.back() << endl;
+				}
+		
+		//checking lattice small enough
+		if (mom_test.back()>closenessP)
 			{
-			cout << "energy change = " << ergChange << endl;
-			cout << "relative energy change = " << relErgChange << endl;
+			cout << "lattice not small enough for momenta, momTest = "<< mom_test.back()  << endl;
 			}
 		
 		//stopping clock
@@ -675,7 +699,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		string runInputs = "./data/" + timeNumber + "inputsM";
 		changeInputs(runInputs, "theta", to_string(theta));
 	
-		//printing output phi on whole time contour
+		//printing output phi
 		string tpifile = "./data/" + timeNumber + "mainp"+to_string(fileLoop)+to_string(loop)+".dat";
 		printVector(tpifile,p);
 		gp(tpifile,"repi.gp");
@@ -689,12 +713,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printSpmat(DDSfile,DDS);
 	
 		//printing linErgVec
-		//string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
-		//simplePrintCVector(linErgFile,linErgA);
+		string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
+		simplePrintVector(linErgFile,linErg);
 		//gpSimple(linErgFile);
 	
 		//printing erg
-		string ergFile = "./data/" + timeNumber + "erg" + to_string(fileLoop)+to_string(loop)+".dat";
+		string ergFile = "./data/" + timeNumber + "mainerg" + to_string(fileLoop)+to_string(loop)+".dat";
 		simplePrintCVector(ergFile,erg);
 		//gpSimple(ergFile);
 		
