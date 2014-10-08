@@ -117,6 +117,20 @@ double absolute (const double& amplitude)
 		}
 	return abs_amplitude;
 	}
+	
+//function giving location of smallest element of a unsigned int vector
+unsigned int smallestFn(const vector <unsigned int> & inVector)
+	{
+	unsigned int loc = 0;
+	for(unsigned int l=1;l<inVector.size();l++)
+		{
+		if (inVector[l]<inVector[loc])
+			{
+			loc = l;
+			}
+		}
+	return loc;
+	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //potential related functions
@@ -923,4 +937,26 @@ void changeInputs(const string & outputFile, const string & search, const string
 		}
 	fin.close();
 	fout.close();
+	}
+	
+//function to reduce two vectors of strings to the size of another, only keeping elements with the timeNumber in common
+vector<string> reduceTo(vector <string> toReduce, const vector <string> & toCompare)
+	{
+	vector <unsigned long long int> toReduceNumbers = getInts(toReduce);
+	vector <unsigned long long int> toCompareNumbers = getInts(toCompare);
+	if (toCompare.size()<toReduce.size() && toCompare.size()>0)
+		{
+		for (unsigned int j=0;j<toReduce.size();j++)
+			{
+			if(find(toCompare.begin(), toCompare.end(), toReduce[j]) == toCompare.end())
+				{
+				toReduce.erase(toReduce.begin()+j);
+				}
+			}
+		}
+	else if (toCompare.size()==0)
+		{
+		toReduce = toCompare;
+		}
+	return toReduce;
 	}

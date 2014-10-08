@@ -33,36 +33,20 @@ copyFile("mainInputs",runInputs);
 
 //getting list of relevant data files
 system("dir ./data/* > dataFiles");
-vector<string> filenames, piFiles, inputsFiles;//, eigenvectorFiles, eigenvalueFiles;
+vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 piFiles = findStrings(filenames,"tpip");
 inputsFiles = findStrings(filenames,"inputsPi");
 eigenvectorFiles = findStrings(filenames,"eigVec");
-//eigenvalueFiles = findStrings(filenames,"eigValue");
-vector <unsigned long long int> piNumbers = getInts(piFiles);
-vector <unsigned long long int> inputsNumbers = getInts(inputsFiles);
-if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)//|| piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size())
+eigenvalueFiles = findStrings(filenames,"eigValue");
+if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size())
 	{
-	if (piFiles.size()<inputsFiles.size() && piFiles.size()>0)
+	vector <vector<string>*> files = {&piFiles,&inputsFiles,&eigenvectorFiles,&eigenvalueFiles};
+	for (unsigned int j=0;j<files.size();j++)
 		{
-		for (unsigned int j=0;j<inputsFiles.size();j++)
+		for (unsigned int k=0;k<files.size();k++)
 			{
-			if(find(piNumbers.begin(), piNumbers.end(), inputsNumbers[j]) == piNumbers.end())
-				{
-				inputsFiles.erase(inputsFiles.begin()+j);
-				inputsNumbers.erase(inputsNumbers.begin()+j);
-				}
-			}
-		}
-	else if (piFiles.size()>inputsFiles.size() && inputsFiles.size()>0)
-		{
-		for (unsigned int j=0;j<piFiles.size();j++)
-			{
-			if(find(inputsNumbers.begin(), inputsNumbers.end(), piNumbers[j]) == inputsNumbers.end())
-				{
-				piFiles.erase(piFiles.begin()+j);
-				piNumbers.erase(piNumbers.begin()+j);
-				}
+			*files[j] = reduceTo(*files[k],*files[j]);
 			}
 		}
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
@@ -71,7 +55,7 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)//|| piFiles.size()!
 		return 0;
 		}
 	}
-vector <unsigned long long int> fileNumbers = piNumbers;
+vector <unsigned long long int> fileNumbers = getInts(piFiles);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //beginning file loop
 for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
@@ -107,13 +91,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			ss >> alpha >> open >> amp;
 			lineNumber++;
 			}
-		//else if(lineNumber==2) //not needed yet
-			//{
-			//istringstream ss(line);
-			//double temp;
-			//ss >> temp >> temp >> negEigDone;
-			//lineNumber++;
-			//}
+		else if(lineNumber==2) //not needed yet
+			{
+			istringstream ss(line);
+			double temp;
+			ss >> temp >> temp >> negEigDone;
+			lineNumber++;
+			}
 		}
 	fin.close();
 	inP = aq.inputChoice;
@@ -124,7 +108,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	R = 2.0/3.0/epsilon;
 	alpha *= R;
 	Gamma = exp(-theta);
-	//vec negVec(2*N*Nb+1);
+	vec negVec(2*N*Nb+1);
 	L = 3.2*R;
 	if (Tb<R)
 		{
@@ -137,25 +121,25 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	else
 		{
-		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
-		//if (negEigDone==0 && 1==0) //not using negEig so not necesasary
-		//	{
-		//	system("./negEig");
-		//	cout << "negEig run" << endl;
-		//	}
-		//negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
-		//ifstream eigFile;
-		//eigFile.open(eigenvalueFiles[fileLoop]);
-		//string lastLine = getLastLine(eigFile);
-		//istringstream ss(lastLine);
-		//double temp;
-		//double eigError; //should be <<1
-		//ss >> temp >> temp >> temp >> eigError >> negVal;
-		//if (eigError>1.0)
-		//	{
-		//	cout << "error in negEig = " << eigError << endl;
-		//	cout << "consider restarting with different values of P and c" << endl;
-		//	}
+		cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
+		if (negEigDone==0 && 1==0) //not using negEig so not necesasary
+			{
+			system("./negEig");
+			cout << "negEig run" << endl;
+			}
+		negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
+		ifstream eigFile;
+		eigFile.open(eigenvalueFiles[fileLoop]);
+		string lastLine = getLastLine(eigFile);
+		istringstream ss(lastLine);
+		double temp;
+		double eigError; //should be <<1
+		ss >> temp >> temp >> temp >> eigError >> negVal;
+		if (eigError>1.0)
+			{
+			cout << "error in negEig = " << eigError << endl;
+			cout << "consider restarting with different values of P and c" << endl;
+			}
 		}
 	a = L/(N-1.0);
 	b = Tb/(Nb-1.0);
