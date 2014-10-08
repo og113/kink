@@ -303,7 +303,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				posMap['B'] = j*NT + (Na-1);
 				posMap['C'] = j*NT+(Na+Nb-1);
 				posMap['D'] = j*NT+(NT-1)-slicesT;
-				if (zmt.size()>2) { cout << "zmx lacks info" << endl; }
+				if (zmt.size()<3) { cout << "zmt lacks info, zmt = " << zmt << endl; }
 				for (unsigned int l=0;l<(zmt.size()-2);l++)
 					{
 					if (posMap.find(zmt[1+l])!=posMap.end())
@@ -328,7 +328,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					}
 				posMap.erase('D');
 				posMap['D'] = j*NT+(NT-1)-slicesX;
-				if (zmx.size()>2) { cout << "zmx lacks info" << endl; }
+				if (zmx.size()<3) { cout << "zmx lacks info, zmx = " << zmx << endl; }
 				for (unsigned int l=0;l<(zmx.size()-2);l++)
 					{
 					if (posMap.find(zmx[1+l])!=posMap.end())

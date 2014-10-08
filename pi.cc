@@ -496,7 +496,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		delta = Eigen::VectorXd::Zero(2*N*Nb+1);
 		DDS.makeCompressed();
 		Eigen::SparseLU<spMat> solver;
-		break;
 		
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
