@@ -296,8 +296,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				unsigned int posCe = j*Nb+(Nb-1); //position C for Euclidean vector, i.e. for negVec
 				unsigned int posX, posT;
-				unsigned int slicesX = (unsigned int)(zmx.back());
-				unsigned int slicesT = (unsigned int)(zmt.back());
+				char* tempChar = &zmx.back();
+				stringstream ssX(tempChar);
+				unsigned int slicesX, slicesT;
+				ssX >> slicesX;
+				tempChar = &zmt.back();
+				stringstream ssT(tempChar);
+				ssT >> slicesT; //all seems v long winded but other ways seemed to fail
 				map<char,unsigned int> posMap;
 				posMap['A'] = j*NT;
 				posMap['B'] = j*NT + (Na-1);
@@ -356,6 +361,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			normX = pow(normX,0.5);
 			double normT = chiT.dot(chiT);
 			normT = pow(normT,0.5);
+			if (absolute(normX)<2.0e-16 || absolute(normT)<2.0e-16)
+				{
+				cout << "norm of chiX = " << chiX << ", norm of chiT = " << chiT << endl;
+				}
 			chiX = chiX/normX;
 			chiT = chiT/normT;
 			
