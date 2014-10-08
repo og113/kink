@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <map>
 #include <cmath>
 #include "pf.h"
 
@@ -293,40 +294,62 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			vec chiT(NT*N);	chiT = Eigen::VectorXd::Zero(N*NT); //to fix real time zero mode
 			for (unsigned int j=0; j<N; j++)
 				{
-				unsigned int posA = j*NT;
-				unsigned int posCe = j*Nb+(Nb-1); //position C for Euclidean vector
-				unsigned int posC = j*NT+(Na+Nb-1);
-				unsigned int posDm = j*NT+(NT-2);
-				//unsigned int posD = j*NT+(NT-1);
-				if (zmt[0]=='n')
+				unsigned int posCe = j*Nb+(Nb-1); //position C for Euclidean vector, i.e. for negVec
+				unsigned int posX, posT;
+				unsigned int slicesX = (unsigned int)(zmx.back());
+				unsigned int slicesT = (unsigned int)(zmt.back());
+				map<char,unsigned int> posMap;
+				posMap['A'] = j*NT;
+				posMap['B'] = j*NT + (Na-1);
+				posMap['C'] = j*NT+(Na+Nb-1);
+				posMap['D'] = j*NT+(NT-1)-slicesT;
+				if (zmt.size()>2) { cout << "zmx lacks info" << endl; }
+				for (unsigned int l=0;l<(zmt.size()-2);l++)
 					{
-					chiT(posA) = negVec(2*posCe); //arbitrary atempt to fix zero mode - at D
-        			chiT(posDm) = negVec(2*posCe); //at A
+					if (posMap.find(zmt[1+l])!=posMap.end())
+						{
+						posT = posMap.at(zmt[1+l]);
+						for (unsigned int k=0;k<slicesT;k++)
+							{
+							if (zmt[0]=='n')
+								{
+								chiT(posT+k) = negVec(2*(posCe+k));
+								}
+							else if (zmt[0]=='d')
+								{
+								chiT(posT+k) = p(2*(posT+k+1))-p(2*(posT+k));
+								}
+							else
+								{
+								cout << "choice of zmt not allowed" << endl;
+								}
+							}
+						}
 					}
-				else if (zmt[0]=='d')
+				posMap.erase('D');
+				posMap['D'] = j*NT+(NT-1)-slicesX;
+				if (zmx.size()>2) { cout << "zmx lacks info" << endl; }
+				for (unsigned int l=0;l<(zmx.size()-2);l++)
 					{
-					chiT(posA) = p(2*(posA+1))-p(2*posA);
-					chiT(posA+1) = p(2*(posA+2))-p(2*posA+1);
-					chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
-					chiT(posDm-1) = p(2*(posDm))-p(2*posDm-1);
-					}
-				else
-					{
-					cout << "choice of zmt not allowed" << endl;
-					}
-				if (zmx[0]=='n')
-					{
-					chiX(posC) = negVec(2*posCe);
-					chiX(posC-1) = negVec(2*(posCe-1));
-					}
-				else if (zmx[0]=='d')
-					{
-					chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
-					chiX(posC-1) = p(2*neigh(posC-1,1,1,NT))-p(2*neigh(posC-1,1,-1,NT));
-					}
-				else
-					{
-					cout << "choice of zmx not allowed" << endl;
+					if (posMap.find(zmx[1+l])!=posMap.end())
+						{
+						posX = posMap.at(zmx[1+l]);
+						for (unsigned int k=0;k<slicesX;k++)
+							{
+							if (zmx[0]=='n')
+								{
+								chiT(posX+k) = negVec(2*(posCe+k));
+								}
+							else if (zmx[0]=='d')
+								{
+								chiX(posX+k) = p(2*neigh(posX+k,1,1,NT))-p(2*neigh(posX+k,1,-1,NT));
+								}
+							else
+								{
+								cout << "choice of zmx not allowed" << endl;
+								}
+							}
+						}
 					}
 				}
 			double normX = chiX.dot(chiX);
