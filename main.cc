@@ -302,9 +302,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				else if (zmt[0]=='d')
 					{
 					chiT(posA) = p(2*(posA+1))-p(2*posA);
-					chiT(posA+1) = p(2*(posA+2))-p(2*posA+1);
+					chiT(posA+2) = p(2*(posA+3))-p(2*posA+2);
+					//##################################################
+					//##################################################
+					//################################################## - need to sort following lines out
 					chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
-					chiT(posDm-1) = p(2*(posDm))-p(2*posDm-1);
+					chiT(posDm-2) = p(2*(posDm-1))-p(2*posDm-2);
 					}
 				else
 					{
