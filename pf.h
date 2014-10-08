@@ -87,6 +87,8 @@ double open; //value of 0 assigns all weight to boundary, value of 1 to neighbou
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
 double negVal; //the negative eigenvalue
 unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
+string zmt; //dictates how time zero mode is dealt with
+string zmx; //dictates how x zero mode is dealt with
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -558,13 +560,14 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 				{
 				istringstream ss(line);
 				ss >> outputVec(2*j+k);
+				//outputVec(2*j+k) = 0.5; //ignoring information from previous zero mode
 				k++;
 				}
 			}
 		}
 	if (j==Nt*N && k==(zeroModes-1))
 		{
-		outputVec(2*j+k) = 0.01; //obviously a random guess
+		outputVec(2*j+k) = 0.5; //obviously a random guess
 		k++;
 		}
 	if ((j+k)!=(Nt*N+zeroModes))

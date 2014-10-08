@@ -3,5 +3,5 @@
 #range of times and dates to loop over
 #in the format yymmdd-hhmmss
 #
-#min fileNo			max fileNo			minTheta		maxTheta	loops
-141008113800		141009000000		0.0				0.0			1
+#min fileNo			max fileNo			minTheta		maxTheta	loops	zmt			zmx
+141008115830		141009000000		0.0				0.0			1		d1			d1

@@ -21,7 +21,7 @@ ifstream fmainin;
 fmainin.open("mainInputs", ios::in);
 string lastLine = getLastLine(fmainin);
 istringstream ss(lastLine);
-ss >> minFile >> maxFile >> minTheta >> maxTheta >> loops;
+ss >> minFile >> maxFile >> minTheta >> maxTheta >> loops >> zmt >> zmx;
 fmainin.close();
 
 //defining the timeNumber
@@ -128,7 +128,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	else
 		{
-		cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
+		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
 		if (negEigDone==0 && 1==0) //not using negEig so not necesasary
 			{
 			system("./negEig");
@@ -289,13 +289,48 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			vec chiT(NT*N);	chiT = Eigen::VectorXd::Zero(N*NT); //to fix real time zero mode
 			for (unsigned int j=0; j<N; j++)
 				{
-				unsigned int posC = j*NT+(Na+Nb-1);
 				unsigned int posA = j*NT;
+				unsigned int posCe = j*Nb+(Nb-1); //position C for Euclidean vector
+				unsigned int posC = j*NT+(Na+Nb-1);
 				unsigned int posDm = j*NT+(NT-2);
-				chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
-				chiT(posA) = p(2*(posA+1))-p(2*posA); //could also fix against negVec if this doesn't work
-				chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
+				//unsigned int posD = j*NT+(NT-1);
+				if (zmt[0]=='n')
+					{
+					chiT(posA) = negVec(2*posCe); //arbitrary atempt to fix zero mode - at D
+        			chiT(posDm) = negVec(2*posCe); //at A
+					}
+				else if (zmt[0]=='d')
+					{
+					chiT(posA) = p(2*(posA+1))-p(2*posA);
+					chiT(posA+1) = p(2*(posA+2))-p(2*posA+1);
+					chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
+					chiT(posDm-1) = p(2*(posDm))-p(2*posDm-1);
+					}
+				else
+					{
+					cout << "choice of zmt not allowed" << endl;
+					}
+				if (zmx[0]=='n')
+					{
+					chiX(posC) = negVec(2*posCe);
+					chiX(posC-1) = negVec(2*(posCe-1));
+					}
+				else if (zmx[0]=='d')
+					{
+					chiX(posC) = p(2*neigh(posC,1,1,NT))-p(2*neigh(posC,1,-1,NT));
+					chiX(posC-1) = p(2*neigh(posC-1,1,1,NT))-p(2*neigh(posC-1,1,-1,NT));
+					}
+				else
+					{
+					cout << "choice of zmx not allowed" << endl;
+					}
 				}
+			double normX = chiX.dot(chiX);
+			normX = pow(normX,0.5);
+			double normT = chiT.dot(chiT);
+			normT = pow(normT,0.5);
+			chiX = chiX/normX;
+			chiT = chiT/normT;
 			
 			// allocating memory for DS, DDS
 			minusDS = Eigen::VectorXd::Zero(2*N*NT+2); //initializing to zero
@@ -649,7 +684,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%6s%6s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
+				printf("%8s%8s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
 				}
 			printf("%6i%6i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
 			
