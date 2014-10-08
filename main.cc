@@ -302,12 +302,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				else if (zmt[0]=='d')
 					{
 					chiT(posA) = p(2*(posA+1))-p(2*posA);
-					chiT(posA+2) = p(2*(posA+3))-p(2*posA+2);
-					//##################################################
-					//##################################################
-					//################################################## - need to sort following lines out
+					chiT(posA+1) = p(2*(posA+2))-p(2*posA+1);
 					chiT(posDm) = p(2*(posDm+1))-p(2*posDm);
-					chiT(posDm-2) = p(2*(posDm-1))-p(2*posDm-2);
+					chiT(posDm-1) = p(2*(posDm))-p(2*posDm-1);
 					}
 				else
 					{
@@ -378,10 +375,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					
 				if (absolute(chiT(j))>2.0e-16)
 					{
-					DDS.insert(2*(j+1),2*N*NT+1) = a*chiT(j); //there should be no chiT on the final time slice or this line will go wrong
-					DDS.insert(2*N*NT+1,2*(j+1)) = a*chiT(j);
-					DDS.insert(2*j,2*N*NT+1) = -a*chiT(j);
-					DDS.insert(2*N*NT+1,2*j) = -a*chiT(j);
+					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //there should be no chiT on the final time slice or this line will go wrong
+					DDS.coeffRef(2*N*NT+1,2*(j+1)) += a*chiT(j);
+					DDS.coeffRef(2*j,2*N*NT+1) += -a*chiT(j);
+					DDS.coeffRef(2*N*NT+1,2*j) += -a*chiT(j);
 		            minusDS(2*(j+1)) += - a*chiT(j)*p(2*N*NT+1);
 		            minusDS(2*N*NT+1) += - a*chiT(j)*p(2*j);
 		            minusDS(2*j) += a*chiT(j)*p(2*N*NT+1);
@@ -687,9 +684,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%8s%8s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
+				printf("%10s%10s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
 				}
-			printf("%6i%6i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
+			printf("%10i%10i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
 			
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing

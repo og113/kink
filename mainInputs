@@ -3,5 +3,9 @@
 #range of times and dates to loop over
 #in the format yymmdd-hhmmss
 #
+#note that the number in zmt and zmx has yet to be used
+#but would refer to the number of time steps on which the
+#field is fixed orthogonal to the zero mode
+#
 #min fileNo			max fileNo			minTheta		maxTheta	loops	zmt			zmx
-141008125720		141009000000		0.0				0.0			1		d1			d1
+141008125720		141009000000		0.0				0.0			1		d2			d2
