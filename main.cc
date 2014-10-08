@@ -46,7 +46,7 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || piFiles.size()!=e
 		{
 		for (unsigned int k=0;k<files.size();k++)
 			{
-			*files[j] = reduceTo(*files[k],*files[j]);
+			*files[j] = reduceTo(*files[j],*files[k]);
 			}
 		}
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
@@ -65,39 +65,46 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 	ifstream fin;
 	fin.open(inputsFiles[fileLoop]);
-	string line;
-	unsigned int lineNumber = 0;
-	while(getline(fin,line))
+	if (fin.is_open())
 		{
-		if(line[0] == '#')
+		string line;
+		unsigned int lineNumber = 0;
+		while(getline(fin,line))
 			{
-			continue;
-			}
-		if (lineNumber==0)
-			{
-			istringstream ss(line);
-			ss >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
-			if (absolute(theta-minTheta)>2.0e-16)
+			if(line[0] == '#')
 				{
-				cout << "minTheta != theta" << endl;
-				cout << minTheta << " != " << theta << endl;
+				continue;
 				}
-			lineNumber++;
+			if (lineNumber==0)
+				{
+				istringstream ss(line);
+				ss >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+				if (absolute(theta-minTheta)>2.0e-16)
+					{
+					cout << "minTheta != theta" << endl;
+					cout << minTheta << " != " << theta << endl;
+					}
+				lineNumber++;
+				}
+			else if (lineNumber==1)
+				{
+				istringstream ss(line);
+				ss >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+				ss >> alpha >> open >> amp;
+				lineNumber++;
+				}
+			else if(lineNumber==2) //not needed yet
+				{
+				istringstream ss(line);
+				double temp;
+				ss >> temp >> temp >> negEigDone;
+				lineNumber++;
+				}
 			}
-		else if (lineNumber==1)
-			{
-			istringstream ss(line);
-			ss >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-			ss >> alpha >> open >> amp;
-			lineNumber++;
-			}
-		else if(lineNumber==2) //not needed yet
-			{
-			istringstream ss(line);
-			double temp;
-			ss >> temp >> temp >> negEigDone;
-			lineNumber++;
-			}
+		}
+	else
+		{
+		cout << "unable to open " << inputsFiles[fileLoop] << endl;
 		}
 	fin.close();
 	inP = aq.inputChoice;
