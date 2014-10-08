@@ -71,7 +71,7 @@ double closenessP; //checking lattice small enough for momenta
 struct aqStruct
 	{
 	string inputChoice;
-	unsigned int fileNo;
+	string inputFile;
 	double maxTheta;
 	unsigned int totalLoops;
 	string loopChoice;

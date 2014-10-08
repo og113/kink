@@ -49,6 +49,10 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || piFiles.size()!=e
 			*files[j] = reduceTo(*files[j],*files[k]);
 			}
 		}
+	sort(piFiles.begin(), piFiles.end());
+	sort(inputsFiles.begin(), inputsFiles.end());
+	sort(eigenvectorFiles.begin(), eigenvectorFiles.end());
+	sort(eigenvalueFiles.begin(), eigenvalueFiles.end());
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 		{
 		cout << "required files not available" << endl;
@@ -89,7 +93,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			else if (lineNumber==1)
 				{
 				istringstream ss(line);
-				ss >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+				ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 				ss >> alpha >> open >> amp;
 				lineNumber++;
 				}

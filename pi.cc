@@ -47,7 +47,7 @@ while(getline(fin,line))
 	else if (lineNumber==1)
 		{
 		istringstream ss(line);
-		ss >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 		ss >> alpha >> open >> amp;
 		lineNumber++;
 		}
@@ -72,7 +72,7 @@ unsigned int negP;
 double negc;
 double negcheck;
 double negerror; //should be <<1
-if (inP.compare("p") == 0)
+if (inP.compare("p") == 0 || inP.compare("f") == 0)
 	{
 	L = 3.2*R;
 	if (Tb<R)
@@ -123,7 +123,7 @@ closenessA = 1.0;
 closenessS = 1.0e-5;
 closenessSM = 1.0e-4;
 closenessD = 1.0;
-closenessC = 5.0e-14;
+closenessC = 5.0e-13;
 closenessE = 1.0e-2;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
@@ -242,7 +242,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
 					}
-				if (Tb>R)
+				if (inP.compare("p")==0)
 					{
 					p(2*j) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j);
 					p(2*j+1) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j+1);
@@ -278,17 +278,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	else
 		{
-		unsigned int toLoad;
+		string loadfile;
 		if (inP.compare("f")==0)
 			{
-			toLoad = aq.fileNo;
+			loadfile = "./data/" + aq.inputFile + ".dat";
 			inP = "p";
 			}
 		else
 			{
-			toLoad = loop-1;
+			loadfile = "./data/" + timeNumber + "pi"+inP+to_string(loop-1)+".dat";
 			}
-		string loadfile = "./data/" + timeNumber + "pi"+inP+to_string(toLoad)+".dat";
+		
 		p = loadVector(loadfile,Nb,1);
 		}
 	
@@ -799,12 +799,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printing linErgVec
 	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
 	simplePrintVector(linErgFile,linErgA);
-	gpSimple(linErgFile);
+//	gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
 	simplePrintCVector(ergFile,erg);
-	gpSimple(ergFile);
+//	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
 	FILE * eigenvalueFile;
