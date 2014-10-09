@@ -41,7 +41,7 @@ while(getline(fin,line))
 	if (lineNumber==0)
 		{
 		istringstream ss(line);
-		ss >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+		ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 		lineNumber++;
 		}
 	else if (lineNumber==1)
@@ -72,9 +72,9 @@ unsigned int negP;
 double negc;
 double negcheck;
 double negerror; //should be <<1
+L = LoR*R;
 if (inP.compare("p") == 0 || inP.compare("f") == 0)
 	{
-	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -110,7 +110,6 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
-	L = 3.2*R;
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);

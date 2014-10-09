@@ -43,7 +43,7 @@ while(getline(fin,line))
 	if (firstLine==0)
 		{
 		istringstream ss1(line);
-		ss1 >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+		ss1 >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 		firstLine++;
 		}
 	else if (firstLine==1)
@@ -61,9 +61,9 @@ inP = aq.inputChoice; //just because I write this a lot
 NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
+L = LoR*R;
 if (inP.compare("p") == 0)
 	{
-	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -77,7 +77,6 @@ if (inP.compare("p") == 0)
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
-	L = 3.2*R;
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);

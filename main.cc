@@ -83,7 +83,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			if (lineNumber==0)
 				{
 				istringstream ss(line);
-				ss >> N >> Na >> Nb >> Nc >> dE >> Tb >> theta;
+				ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 				if (absolute(theta-minTheta)>2.0e-16)
 					{
 					cout << "minTheta != theta" << endl;
@@ -121,7 +121,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	alpha *= R;
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
-	L = 3.2*R;
+	L = LoR*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);

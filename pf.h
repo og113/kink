@@ -37,14 +37,15 @@ unsigned int N;
 unsigned int Na;
 unsigned int Nb;
 unsigned int Nc;
+double LoR; //L/R
 double dE;
+double Tb;  //b section includes both corner points
 double theta;
 
 //derived parameters
 unsigned int NT;
 double epsilon;
 double R; //size of bubble
-double Tb;  //b section includes both corner points
 double Gamma; //equals exp(-theta)
 double angle; //not a primary parameter, just used to make L
 double L;
