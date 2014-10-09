@@ -781,7 +781,7 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Tc = Tc*newParameter/Tb;
 		Tb = newParameter;
 		angle = asin(Tb/R);
-		L = 3*R;
+		L = LoR*R;
 		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
 		a = L/(N-1.0);
 		}
