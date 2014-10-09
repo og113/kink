@@ -615,15 +615,15 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			ergTest = ergTest*2.0/(real(erg(1)+erg(NT-2)));
 			ergTest = absolute(ergTest);
 			erg_test.push_back(ergTest);
-							
-			//checking lattice small enough for E, should have parameter for this
-			double momTest = E*a/Num*pi;
-			mom_test.push_back(momTest);
 						
 			//defining E, Num and cW
 			E = real(erg(1));
 			Num = linNum(1);
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
+			
+			//checking lattice small enough for E, should have parameter for this
+			double momTest = E*a/Num*pi;
+			mom_test.push_back(momTest);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//printing early if desired
@@ -768,16 +768,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//printing to terminal
 		printf("\n");
-		printf("%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s%16s\n","runs","time","N","NT","L","Tb","dE","theta","E","im(action)","bound","W");
-		printf("%8i%8g%8i%8i%8g%8g%8g%8g%16g%16g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,E,imag(action),bound,real(W));
+		printf("%8s%8s%8s%8s%8s%8s%8s%8s%14s%14s%14s%14s\n","runs","time","N","NT","L","Tb","dE","theta","Num","E","im(action)","W");
+		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14g%14g%14g%14g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%8g%14g%12g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E\
-		,imag(action),real(W),sol_test.back(),solM_test.back(),lin_test.back());
+		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%8g%14g%12g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
+		,real(W),sol_test.back(),solM_test.back(),lin_test.back());
 		fclose(actionfile);
 	
 		//copying a version of inputs with timeNumber and theta changed
@@ -808,13 +808,21 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		string DDSfile = "./data/" + timeNumber + "mainDDS"+to_string(fileLoop)+to_string(loop)+".dat";
 		printSpmat(DDSfile,DDS);
 	
+		//printing linNumVec
+		string linNumFile = "./data/" + timeNumber + "mainlinNum"+to_string(fileLoop)+to_string(loop)+".dat";
+		linNum.conservativeResize(Na);
+		simplePrintVector(linNumFile,linNum);
+		//gpSimple(linNumFile);	
+	
 		//printing linErgVec
 		string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
+		linErg.conservativeResize(Na);
 		simplePrintVector(linErgFile,linErg);
 		gpSimple(linErgFile);
 	
 		//printing erg
 		string ergFile = "./data/" + timeNumber + "mainerg" + to_string(fileLoop)+to_string(loop)+".dat";
+		erg.conservativeResize(Na);
 		simplePrintCVector(ergFile,erg);
 		gpSimple(ergFile);
 		
