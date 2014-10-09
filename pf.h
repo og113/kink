@@ -558,9 +558,9 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 				}
 			else
 				{
-				istringstream ss(line);
-				ss >> outputVec(2*j+k);
-				//outputVec(2*j+k) = 0.5; //ignoring information from previous zero mode
+				//istringstream ss(line);
+				//ss >> outputVec(2*j+k);
+				outputVec(2*j+k) = 0.5; //ignoring information from previous zero mode
 				k++;
 				}
 			}

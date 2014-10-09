@@ -17,12 +17,12 @@ int main()
 //getting mainInputs
 unsigned long long int minFile, maxFile;
 unsigned int loops;
-double minTheta, maxTheta;
+double minTb, maxTb, minTheta, maxTheta;
 ifstream fmainin;
 fmainin.open("mainInputs", ios::in);
 string lastLine = getLastLine(fmainin);
 istringstream ss(lastLine);
-ss >> minFile >> maxFile >> minTheta >> maxTheta >> loops >> zmt >> zmx;
+ss >> minFile >> maxFile >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx;
 fmainin.close();
 
 //defining the timeNumber
@@ -134,9 +134,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	else
 		{
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
-		if (negEigDone==0 && 1==0) //not using negEig so not necesasary
+		if (negEigDone==0)
 			{
-			system("./negEig");
+			system("./negEig"); //negEig now needs timeNumber
+			char * fileNumber = (char *)(fileNumbers[fileLoop]);
+			system(fileNumber); //won't work
 			cout << "negEig run" << endl;
 			}
 		negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
@@ -163,7 +165,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessS = 1.0e-5;
 	closenessSM = 1.0e-4;
 	closenessD = 1.0;
-	closenessC = 5.0e-13;
+	closenessC = 1.0e-12;
 	closenessE = 1.0e-2;
 	closenessL = 1.0e-2;
 	closenessT = 1.0e-5;
@@ -220,8 +222,20 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		{
 		if (loops>1)
 			{
-			theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
-			Gamma = exp(-theta);
+			if (absolute(maxTheta-minTheta)>2.0e-16)
+				{
+				theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
+				Gamma = exp(-theta);
+				}
+			else if (absolute(maxTb-minTb)>2.0e-16)
+				{
+				Tb = minTb + (maxTb - minTb)*loop/(loops-1.0);
+				changeDouble ("Tb",Tb);
+				}
+			else
+				{
+				cout << "nothing to loop over, set loops to zero" << endl;
+				}
 			}
 		
 		//defining a time and starting the clock
@@ -294,8 +308,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			vec chiT(NT*N);	chiT = Eigen::VectorXd::Zero(N*NT); //to fix real time zero mode
 			for (unsigned int j=0; j<N; j++)
 				{
-				unsigned int posCe = j*Nb+(Nb-1); //position C for Euclidean vector, i.e. for negVec
-				unsigned int posX, posT;
+				unsigned int posX, posT, posCe;
 				char* tempChar = &zmx.back();
 				stringstream ssX(tempChar);
 				unsigned int slicesX, slicesT;
@@ -303,10 +316,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				tempChar = &zmt.back();
 				stringstream ssT(tempChar);
 				ssT >> slicesT; //all seems v long winded but other ways seemed to fail
+				posCe = j*Nb+Nb-slicesT; //position C for Euclidean vector, i.e. for negVec
 				map<char,unsigned int> posMap;
 				posMap['A'] = j*NT;
 				posMap['B'] = j*NT + (Na-1);
-				posMap['C'] = j*NT+(Na+Nb-1);
+				posMap['C'] = j*NT+Na+Nb-slicesT;
 				posMap['D'] = j*NT+(NT-1)-slicesT;
 				if (zmt.size()<3) { cout << "zmt lacks info, zmt = " << zmt << endl; }
 				for (unsigned int l=0;l<(zmt.size()-2);l++)
@@ -331,8 +345,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 							}
 						}
 					}
+				posMap.erase('C');
 				posMap.erase('D');
-				posMap['D'] = j*NT+(NT-1)-slicesX;
+				posMap['C'] = j*NT+Na+Nb-slicesX;
+				posMap['D'] = j*NT+NT-slicesX;
+				posCe = j*Nb+Nb-slicesX;
 				if (zmx.size()<3) { cout << "zmx lacks info, zmx = " << zmx << endl; }
 				for (unsigned int l=0;l<(zmx.size()-2);l++)
 					{
@@ -363,7 +380,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			normT = pow(normT,0.5);
 			if (absolute(normX)<2.0e-16 || absolute(normT)<2.0e-16)
 				{
-				cout << "norm of chiX = " << chiX << ", norm of chiT = " << chiT << endl;
+				cout << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
 			chiX = chiX/normX;
 			chiT = chiT/normT;
@@ -632,16 +649,22 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printSpmat(DDSfile,DDS);
 				}
-			if (print_choice.compare("e")==0 || print_choice.compare("e")==0)
+			if (print_choice.compare("e")==0 && 1==0)
 				{
 				//printing linErgVec
-				string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
-				simplePrintVector(earlyLinErgFile,linErg);
+				//string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
+				//simplePrintVector(earlyLinErgFile,linErg);
 				//gpSimple(earlyLinErgFile);
 				//printing erg
-				string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
-				simplePrintCVector(earlyErgFile,erg);
+				//string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
+				//simplePrintCVector(earlyErgFile,erg);
 				//gpSimple(earlyErgFile);
+				string earlychiXFile = "./data/" + timeNumber + "mainchiXE" + to_string(fileLoop)+to_string(loop)+".dat";
+				printVector(earlychiXFile,chiX);
+				gp(earlychiXFile,"repi.gp");
+				string earlychiTFile = "./data/" + timeNumber + "mainchiTE" + to_string(fileLoop)+to_string(loop)+".dat";
+				printVector(earlychiTFile,chiT);
+				gp(earlychiTFile,"repi.gp");
 				}
 			}
 		
@@ -759,7 +782,18 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = "./data/" + timeNumber + "inputsM";
-		changeInputs(runInputs, "theta", to_string(theta));
+		if (absolute(maxTheta-minTheta)>2.0e-16)
+			{
+			changeInputs(runInputs, "theta", to_string(theta));
+			}
+		else if (absolute(maxTb-minTb)>2.0e-16)
+			{
+			changeInputs(runInputs, "Tb", to_string(Tb));
+			}
+		else
+			{
+			copyFile("inputs",runInputs);
+			}
 	
 		//printing output phi
 		string tpifile = "./data/" + timeNumber + "mainp"+to_string(fileLoop)+to_string(loop)+".dat";
@@ -777,12 +811,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing linErgVec
 		string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
 		simplePrintVector(linErgFile,linErg);
-		//gpSimple(linErgFile);
+		gpSimple(linErgFile);
 	
 		//printing erg
 		string ergFile = "./data/" + timeNumber + "mainerg" + to_string(fileLoop)+to_string(loop)+".dat";
 		simplePrintCVector(ergFile,erg);
-		//gpSimple(ergFile);
+		gpSimple(ergFile);
 		
 		} //ending theta loop
 	} //ending file loop

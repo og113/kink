@@ -74,7 +74,7 @@ double negcheck;
 double negerror; //should be <<1
 if (inP.compare("p") == 0 || inP.compare("f") == 0)
 	{
-	L = 3.2*R;
+	L = 3.0*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
@@ -123,7 +123,7 @@ closenessA = 1.0;
 closenessS = 1.0e-5;
 closenessSM = 1.0e-4;
 closenessD = 1.0;
-closenessC = 5.0e-13;
+closenessC = 1.0e-12;
 closenessE = 1.0e-2;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
@@ -337,7 +337,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             }
         if (runs_count==1) //printing Chi0
         	{
-        	printVectorB("data/" + timeNumber + "Chi0.dat",Chi0);
+        	//printVectorB("data/" + timeNumber + "Chi0.dat",Chi0);
         	}
 
 		// allocating memory for DS, DDS
@@ -477,7 +477,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				string minusDSfile = "./data/" + timeNumber + "minusDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(minusDSfile,minusDS);
 				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2 && 1==0)
 				{
 				string piEarlyFile = "./data/" + timeNumber + "piE"+inP+to_string(loop)+to_string(runs_count)+".dat";
 				printVectorB(piEarlyFile,p);
@@ -789,8 +789,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
-	string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
-	printVectorB(minusDSfile,minusDS);
+	//string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
+	//printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
 	string DDSfile = "./data/" + timeNumber + "DDS"+inP+to_string(loop)+".dat";

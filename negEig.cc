@@ -49,7 +49,7 @@ while(getline(fin,line))
 	else if (firstLine==1)
 		{
 		istringstream ss2(line);
-		ss2 >> aq.inputChoice >> aq.fileNo >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+		ss2 >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 		ss2 >> alpha >> open >> amp;
 		firstLine++;
 		}
@@ -102,7 +102,8 @@ to_reserve(1) = 3;
 to_reserve(2*N*Nb-2) = 3;
 to_reserve(2*N*Nb-1) = 3;
 to_reserve(2*N*Nb) = N;
-string loadFile = "./data/" + timeNumber + "DDSb" + to_string(aq.fileNo) + ".dat";
+unsigned int fileNumber = 0;
+string loadFile = "./data/" + timeNumber + "DDSb" + to_string(fileNumber) + ".dat";
 
 spMat M = loadSpmat(loadFile,to_reserve);
 
