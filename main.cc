@@ -50,16 +50,16 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || piFiles.size()!=e
 			*files[j] = reduceTo(*files[j],*files[k]);
 			}
 		}
-	sort(piFiles.begin(), piFiles.end());
-	sort(inputsFiles.begin(), inputsFiles.end());
-	sort(eigenvectorFiles.begin(), eigenvectorFiles.end());
-	sort(eigenvalueFiles.begin(), eigenvalueFiles.end());
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 		{
 		cout << "required files not available" << endl;
 		return 0;
 		}
 	}
+sort(piFiles.begin(), piFiles.end());
+sort(inputsFiles.begin(), inputsFiles.end());
+sort(eigenvectorFiles.begin(), eigenvectorFiles.end());
+sort(eigenvalueFiles.begin(), eigenvalueFiles.end());
 vector <unsigned long long int> fileNumbers = getInts(piFiles);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //beginning file loop
