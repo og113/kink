@@ -638,7 +638,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printVector(minusDSfile,minusDS);
 				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0))// && delta_test.back()>0.2)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2 && 1==0)
 				{
 				string piEarlyFile = "./data/" + timeNumber + "mainpE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printVector(piEarlyFile,p);

@@ -74,7 +74,7 @@ double negcheck;
 double negerror; //should be <<1
 if (inP.compare("p") == 0 || inP.compare("f") == 0)
 	{
-	L = 3.0*R;
+	L = 3.2*R;
 	if (Tb<R)
 		{
 		angle = asin(Tb/R);
