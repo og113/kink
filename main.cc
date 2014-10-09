@@ -243,7 +243,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		time = clock();
 	
 		//printing loop name and parameters
-		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
+		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
+		unsigned long long int fileNumberPrint = fileNumbers[fileLoop];
+		printf("%12s%12llu\n","input: ",fileNumberPrint);		
 		printParameters();
 	
 		//defining energy and number vectors
