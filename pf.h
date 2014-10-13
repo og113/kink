@@ -83,6 +83,9 @@ struct aqStruct
 	};
 aqStruct aq; //struct to hold user responses
 string inP; //b for bubble, p for periodic instaton, f for from file
+string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
+double A; //gives parameter in V2, equal to 0.4 in DL
+double reg; //small parameter multiplying regulatory term
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
@@ -137,39 +140,120 @@ unsigned int smallestFn(const vector <unsigned int> & inVector)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //potential related functions
-comp V (const comp & phi)
+
+comp V1 (const comp & phi)
 	{
 	comp Vphi = pow(pow(phi,2)-1.0,2)/8.0 - epsilon*(phi-1.0)/2.0;
 	return Vphi;
 	}
 	
-//potential with degenerate minima
-comp Va (const comp & phi)
+comp Z (const comp & phi)
 	{
-	comp Vaphi = pow(pow(phi,2)-1.0,2)/8.0;
-	return Vaphi;
+	xZ = exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
+	return xZ;
 	}
 	
-//change to degenerate potential
-comp Vb (const comp & phi)
+comp V2 (const comp & phi)
 	{
-	comp Vbphi = -epsilon*(phi-1.0)/2.0;
-	return Vbphi;
+	comp xV = 0.5*pow(phi+1.0,2.0)*(1.0-epsilon*Z((phi-1)/A);
+	return xV;
+	}
+	
+comp Vr (const comp & phi, const double & minimaL, const double & minimaR)
+	{
+	comp Vphi = pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
+	return Vphi;
+	}
+	
+comp V (const comp & phi);
+
+//potentials with degenerate minima, and without regularisation
+comp V10 (const comp & phi)
+	{
+	comp xV10 = pow(pow(phi,2)-1.0,2)/8.0;
+	return xV10;
+	}
+	
+comp V20 (const comp & phi)
+	{
+	comp xV10 = 0.5*pow(phi+1.0,2.0)*(1.0-0.7450777428719992*Z((phi-1)/A); //epsilon0 needs checking
+	return xV10;
+	}
+	
+comp V0 (const comp & phi);
+	
+//change to degenerate potential, still without regulatisation
+comp V1e (const comp & phi)
+	{
+	comp xV1e = -epsilon*(phi-1.0)/2.0;
+	return xV1e;
 	}
 
-//first derivative of V
-comp dV (const comp & phi)
+comp V2e (const comp & phi)
+	{
+	comp xV2e = V2(phi)-V20(phi);
+	return xV2e;
+	}
+	
+comp Ve (const comp & phi);
+	
+	
+//first derivative of Vs
+comp dV1 (const comp & phi)
 	{
 	comp dVphi = phi*(pow(phi,2)-1.0)/2.0 - epsilon/2.0;
 	return dVphi;
 	}
+
+comp dZ (const comp & phi)
+	{
+	comp xdZ = exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
+	return xdZ;
+	}
+
+comp dV2 (const comp & phi)
+	{
+	comp dVphi = (phi+1.0)*(1.0-epsilon*Z((phi-1.0)/A)) - 0.5*pow(phi+1.0,2.0)*(epsilon/A)*dZ((phi-1.0)/A);
+	return dVphi;
+	}
+	
+comp dVr (const comp & phi, const double & minimaL, const double & minimaR)
+	{
+	comp dVphi = pow(phi-minimaL,3.0)*pow(phi-minimR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
+	return dVphi;
+	}
+	
+comp dV (const comp & phi);
 	
 //second derivative of V
-comp ddV (const comp & phi)
+comp ddV1 (const comp & phi)
 	{
 	comp ddVphi = (3.0*pow(phi,2)-1.0)/2.0;
 	return ddVphi;
+	}
+
+comp ddZ (const comp & phi)
+	{
+	comp xddZ = exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
+	return xddZ;
+	}
+	
+comp ddV2 (const comp & phi)
+	{
+	comp ddVphi = (1.0-epsilon*Z((phi-1.0)/A)) - (phi+1.0)*(epsilon/A)*dZ((phi-1.0)/A)\
+					+ 0.5*pow(phi+1.0,2.0)*(epsilon/pow(A,2.0))*ddZ((phi-1.0)/A);;
+	return ddVphi;
 	}	
+	
+comp ddVr (const comp & phi, const double & minimaL, const double & minimaR)
+	{
+	(3*(a - x)^2*(b - x)^4)/4 + 2*(a - x)^3*(b - x)^3 + (3*(a - x)^4*(b - x)^2)/4
+	comp ddV = 3.0*pow(phi-minimaL,2.0)*pow(phi-minimR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\
+				3.0*pow(phi-minimaL,4.0)*pow(phi-minimR,2.0);
+	return ddV;
+	}
+	
+comp ddV (const comp & phi);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

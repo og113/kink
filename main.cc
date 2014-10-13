@@ -98,7 +98,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				ss >> alpha >> open >> amp;
 				lineNumber++;
 				}
-			else if(lineNumber==2) //not needed yet
+			else if(lineNumber==2)
+				{
+				istringstream ss(line);
+				double temp;
+				ss >> alpha >> open >> amp >> pot >> A >> regV;
+				lineNumber++;
+				}
+			else if(lineNumber==3)
 				{
 				istringstream ss(line);
 				double temp;

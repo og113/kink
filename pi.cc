@@ -48,16 +48,22 @@ while(getline(fin,line))
 		{
 		istringstream ss(line);
 		ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss >> alpha >> open >> amp;
 		lineNumber++;
 		}
 	else if(lineNumber==2)
 		{
 		istringstream ss(line);
 		double temp;
-		ss >> temp >> temp >> negEigDone;
+		ss >> alpha >> open >> amp >> pot >> A >> regV;
 		lineNumber++;
 		}
+	else if(lineNumber==3)
+		{
+		istringstream ss(line);
+		double temp;
+		ss >> temp >> temp >> negEigDone;
+		lineNumber++;
+		}	
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
@@ -67,12 +73,12 @@ NT = Na + Nb + Nc;
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
+L = LoR*R;
 vec negVec(2*N*Nb+1);
 unsigned int negP;
 double negc;
 double negcheck;
 double negerror; //should be <<1
-L = LoR*R;
 if (inP.compare("p") == 0 || inP.compare("f") == 0)
 	{
 	if (Tb<R)
@@ -110,6 +116,84 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
+	}
+if (pot[0]=='1')
+	{
+	if (pot[1]=='r')
+		{
+		V (phi)
+			{
+			comp xV = V1(phi) - i*reg*Vr(phi,minima[0],minima[2]);
+			return xV;
+			}
+		dV (phi)
+			{
+			comp xdV = dV1(phi) - i*reg*dVr(phi,minima[0],minima[2]);
+			return xdV;
+			}
+		ddV (phi)
+			{
+			comp xddV = ddV1(phi) - i*reg*ddVr(phi,minima[0],minima[2]);
+			return xddV;
+			}
+		}
+	else
+		{
+		V (phi)
+			{
+			comp xV = V1(phi);
+			return xV;
+			}
+		dV (phi)
+			{
+			comp xdV = dV1(phi);
+			return xdV;
+			}
+		ddV (phi)
+			{
+			comp xddV = ddV1(phi);
+			return xddV;
+			}
+		}
+	}
+else if (pot[0]=='2')
+	{
+	if (pot[1]=='r')
+		{
+		V (phi)
+			{
+			comp xV = V2(phi) - i*reg*Vr(phi,minima[0],minima[2]);
+			return xV;
+			}
+		dV (phi)
+			{
+			comp xdV = dV2(phi) - i*reg*dVr(phi,minima[0],minima[2]);
+			return xdV;
+			}
+		ddV (phi)
+			{
+			comp xddV = ddV2(phi) - i*reg*ddVr(phi,minima[0],minima[2]);
+			return xddV;
+			}
+		}
+	else
+		{
+		V (phi)
+			{
+			comp xV = V2(phi);
+			return xV;
+			}
+		dV (phi)
+			{
+			comp xdV = dV2(phi);
+			return xdV;
+			}
+		ddV (phi)
+			{
+			comp xddV = ddV2(phi);
+			return xddV;
+			}
+		}
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
