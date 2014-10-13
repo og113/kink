@@ -7,5 +7,5 @@
 #but would refer to the number of time steps on which the
 #field is fixed orthogonal to the zero mode
 #
-#min fileNo			max fileNo			minTb		maxTb		minTheta	maxTheta	loops	zmt			zmx
-141009144407		141010000000		18.0		18.0		0.0			0.0			1		dAD1		dC9
+#inF		min fileNo			max fileNo			minTb		maxTb		minTheta	maxTheta	loops	zmt			zmx
+m			141013152423		141014000000		18.0		17.0		0.0			0.0			19		dAD1		dC9

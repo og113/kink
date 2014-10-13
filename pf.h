@@ -83,6 +83,7 @@ struct aqStruct
 	};
 aqStruct aq; //struct to hold user responses
 string inP; //b for bubble, p for periodic instaton, f for from file
+string inF; //file input from where, m for main, p for pi
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
