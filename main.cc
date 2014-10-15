@@ -42,9 +42,9 @@ if (inF.compare("p")==0)
 	inputsFiles = findStrings(filenames,"inputsPi");
 	eigenvectorFiles = findStrings(filenames,"eigVec");
 	eigenvalueFiles = findStrings(filenames,"eigValue");
-	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || piFiles.size()!=eigenvectorFiles.size() || piFiles.size()!=eigenvalueFiles.size())
+	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
 		{
-		vector <vector<string>*> files = {&piFiles,&inputsFiles,&eigenvectorFiles,&eigenvalueFiles};
+		vector <vector<string>*> files = {&piFiles,&inputsFiles};
 		for (unsigned int j=0;j<files.size();j++)
 			{
 			for (unsigned int k=0;k<files.size();k++)
@@ -62,8 +62,6 @@ if (inF.compare("p")==0)
 		}
 	sort(piFiles.begin(), piFiles.end());
 	sort(inputsFiles.begin(), inputsFiles.end());
-	sort(eigenvectorFiles.begin(), eigenvectorFiles.end());
-	sort(eigenvalueFiles.begin(), eigenvalueFiles.end());
 	}
 else if (inF.compare("m")==0)
 	{
@@ -89,16 +87,18 @@ else if (inF.compare("m")==0)
 		}
 	sort(piFiles.begin(), piFiles.end());
 	sort(inputsFiles.begin(), inputsFiles.end());
-	if (zmt[0]=='n' || zmx[0]=='n')
-		{
-		cout << "zmt and zmx must equal 'd' for main input" << endl;
-		}
 	}
 else
 	{
 	cout << "inF error" << endl;
 	}
 vector <unsigned long long int> fileNumbers = getInts(piFiles);
+cout << endl;
+for (unsigned int j=0; j<inputsFiles.size();j++)
+	{
+	cout << inputsFiles[j] << " " << piFiles[j] << endl;
+	}
+cout << endl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //beginning file loop
 for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
@@ -122,7 +122,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				istringstream ss(line);
 				ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
-				if (absolute(theta-minTheta)>2.0e-16)
+				if (absolute(theta-minTheta)>2.0e-16 && loops>1)
 					{
 					cout << "minTheta != theta" << endl;
 					cout << minTheta << " != " << theta << endl;
@@ -133,7 +133,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				istringstream ss(line);
 				ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-				ss >> alpha >> open >> amp;
+				//ss >> alpha >> open >> amp;
 				lineNumber++;
 				}
 			else if(lineNumber==2) //not needed yet
@@ -156,7 +156,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	NT = Na + Nb + Nc;
 	epsilon = dE;
 	R = 2.0/3.0/epsilon;
-	alpha *= R;
+	//alpha *= R;
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
 	L = LoR*R;
@@ -179,9 +179,9 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			system(fileNumber); //won't work
 			cout << "negEig run" << endl;
 			}
-		negVec = loadVector(eigenvectorFiles[fileLoop],Nb,1);
+		negVec = loadVector(eigenvectorFiles[0],Nb,1);
 		ifstream eigFile;
-		eigFile.open(eigenvalueFiles[fileLoop]);
+		eigFile.open(eigenvalueFiles[0]);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		double temp;
@@ -435,8 +435,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			DDS.setZero(); //just making sure
 			Eigen::VectorXi DDS_to_reserve(2*N*NT+2);//number of non-zero elements per column
 			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+2,11);
-			DDS_to_reserve(0) = N+1;
-			DDS_to_reserve(1) = N+1;
+			if (absolute(theta)<2.0e-16)
+				{
+				DDS_to_reserve(0) = 3;
+				DDS_to_reserve(1) = 3;
+				}
+			else
+				{
+				DDS_to_reserve(0) = N+1;
+				DDS_to_reserve(1) = N+1;
+				}
 			DDS_to_reserve(2*N*NT-2) = 3;
 			DDS_to_reserve(2*N*NT-1) = 3;
 			DDS_to_reserve(2*N*NT) = N*(zmx.size()-2);
@@ -473,7 +481,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					
 				if (absolute(chiT(j))>2.0e-16)
 					{
-					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //there should be no chiT on the final time slice or this line will go wrong
+					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) += a*chiT(j);
 					DDS.coeffRef(2*j,2*N*NT+1) += -a*chiT(j);
 					DDS.coeffRef(2*N*NT+1,2*j) += -a*chiT(j);
@@ -497,7 +505,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
 						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						}
 					}
@@ -506,23 +514,21 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				//boundaries			
 				if (t==(NT-1))
 					{
-					comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					pot_l += Dt*a*Va(Cp(j));
 					pot_e += Dt*a*Vb(Cp(j));
-					erg(t) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
+					erg(t) += pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j));
 				
 					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
 					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 					}
 				else if (t==0)
 					{
-					comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					pot_l += Dt*a*Va(Cp(j));
 					pot_e += Dt*a*Vb(Cp(j));
-					erg(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j));
 					
 					if (absolute(theta)<2.0e-16)
 						{
@@ -568,12 +574,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				//bulk
 				else
 					{
-					comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					pot_l += Dt*a*Va(Cp(j));
 					pot_e += Dt*a*Vb(Cp(j));
-					erg(t) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j));
 				
 		            for (unsigned int k=0; k<2*2; k++)
 		            	{
@@ -619,8 +624,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			
 			//checking linearisation of linErg and linNum
 			double linTestE;	double linTestN;
-			double linEMax = 0.0;	double linEMin = 1.0e6; //surely it's going to be less than this
-			double linNMax = 0.0;	double linNMin = 1.0e6;
+			double linEMax = 0.0;	double linEMin = 5.0e15; //surely it's going to be less than this
+			double linNMax = 0.0;	double linNMin = 5.0e15;
 			unsigned int linearInt = (int)(Na/6);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
@@ -701,22 +706,23 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printSpmat(DDSfile,DDS);
 				}
-			if (print_choice.compare("e")==0 && 1==0)
+			if ((print_choice.compare("z")==0 || print_choice.compare("e")==0))
 				{
-				//printing linErgVec
-				//string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
-				//simplePrintVector(earlyLinErgFile,linErg);
-				//gpSimple(earlyLinErgFile);
-				//printing erg
-				//string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
-				//simplePrintCVector(earlyErgFile,erg);
-				//gpSimple(earlyErgFile);
 				string earlychiXFile = "./data/" + timeNumber + "mainchiXE" + to_string(fileLoop)+to_string(loop)+".dat";
 				printVector(earlychiXFile,chiX);
-				gp(earlychiXFile,"repi.gp");
+				//gp(earlychiXFile,"repi.gp");
 				string earlychiTFile = "./data/" + timeNumber + "mainchiTE" + to_string(fileLoop)+to_string(loop)+".dat";
 				printVector(earlychiTFile,chiT);
-				gp(earlychiTFile,"repi.gp");
+				//gp(earlychiTFile,"repi.gp");
+				}
+			if ((print_choice.compare("l")==0 || print_choice.compare("e")==0))
+				{
+				string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
+				simplePrintVector(earlyLinErgFile,linErg);
+				//gpSimple(earlyLinErgFile);
+				string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
+				simplePrintCVector(earlyErgFile,erg);
+				//gpSimple(earlyErgFile);
 				}
 			}
 		
@@ -828,7 +834,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
+		fprintf(actionfile,"%14s%6i%6i%8g%8g%8g%6g%14g%14g%12g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
 		,real(W),sol_test.back(),lin_test.back());
 		fclose(actionfile);
 	

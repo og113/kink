@@ -5,7 +5,7 @@
 128     64      64      32      0.05    3.2		19.0	0.0
 ##
 #inputChoice    file	  	totalLoops  loopChoice  minValue    maxValue    printChoice     printRun    alpha   open    amp
-p               pip5	    1          	n          	18.0        16.0        p               0           0.4     1.0     0.4
+p               pip5	    13          	Tb          20.0        17.0    n               0           0.4     1.0     0.4
 ##
 ##negEig inputs
 #P          c           done
