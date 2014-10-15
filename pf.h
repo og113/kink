@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <ctype.h>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 
@@ -84,6 +85,7 @@ struct aqStruct
 aqStruct aq; //struct to hold user responses
 string inP; //b for bubble, p for periodic instaton, f for from file
 string inF; //file input from where, m for main, p for pi
+unsigned int firstLoop;
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
@@ -964,4 +966,26 @@ vector<string> reduceTo(vector <string> toReduce, const vector <string> & toComp
 		toReduce = toCompare;
 		}
 	return toReduce;
+	}
+	
+//function to give final digit of string
+unsigned int finalDigit(string fileString)
+	{
+	unsigned int lastDigit;
+	unsigned int k=1;
+	while (~isdigit(fileString[fileString.length()-k]) && k<fileString.length())
+		{
+		k++;
+		}
+	if (k==fileString.length())
+		{
+		cout << "minLoop function error, no number in fileString" << endl;
+		}
+	else
+		{
+		char* tempChar = &fileString[k];
+		stringstream ss(tempChar);
+		ss >> lastDigit;
+		}
+	return lastDigit;
 	}

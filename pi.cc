@@ -454,16 +454,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a/dt;
-                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
-                comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
-                    
-                minusDS(2*j) += real(temp1 - temp0*Cp(j));
-                minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
-                DDS.insert(2*j,2*j) = real(-temp2 + temp0);
-                DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
-                DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
-                DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
-                }
+	            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
+	            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
+	                
+	            minusDS(2*j) += real(temp1 - temp0*Cp(j));
+	            minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
+	            DDS.insert(2*j,2*j) = real(-temp2 + temp0);
+	            DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
+	            DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
+	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
+	            }
             }
         action = kineticT - kineticS - pot_l - pot_e;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

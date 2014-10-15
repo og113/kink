@@ -20,9 +20,34 @@ unsigned int loops;
 double minTb, maxTb, minTheta, maxTheta;
 ifstream fmainin;
 fmainin.open("mainInputs", ios::in);
-string lastLine = getLastLine(fmainin);
-istringstream ss(lastLine);
-ss >> inF >> minFile >> maxFile >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx;
+if (fmainin.is_open())
+	{
+	string line;
+	unsigned int lineNumber = 0;
+	while(getline(fmainin,line))
+		{
+		if(line[0] == '#')
+			{
+			continue;
+			}
+		if (lineNumber==0)
+			{
+			istringstream ss(line);
+			ss >> inF >> minFile >> maxFile >> firstLoop;
+			lineNumber++;
+			}
+		else if (lineNumber==1)
+			{
+			istringstream ss(line);
+			ss >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx;
+			lineNumber++;
+			}
+		}
+	}
+else
+	{
+	cout << "unable to open mainInputs" << endl;
+	}
 fmainin.close();
 
 //defining the timeNumber
@@ -42,9 +67,21 @@ if (inF.compare("p")==0)
 	inputsFiles = findStrings(filenames,"inputsPi");
 	eigenvectorFiles = findStrings(filenames,"eigVec");
 	eigenvalueFiles = findStrings(filenames,"eigValue");
+	vector <vector<string>*> files = {&piFiles,&inputsFiles};
+	for (unsigned int k=0;k<files.size();k++)
+		{
+		vector <string>* tempVecStr = files[k];
+		for (unsigned int l=0; l<(*tempVecStr).size();l++)
+			{
+			unsigned int fileLoop = finalDigit((*tempVecStr)[l]);
+				if (fileLoop<firstLoop)
+					{
+					(*tempVecStr).erase((*tempVecStr).begin()+l);
+					}
+			}
+		}
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
 		{
-		vector <vector<string>*> files = {&piFiles,&inputsFiles};
 		for (unsigned int j=0;j<files.size();j++)
 			{
 			for (unsigned int k=0;k<files.size();k++)
@@ -581,30 +618,30 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j));
 				
 		            for (unsigned int k=0; k<2*2; k++)
-		            	{
-		                int sign = pow(-1,k);
-		                int direc = (int)(k/2.0);
-		                if (direc == 0)
-		                	{
-		                    minusDS(2*j) += real(a*Cp(j+sign)/dt);
-		                    minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
-		                    DDS.insert(2*j,2*(j+sign)) = -real(a/dt);
-		                    DDS.insert(2*j,2*(j+sign)+1) = imag(a/dt);
-		                    DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dt);
-		                    DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dt);
-		                    }
-		                else
-		                	{
-		                    unsigned int neighb = neigh(j,direc,sign,NT);
-		                    
-		                    minusDS(2*j) += - real(Dt*Cp(neighb)/a);
-		                    minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
-		                    DDS.insert(2*j,2*neighb) = real(Dt/a);
-		                    DDS.insert(2*j,2*neighb+1) = -imag(Dt/a);
-		                    DDS.insert(2*j+1,2*neighb) = imag(Dt/a);
-		                    DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
-		                    }
-		                }
+                	{
+                    int sign = pow(-1,k);
+                    int direc = (int)(k/2.0);
+                    if (direc == 0)
+                    	{
+                        minusDS(2*j) += real(a*Cp(j+sign)/dt);
+                        minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
+                        DDS.insert(2*j,2*(j+sign)) = -real(a/dt);
+                        DDS.insert(2*j,2*(j+sign)+1) = imag(a/dt);
+                        DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dt);
+                        DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dt);
+                        }
+                    else
+                    	{
+                        unsigned int neighb = neigh(j,direc,sign,NT);
+                        
+                        minusDS(2*j) += - real(Dt*Cp(neighb)/a);
+                        minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
+                        DDS.insert(2*j,2*neighb) = real(Dt/a);
+                        DDS.insert(2*j,2*neighb+1) = -imag(Dt/a);
+                        DDS.insert(2*j+1,2*neighb) = imag(Dt/a);
+                        DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
+                        }
+                    }
 		            comp temp0 = 2.0*a/dt;
 		            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
 		            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
@@ -811,7 +848,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//checking energy conserved
 		if (erg_test.back()>closenessE)
 				{
-				cout << "ergTest = " << erg_test.back() << endl;
+				cout << "test of energy conservation, ergTest = " << erg_test.back() << endl;
 				}
 		
 		//checking lattice small enough
