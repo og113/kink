@@ -662,8 +662,15 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
-			E = real(erg(1));
-			Num = linNum(1);
+			E = 0;
+			Num = 0;
+			for (unsigned int j=0; j<linearInt; j++)
+				{
+				E += real(linErg(j));
+				Num += real(linNum(j));
+				}
+			E /= linearInt;
+			Num /= linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking lattice small enough for E, should have parameter for this
@@ -683,7 +690,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printVector(minusDSfile,minusDS);
 				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) || delta_test.back()>0.2)
 				{
 				string piEarlyFile = "./data/" + timeNumber + "mainE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
 				printVector(piEarlyFile,p);
@@ -813,8 +820,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//printing to terminal
 		printf("\n");
-		printf("%8s%8s%8s%8s%8s%8s%8s%8s%14s%14s%14s%14s\n","runs","time","N","NT","L","Tb","dE","theta","Num","E","im(action)","W");
-		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14g%14g%14g%14g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
+		printf("%8s%8s%8s%8s%8s%8s%8s%8s%14s%14s%14s\n","runs","time","N","NT","L","Tb","dE","theta","Num","E","W");
+		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14g%14g%14g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 

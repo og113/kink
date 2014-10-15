@@ -8,4 +8,4 @@
 #field is fixed orthogonal to the zero mode
 #
 #inF		min fileNo			max fileNo			minTb		maxTb		minTheta	maxTheta	loops	zmt			zmx
-m			141013152423		141014000000		18.0		17.0		0.0			0.0			19		dAD1		dC9
+p			141015135145		141016000000		18.4		17.0		0.0			0.0			31		dAD1		dC9
