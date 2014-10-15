@@ -439,8 +439,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			DDS_to_reserve(1) = N+1;
 			DDS_to_reserve(2*N*NT-2) = 3;
 			DDS_to_reserve(2*N*NT-1) = 3;
-			DDS_to_reserve(2*N*NT) = N;
-			DDS_to_reserve(2*N*NT+1) = 2*N;
+			DDS_to_reserve(2*N*NT) = N*(zmx.size()-2);
+			DDS_to_reserve(2*N*NT+1) = 2*N*(zmt.size()-2);
 			DDS.reserve(DDS_to_reserve);
 			
 			//initializing to zero

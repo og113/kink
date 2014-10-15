@@ -2,7 +2,7 @@
 ##the following are input to pi.cc:
 ##
 #N      Na      Nb      Nc      dE      LoR		Tb      theta
-128     64      64      32      0.05    3.2		18.5	0.0
+128     64      64      32      0.05    3.2		19.0	0.0
 ##
 #inputChoice    file	  	totalLoops  loopChoice  minValue    maxValue    printChoice     printRun    alpha   open    amp
 p               pip5	    1          	n          	18.0        16.0        p               0           0.4     1.0     0.4
