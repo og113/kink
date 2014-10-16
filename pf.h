@@ -644,7 +644,7 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 			file >> fileName;
 			if (fileName.size()>19)
 				{
-				if (fileName[7]=='1')
+				if (fileName[7]=='1' && fileName.back()!='~')
 					{
 					strNumber = fileName.substr(7,12);
 					fileNumber = stoull(strNumber);
@@ -966,26 +966,4 @@ vector<string> reduceTo(vector <string> toReduce, const vector <string> & toComp
 		toReduce = toCompare;
 		}
 	return toReduce;
-	}
-	
-//function to give final digit of string
-unsigned int finalDigit(string fileString)
-	{
-	unsigned int lastDigit;
-	unsigned int k=1;
-	while (~isdigit(fileString[fileString.length()-k]) && k<fileString.length())
-		{
-		k++;
-		}
-	if (k==fileString.length())
-		{
-		cout << "minLoop function error, no number in fileString" << endl;
-		}
-	else
-		{
-		char* tempChar = &fileString[k];
-		stringstream ss(tempChar);
-		ss >> lastDigit;
-		}
-	return lastDigit;
 	}

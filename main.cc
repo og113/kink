@@ -71,13 +71,39 @@ if (inF.compare("p")==0)
 	for (unsigned int k=0;k<files.size();k++)
 		{
 		vector <string>* tempVecStr = files[k];
+		size_t first_index;
+		size_t last_index;
+		
 		for (unsigned int l=0; l<(*tempVecStr).size();l++)
 			{
-			unsigned int fileLoop = finalDigit((*tempVecStr)[l]);
-				if (fileLoop<firstLoop)
-					{
-					(*tempVecStr).erase((*tempVecStr).begin()+l);
-					}
+			string strNumber = (*tempVecStr)[l];
+			if (strNumber.find_last_of("_")!=string::npos)
+				{
+				first_index = strNumber.find_last_of("_");
+				}
+			else
+				{
+				cout << "no underscore in file input, error" << endl;
+				cout << (*tempVecStr)[l] << endl;
+				return 0;
+				}
+			strNumber = strNumber.substr(first_index + 1);
+			if (strNumber.find_last_of("0123456789")!=string::npos)
+				{
+				last_index = strNumber.find_last_of("0123456789");
+				}
+			else
+				{
+				cout << "no numbers in file input, error" << endl;
+				cout << (*tempVecStr)[l] << endl;
+				return 0;
+				}
+			strNumber = strNumber.substr(0,last_index+1);
+			unsigned int loopNumber = stoul(strNumber);
+			if (loopNumber<firstLoop)
+				{
+				(*tempVecStr).erase((*tempVecStr).begin()+l);
+				}
 			}
 		}
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
@@ -107,11 +133,42 @@ else if (inF.compare("m")==0)
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 		{
 		vector <vector<string>*> files = {&piFiles,&inputsFiles};
-		for (unsigned int j=0;j<files.size();j++)
+		for (unsigned int k=0;k<files.size();k++)
 			{
-			for (unsigned int k=0;k<files.size();k++)
+			vector <string>* tempVecStr = files[k];
+			size_t first_index;
+			size_t last_index;
+	
+			for (unsigned int l=0; l<(*tempVecStr).size();l++)
 				{
-				*files[j] = reduceTo(*files[j],*files[k]);
+				string strNumber = (*tempVecStr)[l];
+				if (strNumber.find_last_of("_")!=string::npos)
+					{
+					first_index = strNumber.find_last_of("_");
+					}
+				else
+					{
+					cout << "no underscore in file input, error" << endl;
+					cout << (*tempVecStr)[l] << endl;
+					return 0;
+					}
+				strNumber = strNumber.substr(first_index + 1);
+				if (strNumber.find_last_of("0123456789")!=string::npos)
+					{
+					last_index = strNumber.find_last_of("0123456789");
+					}
+				else
+					{
+					cout << "no numbers in file input, error" << endl;
+					cout << (*tempVecStr)[l] << endl;
+					return 0;
+					}
+				strNumber = strNumber.substr(0,last_index+1);
+				unsigned int loopNumber = stoul(strNumber);
+				if (loopNumber<firstLoop)
+					{
+					(*tempVecStr).erase((*tempVecStr).begin()+l);
+					}
 				}
 			}
 		if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
@@ -368,7 +425,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printParameters();
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(fileLoop) + to_string(loop) + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(fileLoop) + "_" + to_string(loop) + "_" + "0.dat";
 		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -723,41 +780,43 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing early if desired
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
-			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0))
+			string prefix = "./data/" + timeNumber;
+			string suffix = to_string(fileLoop)+"_"+to_string(loop)+"_"+to_string(runs_count)+".dat";
+			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
 				{
-				string minusDSfile = "./data/" + timeNumber + "mainminusDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				string minusDSfile = prefix + "mainminusDSE"+suffix;
 				printVector(minusDSfile,minusDS);
 				}
 			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) || delta_test.back()>0.2)
 				{
-				string piEarlyFile = "./data/" + timeNumber + "mainE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				string piEarlyFile = prefix + "mainE"+suffix;
 				printVector(piEarlyFile,p);
 				//gp(piEarlyFile,"repi.gp");
 				}
 			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0))
 				{
-				string DDSfile = "./data/" + timeNumber + "mainDDSE"+to_string(fileLoop)+to_string(loop)+to_string(runs_count)+".dat";
+				string DDSfile = prefix + "mainDDSE"+suffix;
 				printSpmat(DDSfile,DDS);
 				}
 			if ((print_choice.compare("z")==0 || print_choice.compare("e")==0))
 				{
-				string earlychiXFile = "./data/" + timeNumber + "mainchiXE" + to_string(fileLoop)+to_string(loop)+".dat";
+				string earlychiXFile = prefix + "mainchiXE" + suffix;
 				printVector(earlychiXFile,chiX);
 				//gp(earlychiXFile,"repi.gp");
-				string earlychiTFile = "./data/" + timeNumber + "mainchiTE" + to_string(fileLoop)+to_string(loop)+".dat";
+				string earlychiTFile = prefix + "mainchiTE" + suffix;
 				printVector(earlychiTFile,chiT);
 				//gp(earlychiTFile,"repi.gp");
 				}
 			if ((print_choice.compare("l")==0 || print_choice.compare("e")==0))
 				{
-				string earlyLinErgFile = "./data/" + timeNumber + "mainlinErgE"+to_string(fileLoop)+to_string(loop)+".dat";
+				string earlyLinErgFile = prefix + "mainlinErgE"+suffix;
 				simplePrintVector(earlyLinErgFile,linErg);
 				//gpSimple(earlyLinErgFile);
-				string earlyErgFile = "./data/" + timeNumber + "mainergE" + to_string(fileLoop)+to_string(loop)+".dat";
+				string earlyErgFile = prefix + "mainergE" + suffix;
 				simplePrintCVector(earlyErgFile,erg);
 				//gpSimple(earlyErgFile);
 				}
@@ -876,7 +935,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 	
 		//copying a version of inputs with timeNumber and theta changed
-		string runInputs = "./data/" + timeNumber + "inputsM"+ to_string(fileLoop) + to_string(loop);
+		string runInputs = "./data/" + timeNumber + "inputsM"+ to_string(fileLoop) + "_" + to_string(loop);
 		if (absolute(maxTheta-minTheta)>2.0e-16)
 			{
 			changeInputs(runInputs, "theta", to_string(theta));
@@ -889,34 +948,37 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			copyFile("inputs",runInputs);
 			}
+		
+		string prefix = "./data/" + timeNumber;
+		string suffix = to_string(fileLoop)+"_" + to_string(loop)+".dat";
 	
 		//printing output phi
-		string tpifile = "./data/" + timeNumber + "mainp"+to_string(fileLoop)+to_string(loop)+".dat";
+		string tpifile =  prefix + "mainp"+suffix;
 		printVector(tpifile,p);
 		gp(tpifile,"repi.gp");
 	
 		//printing output minusDS				
-		string minusDSfile = "./data/" + timeNumber + "mainminusDS"+to_string(fileLoop)+to_string(loop)+".dat";
+		string minusDSfile = prefix + "mainminusDS"+suffix;
 		printVector(minusDSfile,minusDS);
 				
 		//printing output DDS
-		string DDSfile = "./data/" + timeNumber + "mainDDS"+to_string(fileLoop)+to_string(loop)+".dat";
+		string DDSfile = prefix + "mainDDS"+suffix;
 		printSpmat(DDSfile,DDS);
 	
 		//printing linNumVec
-		string linNumFile = "./data/" + timeNumber + "mainlinNum"+to_string(fileLoop)+to_string(loop)+".dat";
+		string linNumFile = prefix + "mainlinNum"+suffix;
 		linNum.conservativeResize(Na);
-		//simplePrintVector(linNumFile,linNum);
+		simplePrintVector(linNumFile,linNum);
 		//gpSimple(linNumFile);	
 	
 		//printing linErgVec
-		string linErgFile = "./data/" + timeNumber + "mainlinErg"+to_string(fileLoop)+to_string(loop)+".dat";
+		string linErgFile = prefix + "mainlinErg"+suffix;
 		linErg.conservativeResize(Na);
 		simplePrintVector(linErgFile,linErg);
 		//gpSimple(linErgFile);
 	
 		//printing erg
-		string ergFile = "./data/" + timeNumber + "mainerg" + to_string(fileLoop)+to_string(loop)+".dat";
+		string ergFile = prefix + "mainerg" + suffix;
 		erg.conservativeResize(Na);
 		simplePrintCVector(ergFile,erg);
 		//gpSimple(ergFile);
