@@ -67,125 +67,81 @@ if (inF.compare("p")==0)
 	inputsFiles = findStrings(filenames,"inputsPi");
 	eigenvectorFiles = findStrings(filenames,"eigVec");
 	eigenvalueFiles = findStrings(filenames,"eigValue");
-	vector <vector<string>*> files = {&piFiles,&inputsFiles};
-	for (unsigned int k=0;k<files.size();k++)
+	if  (eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
 		{
-		vector <string>* tempVecStr = files[k];
-		size_t first_index;
-		size_t last_index;
-		
-		for (unsigned int l=0; l<(*tempVecStr).size();l++)
-			{
-			string strNumber = (*tempVecStr)[l];
-			if (strNumber.find_last_of("_")!=string::npos)
-				{
-				first_index = strNumber.find_last_of("_");
-				}
-			else
-				{
-				cout << "no underscore in file input, error" << endl;
-				cout << (*tempVecStr)[l] << endl;
-				return 0;
-				}
-			strNumber = strNumber.substr(first_index + 1);
-			if (strNumber.find_last_of("0123456789")!=string::npos)
-				{
-				last_index = strNumber.find_last_of("0123456789");
-				}
-			else
-				{
-				cout << "no numbers in file input, error" << endl;
-				cout << (*tempVecStr)[l] << endl;
-				return 0;
-				}
-			strNumber = strNumber.substr(0,last_index+1);
-			unsigned int loopNumber = stoul(strNumber);
-			if (loopNumber<firstLoop)
-				{
-				(*tempVecStr).erase((*tempVecStr).begin()+l);
-				}
-			}
+		cout << "correct eigen files not available" << endl;
+		cout << "eigenvalueFiles.size() = " << eigenvalue.size() << endl;
+		cout << "eigenvectorFiles.size() = " << eigenvectorFiles.size() << endl;
 		}
-	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0 || eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
-		{
-		for (unsigned int j=0;j<files.size();j++)
-			{
-			for (unsigned int k=0;k<files.size();k++)
-				{
-				*files[j] = reduceTo(*files[j],*files[k]);
-				}
-			}
-		if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
-			{
-			cout << "required files not available" << endl;
-			cout << "piFiles.size() = " << piFiles.size() << endl;
-			cout << "inputsFiles.size() = " << inputsFiles.size() << endl;
-			return 0;
-			}
-		}
-	sort(piFiles.begin(), piFiles.end());
-	sort(inputsFiles.begin(), inputsFiles.end());
 	}
 else if (inF.compare("m")==0)
 	{
 	piFiles = findStrings(filenames,"mainp");
 	inputsFiles = findStrings(filenames,"inputsM");
-	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
-		{
-		vector <vector<string>*> files = {&piFiles,&inputsFiles};
-		for (unsigned int k=0;k<files.size();k++)
-			{
-			vector <string>* tempVecStr = files[k];
-			size_t first_index;
-			size_t last_index;
-	
-			for (unsigned int l=0; l<(*tempVecStr).size();l++)
-				{
-				string strNumber = (*tempVecStr)[l];
-				if (strNumber.find_last_of("_")!=string::npos)
-					{
-					first_index = strNumber.find_last_of("_");
-					}
-				else
-					{
-					cout << "no underscore in file input, error" << endl;
-					cout << (*tempVecStr)[l] << endl;
-					return 0;
-					}
-				strNumber = strNumber.substr(first_index + 1);
-				if (strNumber.find_last_of("0123456789")!=string::npos)
-					{
-					last_index = strNumber.find_last_of("0123456789");
-					}
-				else
-					{
-					cout << "no numbers in file input, error" << endl;
-					cout << (*tempVecStr)[l] << endl;
-					return 0;
-					}
-				strNumber = strNumber.substr(0,last_index+1);
-				unsigned int loopNumber = stoul(strNumber);
-				if (loopNumber<firstLoop)
-					{
-					(*tempVecStr).erase((*tempVecStr).begin()+l);
-					}
-				}
-			}
-		if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
-			{
-			cout << "required files not available" << endl;
-			cout << "piFiles.size() = " << piFiles.size() << endl;
-			cout << "inputsFiles.size() = " << inputsFiles.size() << endl;
-			return 0;
-			}
-		}
-	sort(piFiles.begin(), piFiles.end());
-	sort(inputsFiles.begin(), inputsFiles.end());
 	}
 else
 	{
 	cout << "inF error" << endl;
 	}
+vector <vector<string>*> files = {&piFiles,&inputsFiles};
+for (unsigned int k=0;k<files.size();k++)
+	{
+	vector <string>* tempVecStr = files[k];
+	size_t first_index;
+	size_t last_index;
+
+	for (unsigned int l=0; l<(*tempVecStr).size();l++)
+		{
+		string strNumber = (*tempVecStr)[l];
+		if (strNumber.find_last_of("_")!=string::npos)
+			{
+			first_index = strNumber.find_last_of("_");
+			}
+		else
+			{
+			cout << "no underscore in file input, error" << endl;
+			cout << (*tempVecStr)[l] << endl;
+			return 0;
+			}
+		strNumber = strNumber.substr(first_index + 1);
+		if (strNumber.find_last_of("0123456789")!=string::npos)
+			{
+			last_index = strNumber.find_last_of("0123456789");
+			}
+		else
+			{
+			cout << "no numbers in file input, error" << endl;
+			cout << (*tempVecStr)[l] << endl;
+			return 0;
+			}
+		strNumber = strNumber.substr(0,last_index+1);
+		unsigned int loopNumber = stoul(strNumber);
+		if (loopNumber<firstLoop)
+			{
+			(*tempVecStr).erase((*tempVecStr).begin()+l);
+			}
+		}
+	}
+if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
+	{
+	for (unsigned int j=0;j<files.size();j++)
+		{
+		for (unsigned int k=0;k<files.size();k++)
+			{
+			*files[j] = reduceTo(*files[j],*files[k]);
+			}
+		}
+	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
+		{
+		cout << "required files not available" << endl;
+		cout << "piFiles.size() = " << piFiles.size() << endl;
+		cout << "inputsFiles.size() = " << inputsFiles.size() << endl;
+		return 0;
+		}
+		
+sort(piFiles.begin(), piFiles.end());
+sort(inputsFiles.begin(), inputsFiles.end());
+
 vector <unsigned long long int> fileNumbers = getInts(piFiles);
 cout << endl;
 for (unsigned int j=0; j<inputsFiles.size();j++)
