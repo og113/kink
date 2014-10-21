@@ -29,7 +29,7 @@ int main()
 string timeNumber = currentDateTime();
 
 ifstream fin;
-fin.open(inputsFiles[fileLoop]);
+fin.open("inputs");
 if (fin.is_open())
 	{
 	string line;
@@ -45,10 +45,10 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta-minTheta)>2.0e-16 && loops>1)
+			if (absolute(theta)>2.0e-16)
 				{
-				cout << "minTheta != theta" << endl;
-				cout << minTheta << " != " << theta << endl;
+				cout << "theta != 0" << endl;
+				cout << "theta = " << theta << endl;
 				}
 			}
 		else if (lineNumber==1)
@@ -58,7 +58,7 @@ if (fin.is_open())
 			}
 		else if(lineNumber==2)
 			{
-			ss >> alpha >> open >> amp >> pot >> A >> regV;
+			ss >> alpha >> open >> amp >> pot >> A >> reg;
 			lineNumber++;
 			}
 		else if(lineNumber==3)
@@ -71,7 +71,7 @@ if (fin.is_open())
 	}
 else
 	{
-	cout << "unable to open " << inputsFiles[fileLoop] << endl;
+	cout << "unable to open inputs" << endl;
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
@@ -432,8 +432,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp Dt = -b*i/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
-				pot_l += Dt*a*Va(Cp(j));
-				pot_e += Dt*a*Vb(Cp(j));
+				pot_l += Dt*a*V0(Cp(j));
+				pot_e += Dt*a*Ve(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -447,8 +447,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i/2.0;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += Dt*a*Va(Cp(j));
-				pot_e += Dt*a*Vb(Cp(j));
+				pot_l += Dt*a*V0(Cp(j));
+				pot_e += Dt*a*Ve(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -472,8 +472,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += Dt*a*Va(Cp(j));
-				pot_e += Dt*a*Vb(Cp(j));
+				pot_l += Dt*a*V0(Cp(j));
+				pot_e += Dt*a*Ve(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
