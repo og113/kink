@@ -29,30 +29,50 @@ cin >> timeNumber;
 
 //load parameters
 //getting variables and user inputs from inputs
-
 ifstream fin;
-fin.open("inputs", ios::in);
-string line;
-int firstLine = 0;
-while(getline(fin,line))
+fin.open(inputsFiles[fileLoop]);
+if (fin.is_open())
 	{
-	if(line[0] == '#')
+	string line;
+	unsigned int lineNumber = 0;
+	while(getline(fin,line))
 		{
-		continue;
+		if(line[0] == '#')
+			{
+			continue;
+			}
+		istringstream ss(line);
+		if (lineNumber==0)
+			{
+			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
+			lineNumber++;
+			if (absolute(theta-minTheta)>2.0e-16 && loops>1)
+				{
+				cout << "minTheta != theta" << endl;
+				cout << minTheta << " != " << theta << endl;
+				}
+			}
+		else if (lineNumber==1)
+			{
+			ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+			lineNumber++;
+			}
+		else if(lineNumber==2)
+			{
+			ss >> alpha >> open >> amp >> pot >> A >> regV;
+			lineNumber++;
+			}
+		else if(lineNumber==3)
+			{
+			double temp;
+			ss >> temp >> temp >> negEigDone;
+			lineNumber++;
+			}
 		}
-	if (firstLine==0)
-		{
-		istringstream ss1(line);
-		ss1 >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
-		firstLine++;
-		}
-	else if (firstLine==1)
-		{
-		istringstream ss2(line);
-		ss2 >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		ss2 >> alpha >> open >> amp;
-		firstLine++;
-		}
+	}
+else
+	{
+	cout << "unable to open " << inputsFiles[fileLoop] << endl;
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot

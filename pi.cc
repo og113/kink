@@ -16,6 +16,7 @@
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 #include "pf.h"
+#include "files.h"
 
 using namespace std;
 
@@ -28,42 +29,49 @@ int main()
 string timeNumber = currentDateTime();
 
 ifstream fin;
-fin.open("inputs");
-string line;
-unsigned int lineNumber = 0;
-unsigned int negEigDone;
-while(getline(fin,line))
+fin.open(inputsFiles[fileLoop]);
+if (fin.is_open())
 	{
-	if(line[0] == '#')
+	string line;
+	unsigned int lineNumber = 0;
+	while(getline(fin,line))
 		{
-		continue;
-		}
-	if (lineNumber==0)
-		{
+		if(line[0] == '#')
+			{
+			continue;
+			}
 		istringstream ss(line);
-		ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
-		lineNumber++;
+		if (lineNumber==0)
+			{
+			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
+			lineNumber++;
+			if (absolute(theta-minTheta)>2.0e-16 && loops>1)
+				{
+				cout << "minTheta != theta" << endl;
+				cout << minTheta << " != " << theta << endl;
+				}
+			}
+		else if (lineNumber==1)
+			{
+			ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+			lineNumber++;
+			}
+		else if(lineNumber==2)
+			{
+			ss >> alpha >> open >> amp >> pot >> A >> regV;
+			lineNumber++;
+			}
+		else if(lineNumber==3)
+			{
+			double temp;
+			ss >> temp >> temp >> negEigDone;
+			lineNumber++;
+			}
 		}
-	else if (lineNumber==1)
-		{
-		istringstream ss(line);
-		ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-		lineNumber++;
-		}
-	else if(lineNumber==2)
-		{
-		istringstream ss(line);
-		double temp;
-		ss >> alpha >> open >> amp >> pot >> A >> regV;
-		lineNumber++;
-		}
-	else if(lineNumber==3)
-		{
-		istringstream ss(line);
-		double temp;
-		ss >> temp >> temp >> negEigDone;
-		lineNumber++;
-		}	
+	}
+else
+	{
+	cout << "unable to open " << inputsFiles[fileLoop] << endl;
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
@@ -219,15 +227,17 @@ string print_choice = aq.printChoice;
 for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	{
 	//giving values of varying parameters
+	int intLoopParameter;
+	double doubleLoopParameter;
 	if (loop_choice.compare("N") == 0)
 		{
-		int loopParameter = aq.minValue + (int)(aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1);
-		changeInt (loop_choice,loopParameter);
+		intLoopParameter = aq.minValue + (int)(aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1);
+		changeInt (loop_choice,intLoopParameter);
 		}
 	else if (loop_choice.compare("n")!=0)
 		{
-		double loopParameter = aq.minValue + (aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1.0);
-		changeDouble (loop_choice,loopParameter);
+		doubleLoopParameter = aq.minValue + (aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1.0);
+		changeDouble (loop_choice,doubleLoopParameter);
 		}
 		
 	//defining a time and starting the clock
@@ -242,6 +252,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	comp action = twaction;
+	double W;
+	double E;
 	cVec erg(NT);	
 
 	//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -534,16 +546,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a/dt;
-                comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
-                comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
-                    
-                minusDS(2*j) += real(temp1 - temp0*Cp(j));
-                minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
-                DDS.insert(2*j,2*j) = real(-temp2 + temp0);
-                DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
-                DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
-                DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
-                }
+	            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
+	            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
+	                
+	            minusDS(2*j) += real(temp1 - temp0*Cp(j));
+	            minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
+	            DDS.insert(2*j,2*j) = real(-temp2 + temp0);
+	            DDS.insert(2*j,2*j+1) = imag(temp2 - temp0);
+	            DDS.insert(2*j+1,2*j) = imag(-temp2 + temp0);
+	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
+	            }
             }
         action = kineticT - kineticS - pot_l - pot_e;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -722,25 +734,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
         	}
     	}
-    	
-    //computing boundary term, at initial time
-    comp bound = 0.0;
-	for (unsigned int j=0; j<N; j++)
+		
+	E = 0;
+	unsigned int linearInt = (unsigned int)(Na/6);
+	for (unsigned int j=0; j<linearInt; j++)
 		{
-		for (unsigned int k=0; k<N; k++)
-			{		
-			if (absolute(theta)<2.0e-16)
-				{
-				bound += 0.0;
-				}
-			else
-				{
-				unsigned int m = Na + j*(Na+1);
-				unsigned int n = Na + k*(Na+1);
-				bound += (1.0-Gamma)*omega(m,n)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(m,n)*imag(ap(m))*imag(ap(n))/(1.0-Gamma);
-				}
-			}
+		E += real(linErgA(j));
 		}
+	E /= linearInt;
+	W = - E*2.0*Tb + 2.0*imag(action);
 
     //now propagating forwards along c
     //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
@@ -846,21 +848,32 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%16s%16s%16s\n","runs","time","N","Na","Nb","Nc","L","Tb","dE","erg","re(action)","im(action)");
-	printf("%8i%8g%8i%8i%8i%8i%8g%8g%8g%16g%16g%16g\n",runs_count,realtime,N,Na,Nb,Nc,L,Tb,dE,real(erg(0)),real(action),imag(action));
+	printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","NT","L","Tb","dE","E","W");
+	printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,E,W);
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,real(erg(0))\
-	,imag(action),sol_test.back(),solM_test.back(),erg_test.back());
+	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,E\
+	,W,sol_test.back(),erg_test.back());
 	fclose(actionfile);
 	
 	//copying a version of inputs with timeNumber
-	string runInputs = "./data/" + timeNumber + "inputsPi";
-	copyFile("inputs",runInputs);
+	string runInputs = "./data/" + timeNumber + "inputsPi" + to_string(loop);
+	if (loop_choice.compare("N") == 0)
+		{
+		changeInputs(runInputs,"N", to_string(intLoopParameter));
+		}
+	else if (loop_choice.compare("n")!=0)
+		{
+		changeInputs(runInputs,loop_choice, to_string(doubleLoopParameter));
+		}
+	else
+		{
+		copyFile("inputs",runInputs);
+		}
 
 	//printing output phi on Euclidean time part
 	string pifile = "./data/" + timeNumber + "pi"+inP+to_string(loop)+".dat";

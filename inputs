@@ -8,7 +8,7 @@
 p               pip5	    1          	n          	18.0        16.0        e               0       
 ##
 #alpha   open    amp	pot		A		reg
-0.4	     1.0     0.4	1n		0.4		1e-6
+0.4	     1.0     0.4	1n		0.4		0.0
 ##
 ##negEig inputs
 #P          c           done

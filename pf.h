@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <ctype.h>
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 
@@ -66,6 +67,7 @@ double closenessE; //energy change
 double closenessL; //linearisation of energy
 double closenessT; //true energy versus linear energy
 double closenessP; //checking lattice small enough for momenta
+double closenessR; //regularization
 
 //parameters determining input phi
 //struct to hold answers to questions
@@ -86,6 +88,8 @@ string inP; //b for bubble, p for periodic instaton, f for from file
 string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 double A; //gives parameter in V2, equal to 0.4 in DL
 double reg; //small parameter multiplying regulatory term
+string inF; //file input from where, m for main, p for pi
+unsigned int firstLoop; //firstLoop to load from
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
@@ -143,117 +147,116 @@ unsigned int smallestFn(const vector <unsigned int> & inVector)
 
 comp V1 (const comp & phi)
 	{
-	comp Vphi = pow(pow(phi,2)-1.0,2)/8.0 - epsilon*(phi-1.0)/2.0;
-	return Vphi;
+	comp result = pow(pow(phi,2)-1.0,2)/8.0 - epsilon*(phi-1.0)/2.0;
+	return result;
 	}
 	
 comp Z (const comp & phi)
 	{
-	xZ = exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
-	return xZ;
+	comp result = exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
+	return result;
 	}
 	
 comp V2 (const comp & phi)
 	{
-	comp xV = 0.5*pow(phi+1.0,2.0)*(1.0-epsilon*Z((phi-1)/A);
-	return xV;
+	comp result = 0.5*pow(phi+1.0,2.0)*(1.0-epsilon*Z((phi-1.0)/A));
+	return result;
 	}
 	
-comp Vr (const comp & phi, const double & minimaL, const double & minimaR)
+comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	comp Vphi = pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
-	return Vphi;
+	comp result = pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
+	return result;
 	}
 	
-comp V (const comp & phi);
+comp (*V) (const comp & phi); //a function pointer
 
 //potentials with degenerate minima, and without regularisation
 comp V10 (const comp & phi)
 	{
-	comp xV10 = pow(pow(phi,2)-1.0,2)/8.0;
-	return xV10;
+	comp result = pow(pow(phi,2)-1.0,2)/8.0;
+	return result;
 	}
 	
 comp V20 (const comp & phi)
 	{
-	comp xV10 = 0.5*pow(phi+1.0,2.0)*(1.0-0.7450777428719992*Z((phi-1)/A); //epsilon0 needs checking
-	return xV10;
+	comp result = 0.5*pow(phi+1.0,2.0)*(1.0-0.7450777428719992*Z((phi-1.0)/A)); //epsilon0 needs checking
+	return result;
 	}
 	
-comp V0 (const comp & phi);
+comp (*V0) (const comp & phi);
 	
 //change to degenerate potential, still without regulatisation
 comp V1e (const comp & phi)
 	{
-	comp xV1e = -epsilon*(phi-1.0)/2.0;
-	return xV1e;
+	comp result = -epsilon*(phi-1.0)/2.0;
+	return result;
 	}
 
 comp V2e (const comp & phi)
 	{
-	comp xV2e = V2(phi)-V20(phi);
-	return xV2e;
+	comp result = V2(phi)-V20(phi);
+	return result;
 	}
 	
-comp Ve (const comp & phi);
+comp (*Ve) (const comp & phi);
 	
 	
 //first derivative of Vs
 comp dV1 (const comp & phi)
 	{
-	comp dVphi = phi*(pow(phi,2)-1.0)/2.0 - epsilon/2.0;
-	return dVphi;
+	comp result = phi*(pow(phi,2)-1.0)/2.0 - epsilon/2.0;
+	return result;
 	}
 
 comp dZ (const comp & phi)
 	{
-	comp xdZ = exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
-	return xdZ;
+	comp result = exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
+	return result;
 	}
 
 comp dV2 (const comp & phi)
 	{
-	comp dVphi = (phi+1.0)*(1.0-epsilon*Z((phi-1.0)/A)) - 0.5*pow(phi+1.0,2.0)*(epsilon/A)*dZ((phi-1.0)/A);
-	return dVphi;
+	comp result = (phi+1.0)*(1.0-epsilon*Z((phi-1.0)/A)) - 0.5*pow(phi+1.0,2.0)*(epsilon/A)*dZ((phi-1.0)/A);
+	return result;
 	}
 	
-comp dVr (const comp & phi, const double & minimaL, const double & minimaR)
+comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	comp dVphi = pow(phi-minimaL,3.0)*pow(phi-minimR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
-	return dVphi;
+	comp result = pow(phi-minimaL,3.0)*pow(phi-minimaR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
+	return result;
 	}
 	
-comp dV (const comp & phi);
+comp (*dV) (const comp & phi);
 	
 //second derivative of V
 comp ddV1 (const comp & phi)
 	{
-	comp ddVphi = (3.0*pow(phi,2)-1.0)/2.0;
-	return ddVphi;
+	comp result = (3.0*pow(phi,2)-1.0)/2.0;
+	return result;
 	}
 
 comp ddZ (const comp & phi)
 	{
-	comp xddZ = exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
-	return xddZ;
+	comp result = exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
+	return result;
 	}
 	
 comp ddV2 (const comp & phi)
 	{
-	comp ddVphi = (1.0-epsilon*Z((phi-1.0)/A)) - (phi+1.0)*(epsilon/A)*dZ((phi-1.0)/A)\
-					+ 0.5*pow(phi+1.0,2.0)*(epsilon/pow(A,2.0))*ddZ((phi-1.0)/A);;
-	return ddVphi;
+	comp result = (1.0-epsilon*Z((phi-1.0)/A)) - (phi+1.0)*(epsilon/A)*dZ((phi-1.0)/A)\
+					+ 0.5*pow(phi+1.0,2.0)*(epsilon/pow(A,2.0))*ddZ((phi-1.0)/A);
+	return result;
 	}	
 	
-comp ddVr (const comp & phi, const double & minimaL, const double & minimaR)
+comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	(3*(a - x)^2*(b - x)^4)/4 + 2*(a - x)^3*(b - x)^3 + (3*(a - x)^4*(b - x)^2)/4
-	comp ddV = 3.0*pow(phi-minimaL,2.0)*pow(phi-minimR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\
-				3.0*pow(phi-minimaL,4.0)*pow(phi-minimR,2.0);
-	return ddV;
+	comp result = 3.0*pow(phi-minimaL,2.0)*pow(phi-minimaR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\
+				+ 3.0*pow(phi-minimaL,4.0)*pow(phi-minimaR,2.0);
+	return result;
 	}
 	
-comp ddV (const comp & phi);
+comp (*ddV) (const comp & phi);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -698,84 +701,6 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 	return M;
 	}
 
-//get last line of a file
-string getLastLine(ifstream& inStream)
-	{
-    string xLine;
-    while (inStream >> ws && getline(inStream, xLine)) // skip empty lines
-    	{
-        ;
-		}
-		
-    return xLine;
-	}
-	
-//read dataFiles into filenames and filenumbers
-vector<string> readDataFiles(const unsigned long long int & minFileNo, const unsigned long long int & maxFileNo)
-	{
-	vector<string> fileNames;
-	unsigned long long int fileNumber;
-    ifstream file;
-    file.open ("dataFiles");
-    string fileName;
-    string strNumber;
-    fileName.clear();
-		while ( !file.eof() )
-			{
-			file >> fileName;
-			if (fileName.size()>19)
-				{
-				if (fileName[7]=='1')
-					{
-					strNumber = fileName.substr(7,12);
-					fileNumber = stoull(strNumber);
-					if (fileNumber>=minFileNo && fileNumber<=maxFileNo)
-						{
-						fileNames.push_back(fileName);
-						}
-					}
-				fileName.clear();
-				}
-    		}
-    file.close();
-    return fileNames;
-	}
-	
-//get elements of string vector that have a given string in them
-vector<string> findStrings(const vector <string> & fullVector, const string & search)
-	{
-	vector <string> subVector;
-	for (unsigned int l=0;l<fullVector.size();l++)
-		{
-		if(fullVector[l].find(search)!=string::npos)
-			{
-			subVector.push_back(fullVector[l]);
-			}
-		}
-	return subVector;
-	}
-	
-//get vector of unsigned long long int from vector of strings
-vector<unsigned long long int> getInts(const vector <string> & strVector)
-	{
-	vector <unsigned long long int> intVector;
-	for (unsigned int l=0; l<strVector.size(); l++)
-		{
-		string temp = strVector[l];
-		if (temp[7]=='1')
-			{
-			temp = temp.substr(7,12);
-			intVector.push_back(stoull(temp));
-			}
-		else
-			{
-			cout << "getInts error, filename not as expected" << endl;
-			}
-		}
-	return intVector;
-	}
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //askQuestions and changeParameters
@@ -972,79 +897,4 @@ mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //misc functions
 
-//getting the date and time
-const string currentDateTime()
-	{
-    time_t     now = time(0);
-    struct tm  tstruct;
-    char       buf[80];
-    tstruct = *localtime(&now);
-    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
-    // for more information about date/time format
-    strftime(buf, sizeof(buf), "%y%m%d%H%M%S", &tstruct);
-    return buf;
-	}
-	
-//copy a file
-void copyFile(const string & inputFile, const string & outputFile)
-	{
-	ifstream  src(inputFile, ios::binary);
-	ofstream  dst(outputFile, ios::binary);
 
-	dst << src.rdbuf();
-	}
-	
-//copy inputs with a change
-void changeInputs(const string & outputFile, const string & search, const string & replace)
-	{ 
-	ifstream fin;
-	ofstream fout;
-	fin.open("inputs");
-	fout.open(outputFile.c_str());
-	string line;
-	size_t pos;
-	while(!fin.eof())
-		{
-		getline(fin,line);
-		if(line[0] == '#' && line[1] == '#')
-			{
-			fout << line << endl;
-			continue;
-			}
-		if (line[0] == '#')
-			{
-			pos = line.find(search);
-			fout << line << endl;
-			getline(fin,line);
-			if (pos != string::npos)
-				{
-				line.replace(pos, search.length(), replace);
-				}
-			}
-		fout << line << endl;
-		}
-	fin.close();
-	fout.close();
-	}
-	
-//function to reduce two vectors of strings to the size of another, only keeping elements with the timeNumber in common
-vector<string> reduceTo(vector <string> toReduce, const vector <string> & toCompare)
-	{
-	vector <unsigned long long int> toReduceNumbers = getInts(toReduce);
-	vector <unsigned long long int> toCompareNumbers = getInts(toCompare);
-	if (toCompare.size()<toReduce.size() && toCompare.size()>0)
-		{
-		for (unsigned int j=0;j<toReduce.size();j++)
-			{
-			if(find(toCompare.begin(), toCompare.end(), toReduce[j]) == toCompare.end())
-				{
-				toReduce.erase(toReduce.begin()+j);
-				}
-			}
-		}
-	else if (toCompare.size()==0)
-		{
-		toReduce = toCompare;
-		}
-	return toReduce;
-	}
