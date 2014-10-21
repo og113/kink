@@ -125,89 +125,29 @@ else if (inP.compare("b") == 0)
 	{
 	Tb = 1.5*R;
 	}
-if (pot[0]=='1')
-	{
-	if (pot[1]=='r')
-		{
-		V (phi)
-			{
-			comp xV = V1(phi) - i*reg*Vr(phi,minima[0],minima[2]);
-			return xV;
-			}
-		dV (phi)
-			{
-			comp xdV = dV1(phi) - i*reg*dVr(phi,minima[0],minima[2]);
-			return xdV;
-			}
-		ddV (phi)
-			{
-			comp xddV = ddV1(phi) - i*reg*ddVr(phi,minima[0],minima[2]);
-			return xddV;
-			}
-		}
-	else
-		{
-		V (phi)
-			{
-			comp xV = V1(phi);
-			return xV;
-			}
-		dV (phi)
-			{
-			comp xdV = dV1(phi);
-			return xdV;
-			}
-		ddV (phi)
-			{
-			comp xddV = ddV1(phi);
-			return xddV;
-			}
-		}
-	}
-else if (pot[0]=='2')
-	{
-	if (pot[1]=='r')
-		{
-		V (phi)
-			{
-			comp xV = V2(phi) - i*reg*Vr(phi,minima[0],minima[2]);
-			return xV;
-			}
-		dV (phi)
-			{
-			comp xdV = dV2(phi) - i*reg*dVr(phi,minima[0],minima[2]);
-			return xdV;
-			}
-		ddV (phi)
-			{
-			comp xddV = ddV2(phi) - i*reg*ddVr(phi,minima[0],minima[2]);
-			return xddV;
-			}
-		}
-	else
-		{
-		V (phi)
-			{
-			comp xV = V2(phi);
-			return xV;
-			}
-		dV (phi)
-			{
-			comp xdV = dV2(phi);
-			return xdV;
-			}
-		ddV (phi)
-			{
-			comp xddV = ddV2(phi);
-			return xddV;
-			}
-		}
-	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
 Ta = b*Na;
 Tc = b*Nc;
 Gamma = exp(-theta);
+
+//potential functions
+if (pot[0]=='1')
+	{
+	V = &V1;
+	V0 = &V10;
+	Ve = &V1e;
+	dV = &dV1;
+	ddV = &ddV1;
+	}
+else if (pot[0]=='2')
+	{
+	V = &V2;
+	V0 = &V20;
+	Ve = &V2e;
+	dV = &dV2;
+	ddV = &ddV2;
+	}
 
 //determining number of runs
 closenessA = 1.0;
@@ -216,6 +156,7 @@ closenessSM = 1.0e-4;
 closenessD = 1.0;
 closenessC = 1.0e-12;
 closenessE = 1.0e-2;
+closenessR = 1.0e-4;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -266,6 +207,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	vector<double> delta_test(1); delta_test[0] = 1.0;
 	vector<double> calc_test(1); calc_test[0] = 1.0;
 	vector<double> erg_test(1); erg_test[0] = 1.0;
+	vector<double> reg_test(1); reg_test[0] = 1.0;
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
@@ -452,7 +394,22 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp kineticT = 0.0;
 		comp pot_l = 0.0;
 		comp pot_e = 0.0;
+		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+
+		//defining lambda functions for regularization
+		auto Vr = [&] (const comp & phi)
+			{
+			return -i*reg*VrFn(phi,root[0],root[2]);
+			};
+		auto dVr = [&] (const comp & phi)
+			{
+			return -i*reg*dVrFn(phi,root[0],root[2]);
+			};
+		auto ddVr = [&] (const comp & phi)
+			{
+			return -i*reg*ddVrFn(phi,root[0],root[2]);
+			};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -474,11 +431,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				comp tempErg =  (kineticS + pot_l + pot_e)/Dt;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				erg(t+Na) += + (kineticS + pot_l + pot_e)/Dt - tempErg;
+				pot_r += Dt*a*Vr(Cp(j));
+				erg(t+Na) += pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -488,12 +445,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
-				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				erg(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				pot_r += Dt*a*Vr(Cp(j));
+				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 				if (inP.compare("b")==0)
 					{
@@ -513,12 +470,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp dt = -b*i;
 				comp Dt = -b*i;
-				comp tempErg =  (kineticS + pot_l + pot_e)/Dt + kineticT/dt;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
 				pot_l += Dt*a*Va(Cp(j));
 				pot_e += Dt*a*Vb(Cp(j));
-				erg(t+Na) += (kineticS + pot_l + pot_e)/Dt + kineticT/dt - tempErg;
+				pot_r += Dt*a*Vr(Cp(j));
+				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -557,7 +514,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
-        action = kineticT - kineticS - pot_l - pot_e;
+        action = kineticT - kineticS - pot_l - pot_e - pot_r;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -634,6 +591,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 		//convergence issues
+		
+		//checking pot_r is much smaller than the other potential terms
+		reg_test.push_back(abs(pot_r/pot_l));
+		if (reg_test.back()<abs(pot_r/pot_e))
+			{
+			reg_test.back() = abs(pot_r/pot_e);
+			}
+
+		if (reg_test.back()>closenessR)
+			{
+			cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
+			}
+		
 		//evaluating norms
 		double normDS = minusDS.dot(minusDS);
 		normDS = pow(normDS,0.5);

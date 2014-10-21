@@ -513,15 +513,15 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//lambda functions for pot_r
 			auto Vr = [&] (const comp & phi)
 				{
-				return reg*VrFn(phi,root[0],root[2]);
+				return -i*reg*VrFn(phi,root[0],root[2]);
 				};
 			auto dVr = [&] (const comp & phi)
 				{
-				return reg*dVrFn(phi,root[0],root[2]);
+				return -i*reg*dVrFn(phi,root[0],root[2]);
 				};
 			auto ddVr = [&] (const comp & phi)
 				{
-				return reg*ddVrFn(phi,root[0],root[2]);
+				return -i*reg*ddVrFn(phi,root[0],root[2]);
 				};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
