@@ -7,13 +7,17 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_poly.h>
+#include <gsl/gsl_roots.h>
 #include "pf.h"
 #include "files.h"
 
 int main()
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-//getting data from files
+//getting data from mainInputs
 
 //getting mainInputs
 unsigned long long int minFile, maxFile;
@@ -50,19 +54,24 @@ else
 	}
 fmainin.close();
 
-//getting list of relevant data files
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+//sorting out files to load
+
+//getting list of relevant data files, with timeNumbers between minFile and maxFile
 system("dir ./data/* > dataFiles");
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
+
+//picking subset based on core of filename, using inF
 if (inF.compare("p")==0)
 	{
 	piFiles = findStrings(filenames,"tpip");
 	inputsFiles = findStrings(filenames,"inputsPi");
 	eigenvectorFiles = findStrings(filenames,"eigVec");
 	eigenvalueFiles = findStrings(filenames,"eigValue");
-	if  (eigenvectorFiles.size()!=1 || eigenvalueFiles.size()!=1)
+	if  (eigenvectorFiles.size()==0 || eigenvalueFiles.size()==0)
 		{
-		cout << "correct eigen files not available" << endl;
+		cout << "eigen files not available" << endl;
 		cout << "eigenvalueFiles.size() = " << eigenvalueFiles.size() << endl;
 		cout << "eigenvectorFiles.size() = " << eigenvectorFiles.size() << endl;
 		}
@@ -76,11 +85,13 @@ else
 	{
 	cout << "inF error" << endl;
 	}
+
+//picking subset based on loopNumbers being above firstLoop
 vector <vector<string>*> files = {&piFiles,&inputsFiles};
 for (unsigned int k=0;k<files.size();k++)
 	{
 	vector <string>* tempVecStr = files[k];
-	vector <unsigned int> loopNumbers = getLastInts(tempVecStr);
+	vector <int> loopNumbers = getLastInts(tempVecStr); //not unsigned so that -1 can be used
 	for (unsigned int l=0;l<(*tempVecStr).size();l++)
 		{
 		if (loopNumbers[l]<firstLoop)
@@ -89,6 +100,8 @@ for (unsigned int k=0;k<files.size();k++)
 			}
 		}
 	}
+
+//reducing to minimum lists with all the same timeNumbers
 if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 	{
 	for (unsigned int j=0;j<files.size();j++)
@@ -106,11 +119,15 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 		return 0;
 		}
 	}
-		
+
+//sorting files		
 sort(piFiles.begin(), piFiles.end());
 sort(inputsFiles.begin(), inputsFiles.end());
 
+//getting timeNumbers
 vector <unsigned long long int> fileNumbers = getInts(piFiles);
+
+//printing filenames
 cout << endl;
 for (unsigned int j=0; j<inputsFiles.size();j++)
 	{
@@ -182,18 +199,24 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	//potential functions
 	if (pot[0]=='1')
 		{
+		V_params = &V1_params;
 		V = &V1;
 		V0 = &V10;
 		Ve = &V1e;
+		dV_params = &dV1_params;
 		dV = &dV1;
+		ddV_params = &ddV1_params;
 		ddV = &ddV1;
 		}
 	else if (pot[0]=='2')
 		{
+		V_params = &V2_params;
 		V = &V2;
 		V0 = &V20;
 		Ve = &V2e;
+		dV_params = &dV2_params;
 		dV = &dV2;
+		ddV_params = &ddV2_params;
 		ddV = &ddV2;
 		}
 
@@ -238,10 +261,15 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	
-	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
-	double b_parameter = -1.0;
-	double c_parameter = -epsilon;
-	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
+	//finding roots of dV
+	struct f_gsl_params params = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &params;
+	
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
 	sort(root.begin(),root.end());
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
@@ -917,9 +945,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fprintf(actionfile,"%14s%6i%6i%8g%8g%8g%6g%14g%14g%12g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
 		,real(W),sol_test.back(),lin_test.back());
 		fclose(actionfile);
+		
+		string prefix = "./data/" + timeNumber;
+		string suffix = to_string(loop)+".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
-		string runInputs = "./data/" + timeNumber + "inputsM"+ to_string(fileLoop) + "_" + to_string(loop);
+		string runInputs = prefix + "inputsM"+ to_string(fileLoop) + "_" + to_string(loop); //different suffix
 		if (absolute(maxTheta-minTheta)>2.0e-16)
 			{
 			changeInputs(runInputs, "theta", to_string(theta));
@@ -932,9 +963,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			copyFile("inputs",runInputs);
 			}
-		
-		string prefix = "./data/" + timeNumber;
-		string suffix = to_string(loop)+".dat";
 	
 		//printing output phi
 		string tpifile =  prefix + "mainp"+suffix;

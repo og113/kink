@@ -57,7 +57,7 @@ double a; //step sizes in each spatial dimension
 double b; //step sizes in time
 double Ta;
 double Tc;
-vector<double> root(3);
+vector<double> root;
 double mass2; //as derived from V''
 
 //determining number of runs
@@ -92,7 +92,7 @@ string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 double A; //gives parameter in V2, equal to 0.4 in DL
 double reg; //small parameter multiplying regulatory term
 string inF; //file input from where, m for main, p for pi
-unsigned int firstLoop; //firstLoop to load from
+int firstLoop; //firstLoop to load from, not unsigned for comparison later
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
@@ -179,7 +179,7 @@ comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	
 comp (*V) (const comp & phi); //a function pointer
 
-comp V_params(const comp & phi, const double & epsi, const double & aa);
+comp (*V_params) (const comp & phi, const double & epsi, const double & aa);
 
 //potentials with degenerate minima, and without regularisation
 comp V10 (const comp & phi)
@@ -241,12 +241,17 @@ comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	
 comp (*dV) (const comp & phi);
 
-comp dV_params(const comp & phi, const double & epsi, const double & aa);
+comp (*dV_params)(const comp & phi, const double & epsi, const double & aa);
 	
 //second derivative of V
-comp ddV1 (const comp & phi)
+comp ddV1_params (const comp & phi, const double & epsi, const double & aa)
 	{ 
 	return (3.0*pow(phi,2)-1.0)/2.0;
+	}
+
+comp ddV1 (const comp & phi)
+	{ 
+	return ddV1_params(phi,epsilon,A);
 	}
 
 comp ddZ (const comp & phi)
@@ -273,38 +278,105 @@ comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 
 comp (*ddV) (const comp & phi);
 
-comp ddV_params(const comp & phi, const double & epsi, const double & aa);
+comp (*ddV_params)(const comp & phi, const double & epsi, const double & aa);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //functions for calculating roots
 	
 //dV
-//struct f_params { double epsi; double aa;};
+struct f_gsl_params { double epsi; double aa;};
 
-//double f (double x, void * parameters) 
-//	{
-//	struct f_params * params = (struct f_params *)parameters;
-//	double epsi = (params->epsi);
-//	double aa = (params->aa);
-//	return real(dV_params(x,epsi,aa));
-//	}
+double f_gsl (double x, void * parameters) 
+	{
+	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
+	return real(dV_params(x,epsi,aa));
+	}
 	
-//double df (double x, void * parameters) 
-//	{
-//	struct f_params * params = (struct f_params *)parameters;
-//	double epsi = (params->epsi);
-//	double aa = (params->aa);
-//	return real(ddV_params(x,epsi,aa));
-//	}
+double df_gsl (double x, void * parameters) 
+	{
+	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
+	return real(ddV_params(x,epsi,aa));
+	}
 	
-//void fdf2 (double x, void * parameters, double * f, double* df) 
-//	{
-//	struct f_params * params = (struct f_params *)parameters;
-//	double epsi = (params->epsi);
-//	double aa = (params->aa);
-//	*f =  real(dV_params(x,epsi,aa));
-//	*df = real(ddV_params(x,epsi,aa));
-//	}
+void fdf_gsl (double x, void * parameters, double * f, double* df) 
+	{
+	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
+	*f =  real(dV_params(x,epsi,aa));
+	*df = real(ddV_params(x,epsi,aa));
+	}
+	
+//function to find a root of function FDF, given initial guess
+double rootFinder(gsl_function_fdf * xFDF, const double & rootGuess)
+	{
+	int status;
+	int iter = 0, max_iter = 100;
+	const gsl_root_fdfsolver_type *T;
+	gsl_root_fdfsolver *s;
+	double x0, x = rootGuess;
+
+	T = gsl_root_fdfsolver_newton;
+	s = gsl_root_fdfsolver_alloc (T);
+	gsl_root_fdfsolver_set (s, xFDF, x);
+
+	do
+		{
+		  iter++;
+		  status = gsl_root_fdfsolver_iterate (s);
+		  x0 = x;
+		  x = gsl_root_fdfsolver_root (s);
+		  status = gsl_root_test_delta (x, x0, 0, 1e-12);
+
+		}
+	while (status == GSL_CONTINUE && iter < max_iter);
+
+	gsl_root_fdfsolver_free (s);
+	return x;
+	}
+	
+//function to give the three roots of FDF given lower and upper limits on them and a number of loops to try
+vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, const double & highLimit,\
+							const unsigned int & rootLoops)
+	{
+	vector <double> roots;
+	for (unsigned int j=0;j<rootLoops;j++)
+		{
+		double x = lowLimit+(absolute(highLimit)+absolute(lowLimit))*j/(rootLoops-1.0);
+		x = rootFinder(xFDF,x);
+	
+		if (j==0)
+			{
+			roots.push_back(x);
+			}
+		else
+			{
+			unsigned int test = 0;
+			for (unsigned int k=0;k<roots.size();k++)
+				{ 
+				if (absolute(x-roots[k])>1.0e-6)
+					{
+					test++;
+					}
+				}
+			if (test==roots.size())
+				{
+				roots.push_back(x);
+				}
+			}
+		}
+	
+		if (roots.size()!=3)
+			{
+			cout << "minimaFn error: only found " << root.size() << " roots, not 3" << endl;
+			}
+	return roots;
+	}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

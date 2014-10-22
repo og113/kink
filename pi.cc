@@ -13,7 +13,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
+#include <gsl/gsl_roots.h>
 #include "gnuplot_i.hpp"
 #include "pf.h"
 #include "files.h"
@@ -75,9 +78,25 @@ else
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
+	
+//determining number of runs
+closenessA = 1.0;
+closenessS = 1.0e-5;
+closenessSM = 1.0e-4;
+closenessD = 1.0;
+closenessC = 1.0e-12;
+closenessE = 1.0e-2;
+closenessR = 1.0e-4;
+
+string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
+string print_choice = aq.printChoice;
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//calculated quantities derived from the inputs, and loading eigVec and eigVal	
 
 //derived quantities
 NT = Na + Nb + Nc;
+Gamma = exp(-theta);
 epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
@@ -104,7 +123,7 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 		if (negEigDone==0)
 			{
 			system("./negEig");
-			system(timeNumber.c_str());
+			system(timeNumber.c_str()); //won't work
 			cout << "negEig run" << endl;
 			}
 		negVec = loadVector("./data/eigVec.dat",Nb,1);
@@ -129,37 +148,6 @@ a = L/(N-1.0);
 b = Tb/(Nb-1.0);
 Ta = b*Na;
 Tc = b*Nc;
-Gamma = exp(-theta);
-
-//potential functions
-if (pot[0]=='1')
-	{
-	V = &V1;
-	V0 = &V10;
-	Ve = &V1e;
-	dV = &dV1;
-	ddV = &ddV1;
-	}
-else if (pot[0]=='2')
-	{
-	V = &V2;
-	V0 = &V20;
-	Ve = &V2e;
-	dV = &dV2;
-	ddV = &ddV2;
-	}
-
-//determining number of runs
-closenessA = 1.0;
-closenessS = 1.0e-5;
-closenessSM = 1.0e-4;
-closenessD = 1.0;
-closenessC = 1.0e-12;
-closenessE = 1.0e-2;
-closenessR = 1.0e-4;
-
-string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
-string print_choice = aq.printChoice;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -189,6 +177,30 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
 	printParameters();
 	
+	//potential functions
+	if (pot[0]=='1')
+		{
+		V_params = &V1_params;
+		V = &V1;
+		V0 = &V10;
+		Ve = &V1e;
+		dV_params = &dV1_params;
+		dV = &dV1;
+		ddV_params = &ddV1_params;
+		ddV = &ddV1;
+		}
+	else if (pot[0]=='2')
+		{
+		V_params = &V2_params;
+		V = &V2;
+		V0 = &V20;
+		Ve = &V2e;
+		dV_params = &dV2_params;
+		dV = &dV2;
+		ddV_params = &ddV2_params;
+		ddV = &ddV2;
+		}
+	
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
@@ -202,21 +214,26 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	unsigned int runs_count = 0;
 	unsigned int min_runs = 2;
 	vector<double> action_test(1);	action_test[0] = 1.0;
-	vector<double> sol_test(1);	sol_test[0] = 1.0;
+	vector<double> sol_test(1);		sol_test[0] = 1.0;
 	vector<double> solM_test(1);	solM_test[0] = 1.0;
-	vector<double> delta_test(1); delta_test[0] = 1.0;
-	vector<double> calc_test(1); calc_test[0] = 1.0;
-	vector<double> erg_test(1); erg_test[0] = 1.0;
-	vector<double> reg_test(1); reg_test[0] = 1.0;
+	vector<double> delta_test(1); 	delta_test[0] = 1.0;
+	vector<double> calc_test(1); 	calc_test[0] = 1.0;
+	vector<double> erg_test(1); 	erg_test[0] = 1.0;
+	vector<double> reg_test(1); 	reg_test[0] = 1.0;
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
 	p = Eigen::VectorXd::Zero(2*N*Nb+1);
 	
-	//finding minima of potential. solving p^3 + 0*p^2 + b*p + c = 0
-	double b_parameter = -1.0;
-	double c_parameter = -epsilon;
-	gsl_poly_solve_cubic (0, b_parameter, c_parameter, &root[0], &root[1], &root[2]);
+	//finding roots of dV
+	struct f_gsl_params params = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &params;
+	
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
 	sort(root.begin(),root.end());
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
@@ -520,23 +537,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//printing early if desired
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
+			string prefix = "./data/" + timeNumber;
+			string suffix = to_string(loop)+"_" + to_string(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string minusDSfile = "./data/" + timeNumber + "minusDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
+				string minusDSfile = prefix + "minusDSE"+inP+suffix;
 				printVectorB(minusDSfile,minusDS);
 				}
 			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2 && 1==0)
 				{
-				string piEarlyFile = "./data/" + timeNumber + "piE"+inP+to_string(loop)+to_string(runs_count)+".dat";
+				string piEarlyFile = prefix + "piE"+inP+to_string(loop)+suffix;
 				printVectorB(piEarlyFile,p);
 				}
 			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string DDSfile = "./data/" + timeNumber + "DDSE"+inP+to_string(loop)+to_string(runs_count)+".dat";
+				string DDSfile = prefix + "DDSE"+inP+to_string(loop)+suffix;
 				printSpmat(DDSfile,DDS);
 				}
 			}
@@ -832,8 +851,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	,W,sol_test.back(),erg_test.back());
 	fclose(actionfile);
 	
+	string prefix = "./data/" + timeNumber;
+	string suffix = "_" + to_string(loop) + ".dat";
+	
 	//copying a version of inputs with timeNumber
-	string runInputs = "./data/" + timeNumber + "inputsPi" + to_string(loop);
+	string runInputs = prefix + "inputsPi" + "_" + to_string(loop);
 	if (loop_choice.compare("N") == 0)
 		{
 		changeInputs(runInputs,"N", to_string(intLoopParameter));
@@ -848,11 +870,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 
 	//printing output phi on Euclidean time part
-	string pifile = "./data/" + timeNumber + "pi"+inP+to_string(loop)+".dat";
+	string pifile = prefix + "pi"+inP+suffix;
 	printVectorB(pifile,p);
 	
 	//printing output phi on whole time contour
-	string tpifile = "./data/" + timeNumber + "tpi"+inP+to_string(loop)+".dat";
+	string tpifile = prefix + "tpi"+inP+suffix;
 	printVector(tpifile,tp);
 	gp(tpifile,"repi.gp");
 	
@@ -861,28 +883,28 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
-	string DDSfile = "./data/" + timeNumber + "DDS"+inP+to_string(loop)+".dat";
+	string DDSfile = prefix + "DDS"+inP+suffix;
 	printSpmat(DDSfile,DDS);
 	
 	//printing linErgVec
-	string linErgFile = "./data/" + timeNumber + "linErg"+inP+to_string(loop)+".dat";
+	string linErgFile = "./data/" + timeNumber + "linErg"+inP+suffix;
 	simplePrintVector(linErgFile,linErgA);
 //	gpSimple(linErgFile);
 	
 	//printing erg
-	string ergFile = "./data/" + timeNumber + "erg"+inP+to_string(loop)+".dat";
+	string ergFile = prefix + "erg"+inP+suffix;
 	simplePrintCVector(ergFile,erg);
 //	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
 	FILE * eigenvalueFile;
-	string eigValueFile = "./data/" + timeNumber + "eigValue.dat";
+	string eigValueFile = prefix + "eigValue.dat";
 	eigenvalueFile = fopen(eigValueFile.c_str(),"w");
 	fprintf(eigenvalueFile,"%16i%16g%16g%16g%16g\n",negP,negc,negcheck,negerror,negVal);
 	fclose(eigenvalueFile);
 
 	//printing eigenvector to file
-	string eigenvectorFile = "./data/" + timeNumber + "eigVec.dat";
+	string eigenvectorFile = prefix + "eigVec.dat";
 	printVectorB(eigenvectorFile,negVec);
 
 } //closing parameter loop
