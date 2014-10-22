@@ -13,7 +13,10 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <ctype.h>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
+#include <gsl/gsl_roots.h>
 #include "gnuplot_i.hpp"
 
 using namespace std;
@@ -144,44 +147,49 @@ unsigned int smallestFn(const vector <unsigned int> & inVector)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //potential related functions
+comp V1_params (const comp & phi, const double & epsi, const double & aa) //aa is intentionally unused
+	{
+	return pow(pow(phi,2)-1.0,2.0)/8.0 - epsi*(phi-1.0)/2.0;
+	}
 
 comp V1 (const comp & phi)
 	{
-	comp result = pow(pow(phi,2)-1.0,2)/8.0 - epsilon*(phi-1.0)/2.0;
-	return result;
+	return V1_params(phi,epsilon,0.0);
 	}
 	
 comp Z (const comp & phi)
 	{
-	comp result = exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
-	return result;
+	return exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
+	}
+	
+comp V2_params (const comp & phi, const double & epsi, const double & aa)
+	{
+	return 0.5*pow(phi+1.0,2.0)*(1.0-epsi*Z((phi-1.0)/aa));
 	}
 	
 comp V2 (const comp & phi)
 	{
-	comp result = 0.5*pow(phi+1.0,2.0)*(1.0-epsilon*Z((phi-1.0)/A));
-	return result;
+	return V2_params(phi,epsilon,A);
 	}
 	
 comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	comp result = pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
-	return result;
+	return pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
 	}
 	
 comp (*V) (const comp & phi); //a function pointer
 
+comp V_params(const comp & phi, const double & epsi, const double & aa);
+
 //potentials with degenerate minima, and without regularisation
 comp V10 (const comp & phi)
 	{
-	comp result = pow(pow(phi,2)-1.0,2)/8.0;
-	return result;
+	return V1_params(phi,0.0,0.0);
 	}
 	
 comp V20 (const comp & phi)
 	{
-	comp result = 0.5*pow(phi+1.0,2.0)*(1.0-0.7450777428719992*Z((phi-1.0)/A)); //epsilon0 needs checking
-	return result;
+	return V2_params(phi,0.7450777428719992,A); //epsilon0 needs checking
 	}
 	
 comp (*V0) (const comp & phi);
@@ -189,74 +197,114 @@ comp (*V0) (const comp & phi);
 //change to degenerate potential, still without regulatisation
 comp V1e (const comp & phi)
 	{
-	comp result = -epsilon*(phi-1.0)/2.0;
-	return result;
+	return -epsilon*(phi-1.0)/2.0;
 	}
 
 comp V2e (const comp & phi)
 	{
-	comp result = V2(phi)-V20(phi);
-	return result;
+	return V2(phi)-V20(phi);
 	}
 	
 comp (*Ve) (const comp & phi);
 	
 	
 //first derivative of Vs
+comp dV1_params(const comp & phi, const double & epsi, const double & aa) //aa is intentionally unused
+	{
+	return phi*(pow(phi,2)-1.0)/2.0 - epsi/2.0;
+	}
+
 comp dV1 (const comp & phi)
 	{
-	comp result = phi*(pow(phi,2)-1.0)/2.0 - epsilon/2.0;
-	return result;
+	return dV1_params(phi,epsilon,0.0);
 	}
 
 comp dZ (const comp & phi)
 	{
-	comp result = exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
-	return result;
+	return exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
+	}
+	
+comp dV2_params(const comp & phi, const double & epsi, const double & aa)
+	{
+	return (phi+1.0)*(1.0-epsi*Z((phi-1.0)/aa)) - 0.5*pow(phi+1.0,2.0)*(epsi/aa)*dZ((phi-1.0)/aa);
 	}
 
 comp dV2 (const comp & phi)
 	{
-	comp result = (phi+1.0)*(1.0-epsilon*Z((phi-1.0)/A)) - 0.5*pow(phi+1.0,2.0)*(epsilon/A)*dZ((phi-1.0)/A);
-	return result;
+	return dV2_params(phi,epsilon,A);
 	}
 	
 comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	comp result = pow(phi-minimaL,3.0)*pow(phi-minimaR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
-	return result;
+	return pow(phi-minimaL,3.0)*pow(phi-minimaR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
 	}
 	
 comp (*dV) (const comp & phi);
+
+comp dV_params(const comp & phi, const double & epsi, const double & aa);
 	
 //second derivative of V
 comp ddV1 (const comp & phi)
-	{
-	comp result = (3.0*pow(phi,2)-1.0)/2.0;
-	return result;
+	{ 
+	return (3.0*pow(phi,2)-1.0)/2.0;
 	}
 
 comp ddZ (const comp & phi)
 	{
-	comp result = exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
-	return result;
+	return exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
+	}
+
+comp ddV2_params (const comp & phi, const double & epsi, const double & aa)
+	{ 
+	return (1.0-epsi*Z((phi-1.0)/aa)) - (phi+1.0)*(epsi/aa)*dZ((phi-1.0)/aa)\
+					+ 0.5*pow(phi+1.0,2.0)*(epsi/pow(aa,2.0))*ddZ((phi-1.0)/aa);
 	}
 	
 comp ddV2 (const comp & phi)
-	{
-	comp result = (1.0-epsilon*Z((phi-1.0)/A)) - (phi+1.0)*(epsilon/A)*dZ((phi-1.0)/A)\
-					+ 0.5*pow(phi+1.0,2.0)*(epsilon/pow(A,2.0))*ddZ((phi-1.0)/A);
-	return result;
+	{ 
+	return ddV2_params(phi,epsilon,A);
 	}	
 	
 comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
-	comp result = 3.0*pow(phi-minimaL,2.0)*pow(phi-minimaR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\
+	return 3.0*pow(phi-minimaL,2.0)*pow(phi-minimaR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\
 				+ 3.0*pow(phi-minimaL,4.0)*pow(phi-minimaR,2.0);
-	return result;
 	}
-	
+
 comp (*ddV) (const comp & phi);
+
+comp ddV_params(const comp & phi, const double & epsi, const double & aa);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//functions for calculating roots
+	
+//dV
+//struct f_params { double epsi; double aa;};
+
+//double f (double x, void * parameters) 
+//	{
+//	struct f_params * params = (struct f_params *)parameters;
+//	double epsi = (params->epsi);
+//	double aa = (params->aa);
+//	return real(dV_params(x,epsi,aa));
+//	}
+	
+//double df (double x, void * parameters) 
+//	{
+//	struct f_params * params = (struct f_params *)parameters;
+//	double epsi = (params->epsi);
+//	double aa = (params->aa);
+//	return real(ddV_params(x,epsi,aa));
+//	}
+	
+//void fdf2 (double x, void * parameters, double * f, double* df) 
+//	{
+//	struct f_params * params = (struct f_params *)parameters;
+//	double epsi = (params->epsi);
+//	double aa = (params->aa);
+//	*f =  real(dV_params(x,epsi,aa));
+//	*df = real(ddV_params(x,epsi,aa));
+//	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

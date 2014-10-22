@@ -220,6 +220,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	sort(root.begin(),root.end());
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
+	
+	//defining lambda functions for regularization
+	auto Vr = [&] (const comp & phi)
+		{
+		return -i*reg*VrFn(phi,root[0],root[2]);
+		};
+	auto dVr = [&] (const comp & phi)
+		{
+		return -i*reg*dVrFn(phi,root[0],root[2]);
+		};
+	auto ddVr = [&] (const comp & phi)
+		{
+		return -i*reg*ddVrFn(phi,root[0],root[2]);
+		};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -397,20 +411,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 
-		//defining lambda functions for regularization
-		auto Vr = [&] (const comp & phi)
-			{
-			return -i*reg*VrFn(phi,root[0],root[2]);
-			};
-		auto dVr = [&] (const comp & phi)
-			{
-			return -i*reg*dVrFn(phi,root[0],root[2]);
-			};
-		auto ddVr = [&] (const comp & phi)
-			{
-			return -i*reg*ddVrFn(phi,root[0],root[2]);
-			};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//assigning values to minusDS and DDS and evaluating action
@@ -503,8 +503,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     }
                 comp temp0 = 2.0*a/dt;
-	            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)));
-	            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)));
+	            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)) + dVr(Cp(j)));
+	            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)) + ddVr(Cp(j)));
 	                
 	            minusDS(2*j) += real(temp1 - temp0*Cp(j));
 	            minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
@@ -666,7 +666,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
     	unsigned int l = j*(Na+1);
         accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
-            -Dt0*dV(ap(l)))/dtau;
+            -Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
     	}
     	
     //A4.5 starting the energy and that off
@@ -686,8 +686,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	{
             unsigned int m = t+x*(Na+1);
             accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
-            -dV(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 + a*V(ap(m));
+            -dV(ap(m)) - dVr(ap(m));
+            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 \
+            + a*V(ap(m)) + a*Vr(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
@@ -741,7 +742,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
     	unsigned int l = j*(Nc+1);
         accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
-            -Dt0*dV(ccp(l)))/dtau;
+            -Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
     	}
 
     //C7. run loop
@@ -760,7 +761,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    -dV(ccp(l));
 		    if (t>1)
 		    	{
-		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0 + a*V(ccp(l-1));
+		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0\
+		    	+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
 			}
 		}
