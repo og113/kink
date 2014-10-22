@@ -50,13 +50,6 @@ else
 	}
 fmainin.close();
 
-//defining the timeNumber
-string timeNumber = currentDateTime();
-
-//copying a version of mainInputs with timeNumber
-string runInputs = "./data/" + timeNumber + "mainInputs";
-copyFile("mainInputs",runInputs);
-
 //getting list of relevant data files
 system("dir ./data/* > dataFiles");
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
@@ -130,6 +123,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//getting variables from inputs
+	
+	//defining the timeNumber
+	string timeNumber = currentDateTime();
+
+	//copying a version of mainInputs with timeNumber
+	string runInputs = "./data/" + timeNumber + "mainInputs";
+	copyFile("mainInputs",runInputs);
 
 	ifstream fin;
 	fin.open(inputsFiles[fileLoop]);
@@ -371,7 +371,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		else
 			{
 			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainp" + to_string(fileLoop) + to_string(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainp" + to_string(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%12s%12s%12u\n","input: ",timeNumber.c_str(), ", loop: ", toLoad);
 			}
@@ -379,7 +379,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printParameters();
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE"+ to_string(fileLoop) + "_" + to_string(loop) + "_" + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainE" + to_string(loop) + "_" + "0.dat";
 		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -765,7 +765,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
 			string prefix = "./data/" + timeNumber;
-			string suffix = to_string(fileLoop)+"_"+to_string(loop)+"_"+to_string(runs_count)+".dat";
+			string suffix = to_string(loop)+"_"+to_string(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
@@ -934,7 +934,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		
 		string prefix = "./data/" + timeNumber;
-		string suffix = to_string(fileLoop)+"_" + to_string(loop)+".dat";
+		string suffix = to_string(loop)+".dat";
 	
 		//printing output phi
 		string tpifile =  prefix + "mainp"+suffix;
