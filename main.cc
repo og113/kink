@@ -87,7 +87,7 @@ vector <vector<string>*> files = {&piFiles,&inputsFiles};
 for (unsigned int k=0;k<files.size();k++)
 	{
 	vector <string>* tempVecStr = files[k];
-	vector <unsigned int> loopNumbers = getLastInts(*tempVecStr);
+	vector <unsigned int> loopNumbers = getLastInts(tempVecStr);
 	for (unsigned int l=0;l<(*tempVecStr).size();l++)
 		{
 		if (loopNumbers[l]<firstLoop)

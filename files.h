@@ -92,31 +92,33 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 	return intVector;
 	}
 	
-//function to return final numbers in strings, after last "_"
-vector<unsigned int> getLastInts(const vector <string> & strVector)
+//function to return final numbers in strings, after last "_", note it will also change argument
+vector<unsigned int> getLastInts(vector <string> * strVector)
 	{
-	vector <unsigned int> intVector(strVector.size());
-	for (unsigned int l=0; l<strVector.size(); l++)
+	vector <unsigned int> intVector;
+	for (unsigned int l=0; l<(*strVector).size(); l++)
 		{
 		size_t first_index;
 		size_t last_index;
-		string str = strVector[l];
+		string str = (*strVector)[l];
 		if (str.find_last_of("_")!=string::npos)
 			{
 			first_index = str.find_last_of("_");
 			}
 		else
 			{
-			cout << "getLastInt error, no underscore in file input" << endl;
-			cout << strVector[l] << endl;
-			return intVector;
+			cout << "getLastInt error, no underscore in file input so file removed from list:" << endl;
+			cout << (*strVector)[l] << endl;
+			(*strVector).erase((*strVector).begin()+l);
+			continue;
 			}
 		str = str.substr(first_index + 1);
 		if (~isdigit(str[0]))
 			{
-			cout << "getLastInt error, character after _ is not digit" << endl;
-			cout << strVector[l] << endl;
-			return intVector;
+			cout << "getLastInt error, character after _ is not digit so file removed from list:" << endl;
+			cout << (*strVector)[l] << endl;
+			(*strVector).erase((*strVector).begin()+l);
+			continue;
 			}
 		if (str.find_last_of("0123456789")!=string::npos)
 			{
@@ -124,12 +126,13 @@ vector<unsigned int> getLastInts(const vector <string> & strVector)
 			}
 		else
 			{
-			cout << "getLastInt error, no numbers in file input" << endl;
-			cout << strVector[l] << endl;
-			return intVector;
+			cout << "getLastInt error, no numbers in file input so file removed from list:" << endl;
+			cout << (*strVector)[l] << endl;
+			(*strVector).erase((*strVector).begin()+l);
+			continue;
 			}
 		str = str.substr(0,last_index+1);
-		intVector[l] = stoul(str);		
+		intVector.push_back(stoul(str));		
 		}
 	return intVector;
 	}
