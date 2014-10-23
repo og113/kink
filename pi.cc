@@ -538,24 +538,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
 			string prefix = "./data/" + timeNumber;
-			string suffix = to_string(loop)+"_" + to_string(runs_count)+".dat";
+			string suffix = inP+"_" + to_string(loop)+"_" + to_string(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string minusDSfile = prefix + "minusDSE"+inP+suffix;
+				string minusDSfile = prefix + "minusDSE"+suffix;
 				printVectorB(minusDSfile,minusDS);
 				}
 			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2 && 1==0)
 				{
-				string piEarlyFile = prefix + "piE"+inP+to_string(loop)+suffix;
+				string piEarlyFile = prefix + "piE"+suffix;
 				printVectorB(piEarlyFile,p);
 				}
 			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
 				{
-				string DDSfile = prefix + "DDSE"+inP+to_string(loop)+suffix;
+				string DDSfile = prefix + "DDSE"+suffix;
 				printSpmat(DDSfile,DDS);
 				}
 			}
