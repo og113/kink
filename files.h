@@ -22,6 +22,24 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //simpler generic functions
 
+//to convert number to string, usage is string str = NumberToString<number type>(x);
+template <typename T>
+string numberToString ( T Number )
+	{
+	stringstream ss;
+	ss << Number;
+	return ss.str();
+	}
+
+//to convert string to number, usage is (number type) x = StringToNumber<number type>(str);
+template <typename T>
+T stringToNumber ( const string &Text )//Text not by const reference so that the function can be used with a 
+	{                               //character array as argument
+	stringstream ss(Text);
+	T result;
+	return ss >> result ? result : 0;
+	}
+
 //getting the date and time
 const string currentDateTime()
 	{
@@ -38,8 +56,8 @@ const string currentDateTime()
 //copy a file
 void copyFile(const string & inputFile, const string & outputFile)
 	{
-	ifstream  src(inputFile, ios::binary);
-	ofstream  dst(outputFile, ios::binary);
+	ifstream  src(inputFile.c_str(), ios::binary);
+	ofstream  dst(outputFile.c_str(), ios::binary);
 
 	dst << src.rdbuf();
 	}
@@ -82,7 +100,7 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 		if (temp[7]=='1')
 			{
 			temp = temp.substr(7,12);
-			intVector.push_back(stoull(temp));
+			intVector.push_back(stringToNumber<unsigned long long>(temp));
 			}
 		else
 			{
@@ -132,7 +150,7 @@ vector<int> getLastInts(vector <string> * strVector)
 			continue;
 			}
 		str = str.substr(0,last_index+1);
-		intVector.push_back(stoul(str));		
+		intVector.push_back(stringToNumber<unsigned long long>(str));		
 		}
 	return intVector;
 	}
@@ -177,10 +195,10 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 			file >> fileName;
 			if (fileName.size()>19)
 				{
-				if (fileName[7]=='1' && fileName.back()!='~')
+				if (fileName[7]=='1' && fileName[fileName.size()-1]!='~')
 					{
 					strNumber = fileName.substr(7,12);
-					fileNumber = stoull(strNumber);
+					fileNumber = stringToNumber<unsigned long long>(strNumber);
 					if (fileNumber>=minFileNo && fileNumber<=maxFileNo)
 						{
 						fileNames.push_back(fileName);
