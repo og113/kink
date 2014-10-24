@@ -291,7 +291,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		eigenValues = eigensolver.eigenvalues();
 		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
-		
+	
+	#pragma omp parallel for	
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
@@ -399,7 +400,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		else
 			{
 			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainp" + to_string(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainp" + numberToString<unsigned int>(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%12s%12s%12u\n","input: ",timeNumber.c_str(), ", loop: ", toLoad);
 			}
@@ -407,7 +408,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printParameters();
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE" + to_string(loop) + "_" + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainE" + numberToString<unsigned int>(loop) + "_" + "0.dat";
 		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -430,11 +431,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			for (unsigned int j=0; j<N; j++)
 				{
 				unsigned int posX, posT, posCe;
-				char* tempChar = &zmx.back();
+				char* tempChar = &zmx[zmx.size()-1];
 				stringstream ssX(tempChar);
 				unsigned int slicesX, slicesT;
 				ssX >> slicesX;
-				tempChar = &zmt.back();
+				tempChar = &zmt[zmt.size()-1];
 				stringstream ssT(tempChar);
 				ssT >> slicesT; //all seems v long winded but other ways seemed to fail
 				posCe = j*Nb+Nb-slicesT; //position C for Euclidean vector, i.e. for negVec
@@ -793,7 +794,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
 			string prefix = "./data/" + timeNumber;
-			string suffix = to_string(loop)+"_"+to_string(runs_count)+".dat";
+			string suffix = numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
@@ -947,17 +948,17 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 		
 		string prefix = "./data/" + timeNumber;
-		string suffix = to_string(loop)+".dat";
+		string suffix = numberToString<unsigned int>(loop)+".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
-		string runInputs = prefix + "inputsM"+ to_string(fileLoop) + "_" + to_string(loop); //different suffix
+		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
 		if (absolute(maxTheta-minTheta)>2.0e-16)
 			{
-			changeInputs(runInputs, "theta", to_string(theta));
+			changeInputs(runInputs, "theta", numberToString<double>(theta));
 			}
 		else if (absolute(maxTb-minTb)>2.0e-16)
 			{
-			changeInputs(runInputs, "Tb", to_string(Tb));
+			changeInputs(runInputs, "Tb", numberToString<double>(Tb));
 			}
 		else
 			{
