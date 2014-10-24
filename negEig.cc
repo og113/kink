@@ -118,7 +118,7 @@ to_reserve(2*N*Nb-2) = 3;
 to_reserve(2*N*Nb-1) = 3;
 to_reserve(2*N*Nb) = N;
 unsigned int fileNumber = 0;
-string loadFile = "./data/" + timeNumber + "DDSb" + numberToString<unsigned int>(fileNumber) + ".dat";
+string loadFile = "./data/" + timeNumber + "DDSb" + "_" + numberToString<unsigned int>(fileNumber) + ".dat";
 
 spMat M = loadSpmat(loadFile,to_reserve);
 
