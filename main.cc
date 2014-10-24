@@ -291,7 +291,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		eigenValues = eigensolver.eigenvalues();
 		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
-		
+	
+	#pragma omp parallel for	
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)

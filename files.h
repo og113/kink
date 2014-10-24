@@ -111,7 +111,7 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 	}
 	
 //function to return final numbers in strings, after last "_", note it will also change argument
-vector<int> getLastInts(vector <string> * strVector)
+vector<int> getLastInts(vector <string> * strVector) //this function could be improved by splitting into two functions, one that finds the integers at the end of a string and the other that loops over the vector, ideally we wouldn't have to look for "_" but could just look for not digit, something along these lines would surely work
 	{
 	vector <int> intVector;
 	for (unsigned int l=0; l<(*strVector).size(); l++)
