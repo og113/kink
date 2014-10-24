@@ -1,5 +1,0 @@
-1) input euclidean phi agree to order 1e-14
-
-2) minusDs agree to order 1e-14 before newton-raphson
-
-3) DDS agree to machine precision in bulk and on lagrange multipliers

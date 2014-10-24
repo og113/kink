@@ -1,0 +1,14 @@
+#the following are input to main.cc:
+#
+#range of times and dates to loop over
+#in the format yymmdd-hhmmss
+#
+#note that the number in zmt and zmx has yet to be used
+#but would refer to the number of time steps on which the
+#field is fixed orthogonal to the zero mode
+#
+#inF		min fileNo			max fileNo		firstLoop		
+p			141022182027		141023152422	0
+#
+#minTb		maxTb		minTheta	maxTheta	loops	zmt			zmx
+19.0		19.0		0.0			0.0			1		dAD1 		dC9
