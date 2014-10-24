@@ -355,7 +355,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		else
 			{
-			loadfile = "./data/" + timeNumber + "pi"+inP+to_string(loop-1)+".dat";
+			loadfile = "./data/" + timeNumber + "pi"+inP+numberToString<int>(loop-1)+".dat";
 			}
 		
 		p = loadVector(loadfile,Nb,1);
@@ -379,7 +379,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ to_string(loop) + "0.dat";
+	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ numberToString<unsigned int>(loop) + "0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
@@ -541,7 +541,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
 			string prefix = "./data/" + timeNumber;
-			string suffix = inP+"_" + to_string(loop)+"_" + to_string(runs_count)+".dat";
+			string suffix = inP+"_" + numberToString<unsigned int>(loop)+"_" + numberToString<unsigned int>(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
@@ -867,17 +867,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	fclose(actionfile);
 	
 	string prefix = "./data/" + timeNumber;
-	string suffix = "_" + to_string(loop) + ".dat";
+	string suffix = "_" + numberToString<unsigned int>(loop) + ".dat";
 	
 	//copying a version of inputs with timeNumber
-	string runInputs = prefix + "inputsPi" + "_" + to_string(loop);
+	string runInputs = prefix + "inputsPi" + "_" + numberToString<unsigned int>(loop);
 	if (loop_choice.compare("N") == 0)
 		{
-		changeInputs(runInputs,"N", to_string(intLoopParameter));
+		changeInputs(runInputs,"N", numberToString<unsigned int>(intLoopParameter));
 		}
 	else if (loop_choice.compare("n")!=0)
 		{
-		changeInputs(runInputs,loop_choice, to_string(doubleLoopParameter));
+		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(doubleLoopParameter));
 		}
 	else
 		{
@@ -894,7 +894,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
-	//string minusDSfile = "./data/" + timeNumber + "minusDS"+inP+to_string(loop)+".dat";
+	//string minusDSfile = "./data/" + timeNumber + "minusDS"+suffix;
 	//printVectorB(minusDSfile,minusDS);
 				
 	//printing output DDS
