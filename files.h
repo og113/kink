@@ -38,8 +38,8 @@ const string currentDateTime()
 //copy a file
 void copyFile(const string & inputFile, const string & outputFile)
 	{
-	ifstream  src(inputFile, ios::binary);
-	ofstream  dst(outputFile, ios::binary);
+	ifstream  src(inputFile.c_str(), ios::binary);
+	ofstream  dst(outputFile.c_str(), ios::binary);
 
 	dst << src.rdbuf();
 	}
