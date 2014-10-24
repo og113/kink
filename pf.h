@@ -283,7 +283,7 @@ comp (*ddV_params)(const comp & phi, const double & epsi, const double & aa);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //functions for calculating roots
 	
-//dV
+//dV as gsl ready functions
 struct f_gsl_params { double epsi; double aa;};
 
 double f_gsl (double x, void * parameters) 

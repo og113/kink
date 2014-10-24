@@ -805,7 +805,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) || delta_test.back()>0.2)
 				{
-				string piEarlyFile = prefix + "mainE"+suffix;
+				string piEarlyFile = prefix + "mainpiE"+suffix;
 				printVector(piEarlyFile,p);
 				//gp(piEarlyFile,"repi.gp");
 				}
@@ -919,7 +919,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//checking energy conserved
 		if (erg_test.back()>closenessE)
 				{
-				cout << "test of energy conservation, ergTest = " << erg_test.back() << endl;
+				cout << "energy not conserved, ergTest = " << erg_test.back() << endl;
 				}
 		
 		//checking lattice small enough
@@ -965,7 +965,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 	
 		//printing output phi
-		string tpifile =  prefix + "mainp"+suffix;
+		string tpifile =  prefix + "mainpi"+suffix;
 		printVector(tpifile,p);
 		gp(tpifile,"repi.gp");
 	
