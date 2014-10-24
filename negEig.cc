@@ -17,6 +17,7 @@
 #include <gsl/gsl_poly.h>
 #include "gnuplot_i.hpp"
 #include "pf.h"
+#include "files.h"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ cin >> timeNumber;
 //load parameters
 //getting variables and user inputs from inputs
 ifstream fin;
-fin.open(inputsFiles[fileLoop]);
+fin.open(inputs);
 if (fin.is_open())
 	{
 	string line;
@@ -46,11 +47,6 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta-minTheta)>2.0e-16 && loops>1)
-				{
-				cout << "minTheta != theta" << endl;
-				cout << minTheta << " != " << theta << endl;
-				}
 			}
 		else if (lineNumber==1)
 			{
@@ -59,7 +55,7 @@ if (fin.is_open())
 			}
 		else if(lineNumber==2)
 			{
-			ss >> alpha >> open >> amp >> pot >> A >> regV;
+			ss >> alpha >> open >> amp >> pot >> A >> reg;
 			lineNumber++;
 			}
 		else if(lineNumber==3)
@@ -122,7 +118,7 @@ to_reserve(2*N*Nb-2) = 3;
 to_reserve(2*N*Nb-1) = 3;
 to_reserve(2*N*Nb) = N;
 unsigned int fileNumber = 0;
-string loadFile = "./data/" + timeNumber + "DDSb" + to_string(fileNumber) + ".dat";
+string loadFile = "./data/" + timeNumber + "DDSb" + numberToString<unsigned int>(fileNumber) + ".dat";
 
 spMat M = loadSpmat(loadFile,to_reserve);
 
