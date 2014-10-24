@@ -269,7 +269,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		eigenValues = eigensolver.eigenvalues();
 		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
-		
+	#pragma omp parallel for	
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
@@ -290,6 +290,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
 			}
+		#pragma omp parallel for
 		for (unsigned int j=0; j<N*Nb; j++)
 			{
 			comp t = coordB(j,0);
@@ -363,6 +364,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//fixing input periodic instanton to have zero time derivative at time boundaries
     if (true)
     	{
+    	#pragma omp parallel for
 		for (unsigned int j=0;j<N;j++)
 			{
 		    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
@@ -397,6 +399,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//defining the zero mode at the final time boundary and the time step before
 		vec Chi0(Nb*N);
 		Chi0 = Eigen::VectorXd::Zero(N*Nb);
+		#pragma omp parallel for
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
@@ -661,6 +664,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //A1. initialize mp==mphi using last point of ephi and zeros- use complex phi
     cVec ap(N*(Na+1)); //phi on section "a"
     ap = Eigen::VectorXcd::Zero(N*(Na+1));
+    #pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
         ap(j*(Na+1)) = Cp(j*Nb);
@@ -672,15 +676,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     velA = Eigen::VectorXcd::Zero(N*(Na+1));
     double dtau = -b;
     double Dt0 = dtau; //b/2*(-1+1i); - this is surely wrong!!
-    for (unsigned int j=0; j<N; j++)
-    	{
-        velA(j*(Na+1)) = 0; //due to boundary condition
-    	}
+    //#pragma omp parallel for
+    //for (unsigned int j=0; j<N; j++)
+    	//{
+        //velA(j*(Na+1)) = 0; //due to boundary condition
+    	//}
 
     
     //A3. initialize acc using phi and expression from equation of motion and zeros-complex
     cVec accA(N*(Na+1));
     accA = Eigen::VectorXcd::Zero(N*(Na+1));
+    #pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Na+1);
@@ -695,12 +701,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //A7. run loop
     for (unsigned int t=1; t<(Na+1); t++)
     	{
+    	#pragma omp parallel for
         for (unsigned int x=0; x<N; x++)
         	{
             unsigned int m = t+x*(Na+1);
             velA(m) = velA(m-1) + dtau*accA(m-1);
             ap(m) = ap(m-1) + dtau*velA(m);
         	}
+        #pragma omp parallel for	
         for (unsigned int x=0; x<N; x++)
         	{
             unsigned int m = t+x*(Na+1);
@@ -727,6 +735,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 	E = 0;
 	unsigned int linearInt = (unsigned int)(Na/6);
+	#pragma omp parallel for
 	for (unsigned int j=0; j<linearInt; j++)
 		{
 		E += real(linErgA(j));
@@ -738,6 +747,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
     cVec ccp(N*(Nc+1)); //phi on section "c"
     ccp = Eigen::VectorXcd::Zero(N*(Nc+1));
+    #pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
         ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
@@ -749,14 +759,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     velC = Eigen::VectorXcd::Zero(N*(Nc+1));
     dtau = b;
     Dt0 = dtau; //b/2*(1-1i); - this is surely wrong!!
-    for (unsigned int j=0; j<N; j++)
-    	{
-        velC(j*(Nc+1)) = 0; //due to boundary condition
-    	}
+    //#pragma omp parallel for
+    //for (unsigned int j=0; j<N; j++)
+    	//{
+        //velC(j*(Nc+1)) = 0; //due to boundary condition
+    	//}
 
     //C4. initialize acc using phi and expression from equation of motion and zeros-complex
     cVec accC(N*(Nc+1));
     accC = Eigen::VectorXcd::Zero(N*(Nc+1));
+    #pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
@@ -767,12 +779,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //C7. run loop
     for (unsigned int t=1; t<(Nc+1); t++)
 		{
+		#pragma omp parallel for
 		for (unsigned int x=0; x<N; x++)
 			{
 		    unsigned int l = t+x*(Nc+1);
 		    velC(l) = velC(l-1) + dtau*accC(l-1);
 		    ccp(l) = ccp(l-1) + dtau*velC(l);
 			}
+		#pragma omp parallel for
 		for (unsigned int x=0; x<N; x++)
 			{
 		    unsigned int l = t+x*(Nc+1);
@@ -804,6 +818,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
     //12. combine phi with ap and cp and save combination to file
     cVec tCp(NT*N);
+    #pragma omp parallel for
     for (unsigned int j=0; j<NT*N; j++)
     	{
         unsigned int t = intCoord(j,0,NT);
