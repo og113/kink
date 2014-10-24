@@ -31,7 +31,7 @@ cin >> timeNumber;
 //load parameters
 //getting variables and user inputs from inputs
 ifstream fin;
-fin.open(inputs);
+fin.open("inputs");
 if (fin.is_open())
 	{
 	string line;
@@ -68,7 +68,7 @@ if (fin.is_open())
 	}
 else
 	{
-	cout << "unable to open " << inputsFiles[fileLoop] << endl;
+	cout << "unable to open inputs" << endl;
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
