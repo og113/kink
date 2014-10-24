@@ -3,10 +3,6 @@
 #range of times and dates to loop over
 #in the format yymmdd-hhmmss
 #
-#note that the number in zmt and zmx has yet to be used
-#but would refer to the number of time steps on which the
-#field is fixed orthogonal to the zero mode
-#
 #inF		min fileNo			max fileNo		firstLoop		
 p			141022180101		141023152422	0
 #
