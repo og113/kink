@@ -149,7 +149,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	copyFile("mainInputs",runInputs);
 
 	ifstream fin;
-	fin.open(inputsFiles[fileLoop]);
+	fin.open(inputsFiles[fileLoop].c_str());
 	if (fin.is_open())
 		{
 		string line;
@@ -317,7 +317,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		negVec = loadVector(eigenvectorFiles[0],Nb,1);
 		ifstream eigFile;
-		eigFile.open(eigenvalueFiles[0]);
+		eigFile.open(eigenvalueFiles[0].c_str());
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		double temp;
