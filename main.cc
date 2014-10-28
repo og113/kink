@@ -400,7 +400,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		else
 			{
 			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainp" + numberToString<unsigned int>(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainpi" + numberToString<unsigned int>(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%12s%12s%12u\n","input: ",timeNumber.c_str(), ", loop: ", toLoad);
 			}
@@ -998,7 +998,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		simplePrintCVector(ergFile,erg);
 		//gpSimple(ergFile);
 		
-		} //ending theta loop
+		} //ending parameter loop
 	} //ending file loop
 
 return 0;
