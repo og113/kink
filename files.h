@@ -104,7 +104,7 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 			}
 		else
 			{
-			cout << "getInts error, filename not as expected" << endl;
+			cout << "getInts error, filename not as expected: " << temp << endl;
 			}
 		}
 	return intVector;

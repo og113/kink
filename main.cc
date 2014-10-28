@@ -78,7 +78,7 @@ if (inF.compare("p")==0)
 	}
 else if (inF.compare("m")==0)
 	{
-	piFiles = findStrings(filenames,"mainp");
+	piFiles = findStrings(filenames,"mainpi_");
 	inputsFiles = findStrings(filenames,"inputsM");
 	}
 else
@@ -88,6 +88,10 @@ else
 
 //picking subset based on loopNumbers being above firstLoop
 vector <vector<string>*> files = {&piFiles,&inputsFiles};
+if (files.size()==0)
+	{
+	cout << "no files found" << endl;
+	}
 for (unsigned int k=0;k<files.size();k++)
 	{
 	vector <string>* tempVecStr = files[k];
@@ -400,7 +404,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		else
 			{
 			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainpi" + numberToString<unsigned int>(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%12s%12s%12u\n","input: ",timeNumber.c_str(), ", loop: ", toLoad);
 			}
@@ -950,7 +954,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 		
 		string prefix = "./data/" + timeNumber;
-		string suffix = numberToString<unsigned int>(loop)+".dat";
+		string suffix = "_" + numberToString<unsigned int>(loop)+".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
