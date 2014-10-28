@@ -597,7 +597,7 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(22) << vecToPrint(j) << endl;
+		F << setw(25) << vecToPrint(j) << endl;
 		}
 	F.close();
 	}
@@ -612,7 +612,7 @@ void simplePrintCVector(const string& printFile, cVec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(22) << real(vecToPrint(j)) << setw(22) << imag(vecToPrint(j)) << endl;
+		F << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
 		}
 	F.close();
 	}
@@ -633,15 +633,15 @@ void printVectorB (const string& printFile, vec vecToPrint)
 			x0 = x;
 			}
 		F << left;
-		F << setw(22) << real(coordB(j,0)) << setw(22) << imag(coordB(j,0));
-		F << setw(22) << real(coordB(j,1));
+		F << setw(24) << real(coordB(j,0)) << setw(25) << imag(coordB(j,0));
+		F << setw(25) << real(coordB(j,1));
 		if (vecToPrint.size()>N*Nb)
 			{
-			F << setw(22) << vecToPrint(2*j) << setw(22) << vecToPrint(2*j+1)  << endl;
+			F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
 			}
 		else
 			{
-			F << setw(22) << vecToPrint(j) << endl;
+			F << setw(25) << vecToPrint(j) << endl;
 			}
 		}
 	if (vecToPrint.size()>2*N*Nb)
@@ -649,7 +649,7 @@ void printVectorB (const string& printFile, vec vecToPrint)
 		F << endl;
 		for (unsigned int k=0; k<(vecToPrint.size()-2*N*Nb);k++)
 			{
-			F << setw(22) << vecToPrint(2*N*Nb+k) << endl;
+			F << setw(25) << vecToPrint(2*N*Nb+k) << endl;
 			}
 		}
 	F.close();
@@ -671,15 +671,15 @@ void printVector (const string& printFile, vec vecToPrint)
 			x0 = x;
 			}
 		F << left;
-		F << setw(22) << real(coord(j,0)) << setw(22) << imag(coord(j,0)); //note using coord for full time contour
-		F << setw(22) << real(coord(j,1));
+		F << setw(25) << real(coord(j,0)) << setw(25) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(25) << real(coord(j,1));
 		if (vecToPrint.size()>N*NT)
 			{
-			F << setw(22) << vecToPrint(2*j) << setw(22) << vecToPrint(2*j+1)  << endl;
+			F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
 			}
 		else
 			{
-			F << setw(22) << vecToPrint(j) << endl;
+			F << setw(25) << vecToPrint(j) << endl;
 			}
 		}
 	if (vecToPrint.size()>2*N*NT)
@@ -687,7 +687,7 @@ void printVector (const string& printFile, vec vecToPrint)
 		F << endl;
 		for (unsigned int j=0; j<(vecToPrint.size()-2*N*NT);j++)
 			{
-			F << setw(22) << vecToPrint(2*N*NT+j) << endl;
+			F << setw(25) << vecToPrint(2*N*NT+j) << endl;
 			}
 		}
 	F.close();
@@ -704,7 +704,7 @@ void printSpmat (const string & printFile, spMat spmatToPrint)
 		{
 		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
 			{
-			F << setw(22) << it.row()+1 << setw(22) << it.col()+1 << setw(22) << it.value() << endl;
+			F << setw(25) << it.row()+1 << setw(25) << it.col()+1 << setw(25) << it.value() << endl;
 			}
 		}
 	F.close();
@@ -730,6 +730,21 @@ void gpSimple(const string & readFile)
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string command1Str = "plot \"" + readFile + "\" using 1 with lines";
+	string command2Str = "pause -1";
+	const char * command1 = command1Str.c_str();
+	const char * command2 = command2Str.c_str();
+	fprintf(gnuplotPipe, "%s \n", command1);
+	fprintf(gnuplotPipe, "%s \n", command2);
+	pclose(gnuplotPipe);
+	}
+	
+//print repi via gnuplot
+void gpSimple2(const string & readFile) 
+	{
+	string commandOpenStr = "gnuplot -persistent";
+	const char * commandOpen = commandOpenStr.c_str();
+	FILE * gnuplotPipe = popen (commandOpen,"w");
+	string command1Str = "plot \"" + readFile + "\" using 1:2 with points";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();

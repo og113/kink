@@ -5,7 +5,7 @@
 100     64      64      32      0.05    3.2     18.0	0.0
 ##
 #inputChoice    file     totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
-b               pip5	 1           n           18.0        16.0        e               0       
+p               pip5	 1           n           18.0        16.0        e               0       
 ##
 #alpha     open     amp     pot     A     reg
 0.4        1.0      0.4     1n      0.4   0.0

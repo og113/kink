@@ -408,7 +408,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printParameters();
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainE" + numberToString<unsigned int>(loop) + "_" + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainpiE" + numberToString<unsigned int>(loop) + "_" + "0.dat";
 		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -482,7 +482,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 							{
 							if (zmx[0]=='n')
 								{
-								chiT(posX+k) = negVec(2*(posCe+k));
+								chiX(posX+k) = negVec(2*(posCe+k));
 								}
 							else if (zmx[0]=='d')
 								{
@@ -656,7 +656,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         for (unsigned int k=0; k<N; k++)
                         	{
                         	//dropped two terms here, as had imag(real()) or vice versa
-							unsigned int m = x*NT;
+							unsigned int m = x*NT; //equals j
 							unsigned int n = k*NT;
 							DDS.insert(2*j,2*n+1) = -omega(x,k)*(1.0-Gamma)/(1.0+Gamma);
                         	DDS.insert(2*j+1,2*n) = omega(x,k)*(1.0+Gamma)/(1.0-Gamma);
@@ -679,14 +679,16 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                 	{
                     int sign = pow(-1,k);
                     int direc = (int)(k/2.0);
+                    comp dtd = dt;
+                    if (sign==-1) {dtd = dtFn(t-1);}
                     if (direc == 0)
                     	{
-                        minusDS(2*j) += real(a*Cp(j+sign)/dt);
-                        minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
-                        DDS.insert(2*j,2*(j+sign)) = -real(a/dt);
-                        DDS.insert(2*j,2*(j+sign)+1) = imag(a/dt);
-                        DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dt);
-                        DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dt);
+                        minusDS(2*j) += real(a*Cp(j+sign)/dtd);
+                        minusDS(2*j+1) += imag(a*Cp(j+sign)/dtd);
+                        DDS.insert(2*j,2*(j+sign)) = -real(a/dtd);
+                        DDS.insert(2*j,2*(j+sign)+1) = imag(a/dtd);
+                        DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dtd);
+                        DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dtd);
                         }
                     else
                     	{
@@ -700,7 +702,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         DDS.insert(2*j+1,2*neighb+1) = real(Dt/a);
                         }
                     }
-		            comp temp0 = 2.0*a/dt;
+		            comp temp0 = a*(1.0/dt + 1.0/dtFn(t-1));
 		            comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)) + dVr(Cp(j)));
 		            comp temp2 = a*Dt*(2.0/pow(a,2.0) + ddV(Cp(j)) + ddVr(Cp(j)));
 		                
@@ -786,7 +788,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking lattice small enough for E, should have parameter for this
-			double momTest = E*a/Num*pi;
+			double momTest = E*b/Num*pi; //perhaps should have a not b here
 			mom_test.push_back(momTest);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -926,7 +928,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//checking lattice small enough
 		if (mom_test.back()>closenessP)
 			{
-			cout << "lattice not small enough for momenta, momTest = "<< mom_test.back()  << endl;
+			cout << "lattice not small enough for energies, momTest = "<< mom_test.back()  << endl;
 			}
 		
 		//stopping clock
