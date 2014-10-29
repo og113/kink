@@ -795,7 +795,7 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 		}
 	if ((j+k)!=(Nt*N+zeroModes))
 		{
-		cout << "loadVector error" << endl;
+		cout << "loadVector error: j+k = " << j+k << endl;
 		}
 	F.close();
 	return outputVec;

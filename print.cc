@@ -43,7 +43,7 @@ cin >> paramLoop;
 string filename;
 if (program=='m')
 	{
-	filename  = "./data/" + timeNumber + "main" + id + to_string(fileLoop) + "_" + to_string(paramLoop);
+	filename  = "./data/" + timeNumber + "main" + id + "_" + to_string(fileLoop) + "_" + to_string(paramLoop);
 	}
 else if (program=='p')
 	{

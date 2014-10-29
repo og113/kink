@@ -87,7 +87,9 @@ else
 	}
 
 //picking subset based on loopNumbers being above firstLoop
-vector <vector<string>*> files = {&piFiles,&inputsFiles};
+vector <vector<string>*> files;
+files.reserve(2);
+files.push_back(&piFiles); files.push_back(&inputsFiles);
 if (files.size()==0)
 	{
 	cout << "no files found" << endl;
@@ -169,11 +171,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 				lineNumber++;
-				if (absolute(theta-minTheta)>2.0e-16 && loops>1)
-					{
-					cout << "minTheta != theta" << endl;
-					cout << minTheta << " != " << theta << endl;
-					}
 				}
 			else if (lineNumber==1)
 				{
@@ -316,12 +313,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			system("./negEig"); //negEig now needs timeNumber
 			char * fileNumber = (char *)(fileNumbers[fileLoop]);
-			system(fileNumber); //won't work
+			system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
 			cout << "negEig run" << endl;
 			}
-		negVec = loadVector(eigenvectorFiles[0],Nb,1);
+		negVec = loadVector("data/eigVec.dat",Nb,1);
 		ifstream eigFile;
-		eigFile.open(eigenvalueFiles[0].c_str());
+		eigFile.open("data/eigValue.dat");
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		double temp;
@@ -340,9 +337,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		{
 		if (loops>1)
 			{
-			if (absolute(theta-minTheta)>2.0e-16 && absolute(Tb-minTb)>2.0e-16 && loop==0)
+			if ((absolute(theta-minTheta)>2.0e-16 || absolute(Tb-minTb)>2.0e-16) && loop==0)
 				{
-				cout << "inputs and mainInputs don't agree" << endl;
+				cout << "input Tb: " << Tb << endl;
+				cout << "program Tb: " << minTb << endl;
+				cout << "input theta: " << theta << endl;
+				cout << "program theta: " << minTheta << endl;
+				cout << endl;
 				}
 			if (absolute(maxTheta-minTheta)>2.0e-16)
 				{
@@ -385,29 +386,29 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vector<double> solM_test(1);	solM_test[0] = 1.0;
 		vector<double> delta_test(1); delta_test[0] = 1.0;
 		vector<double> calc_test(1); calc_test[0] = 1.0;
-		vector<double> erg_test(1); erg_test[0] = 1.0;
+	 	vector<double> erg_test(1); erg_test[0] = 1.0;
 		vector<double> lin_test(1); lin_test[0] = 1.0;
 		vector<double> true_test(1); true_test[0] = 1.0;
 		vector<double> mom_test(1); mom_test[0] = 1.0;
 		vector<double> reg_test(1); reg_test[0] = 1.0;
-		
-		//printing loop name and parameters
-		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
 
 		//initializing phi (=p)
 		vec p(2*N*NT+2);
 		if (loop==0)
 			{
 			p = loadVector(piFiles[fileLoop],NT,2);
-			printf("%12s%12llu\n","input: ",fileNumbers[fileLoop]);
+			printf("%12s%30s\n","input: ",(piFiles[fileLoop]).c_str());
 			}
 		else
 			{
 			unsigned int toLoad = loop-1;
 			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
-			printf("%12s%12s%12s%12u\n","input: ",timeNumber.c_str(), ", loop: ", toLoad);
+			printf("%12s%30s\n","input: ",loadfile.c_str());
 			}
+			
+		//printing loop name and parameters
+		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
 				
 		printParameters();
 			
@@ -516,16 +517,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			DDS.setZero(); //just making sure
 			Eigen::VectorXi DDS_to_reserve(2*N*NT+2);//number of non-zero elements per column
 			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+2,11);
-			if (absolute(theta)<2.0e-16)
-				{
-				DDS_to_reserve(0) = 3;
-				DDS_to_reserve(1) = 3;
-				}
-			else
-				{
-				DDS_to_reserve(0) = N+1;
-				DDS_to_reserve(1) = N+1;
-				}
+			DDS_to_reserve(0) = N+1;
+			DDS_to_reserve(1) = N+1;
 			DDS_to_reserve(2*N*NT-2) = 3;
 			DDS_to_reserve(2*N*NT-1) = 3;
 			DDS_to_reserve(2*N*NT) = N*(zmx.size()-2);
@@ -582,9 +575,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					DDS.coeffRef(2*j,2*N*NT+1) += -a*chiT(j);
 					DDS.coeffRef(2*N*NT+1,2*j) += -a*chiT(j);
 		            minusDS(2*(j+1)) += - a*chiT(j)*p(2*N*NT+1);
-		            minusDS(2*N*NT+1) += - a*chiT(j)*p(2*j);
 		            minusDS(2*j) += a*chiT(j)*p(2*N*NT+1);
-		            minusDS(2*N*NT+1) += a*chiT(j)*p(2*j);
+		            minusDS(2*N*NT+1) += - a*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
 				if (absolute(theta)<2.0e-16)
@@ -630,8 +622,43 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					
 					if (absolute(theta)<2.0e-16)
 						{
-						DDS.insert(2*j,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
-						DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+						//DDS.insert(2*j,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
+						//DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
+						/////////////////////////////////////equation 1
+						for (unsigned int k=0;k<N;k++) //not the simplest b.c.s possible, but continuously related to the theta!=0 ones
+							{
+							if (absolute(omega(x,k))>2.0e-16)
+								{
+								unsigned int m=k*NT;
+								DDS.coeffRef(2*j+1,2*m+1) += -2.0*omega(x,k);
+								minusDS(2*j+1) += 2.0*omega(x,k)*p(2*m+1);
+								}
+							}
+						//////////////////////////////////////equation 2
+						for (unsigned int k=1; k<2*2; k++)
+				        	{
+				            int sign = pow(-1,k+1);
+				            int direc = (int)(k/2.0);
+				            if (direc == 0)
+				            	{
+				                minusDS(2*j) += imag(a/dt)*p(2*j) + real(a/dt)*p(2*j+1);
+				                DDS.coeffRef(2*j,2*(j+sign)) += -imag(a/dt);
+				                DDS.coeffRef(2*j,2*(j+sign)+1) += -real(a/dt);
+				                }
+				            else
+				            	{
+				                unsigned int neighb = neigh(j,direc,sign,NT);
+				                minusDS(2*j) += - imag(Dt/a)p(2*neighb) - real(Dt/a)*p(2*neighb+1);
+				                DDS.coeffRef(2*j,2*neighb) += imag(Dt/a);
+				                DDS.coeffRef(2*j,2*neighb+1) += real(Dt/a);
+				                }
+				            }
+				        comp temp0 = a/dt - 2.0*Dt/a;
+				        double temp1 = imag(a*Dt*dV(Cp(j)));
+				        double temp2 = - 3.0*real(Dt)*a*p(2*j)*p(2*j+1)
+				        
+				        minusDS(2*j) += -imag(temp0)*p(2*j) - real(temp0)*p(2*j+1) + imag(a*Dt*dV(Cp(j)));
+				        //////////////////////UNFINISHED/////////////////////////////
 						}
 					else
 						{
@@ -652,7 +679,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				                }
 				            }
                         comp temp0 = a/dt;
-		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0));//dropped this last term, as linearised + dV(Cp(j))) + dVr(Cp(j));
+		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j))) + dVr(Cp(j)));//dV terms should be small as linearised
 
 				        minusDS(2*j) += real(temp1 - temp0*Cp(j));
 				        minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
@@ -926,13 +953,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//checking energy conserved
 		if (erg_test.back()>closenessE)
 				{
-				cout << "energy not conserved, ergTest = " << erg_test.back() << endl;
+				cout << endl;
+				cout << "ergTest = " << erg_test.back() << endl;
 				}
 		
 		//checking lattice small enough
 		if (mom_test.back()>closenessP)
 			{
-			cout << "lattice not small enough for energies, momTest = "<< mom_test.back()  << endl;
+			cout << "momTest = "<< mom_test.back()  << endl;
 			}
 		
 		//stopping clock
@@ -954,7 +982,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 		
 		string prefix = "./data/" + timeNumber;
-		string suffix = "_" + numberToString<unsigned int>(loop)+".dat";
+		string suffix = "_" + numberToString<unsigned int>(fileLoop)+"_" + numberToString<unsigned int>(fileLoop)+ ".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
@@ -977,17 +1005,17 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		gp(tpifile,"repi.gp");
 	
 		//printing output minusDS				
-		string minusDSfile = prefix + "mainminusDS"+suffix;
-		printVector(minusDSfile,minusDS);
+		//string minusDSfile = prefix + "mainminusDS"+suffix;
+		//printVector(minusDSfile,minusDS);
 				
 		//printing output DDS
-		string DDSfile = prefix + "mainDDS"+suffix;
-		printSpmat(DDSfile,DDS);
+		//string DDSfile = prefix + "mainDDS"+suffix;
+		//printSpmat(DDSfile,DDS);
 	
 		//printing linNumVec
-		string linNumFile = prefix + "mainlinNum"+suffix;
-		linNum.conservativeResize(Na);
-		simplePrintVector(linNumFile,linNum);
+		//string linNumFile = prefix + "mainlinNum"+suffix;
+		//linNum.conservativeResize(Na);
+		//simplePrintVector(linNumFile,linNum);
 		//gpSimple(linNumFile);	
 	
 		//printing linErgVec

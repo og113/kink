@@ -351,13 +351,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if (inP.compare("f")==0)
 			{
 			loadfile = "./data/" + aq.inputFile + ".dat";
+			cout << "input: " << loadfile << endl;
 			inP = "p";
 			}
 		else
 			{
 			loadfile = "./data/" + timeNumber + "pi"+inP+numberToString<int>(loop-1)+".dat";
-			}
-		
+			}		
 		p = loadVector(loadfile,Nb,1);
 		}
 	
@@ -546,17 +546,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
 				}
-			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0) && 1==0)
+			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
 				{
 				string minusDSfile = prefix + "minusDSE"+suffix;
 				printVectorB(minusDSfile,minusDS);
 				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) && delta_test.back()>0.2 && 1==0)
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0))
 				{
 				string piEarlyFile = prefix + "piE"+suffix;
 				printVectorB(piEarlyFile,p);
 				}
-			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0) && 1==0)
+			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0))
 				{
 				string DDSfile = prefix + "DDSE"+suffix;
 				printSpmat(DDSfile,DDS);
@@ -912,15 +912,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 //	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
-	FILE * eigenvalueFile;
+	ifstream eigenvalueIn;
+	eigenvalueIn.open("data/eigValue.dat",ios::in);
+	string lastEigLine = getLastLine(eigenvalueIn);
+	eigenvalueIn.close();
+	ofstream eigenvalueOut;
 	string eigValueFile = prefix + "eigValue.dat";
-	eigenvalueFile = fopen(eigValueFile.c_str(),"w");
-	fprintf(eigenvalueFile,"%16i%16g%16g%16g%16g\n",negP,negc,negcheck,negerror,negVal);
-	fclose(eigenvalueFile);
+	eigenvalueOut.open(eigValueFile.c_str(),ios::out);
+	eigenvalueOut << lastEigLine;
+	eigenvalueOut.close();
 
 	//printing eigenvector to file
 	string eigenvectorFile = prefix + "eigVec.dat";
-	printVectorB(eigenvectorFile,negVec);
+	copyFile("data/eigVec.dat",eigenvectorFile);
 
 } //closing parameter loop
 

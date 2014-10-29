@@ -24,9 +24,15 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
+//taking in timeNumber
 string timeNumber;
-cout << "input timeNumber: ";
+cout << endl;
+cout << "timeNumber: ";
 cin >> timeNumber;
+
+//starting clock
+clock_t time;
+time = clock();
 
 //load parameters
 //getting variables and user inputs from inputs
@@ -106,6 +112,9 @@ inputs.open("inputs", ios::in);
 string lastLine = getLastLine(inputs);
 istringstream ss(lastLine);
 ss >> P >> c;
+cout << "P: " << P << endl;
+cout << "c: " << c << endl;
+cout << endl;
 
 //load DDS from file into matrix M
 unsigned int zeroModes = 1;
@@ -157,7 +166,7 @@ for (unsigned int j=P1; j<P;j++)
 	double scaleR = r.maxCoeff();
 	r /= scaleR;
 	}
-
+	
 //normalising r to get approximation to eigenvector v
 double norm = r.dot(r);
 norm = pow(norm,0.5);
@@ -180,6 +189,15 @@ if (check>1)
 	{
 	//cout << "check>1" << endl;//not sure about the relevance of this
 	}
+	
+//stopping clock
+time = clock() - time;
+double realtime = time/1000000.0;
+	
+//printing time, error, and eigenvalue to screen
+cout << left << setw(20) << "time" << setw(20) << "check<1" << setw(20) << "error" << setw(20) << "eigenvalue" << endl;
+cout << left << setw(20) << realtime << setw(20) << check << setw(20) << error << setw(20) << eigenvalue << endl;
+cout << endl;
 
 //printing error, and eigenvalue to file
 FILE * scalarFile;
