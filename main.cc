@@ -627,14 +627,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			            int direc = (int)(k/2.0);
 			            if (direc == 0)
 			            	{
-			                minusDS(2*j) += imag(a/dt)*p(2*(j+sign)) + real(a/dt)*p(2*(j+sign)+1);
+			                minusDS(2*j) += imag(a*Cp(j+sign)/dt));
 			                DDS.coeffRef(2*j,2*(j+sign)) += -imag(a/dt);
 			                DDS.coeffRef(2*j,2*(j+sign)+1) += -real(a/dt);
 			                }
 			            else
 			            	{
 			                unsigned int neighb = neigh(j,direc,sign,NT);
-			                minusDS(2*j) += - imag(Dt)p(2*neighb)/a - real(Dt)*p(2*neighb+1)/a;
+			                minusDS(2*j) += - imag(Dt*Cp(neighb)/a);
 			                DDS.coeffRef(2*j,2*neighb) += imag(Dt)/a;
 			                DDS.coeffRef(2*j,2*neighb+1) += real(Dt)/a;
 			                }
@@ -683,14 +683,17 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				            int direc = (int)(k/2.0);
 				            if (direc == 0)
 				            	{
-				                minusDS(2*j) += real(a*Cp(j+sign)/dt);
-				                minusDS(2*j+1) += imag(a*Cp(j+sign)/dt);
+				                minusDS(2*j+1) += imag(a/dt)*p(2*(j+sign)) + real(a/dt)*p(2*(j+sign)+1);
+			                	DDS.coeffRef(2*j+1,2*(j+sign)) += -real(a/dt)*theta;
+			                	DDS.coeffRef(2*j+1,2*(j+sign)+1) += imag(a/dt)*theta;
 				                }
 				            else
 				            	{
 				                unsigned int neighb = neigh(j,direc,sign,NT);
 				                minusDS(2*j) += - real(Dt*Cp(neighb)/a);
 				                minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
+				                DDS.coeffRef(2*j+1,2*(j+sign)) += -real(a/dt)*theta;
+			                	DDS.coeffRef(2*j+1,2*(j+sign)+1) += imag(a/dt)*theta;
 				                }
 				            }
                         comp temp0 = a/dt;
