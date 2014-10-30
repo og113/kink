@@ -620,12 +620,39 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 					
+					//////////////////////////////////////equation R - both///////////////////////////////////
+					for (unsigned int k=1; k<2*2; k++)
+			        	{
+			            int sign = pow(-1,k+1);
+			            int direc = (int)(k/2.0);
+			            if (direc == 0)
+			            	{
+			                minusDS(2*j) += imag(a/dt)*p(2*(j+sign)) + real(a/dt)*p(2*(j+sign)+1);
+			                DDS.coeffRef(2*j,2*(j+sign)) += -imag(a/dt);
+			                DDS.coeffRef(2*j,2*(j+sign)+1) += -real(a/dt);
+			                }
+			            else
+			            	{
+			                unsigned int neighb = neigh(j,direc,sign,NT);
+			                minusDS(2*j) += - imag(Dt)p(2*neighb)/a - real(Dt)*p(2*neighb+1)/a;
+			                DDS.coeffRef(2*j,2*neighb) += imag(Dt)/a;
+			                DDS.coeffRef(2*j,2*neighb+1) += real(Dt)/a;
+			                }
+			            }
+			        comp temp0 = a/dt - 2.0*Dt/a;
+			        
+			        minusDS(2*j) += -imag(temp0*Cp(j)) + a*imag( Dt*( dV(Cp(j)) + dVr(Cp(j)) ) );
+			        DDS.coeffRef(2*j,2*j) += imag(temp0) - a*imag( Dt*( ddV(Cp(j)) + ddVr(Cp(j)) ) );
+			        DDS.coeffRef(2*j,2*j+1) += real(temp0) - a*real( Dt*( ddV(Cp(j)) + ddVr(Cp(j)) ) );
+				    /////////////////////////////////////////////////////////////////////////////////////////
 					if (absolute(theta)<2.0e-16)
 						{
+						//simplest boundary conditions replaced by ones continuously connected to theta!=0 ones
 						//DDS.insert(2*j,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
 						//DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
-						/////////////////////////////////////equation 1
-						for (unsigned int k=0;k<N;k++) //not the simplest b.c.s possible, but continuously related to the theta!=0 ones
+						
+						/////////////////////////////////////equation I - theta=0//////////////////////////////////////
+						for (unsigned int k=0;k<N;k++)
 							{
 							if (absolute(omega(x,k))>2.0e-16)
 								{
@@ -634,34 +661,22 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 								minusDS(2*j+1) += 2.0*omega(x,k)*p(2*m+1);
 								}
 							}
-						//////////////////////////////////////equation 2
-						for (unsigned int k=1; k<2*2; k++)
-				        	{
-				            int sign = pow(-1,k+1);
-				            int direc = (int)(k/2.0);
-				            if (direc == 0)
-				            	{
-				                minusDS(2*j) += imag(a/dt)*p(2*j) + real(a/dt)*p(2*j+1);
-				                DDS.coeffRef(2*j,2*(j+sign)) += -imag(a/dt);
-				                DDS.coeffRef(2*j,2*(j+sign)+1) += -real(a/dt);
-				                }
-				            else
-				            	{
-				                unsigned int neighb = neigh(j,direc,sign,NT);
-				                minusDS(2*j) += - imag(Dt/a)p(2*neighb) - real(Dt/a)*p(2*neighb+1);
-				                DDS.coeffRef(2*j,2*neighb) += imag(Dt/a);
-				                DDS.coeffRef(2*j,2*neighb+1) += real(Dt/a);
-				                }
-				            }
-				        comp temp0 = a/dt - 2.0*Dt/a;
-				        double temp1 = imag(a*Dt*dV(Cp(j)));
-				        double temp2 = - 3.0*real(Dt)*a*p(2*j)*p(2*j+1)
-				        
-				        minusDS(2*j) += -imag(temp0)*p(2*j) - real(temp0)*p(2*j+1) + imag(a*Dt*dV(Cp(j)));
-				        //////////////////////UNFINISHED/////////////////////////////
+						////////////////////////////////////////////////////////////////////////////////////////
 						}
 					else
 						{
+						//////////////////////////////////////equation R - theta!=0/////////////////////////////
+						for (unsigned int k=0;k<N;k++)
+							{
+							if (absolute(omega(x,k))>2.0e-16)
+								{
+								unsigned int m=k*NT;
+								DDS.coeffRef(2*j,2*m) += (1.0-gamma)*omega(x,k)/(1.0+gamma);
+								minusDS(2*j) += -(1.0-gamma)*omega(x,k)*(p(2*m)-root[0])/(1.0+gamma);
+								}
+							}
+						/////////////////////////////////////////////////////////////////////////////////////////
+						//////////////////////////////////////equation I - theta!=0//////////////////////////////
 						for (unsigned int k=1; k<2*2; k++)
 				        	{
 				            int sign = pow(-1,k+1);
