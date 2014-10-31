@@ -1,0 +1,7 @@
+to do:
+main thing to check is the mode occupations and the linearisation:
+	- rederive mode expansion in lattice for theta=0, to check sign
+	- write linear energy i.e. in terms of the fields, separately to the spectral energy
+	- check linearisation
+	- plot these things
+	- may need to remove high energy modes, potentially as artefacts of the lattice, check that results are independent of the cut off.
