@@ -795,7 +795,8 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 		}
 	if ((j+k)!=(Nt*N+zeroModes))
 		{
-		cout << "loadVector error: j+k = " << j+k << endl;
+		cout << "loadVector error in: << " << loadFile << endl;
+		cout << "j+k = " << j+k << endl;
 		}
 	F.close();
 	return outputVec;
@@ -830,7 +831,7 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 		}
 	if (nnz==0)
 		{
-		cout << "loadSpMat failed, no data in file" << endl;
+		cout << "loadSpMat failed, no data in file: " << loadFile << endl;
 		}
 	M.makeCompressed();
 	return M;

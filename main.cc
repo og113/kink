@@ -674,17 +674,20 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 						}
 					else
 						{
-						//////////////////////////////////////equation I - theta!=0/////////////////////////////
 						for (unsigned int k=0;k<N;k++)
 							{
 							if (absolute(omega(x,k))>2.0e-16)
 								{
+								/////////////////////equation I - theta!=0//////////////
 								unsigned int m=k*NT;
 								DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega(x,k)/(1.0+Gamma);
 								minusDS(2*j+1) += -(1.0-Gamma)*omega(x,k)*(p(2*m)-root[0])/(1.0+Gamma);
+								/////////////////////equation R - theta!=0//////////////
+								minusDS(2*j) += p(2*m+1)*omega(x,k)*(1+Gamma)*theta/(1-Gamma);
+								DDS.coeffRef(2*j,2*m+1) += -omega(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
+								bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-root[0])*(p(2*m)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
 								}
 							}
-						/////////////////////////////////////////////////////////////////////////////////////////
 						//////////////////////////////////////equation R - theta!=0//////////////////////////////
 						for (unsigned int k=1; k<2*2; k++)
 				        	{
@@ -700,20 +703,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				            	{
 				                unsigned int neighb = neigh(j,direc,sign,NT);
 				                minusDS(2*j) += - real(Dt*Cp(neighb))*theta/a;
-				                DDS.coeffRef(2*j,2*(j+sign)) += real(Dt)*theta/a;
-			                	DDS.coeffRef(2*j,2*(j+sign)+1) += -imag(Dt)*theta/a;
+				                DDS.coeffRef(2*j,2*neighb) += real(Dt)*theta/a;
+			                	DDS.coeffRef(2*j,2*neighb+1) += -imag(Dt)*theta/a;
 				                }
 				            }
 				        minusDS(2*j) += real(-temp0*Cp(j) + temp1 )*theta;
 			        	DDS.coeffRef(2*j,2*j) += real(temp0 - temp1 )*theta;
 			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp1 )*theta;
-                        for (unsigned int k=0; k<N; k++)
-                        	{
-							unsigned int n = k*NT;
-							minusDS(2*j) += p(2*n+1)*omega(x,k)*(1+Gamma)*theta/(1-Gamma);
-							DDS.coeffRef(2*j,2*n+1) += -omega(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
-							bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*n+1)/(1.0-Gamma);
-                        	}
 						}
 					}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
