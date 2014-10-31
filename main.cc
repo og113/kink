@@ -402,7 +402,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		else
 			{
 			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(toLoad)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%30s\n","input: ",loadfile.c_str());
 			}
@@ -999,7 +999,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		fclose(actionfile);
 		
 		string prefix = "./data/" + timeNumber;
-		string suffix = "_" + numberToString<unsigned int>(fileLoop)+"_" + numberToString<unsigned int>(fileLoop)+ ".dat";
+		string suffix = "_" + numberToString<unsigned int>(fileLoop)+"_" + numberToString<unsigned int>(loop)+ ".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
@@ -1015,37 +1015,45 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			copyFile("inputs",runInputs);
 			}
+		printf("%12s%30s\n","output: ",runInputs.c_str());
 	
 		//printing output phi
 		string tpifile =  prefix + "mainpi"+suffix;
 		printVector(tpifile,p);
 		gp(tpifile,"repi.gp");
+		printf("%12s%30s\n"," ",tpifile.c_str());
 	
 		//printing output minusDS				
 		//string minusDSfile = prefix + "mainminusDS"+suffix;
 		//printVector(minusDSfile,minusDS);
+		//printf("%12s%30s\n"," ",minusDSfile.c_str());
 				
 		//printing output DDS
 		//string DDSfile = prefix + "mainDDS"+suffix;
 		//printSpmat(DDSfile,DDS);
-	
+	    //printf("%12s%30s\n"," ",DDSfile.c_str());
+	    
 		//printing linNumVec
 		//string linNumFile = prefix + "mainlinNum"+suffix;
 		//linNum.conservativeResize(Na);
 		//simplePrintVector(linNumFile,linNum);
-		//gpSimple(linNumFile);	
+		//gpSimple(linNumFile);
+		//printf("%12s%30s\n"," ",linNumFile.c_str());
 	
 		//printing linErgVec
 		string linErgFile = prefix + "mainlinErg"+suffix;
 		linErg.conservativeResize(Na);
 		simplePrintVector(linErgFile,linErg);
 		//gpSimple(linErgFile);
+		printf("%12s%30s\n"," ",linErgFile.c_str());
 	
 		//printing erg
 		string ergFile = prefix + "mainerg" + suffix;
 		erg.conservativeResize(Na);
 		simplePrintCVector(ergFile,erg);
 		//gpSimple(ergFile);
+		printf("%12s%30s\n"," ",ergFile.c_str());
+		cout << endl;
 		
 		} //ending parameter loop
 	} //ending file loop
