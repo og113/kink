@@ -710,8 +710,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         for (unsigned int k=0; k<N; k++)
                         	{
 							unsigned int n = k*NT;
-							minusDS(2*j) += (1+Gamma)*omega(x,k)*p(2*n+1)*theta/(1-Gamma);
-							DDS.coeffRef(2*j,2*n+1) += -omega(x,k)*(1.0+Gamma)/(1.0-Gamma)*theta;
+							minusDS(2*j) += p(2*n+1)*omega(x,k)*(1+Gamma)*theta/(1-Gamma);
+							DDS.coeffRef(2*j,2*n+1) += -omega(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
 							bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*n+1)/(1.0-Gamma);
                         	}
 						}
