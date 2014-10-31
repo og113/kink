@@ -5,3 +5,5 @@ main thing to check is the mode occupations and the linearisation:
 	- check linearisation
 	- plot these things
 	- may need to remove high energy modes, potentially as artefacts of the lattice, check that results are independent of the cut off.
+	
+also, loading from a given loop of main input file doesn't seem to be working. 

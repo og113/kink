@@ -98,11 +98,17 @@ for (unsigned int k=0;k<files.size();k++)
 	{
 	vector <string>* tempVecStr = files[k];
 	vector <int> loopNumbers = getLastInts(tempVecStr); //not unsigned so that -1 can be used
-	for (unsigned int l=0;l<(*tempVecStr).size();l++)
+	unsigned int l=0;
+	while(l<(*tempVecStr).size())
 		{
 		if (loopNumbers[l]<firstLoop)
 			{
 			(*tempVecStr).erase((*tempVecStr).begin()+l);
+			loopNumbers.erase(loopNumbers.begin()+l);
+			}
+		else
+			{
+			l++;
 			}
 		}
 	}
@@ -1044,14 +1050,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		string linErgFile = prefix + "mainlinErg"+suffix;
 		linErg.conservativeResize(Na);
 		simplePrintVector(linErgFile,linErg);
-		//gpSimple(linErgFile);
+		gpSimple(linErgFile);
 		printf("%12s%30s\n"," ",linErgFile.c_str());
 	
 		//printing erg
 		string ergFile = prefix + "mainerg" + suffix;
 		erg.conservativeResize(Na);
 		simplePrintCVector(ergFile,erg);
-		//gpSimple(ergFile);
+		gpSimple(ergFile);
 		printf("%12s%30s\n"," ",ergFile.c_str());
 		cout << endl;
 		
