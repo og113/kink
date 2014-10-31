@@ -671,8 +671,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 							if (absolute(omega(x,k))>2.0e-16)
 								{
 								unsigned int m=k*NT;
-								DDS.coeffRef(2*j,2*m) += (1.0-gamma)*omega(x,k)/(1.0+gamma);
-								minusDS(2*j) += -(1.0-gamma)*omega(x,k)*(p(2*m)-root[0])/(1.0+gamma);
+								DDS.coeffRef(2*j,2*m) += (1.0-Gamma)*omega(x,k)/(1.0+Gamma);
+								minusDS(2*j) += -(1.0-Gamma)*omega(x,k)*(p(2*m)-root[0])/(1.0+Gamma);
 								}
 							}
 						/////////////////////////////////////////////////////////////////////////////////////////
@@ -696,20 +696,18 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			                	DDS.coeffRef(2*j+1,2*(j+sign)+1) += imag(a/dt)*theta;
 				                }
 				            }
-                        comp temp0 = a/dt;
-		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j))) + dVr(Cp(j)));//dV terms should be small as linearised
+		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j))) + dVr(Cp(j)));//dV terms should be small
 
-				        minusDS(2*j) += real(temp1 - temp0*Cp(j));
-				        minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
+				        minusDS(2*j+1) += real(-temp0*Cp(j) + a*Dt*( dV(Cp(j)) + dVr(Cp(j)) ) )*theta;
+			        	DDS.coeffRef(2*j+1,2*j) += real(temp0 - a*Dt*( ddV(Cp(j)) + ddVr(Cp(j)) ) )*theta;
+			        	DDS.coeffRef(2*j+1,2*j+1) += imag(-temp0 + a*Dt*( ddV(Cp(j)) + ddVr(Cp(j)) ) )*theta;
 
                         for (unsigned int k=0; k<N; k++)
                         	{
-                        	//dropped two terms here, as had imag(real()) or vice versa
-							unsigned int m = x*NT; //equals j
 							unsigned int n = k*NT;
-							DDS.insert(2*j,2*n+1) = -omega(x,k)*(1.0-Gamma)/(1.0+Gamma);
-                        	DDS.insert(2*j+1,2*n) = omega(x,k)*(1.0+Gamma)/(1.0-Gamma);
-							bound += -(1.0-Gamma)*omega(x,k)*(p(2*m)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*m+1)*p(2*n+1)/(1.0-Gamma);
+							minusDS(2*j+1) += (1+Gamma)*omega(x,k)p(2*n+1)*theta/(1-Gamma);
+							DDS.coeffRef(2*j,2*n+1) += -omega(x,k)*(1.0-Gamma)/(1.0+Gamma)*theta;
+							bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-root[0])*(p(2*n)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*n+1)/(1.0-Gamma);
                         	}
 						}
 					}
