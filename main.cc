@@ -280,7 +280,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 	//other derived quantities
 	NT = Na + Nb + Nc;
-	R = 2.0/3.0/epsilon;
+	R = S1/dE;
 	alpha *= R;
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
