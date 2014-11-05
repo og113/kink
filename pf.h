@@ -311,8 +311,41 @@ void fdf_gsl (double x, void * parameters, double * f, double* df)
 	*df = real(ddV_params(x,epsi,aa));
 	}
 	
+//energy change gsl functions : V(root[2])-V(root[0])-dE
+struct ec_gsl_params {double aa; double root0; double root2; double de; };
+
+double ec_gsl (double epsi, void * parameters)
+	{
+	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
+	double aa = (params->aa);
+	double root2 = (params->root2);
+	double root0 = (params->root0);
+	double de = (params->de);
+	return real(V_params(root2,epsi,aa) - V_params(root0,epsi,aa) - de);
+	}
+	
+double dec_gsl (double epsi, void * parameters)
+	{
+	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
+	double aa = (params->aa);
+	double root2 = (params->root2);
+	double root0 = (params->root0);
+	return real(dV_params(root2,epsi,aa)-dV_params(root0,epsi,aa));
+	}
+	
+void ecdec_gsl (double epsi, void * parameters, double * ec, double * dec)
+	{
+	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
+	double aa = (params->aa);
+	double root2 = (params->root2);
+	double root0 = (params->root0);
+	double de = (params->de);
+	*ec = real(V_params(root2,epsi,aa) - V_params(root0,epsi,aa) - de);
+	*dec = real(dV_params(root2,epsi,aa)-dV_params(root0,epsi,aa));
+	}
+	
 //function to find a root of function FDF, given initial guess
-double rootFinder(gsl_function_fdf * xFDF, const double & rootGuess)
+double rootFinder(gsl_function_fdf * xFDF, double rootGuess)
 	{
 	int status;
 	int iter = 0, max_iter = 100;
@@ -376,7 +409,36 @@ vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, cons
 			}
 	return roots;
 	}
-
+	
+//program to find epsilon given a gsl function fdf and dE
+void epsilonFn (gsl_function_fdf * xFDF, gsl_function_fdf * xECDEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
+	{
+	double closenessdE = 2.0e-16;
+	vector<double> dE_test(1);	dE_test[0] = 1.0;
+	double newdE = dE;
+	struct f_gsl_params * Fparameters = (struct f_gsl_params *) (*xFDF).params;
+	struct ec_gsl_params * ECparameters = (struct ec_gsl_params *) (*xECDEC).params;
+	while (dE_test.back()>closenessdE)
+		{
+		//find roots of ec(epsilon)=0
+		*xEpsilon = rootFinder(xECDEC,*xEpsilon);
+		//assign new value of epsilon to xFDF
+		(*Fparameters).epsi = *xEpsilon;
+		(*xFDF).params = Fparameters;
+		//finding new roots of dV(phi)=0
+		*xRoot = minimaFn(xFDF, -3.0, 3.0, 20);
+		sort((*xRoot).begin(),(*xRoot).end());
+		//assign new roots to xECDF
+		(*ECparameters).root0 = (*xRoot)[0];
+		(*ECparameters).root2 = (*xRoot)[2];
+		(*xECDEC).params = ECparameters;
+		//evaluating new dE
+		newdE = (*xECDEC).f(*xEpsilon,ECparameters);
+		//evaluating test
+		dE_test.push_back(absolute((newdE-(*xdE))/(*xdE)));
+		}
+	*xdE = newdE;
+	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

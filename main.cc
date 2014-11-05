@@ -58,7 +58,11 @@ fmainin.close();
 //sorting out files to load
 
 //getting list of relevant data files, with timeNumbers between minFile and maxFile
-system("dir ./data/* > dataFiles");
+int systemCall = system("dir ./data/* > dataFiles");
+if (systemCall==-1)
+	{
+	cout << "system call failure, finding dataFiles" << endl;
+	}
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 
@@ -221,9 +225,46 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		ddV = &ddV2;
 		}
 
-	//derived quantities
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding epsilon
+	if (pot.compare("1")==0)
+		{
+		epsilon = dE;
+		}
+	else if (pot.compare("2")==0)
+		{
+		epsilon = 0.75;
+		}
+	
+	//gsl function for dV(phi)
+	struct f_gsl_params fparams = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &fparams;	
+	
+	//finding roots of dV(phi)=0
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
+	sort(root.begin(),root.end());
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
+	
+	//gsl function for V(root2)-V(root1)-dE
+	struct ec_gsl_params ecparams = { A, root[0], root[2], dE};
+	gsl_function_fdf ECDEC;
+	ECDEC.f = ec_gsl;
+	ECDEC.df = dec_gsl;
+	ECDEC.fdf = ecdec_gsl;
+	ECDEC.params = &ecparams;
+	
+	//evaluating epsilon, new root and dE may change slightly
+	epsilonFn(&FDF,&ECDEC,&dE,&epsilon,&root);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//other derived quantities
 	NT = Na + Nb + Nc;
-	epsilon = dE;
 	R = 2.0/3.0/epsilon;
 	//alpha *= R;
 	Gamma = exp(-theta);
@@ -261,19 +302,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	//defining some important scalar quantities
 	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
 	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
-	
-	//finding roots of dV
-	struct f_gsl_params params = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &params;
-	
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -311,10 +339,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
 		if (negEigDone==0)
 			{
-			system("./negEig"); //negEig now needs timeNumber
-			char * fileNumber = (char *)(fileNumbers[fileLoop]);
-			system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
-			cout << "negEig run" << endl;
+			//system("./negEig"); //negEig now needs timeNumber
+			//char * fileNumber = (char *)(fileNumbers[fileLoop]);
+			//system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
+			//cout << "negEig run" << endl;
+			cout << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
 			}
 		negVec = loadVector("data/eigVec.dat",Nb,1);
 		ifstream eigFile;
@@ -648,14 +677,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				            else
 				            	{
 				                unsigned int neighb = neigh(j,direc,sign,NT);
-				                minusDS(2*j) += - imag(Dt/a)p(2*neighb) - real(Dt/a)*p(2*neighb+1);
+				                minusDS(2*j) += - imag(Dt/a)*p(2*neighb) - real(Dt/a)*p(2*neighb+1);
 				                DDS.coeffRef(2*j,2*neighb) += imag(Dt/a);
 				                DDS.coeffRef(2*j,2*neighb+1) += real(Dt/a);
 				                }
 				            }
 				        comp temp0 = a/dt - 2.0*Dt/a;
 				        double temp1 = imag(a*Dt*dV(Cp(j)));
-				        double temp2 = - 3.0*real(Dt)*a*p(2*j)*p(2*j+1)
+				        double temp2 = - 3.0*real(Dt)*a*p(2*j)*p(2*j+1);
 				        
 				        minusDS(2*j) += -imag(temp0)*p(2*j) - real(temp0)*p(2*j+1) + imag(a*Dt*dV(Cp(j)));
 				        //////////////////////UNFINISHED/////////////////////////////
@@ -679,7 +708,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				                }
 				            }
                         comp temp0 = a/dt;
-		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j))) + dVr(Cp(j)));//dV terms should be small as linearised
+		            	comp temp1 = a*Dt*(2.0*Cp(j)/pow(a,2.0) + dV(Cp(j)) + dVr(Cp(j)));//dV terms should be small as linearised
 
 				        minusDS(2*j) += real(temp1 - temp0*Cp(j));
 				        minusDS(2*j+1) += imag(temp1 - temp0*Cp(j));
