@@ -206,41 +206,25 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	if (pot[0]=='1')
 		{
 		V_params = &V1_params;
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
 		dV_params = &dV1_params;
-		dV = &dV1;
 		ddV_params = &ddV1_params;
-		ddV = &ddV1;
-		}
-	else if (pot[0]=='2')
-		{
-		V_params = &V2_params;
-		V = &V2;
-		V0 = &V20;
-		Ve = &V2e;
-		dV_params = &dV2_params;
-		dV = &dV2;
-		ddV_params = &ddV2_params;
-		ddV = &ddV2;
-		}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//finding epsilon
-	if (pot[0]=='1')
-		{
 		epsilon = dE;
 		}
 	else if (pot[0]=='2')
 		{
+		V_params = &V2_params;
+		dV_params = &dV2_params;
+		ddV_params = &ddV2_params;
 		epsilon = 0.75;
 		}
 	else
 		{
 		cout << "pot option not available, pot = " << pot << endl;
 		}
-	
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding epsilon and root
+
 	//gsl function for dV(phi)
 	struct f_gsl_params fparams = { epsilon, A};
 	gsl_function_fdf FDF;
@@ -252,8 +236,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	//finding roots of dV(phi)=0
 	root = minimaFn(&FDF, -3.0, 3.0, 20);
 	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
 	
 	//gsl function for V(root2)-V(root1)-dE
 	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
@@ -263,6 +245,26 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 	//evaluating epsilon, new root and dE may change slightly
 	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	
+	//evaluating V and a couple of properties of V
+	if (pot[0]=='1')
+		{
+		V = &V1;
+		V0 = &V10;
+		Ve = &V1e;
+		dV = &dV1;
+		ddV = &ddV1;
+		}
+	else if (pot[0]=='2')
+		{
+		V = &V2;
+		V0 = &V20;
+		Ve = &V2e;
+		dV = &dV2;
+		ddV = &ddV2;
+		}
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

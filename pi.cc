@@ -93,12 +93,81 @@ string loop_choice = aq.loopChoice; //just so that we don't have two full stops 
 string print_choice = aq.printChoice;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//calculated quantities derived from the inputs, and loading eigVec and eigVal	
+//calculated quantities derived from the inputs, and loading eigVec and eigVal
+	
+	//potential functions
+	if (pot[0]=='1')
+		{
+		V_params = &V1_params;
+		dV_params = &dV1_params;
+		ddV_params = &ddV1_params;
+		epsilon = dE;
+		}
+	else if (pot[0]=='2')
+		{
+		V_params = &V2_params;
+		dV_params = &dV2_params;
+		ddV_params = &ddV2_params;
+		epsilon = 0.75;
+		}
+	else
+		{
+		cout << "pot option not available, pot = " << pot << endl;
+		}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding epsilon and root
+	
+	//gsl function for dV(phi)
+	struct f_gsl_params fparams = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &fparams;	
+	
+	//finding roots of dV(phi)=0
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
+	sort(root.begin(),root.end());
+	
+	//gsl function for V(root2)-V(root1)-dE
+	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	gsl_function EC;
+	EC.function = &ec_gsl;
+	EC.params = &ec_params;
+	
+	//evaluating epsilon, new root and dE may change slightly
+	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	
+	//evaluating V and a couple of properties of V
+	if (pot[0]=='1')
+		{
+		V = &V1;
+		V0 = &V10;
+		Ve = &V1e;
+		dV = &dV1;
+		ddV = &ddV1;
+		}
+	else if (pot[0]=='2')
+		{
+		V = &V2;
+		V0 = &V20;
+		Ve = &V2e;
+		dV = &dV2;
+		ddV = &ddV2;
+		}
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//defining some important scalar quantities
+double S1 = 2.0/3.0; //mass of kink multiplied by lambda
+double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 
 //derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
-epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
 L = LoR*R;
@@ -178,33 +247,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
 	printParameters();
 	
-	//potential functions
-	if (pot[0]=='1')
-		{
-		V_params = &V1_params;
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
-		dV_params = &dV1_params;
-		dV = &dV1;
-		ddV_params = &ddV1_params;
-		ddV = &ddV1;
-		}
-	else if (pot[0]=='2')
-		{
-		V_params = &V2_params;
-		V = &V2;
-		V0 = &V20;
-		Ve = &V2e;
-		dV_params = &dV2_params;
-		dV = &dV2;
-		ddV_params = &ddV2_params;
-		ddV = &ddV2;
-		}
-	
-	//defining some important scalar quantities
-	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	comp action = twaction;
 	double W;
 	double E;
@@ -225,19 +267,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
 	p = Eigen::VectorXd::Zero(2*N*Nb+1);
-	
-	//finding roots of dV
-	struct f_gsl_params params = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &params;
-	
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
 	
 	//defining lambda functions for regularization
 	auto Vr = [&] (const comp & phi)
