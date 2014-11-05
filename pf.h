@@ -390,15 +390,15 @@ double ec_gsl (double epsi, void * parameters)
 	
 //S1 integrand
 struct void_gsl_params{};
-double s1_gsl (double epsi, void * parameters)
+double s1_gsl (double x, void * parameters)
 	{
-	return pow(2.0*real(V0(x),0.5);
+	return pow(2.0*real(V0(x)),0.5);
 	}
 
 //rho integrand
-double rho_gsl (double epsi, void * parameters)
+double rho_gsl (double x, void * parameters)
 	{
-	return pow(2.0*real(V0(x),-0.5);
+	return pow(2.0*real(V0(x)),-0.5);
 	}
 	
 //function to give the three roots of FDF given lower and upper limits on them and a number of loops to try
