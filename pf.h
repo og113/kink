@@ -148,6 +148,68 @@ unsigned int smallestFn(const vector <unsigned int> & inVector)
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//generic gsl derived functions
+
+//function to find a root of function FDF, given initial guess, using newton method
+double rootFinder(gsl_function_fdf * xFDF, double rootGuess)
+	{
+	int status;
+	int iter = 0, max_iter = 100;
+	const gsl_root_fdfsolver_type *T;
+	gsl_root_fdfsolver *s;
+	double x0, x = rootGuess;
+
+	T = gsl_root_fdfsolver_newton;
+	s = gsl_root_fdfsolver_alloc (T);
+	gsl_root_fdfsolver_set (s, xFDF, x);
+
+	do
+		{
+		  iter++;
+		  status = gsl_root_fdfsolver_iterate (s);
+		  x0 = x;
+		  x = gsl_root_fdfsolver_root (s);
+		  status = gsl_root_test_delta (x, x0, 0, DBL_MIN);
+		}
+	while (status == GSL_CONTINUE && iter < max_iter);
+
+	gsl_root_fdfsolver_free (s);
+	return x;
+	}
+	
+//function to find a root of function FDF, given initial guess, and lower and upper bounds, using brent method
+double brentRootFinder(gsl_function * xF, const double & rootGuess, const double & rootLower, const double &rootUpper)
+	{
+	int status;
+	int iter = 0, max_iter = 100;
+	const gsl_root_fsolver_type *T;
+	gsl_root_fsolver *s;
+	double x = rootGuess;
+	double x_lo = rootLower;
+	double x_hi = rootUpper;
+
+	T = gsl_root_fsolver_brent;
+	s = gsl_root_fsolver_alloc (T);
+	gsl_root_fsolver_set (s, xF, x_lo, x_hi);
+
+	do
+		{
+		  iter++;
+		  status = gsl_root_fsolver_iterate (s);
+		  x = gsl_root_fsolver_root (s);
+		  x_lo = gsl_root_fsolver_x_lower (s);
+		  x_hi = gsl_root_fsolver_x_upper (s);
+      	  status = gsl_root_test_interval (x_lo, x_hi,
+                                       0, DBL_MIN);
+		}
+	while (status == GSL_CONTINUE && iter < max_iter);
+
+	gsl_root_fsolver_free (s);
+	return x;
+	}
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //potential related functions
 comp V1_params (const comp & phi, const double & epsi, const double & aa) //aa is intentionally unused
 	{
@@ -326,64 +388,18 @@ double ec_gsl (double epsi, void * parameters)
 	return real(V_params(root0,epsi,aa) - V_params(root2,epsi,aa) - de);
 	}
 	
-//function to find a root of function FDF, given initial guess, using newton method
-double rootFinder(gsl_function_fdf * xFDF, double rootGuess)
+//S1 integrand
+struct void_gsl_params{};
+double s1_gsl (double epsi, void * parameters)
 	{
-	int status;
-	int iter = 0, max_iter = 100;
-	const gsl_root_fdfsolver_type *T;
-	gsl_root_fdfsolver *s;
-	double x0, x = rootGuess;
-
-	T = gsl_root_fdfsolver_newton;
-	s = gsl_root_fdfsolver_alloc (T);
-	gsl_root_fdfsolver_set (s, xFDF, x);
-
-	do
-		{
-		  iter++;
-		  status = gsl_root_fdfsolver_iterate (s);
-		  x0 = x;
-		  x = gsl_root_fdfsolver_root (s);
-		  status = gsl_root_test_delta (x, x0, 0, DBL_MIN);
-		}
-	while (status == GSL_CONTINUE && iter < max_iter);
-
-	gsl_root_fdfsolver_free (s);
-	return x;
-	}
-	
-//function to find a root of function FDF, given initial guess, and lower and upper bounds, using brent method
-double brentRootFinder(gsl_function * xF, double rootGuess, double rootLower, double rootUpper)
-	{
-	int status;
-	int iter = 0, max_iter = 100;
-	const gsl_root_fsolver_type *T;
-	gsl_root_fsolver *s;
-	double x = rootGuess;
-	double x_lo = rootLower;
-	double x_hi = rootUpper;
-
-	T = gsl_root_fsolver_brent;
-	s = gsl_root_fsolver_alloc (T);
-	gsl_root_fsolver_set (s, xF, x_lo, x_hi);
-
-	do
-		{
-		  iter++;
-		  status = gsl_root_fsolver_iterate (s);
-		  x = gsl_root_fsolver_root (s);
-		  x_lo = gsl_root_fsolver_x_lower (s);
-		  x_hi = gsl_root_fsolver_x_upper (s);
-      	  status = gsl_root_test_interval (x_lo, x_hi,
-                                       0, DBL_MIN);
-		}
-	while (status == GSL_CONTINUE && iter < max_iter);
-
-	gsl_root_fsolver_free (s);
-	return x;
+	return pow(2.0*real(V0(x),0.5);
 	}
 
+//rho integrand
+double rho_gsl (double epsi, void * parameters)
+	{
+	return pow(2.0*real(V0(x),-0.5);
+	}
 	
 //function to give the three roots of FDF given lower and upper limits on them and a number of loops to try
 vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, const double & highLimit,\
@@ -436,7 +452,7 @@ void epsilonFn (gsl_function_fdf * xFDF, gsl_function * xEC, double * xdE, doubl
 	while (dE_test.back()>closenessdE)
 		{
 		//find roots of ec(epsilon)=0
-		*xEpsilon = brentRootFinder(xEC,*xEpsilon,*xEpsilon/3.0,*xEpsilon*3.0);
+		*xEpsilon = brentRootFinder(xEC,*xEpsilon,*xEpsilon/2.0,*xEpsilon*2.0);
 		//assign new value of epsilon to xFDF
 		(*Fparameters).epsi = *xEpsilon;
 		(*xFDF).params = Fparameters;

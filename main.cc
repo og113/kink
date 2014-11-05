@@ -265,13 +265,23 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
+	
+	//finding S1
+	double S1, S1error;
+	struct void_gsl_params s1params = {};
+	gsl_function S1_integrand;
+	S1_integrand.function = &s1_gsl;
+	S1_integrand.params = &s1params;
+	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+	gsl_integration_qags(&S1_integrand, root[0], root[3], DBL_MIN, DBL_MIN, 1e4, w, &S1, &S1error);
+	gsl_integration_workspace_free(w);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//other derived quantities
 	NT = Na + Nb + Nc;
 	R = 2.0/3.0/epsilon;
-	//alpha *= R;
+	alpha *= R;
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
 	L = LoR*R;
@@ -303,10 +313,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
-	
-	//defining some important scalar quantities
-	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -405,6 +411,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vec linNum(NT);
 		
 		//defining the action and bound and W
+		double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		comp action = i*twaction;
 		double bound = 0.0;
 		double W = 0.0;
