@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
@@ -227,13 +228,17 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon
-	if (pot.compare("1")==0)
+	if (pot[0]=='1')
 		{
 		epsilon = dE;
 		}
-	else if (pot.compare("2")==0)
+	else if (pot[0]=='2')
 		{
 		epsilon = 0.75;
+		}
+	else
+		{
+		cout << "pot option not available, pot = " << pot << endl;
 		}
 	
 	//gsl function for dV(phi)
@@ -251,15 +256,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	mass2 = real(ddV(root[0]));
 	
 	//gsl function for V(root2)-V(root1)-dE
-	struct ec_gsl_params ecparams = { A, root[0], root[2], dE};
-	gsl_function_fdf ECDEC;
-	ECDEC.f = ec_gsl;
-	ECDEC.df = dec_gsl;
-	ECDEC.fdf = ecdec_gsl;
-	ECDEC.params = &ecparams;
+	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	gsl_function EC;
+	EC.function = &ec_gsl;
+	EC.params = &ec_params;
 	
 	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&FDF,&ECDEC,&dE,&epsilon,&root);
+	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -366,7 +369,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		{
 		if (loops>1)
 			{
-			if ((absolute(theta-minTheta)>2.0e-16 || absolute(Tb-minTb)>2.0e-16) && loop==0)
+			if ((absolute(theta-minTheta)>DBL_MIN || absolute(Tb-minTb)>DBL_MIN) && loop==0)
 				{
 				cout << "input Tb: " << Tb << endl;
 				cout << "program Tb: " << minTb << endl;
@@ -374,12 +377,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				cout << "program theta: " << minTheta << endl;
 				cout << endl;
 				}
-			if (absolute(maxTheta-minTheta)>2.0e-16)
+			if (absolute(maxTheta-minTheta)>DBL_MIN)
 				{
 				theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
 				Gamma = exp(-theta);
 				}
-			else if (absolute(maxTb-minTb)>2.0e-16)
+			else if (absolute(maxTb-minTb)>DBL_MIN)
 				{
 				Tb = minTb + (maxTb - minTb)*loop/(loops-1.0);
 				changeDouble ("Tb",Tb);
@@ -534,7 +537,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			normX = pow(normX,0.5);
 			double normT = chiT.dot(chiT);
 			normT = pow(normT,0.5);
-			if (absolute(normX)<2.0e-16 || absolute(normT)<2.0e-16)
+			if (absolute(normX)<DBL_MIN || absolute(normT)<DBL_MIN)
 				{
 				cout << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
@@ -589,7 +592,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				comp Dt = DtFn(t);
 				comp dt = dtFn(t);
 			
-				if (absolute(chiX(j))>2.0e-16) //spatial zero mode lagrange constraint
+				if (absolute(chiX(j))>DBL_MIN) //spatial zero mode lagrange constraint
 					{
 					DDS.insert(2*j,2*N*NT) = a*chiX(j); 
 					DDS.insert(2*N*NT,2*j) = a*chiX(j);
@@ -597,7 +600,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					minusDS(2*N*NT) += -a*chiX(j)*p(2*j);
 					}
 					
-				if (absolute(chiT(j))>2.0e-16)
+				if (absolute(chiT(j))>DBL_MIN)
 					{
 					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) += a*chiT(j);
@@ -608,7 +611,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		            minusDS(2*N*NT+1) += - a*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
-				if (absolute(theta)<2.0e-16)
+				if (absolute(theta)<DBL_MIN)
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
@@ -649,14 +652,14 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 					
-					if (absolute(theta)<2.0e-16)
+					if (absolute(theta)<DBL_MIN)
 						{
 						//DDS.insert(2*j,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
 						//DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 						/////////////////////////////////////equation 1
 						for (unsigned int k=0;k<N;k++) //not the simplest b.c.s possible, but continuously related to the theta!=0 ones
 							{
-							if (absolute(omega(x,k))>2.0e-16)
+							if (absolute(omega(x,k))>DBL_MIN)
 								{
 								unsigned int m=k*NT;
 								DDS.coeffRef(2*j+1,2*m+1) += -2.0*omega(x,k);
@@ -1015,11 +1018,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (absolute(maxTheta-minTheta)>2.0e-16)
+		if (absolute(maxTheta-minTheta)>DBL_MIN)
 			{
 			changeInputs(runInputs, "theta", numberToString<double>(theta));
 			}
-		else if (absolute(maxTb-minTb)>2.0e-16)
+		else if (absolute(maxTb-minTb)>DBL_MIN)
 			{
 			changeInputs(runInputs, "Tb", numberToString<double>(Tb));
 			}

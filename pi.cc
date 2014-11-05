@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
@@ -48,7 +49,7 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta)>2.0e-16)
+			if (absolute(theta)>DBL_MIN)
 				{
 				cout << "theta != 0" << endl;
 				cout << "theta = " << theta << endl;
@@ -438,7 +439,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			
-			if (absolute(Chi0(j))>2.0e-16) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>DBL_MIN) //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -719,7 +720,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
-		        if (absolute(theta)<2.0e-16)
+		        if (absolute(theta)<DBL_MIN)
 					{
 		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
 					linNumA (Na-t) += omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
@@ -803,7 +804,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//checking energy conserved
 	double ergChange = 0.0;
 	double relErgChange = 0.0;
-	if (absolute(real(erg(0)))>2.0e-16)
+	if (absolute(real(erg(0)))>DBL_MIN)
 		{
 		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
 		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));

@@ -13,10 +13,12 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <ctype.h>
+#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
 #include <gsl/gsl_roots.h>
+#include <gsl/gsl_integration.h>
 #include "gnuplot_i.hpp"
 
 using namespace std;
@@ -321,30 +323,10 @@ double ec_gsl (double epsi, void * parameters)
 	double root2 = (params->root2);
 	double root0 = (params->root0);
 	double de = (params->de);
-	return real(V_params(root2,epsi,aa) - V_params(root0,epsi,aa) - de);
+	return real(V_params(root0,epsi,aa) - V_params(root2,epsi,aa) - de);
 	}
 	
-double dec_gsl (double epsi, void * parameters)
-	{
-	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
-	double aa = (params->aa);
-	double root2 = (params->root2);
-	double root0 = (params->root0);
-	return real(dV_params(root2,epsi,aa)-dV_params(root0,epsi,aa));
-	}
-	
-void ecdec_gsl (double epsi, void * parameters, double * ec, double * dec)
-	{
-	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
-	double aa = (params->aa);
-	double root2 = (params->root2);
-	double root0 = (params->root0);
-	double de = (params->de);
-	*ec = real(V_params(root2,epsi,aa) - V_params(root0,epsi,aa) - de);
-	*dec = real(dV_params(root2,epsi,aa)-dV_params(root0,epsi,aa));
-	}
-	
-//function to find a root of function FDF, given initial guess
+//function to find a root of function FDF, given initial guess, using newton method
 double rootFinder(gsl_function_fdf * xFDF, double rootGuess)
 	{
 	int status;
@@ -363,14 +345,45 @@ double rootFinder(gsl_function_fdf * xFDF, double rootGuess)
 		  status = gsl_root_fdfsolver_iterate (s);
 		  x0 = x;
 		  x = gsl_root_fdfsolver_root (s);
-		  status = gsl_root_test_delta (x, x0, 0, 1e-12);
-
+		  status = gsl_root_test_delta (x, x0, 0, DBL_MIN);
 		}
 	while (status == GSL_CONTINUE && iter < max_iter);
 
 	gsl_root_fdfsolver_free (s);
 	return x;
 	}
+	
+//function to find a root of function FDF, given initial guess, and lower and upper bounds, using brent method
+double brentRootFinder(gsl_function * xF, double rootGuess, double rootLower, double rootUpper)
+	{
+	int status;
+	int iter = 0, max_iter = 100;
+	const gsl_root_fsolver_type *T;
+	gsl_root_fsolver *s;
+	double x = rootGuess;
+	double x_lo = rootLower;
+	double x_hi = rootUpper;
+
+	T = gsl_root_fsolver_brent;
+	s = gsl_root_fsolver_alloc (T);
+	gsl_root_fsolver_set (s, xF, x_lo, x_hi);
+
+	do
+		{
+		  iter++;
+		  status = gsl_root_fsolver_iterate (s);
+		  x = gsl_root_fsolver_root (s);
+		  x_lo = gsl_root_fsolver_x_lower (s);
+		  x_hi = gsl_root_fsolver_x_upper (s);
+      	  status = gsl_root_test_interval (x_lo, x_hi,
+                                       0, DBL_MIN);
+		}
+	while (status == GSL_CONTINUE && iter < max_iter);
+
+	gsl_root_fsolver_free (s);
+	return x;
+	}
+
 	
 //function to give the three roots of FDF given lower and upper limits on them and a number of loops to try
 vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, const double & highLimit,\
@@ -411,17 +424,19 @@ vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, cons
 	}
 	
 //program to find epsilon given a gsl function fdf and dE
-void epsilonFn (gsl_function_fdf * xFDF, gsl_function_fdf * xECDEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
+void epsilonFn (gsl_function_fdf * xFDF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
 	{
-	double closenessdE = 2.0e-16;
+	double closenessdE =  DBL_MIN;
 	vector<double> dE_test(1);	dE_test[0] = 1.0;
 	double newdE = dE;
 	struct f_gsl_params * Fparameters = (struct f_gsl_params *) (*xFDF).params;
-	struct ec_gsl_params * ECparameters = (struct ec_gsl_params *) (*xECDEC).params;
+	struct ec_gsl_params * ECparameters = (struct ec_gsl_params *) (*xEC).params;
+	unsigned int counter = 0;
+	unsigned int maxCounter = 100;
 	while (dE_test.back()>closenessdE)
 		{
 		//find roots of ec(epsilon)=0
-		*xEpsilon = rootFinder(xECDEC,*xEpsilon);
+		*xEpsilon = brentRootFinder(xEC,*xEpsilon,*xEpsilon/3.0,*xEpsilon*3.0);
 		//assign new value of epsilon to xFDF
 		(*Fparameters).epsi = *xEpsilon;
 		(*xFDF).params = Fparameters;
@@ -431,11 +446,18 @@ void epsilonFn (gsl_function_fdf * xFDF, gsl_function_fdf * xECDEC, double * xdE
 		//assign new roots to xECDF
 		(*ECparameters).root0 = (*xRoot)[0];
 		(*ECparameters).root2 = (*xRoot)[2];
-		(*xECDEC).params = ECparameters;
+		(*xEC).params = ECparameters;
 		//evaluating new dE
-		newdE = (*xECDEC).f(*xEpsilon,ECparameters);
+		newdE = (*(*xEC).function)(*xEpsilon,ECparameters) + dE;
 		//evaluating test
 		dE_test.push_back(absolute((newdE-(*xdE))/(*xdE)));
+		counter++;
+		//test if too many runs
+		if (counter>maxCounter)
+			{
+			cout << "epsilonFn error, more that " << maxCounter << " loops, consider reducing closenessdE" << endl;
+			cout << "dE_test.back() = " << dE_test.back() << endl;
+			}
 		}
 	*xdE = newdE;
 	}
@@ -636,8 +658,8 @@ comp DtFn (const unsigned int& time)
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%12s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","epsilon");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%12g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,epsilon);
 	printf("\n");
 	}
 	
@@ -883,7 +905,7 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 			{
 			istringstream ss(line);
 			ss >> row >> column >> value;
-			if (absolute(value)>2.0e-16)
+			if (absolute(value)>DBL_MIN)
 				{
 				M.insert(row-1,column-1) = value;
 				nnz++;
