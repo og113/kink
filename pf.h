@@ -102,6 +102,7 @@ double negVal; //the negative eigenvalue
 unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 string zmt; //dictates how time zero mode is dealt with
 string zmx; //dictates how x zero mode is dealt with
+double epsilon0; //the value of epsilon when the minima are degenerate
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -248,12 +249,12 @@ comp (*V_params) (const comp & phi, const double & epsi, const double & aa);
 //potentials with degenerate minima, and without regularisation
 comp V10 (const comp & phi)
 	{
-	return V1_params(phi,0.0,0.0);
+	return V1_params(phi,epsilon0,0.0);
 	}
 	
 comp V20 (const comp & phi)
 	{
-	return V2_params(phi,0.7450777428719992,A); //epsilon0 needs checking
+	return V2_params(phi,epsilon0,A); //epsilon0 needs checking
 	}
 	
 comp (*V0) (const comp & phi);
@@ -388,8 +389,28 @@ double ec_gsl (double epsi, void * parameters)
 	return real(V_params(root0,epsi,aa) - V_params(root2,epsi,aa) - de);
 	}
 	
-//S1 integrand
+//dV0
 struct void_gsl_params{};
+//dV0 as a gsl function
+double dV0_gsl (double x, void * parameters)
+	{
+	return real(dV_params(x,epsilon0,A));
+	}
+	
+//ddV0 as a gsl_function
+double ddV0_gsl (double x, void * parameters)
+	{
+	return real(ddV_params(x,epsilon0,A));
+	}
+	
+//dV0ddV0 as a void gsl_fdf
+void dV0ddV0_gsl (double x, void * parameters, double * f, double* df) 
+	{
+	*f =  real(dV_params(x,epsilon0,A));
+	*df = real(ddV_params(x,epsilon0,A));
+	}
+	
+//S1 integrand
 double s1_gsl (double x, void * parameters)
 	{
 	return pow(2.0*real(V0(x)),0.5);

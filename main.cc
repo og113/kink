@@ -209,6 +209,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		dV_params = &dV1_params;
 		ddV_params = &ddV1_params;
 		epsilon = dE;
+		epsilon0 = 0.0;
 		}
 	else if (pot[0]=='2')
 		{
@@ -216,6 +217,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		dV_params = &dV2_params;
 		ddV_params = &ddV2_params;
 		epsilon = 0.75;
+		epsilon0 = 0.7450777428719992;
 		}
 	else
 		{
@@ -266,14 +268,31 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
 	
+	//finding root0 of dV0(phi)=0;
+	struct void_gsl_params vparams = {};
+	vector<double> root0(3);
+	if (pot[0]=='1')
+		{
+		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		}
+	else if (pot[0]=='2')
+		{
+		gsl_function_fdf DV0DDV0;
+		DV0DDV0.f = dV0_gsl;
+		DV0DDV0.df = ddV0_gsl;
+		DV0DDV0.fdf = dV0ddV0_gsl;
+		DV0DDV0.params = &vparams;	
+		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
+		sort(root0.begin(),root0.end());
+		}
+	
 	//finding S1
 	double S1, S1error;
-	struct void_gsl_params s1params = {};
 	gsl_function S1_integrand;
 	S1_integrand.function = &s1_gsl;
-	S1_integrand.params = &s1params;
+	S1_integrand.params = &vparams;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qags(&S1_integrand, root[0], root[3], DBL_MIN, DBL_MIN, 1e4, w, &S1, &S1error);
+	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, (size_t)1e4, 1e4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

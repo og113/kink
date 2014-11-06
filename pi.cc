@@ -117,7 +117,7 @@ string print_choice = aq.printChoice;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon and root
-	
+
 	//gsl function for dV(phi)
 	struct f_gsl_params fparams = { epsilon, A};
 	gsl_function_fdf FDF;
@@ -158,6 +158,46 @@ string print_choice = aq.printChoice;
 		}
 	comp ergZero = N*a*V(root[0]);
 	mass2 = real(ddV(root[0]));
+	
+	//finding root0 of dV0(phi)=0;
+	struct void_gsl_params vparams = {};
+	vector<double> root0(3);
+	if (pot[0]=='1')
+		{
+		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		}
+	else if (pot[0]=='2')
+		{
+		gsl_function_fdf DV0DDV0;
+		DV0DDV0.f = dV0_gsl;
+		DV0DDV0.df = ddV0_gsl;
+		DV0DDV0.fdf = dV0ddV0_gsl;
+		DV0DDV0.params = &vparams;	
+		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
+		sort(root0.begin(),root0.end());
+		}
+	
+	//finding S1
+	double S1, S1error;
+	gsl_function S1_integrand;
+	S1_integrand.function = &s1_gsl;
+	S1_integrand.params = &vparams;
+	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, (size_t)1e4, 1e4, w, &S1, &S1error);
+	gsl_integration_workspace_free(w);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//finding phi profile between minima
+unsigned int profileSize = 50;
+vector<double> phiProfile(profileSize);
+vector<double> rhoProfile(profileSize);
+double rhoMin, rhoMax;
+for (unsigned int j=0;j<profileSize;j++)
+	{
+	phiProfile[j] = root[0] + (root[2]-root[0])*j/(profileSize-1.0);
+	}
+rhoMin = 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
