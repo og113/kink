@@ -1,5 +1,5 @@
 plans to get V2 working on c++ side:
-	- program to find epsilon given dE
+	DONE - program to find epsilon given dE
 		- while test>closeness
 		- find roots of dV, with an initial guess for epsilon
 		- find zero of V(root[2])-V(root[0])-dE as a function of epsilon
@@ -7,7 +7,7 @@ plans to get V2 working on c++ side:
 		- evaluate new dE
 		- test=(newdE-dE)/dE
 		- end while, assign new minima, new epsilon and new dE
-	- program to find S1
+	DONE - program to find S1
 		- S1 is the integral of (2V)^0.5 between the minima, use the degenerate minima case
 		- use S1 program to get R
 	- program to find phi to input, the generalisation of the tanh

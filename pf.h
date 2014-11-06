@@ -134,13 +134,14 @@ double absolute (const double& amplitude)
 	return abs_amplitude;
 	}
 	
-//function giving location of smallest element of a unsigned int vector
-unsigned int smallestFn(const vector <unsigned int> & inVector)
+//function giving location of smallest element of a vector of type T
+template <typename T>
+unsigned int smallestLoc(const vector <T> & inVector)
 	{
 	unsigned int loc = 0;
 	for(unsigned int l=1;l<inVector.size();l++)
 		{
-		if (inVector[l]<inVector[loc])
+		if (absolute(inVector[l])<absolute(inVector[loc]))
 			{
 			loc = l;
 			}
@@ -460,13 +461,59 @@ vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, cons
 	return roots;
 	}
 	
+//function to give the three roots of FDF given lower and upper limits on them and a number of loops to try, using brent method
+vector <double> brentMinimaFn (gsl_function * xF, const double & lowLimit, const double & highLimit,\
+							const unsigned int & rootLoops)
+	{
+	vector <double> roots;
+	double tempLow = lowLimit;
+	double tempHigh = highLimit;
+	unsigned int j = 0;
+	while( roots.size()<3 && j<rootLoops)
+		{
+		double x = lowLimit+(absolute(highLimit)+absolute(lowLimit))*j/(rootLoops-1.0);
+	
+		if (j==0)
+			{
+			roots.push_back(x);
+			tempLow = x + 1.0e-1; //assuming minima are more spaced than 1.0e-1
+			tempHigh = 0.8; //assuming that the middle root is less than 0.8
+			//this is a bad fudge, try accepting errors and just relooping with different tempHigh if nothing was found
+			}
+		else
+			{
+			unsigned int test = 0;
+			for (unsigned int k=0;k<roots.size();k++)
+				{ 
+				if (absolute(x-roots[k])>1.0e-6)
+					{
+					test++;
+					}
+				}
+			if (test==roots.size())
+				{
+				roots.push_back(x);
+				tempLow = x + 1.0e-1; //assuming minima are more spaced than 1.0e-1
+				tempHigh = highLimit;
+				}
+			}
+		j++;
+		}
+	
+		if (roots.size()!=3)
+			{
+			cout << "minimaFn error: only found " << root.size() << " roots, not 3" << endl;
+			}
+	return roots;
+	}
+	
 //program to find epsilon given a gsl function fdf and dE
-void epsilonFn (gsl_function_fdf * xFDF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
+void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
 	{
 	double closenessdE =  DBL_MIN;
 	vector<double> dE_test(1);	dE_test[0] = 1.0;
 	double newdE = dE;
-	struct f_gsl_params * Fparameters = (struct f_gsl_params *) (*xFDF).params;
+	struct f_gsl_params * Fparameters = (struct f_gsl_params *) (*xF).params;
 	struct ec_gsl_params * ECparameters = (struct ec_gsl_params *) (*xEC).params;
 	unsigned int counter = 0;
 	unsigned int maxCounter = 100;
@@ -476,9 +523,9 @@ void epsilonFn (gsl_function_fdf * xFDF, gsl_function * xEC, double * xdE, doubl
 		*xEpsilon = brentRootFinder(xEC,*xEpsilon,*xEpsilon/2.0,*xEpsilon*2.0);
 		//assign new value of epsilon to xFDF
 		(*Fparameters).epsi = *xEpsilon;
-		(*xFDF).params = Fparameters;
+		(*xF).params = Fparameters;
 		//finding new roots of dV(phi)=0
-		*xRoot = minimaFn(xFDF, -3.0, 3.0, 20);
+		*xRoot = brentMinimaFn(xF, -3.0, 3.0, 20);
 		sort((*xRoot).begin(),(*xRoot).end());
 		//assign new roots to xECDF
 		(*ECparameters).root0 = (*xRoot)[0];
@@ -695,8 +742,8 @@ comp DtFn (const unsigned int& time)
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta","reg");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta,reg);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%12s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%12g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 

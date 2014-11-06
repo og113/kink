@@ -120,14 +120,12 @@ string print_choice = aq.printChoice;
 
 	//gsl function for dV(phi)
 	struct f_gsl_params fparams = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &fparams;	
+	gsl_function F;
+	F.function = &f_gsl;
+	F.params = &fparams;	
 	
 	//finding roots of dV(phi)=0
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
+	root = brentMinimaFn(&F, -3.0, 3.0, 20);
 	sort(root.begin(),root.end());
 	
 	//gsl function for V(root2)-V(root1)-dE
@@ -137,7 +135,7 @@ string print_choice = aq.printChoice;
 	EC.params = &ec_params;
 	
 	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	epsilonFn(&F,&EC,&dE,&epsilon,&root);
 	
 	//evaluating V and a couple of properties of V
 	if (pot[0]=='1')
@@ -168,12 +166,10 @@ string print_choice = aq.printChoice;
 		}
 	else if (pot[0]=='2')
 		{
-		gsl_function_fdf DV0DDV0;
-		DV0DDV0.f = dV0_gsl;
-		DV0DDV0.df = ddV0_gsl;
-		DV0DDV0.fdf = dV0ddV0_gsl;
-		DV0DDV0.params = &vparams;	
-		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
+		gsl_function DV0;
+		DV0.function = dV0_gsl;
+		DV0.params = &vparams;	
+		root0 = brentMinimaFn(&DV0, -3.0, 3.0, 20);
 		sort(root0.begin(),root0.end());
 		}
 	
@@ -185,30 +181,44 @@ string print_choice = aq.printChoice;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
 	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
-
+	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//finding phi profile between minima
-unsigned int profileSize = 50;
-vector<double> phiProfile(profileSize);
-vector<double> rhoProfile(profileSize);
-double rhoMin, rhoMax;
-for (unsigned int j=0;j<profileSize;j++)
-	{
-	phiProfile[j] = root[0] + (root[2]-root[0])*j/(profileSize-1.0);
-	}
-rhoMin = 
-
+	//finding phi profile between minima
+	unsigned int profileSize = 50;
+	vector<double> phiProfile(profileSize);
+	vector<double> rhoProfile(profileSize);
+	double alphaL, alphaR;
+	if (pot[0]=='2' || 1==1)
+		{
+		alphaL = root0[0]+1.0e-2;
+		alphaR = root0[2]-1.0e-2;
+		for (unsigned int j=0;j<profileSize;j++)
+			{
+			phiProfile[j] = alphaL + (alphaR-alphaL)*j/(profileSize-1.0);
+			}
+	
+		double profileError;
+		gsl_function rho_integrand;
+		rho_integrand.function = &rho_gsl;
+		rho_integrand.params = &vparams;
+		w = gsl_integration_workspace_alloc(1e4);
+		for (unsigned int j=0;j<profileSize;j++)
+			{
+			gsl_integration_qags(&rho_integrand, 0, phiProfile[j], DBL_MIN, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
+			if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
+			}
+		gsl_integration_workspace_free(w);
+		}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//defining some important scalar quantities
-double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
-
-//derived quantities
+//other derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
 R = 2.0/3.0/epsilon;
+double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 alpha *= R;
 L = LoR*R;
 vec negVec(2*N*Nb+1);
@@ -367,17 +377,41 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 				{
 				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
-				if ((rho-R)<-alpha)
+				if (pot[0]=='1')
 					{
-					p(2*j) = root[2];
+					if ((rho-R)<-alpha)
+						{
+						p(2*j) = root[2];
+						}
+					else if ((rho-R)>alpha)
+						{
+						p(2*j) = root[0];
+						}
+					else
+						{
+						p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
+						}
 					}
-				else if ((rho-R)>alpha)
+				else if (pot[0]=='2')
 					{
-					p(2*j) = root[0];
-					}
-				else
-					{
-					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
+					if ((rho-R)<alphaL) //alphaL is negative
+						{
+						p(2*j) = root[2];
+						}
+					else if ((rho-R)>alphaR)
+						{
+						p(2*j) = root[0];
+						}
+					else
+						{
+						vector<double> rhoPos (profileSize,rho-R);
+						for (unsigned int k=0; k<profileSize; k++)
+							{
+							rhoPos[k] -= rhoProfile[k];
+							}
+						unsigned int minLoc = smallestLoc(rhoPos);
+                        p(2*j) = phiProfile[minLoc];
+						}
 					}
 				if (inP.compare("p")==0)
 					{
