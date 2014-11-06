@@ -38,7 +38,7 @@ if (fmainin.is_open())
 		istringstream ss(line);
 		if (lineNumber==0)
 			{
-			ss >> inF >> minFile >> maxFile >> firstLoop;
+			ss >> inF >> minFile >> maxFile >> firstLoop >> lastLoop;
 			lineNumber++;
 			}
 		else if (lineNumber==1)
@@ -58,7 +58,11 @@ fmainin.close();
 //sorting out files to load
 
 //getting list of relevant data files, with timeNumbers between minFile and maxFile
-system("dir ./data/* > dataFiles");
+int systemRet = system("dir ./data/* > dataFiles");
+if(systemRet == -1)
+	{
+  	cout << "loading data files failed" << endl;
+	}
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 
@@ -101,7 +105,7 @@ for (unsigned int k=0;k<files.size();k++)
 	unsigned int l=0;
 	while(l<(*tempVecStr).size())
 		{
-		if (loopNumbers[l]<firstLoop)
+		if (loopNumbers[l]<firstLoop || loopNumbers[l]>lastLoop)
 			{
 			(*tempVecStr).erase((*tempVecStr).begin()+l);
 			loopNumbers.erase(loopNumbers.begin()+l);
@@ -251,8 +255,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 	//determining number of runs
 	closenessA = 1.0;
-	closenessS = 1.0e-5;
-	closenessSM = 1.0e-4;
+	closenessS = 1.0e-6;
+	closenessSM = 1.0e-5;
 	closenessD = 1.0;
 	closenessC = 1.0e-12;
 	closenessE = 1.0e-2;
@@ -317,10 +321,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
 		if (negEigDone==0)
 			{
-			system("./negEig"); //negEig now needs timeNumber
-			char * fileNumber = (char *)(fileNumbers[fileLoop]);
-			system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
-			cout << "negEig run" << endl;
+			cout << "need to run negVec first and set negEigDone=1 in inputs" << endl;
 			}
 		negVec = loadVector("data/eigVec.dat",Nb,1);
 		ifstream eigFile;
@@ -338,7 +339,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//beginning theta loop
+	//beginning theta or Tb loop
 	for (unsigned int loop=0; loop<loops; loop++)
 		{
 		if (loops>1)
@@ -378,8 +379,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		
 		//defining the action and bound and W
 		comp action = i*twaction;
-		double bound = 0.0;
-		double W = 0.0;
+		double bound;
+		double W;
 		double E;
 		double Num;
 		
@@ -407,8 +408,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		else
 			{
-			unsigned int toLoad = loop-1;
-			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(toLoad)+".dat";
+			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop-1)+".dat";
 			p = loadVector(loadfile,NT,2);
 			printf("%12s%30s\n","input: ",loadfile.c_str());
 			}
@@ -417,9 +417,10 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
 				
 		printParameters();
+		//printMoreParameters();
 			
 		//very early vector print
-		string earlyPrintFile = "data/" + timeNumber + "mainpiE" + numberToString<unsigned int>(loop) + "_" + "0.dat";
+		string earlyPrintFile = "data/" + timeNumber + "mainpiE" + "_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop) + "_" + "0.dat";
 		printVector(earlyPrintFile,p);
 		
 		//defining complexified vector Cp
@@ -850,7 +851,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		if (runs_count == aq.printRun || aq.printRun == 0)
 			{
 			string prefix = "./data/" + timeNumber;
-			string suffix = numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
+			string suffix = "_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
 			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0)
 				{
 				printAction(kineticT-kineticS,pot_l,pot_e);
@@ -1008,7 +1009,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		string suffix = "_" + numberToString<unsigned int>(fileLoop)+"_" + numberToString<unsigned int>(loop)+ ".dat";
 	
 		//copying a version of inputs with timeNumber and theta changed
-		string runInputs = prefix + "inputsM"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
+		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
 		if (absolute(maxTheta-minTheta)>2.0e-16)
 			{
 			changeInputs(runInputs, "theta", numberToString<double>(theta));
@@ -1019,7 +1020,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			}
 		else
 			{
-			copyFile("inputs",runInputs);
+			copyFile(inputsFiles[fileLoop],runInputs);
 			}
 		printf("%12s%30s\n","output: ",runInputs.c_str());
 	
@@ -1030,34 +1031,34 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		printf("%12s%30s\n"," ",tpifile.c_str());
 	
 		//printing output minusDS				
-		//string minusDSfile = prefix + "mainminusDS"+suffix;
-		//printVector(minusDSfile,minusDS);
-		//printf("%12s%30s\n"," ",minusDSfile.c_str());
+		string minusDSfile = prefix + "mainminusDS"+suffix;
+		printVector(minusDSfile,minusDS);
+		printf("%12s%30s\n"," ",minusDSfile.c_str());
 				
 		//printing output DDS
-		//string DDSfile = prefix + "mainDDS"+suffix;
-		//printSpmat(DDSfile,DDS);
-	    //printf("%12s%30s\n"," ",DDSfile.c_str());
+		string DDSfile = prefix + "mainDDS"+suffix;
+		printSpmat(DDSfile,DDS);
+	    printf("%12s%30s\n"," ",DDSfile.c_str());
 	    
 		//printing linNumVec
-		//string linNumFile = prefix + "mainlinNum"+suffix;
-		//linNum.conservativeResize(Na);
-		//simplePrintVector(linNumFile,linNum);
+		string linNumFile = prefix + "mainlinNum"+suffix;
+		linNum.conservativeResize(Na);
+		simplePrintVector(linNumFile,linNum);
+		printf("%12s%30s\n"," ",linNumFile.c_str());
 		//gpSimple(linNumFile);
-		//printf("%12s%30s\n"," ",linNumFile.c_str());
 	
 		//printing linErgVec
 		string linErgFile = prefix + "mainlinErg"+suffix;
 		linErg.conservativeResize(Na);
 		simplePrintVector(linErgFile,linErg);
-		gpSimple(linErgFile);
+		//gpSimple(linErgFile);
 		printf("%12s%30s\n"," ",linErgFile.c_str());
 	
 		//printing erg
 		string ergFile = prefix + "mainerg" + suffix;
 		erg.conservativeResize(Na);
 		simplePrintCVector(ergFile,erg);
-		gpSimple(ergFile);
+		//gpSimple(ergFile);
 		printf("%12s%30s\n"," ",ergFile.c_str());
 		cout << endl;
 		

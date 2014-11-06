@@ -122,9 +122,7 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
 		if (negEigDone==0)
 			{
-			system("./negEig");
-			system(timeNumber.c_str()); //won't work
-			cout << "negEig run" << endl;
+			cout << "need to run negEig and set negEigDone=1" << endl;
 			}
 		negVec = loadVector("./data/eigVec.dat",Nb,1);
 		ifstream eigFile;
@@ -356,7 +354,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			}
 		else
 			{
-			loadfile = "./data/" + timeNumber + "pi"+inP+numberToString<int>(loop-1)+".dat";
+			loadfile = "./data/" + timeNumber + "pi"+inP+"_" + numberToString<int>(loop-1)+".dat";
 			}		
 		p = loadVector(loadfile,Nb,1);
 		}
@@ -738,7 +736,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	#pragma omp parallel for
 	for (unsigned int j=0; j<linearInt; j++)
 		{
-		E += real(linErgA(j));
+		E += real(erg(j));
 		}
 	E /= linearInt;
 	W = - E*2.0*Tb + 2.0*imag(action);
@@ -877,43 +875,51 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	else if (loop_choice.compare("n")!=0)
 		{
-		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(doubleLoopParameter));
+		changeInputs(runInputs,loop_choice, numberToString<double>(doubleLoopParameter));
 		}
 	else
 		{
 		copyFile("inputs",runInputs);
 		}
+	printf("%12s%30s\n","output: ",runInputs.c_str());
 
 	//printing output phi on Euclidean time part
 	string pifile = prefix + "pi"+inP+suffix;
 	printVectorB(pifile,p);
+	printf("%12s%30s\n"," ",pifile.c_str());
 	
 	//printing output phi on whole time contour
 	string tpifile = prefix + "tpi"+inP+suffix;
 	printVector(tpifile,tp);
-	gp(tpifile,"repi.gp");
+	printf("%12s%30s\n"," ",tpifile.c_str());
+	//gp(tpifile,"repi.gp");
 	
 	//printing output minusDS				
-	//string minusDSfile = "./data/" + timeNumber + "minusDS"+suffix;
-	//printVectorB(minusDSfile,minusDS);
+	string minusDSfile = "./data/" + timeNumber + "minusDS"+suffix;
+	printVectorB(minusDSfile,minusDS);
+	printf("%12s%30s\n"," ",minusDSfile.c_str());
 				
 	//printing output DDS
 	string DDSfile = prefix + "DDS"+inP+suffix;
 	printSpmat(DDSfile,DDS);
+	printf("%12s%30s\n"," ",DDSfile.c_str());
 	
 	//printing linErgVec
 	string linErgFile = "./data/" + timeNumber + "linErg"+inP+suffix;
 	simplePrintVector(linErgFile,linErgA);
+	printf("%12s%30s\n"," ",linErgFile.c_str());
 //	gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = prefix + "erg"+inP+suffix;
 	simplePrintCVector(ergFile,erg);
+	printf("%12s%30s\n"," ",ergFile.c_str());
 //	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
 	ifstream eigenvalueIn;
-	eigenvalueIn.open("data/eigValue.dat",ios::in);
+	string eigenvaluefile = "data/eigValue.dat";
+	eigenvalueIn.open(eigenvaluefile.c_str(),ios::in);
 	string lastEigLine = getLastLine(eigenvalueIn);
 	eigenvalueIn.close();
 	ofstream eigenvalueOut;
@@ -921,10 +927,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	eigenvalueOut.open(eigValueFile.c_str(),ios::out);
 	eigenvalueOut << lastEigLine;
 	eigenvalueOut.close();
+	printf("%12s%30s\n"," ",eigenvaluefile.c_str());
 
 	//printing eigenvector to file
 	string eigenvectorFile = prefix + "eigVec.dat";
 	copyFile("data/eigVec.dat",eigenvectorFile);
+	printf("%12s%30s\n"," ",eigenvectorFile.c_str());
 
 } //closing parameter loop
 

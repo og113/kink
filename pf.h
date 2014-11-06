@@ -92,7 +92,7 @@ string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 double A; //gives parameter in V2, equal to 0.4 in DL
 double reg; //small parameter multiplying regulatory term
 string inF; //file input from where, m for main, p for pi
-int firstLoop; //firstLoop to load from, not unsigned for comparison later
+int firstLoop, lastLoop; //first and last loop to load from, not unsigned for comparison later
 double alpha; //gives span over which tanh is used
 double open; //value of 0 assigns all weight to boundary, value of 1 to neighbour of boundary
 double amp; //ammount of negative eigenvector added to bubble for Tb>R
@@ -574,8 +574,17 @@ comp DtFn (const unsigned int& time)
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta","reg");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta,reg);
+	printf("\n");
+	}	
+
+void printMoreParameters()
+	{
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta","reg");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta,reg);
+	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","NT","Gamma","a","b","Ta","Tc","root[0]","root[1]","root[2]","mass2");
+	printf("%12i%12g%12g%12g%12g%12g%12g%12g%12g%12g\n",NT,Gamma,a,b,Ta,Tc,root[0],root[1],root[2],mass2);
 	printf("\n");
 	}
 	
@@ -926,7 +935,6 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Tc = Tc*newParameter/Tb;
 		Tb = newParameter;
 		angle = asin(Tb/R);
-		L = LoR*R;
 		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
 		a = L/(N-1.0);
 		}

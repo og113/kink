@@ -6,4 +6,4 @@ main thing to check is the mode occupations and the linearisation:
 	- plot these things
 	- may need to remove high energy modes, potentially as artefacts of the lattice, check that results are independent of the cut off.
 	
-also, loading from a given loop of main input file doesn't seem to be working. 
+also, there is something up with loading files from main. the errors are way too large, its as though the parameters that are being used are completely different from what they say they are.

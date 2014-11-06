@@ -23,52 +23,64 @@ int main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //putting together filename from questions
 
-string timeNumber;
-cout << "timeNumber: ";
-cin >> timeNumber;
-char program;
-cout << "pi or main, p/m: ";
-cin >> program;
-string id;
-cout << "identifier: ";
-cin >> id;
-unsigned int fileLoop, paramLoop, runsCount;
-if (program=='m')
+string filename, id, method;
+cout << "filename/n: ";
+cin >> filename;
+if (filename.compare("n")==0)
 	{
-	cout << "fileLoop: ";
-	cin >> fileLoop;
-	}
-cout << "parameter loop: ";
-cin >> paramLoop;
-string filename;
-if (program=='m')
-	{
-	filename  = "./data/" + timeNumber + "main" + id + "_" + to_string(fileLoop) + "_" + to_string(paramLoop);
-	}
-else if (program=='p')
-	{
-	filename  = "./data/" + timeNumber + id + "_" + to_string(paramLoop);
+	filename = "";
+	string timeNumber;
+	cout << "timeNumber: ";
+	cin >> timeNumber;
+	char program;
+	cout << "pi or main, p/m: ";
+	cin >> program;
+	cout << "identifier: ";
+	cin >> id;
+	unsigned int fileLoop, paramLoop, runsCount;
+	if (program=='m')
+		{
+		cout << "fileLoop: ";
+		cin >> fileLoop;
+		}
+	cout << "parameter loop: ";
+	cin >> paramLoop;
+	if (program=='m')
+		{
+		filename  = "./data/" + timeNumber + "main" + id + "_" + to_string(fileLoop) + "_" + to_string(paramLoop);
+		}
+	else if (program=='p')
+		{
+		filename  = "./data/" + timeNumber + id + "_" + to_string(paramLoop);
+		}
+	else
+		{
+		cout << "error: program must be either p/m" << endl;
+		return 0;
+		}
+	if (id.back()=='p' || id.back()=='b')
+		{
+		id = id.substr(0,id.size()-1);
+		}
+	if (id.back()=='E')
+		{
+		cout << "runsCount: ";
+		cin >> runsCount;
+		filename = filename + "_" + to_string(runsCount);
+		id = id.substr(0,id.size()-1);
+		}
+	filename = filename + ".dat";
+	cout << "using filename: " << filename << endl;
+	cout << "trimmed id: " << id << endl;
+	cout << endl;
 	}
 else
 	{
-	cout << "error: program must be either p/m" << endl;
-	return 0;
+	cout << "printing method: simple or vector (s/v): ";
+	cin >> method;
+	cout << endl; 
 	}
-if (id.back()=='p' || id.back()=='b')
-	{
-	id = id.substr(0,id.size()-1);
-	}
-if (id.back()=='E')
-	{
-	cout << "runsCount: ";
-	cin >> runsCount;
-	filename = filename + "_" + to_string(runsCount);
-	id = id.substr(0,id.size()-1);
-	}
-filename = filename + ".dat";
-cout << "using filename: " << filename << endl;
-cout << "trimmed id: " << id << endl;
-cout << endl;
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //loading parameters
@@ -76,11 +88,11 @@ cout << endl;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //printing
 
-if (id.compare("linErg")==0 || id.compare("linNum")==0 || id.compare("erg")==0)
+if (id.compare("linErg")==0 || id.compare("linNum")==0 || id.compare("erg")==0 || method.compare("s")==0)
 	{
 	gpSimple(filename);
 	}
-else if (id.compare("tpi")==0 || id.compare("pi")==0 || id.compare("minusDS")==0|| id.compare("chiX")==0|| id.compare("chiT")==0)
+else if (id.compare("tpi")==0 || id.compare("pi")==0 || id.compare("minusDS")==0|| id.compare("chiX")==0|| id.compare("chiT")==0 || method.compare("v")==0)
 	{
 	gp(filename,"repi.gp");
 	}

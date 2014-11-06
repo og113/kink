@@ -235,7 +235,7 @@ void changeInputs(const string & outputFile, const string & search, const string
 			getline(fin,line);
 			if (pos != string::npos)
 				{
-				line.replace(pos, search.length(), replace);
+				line.replace(pos, replace.length(), replace);
 				}
 			}
 		fout << line << endl;
