@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
@@ -48,7 +49,7 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta)>2.0e-16)
+			if (absolute(theta)>DBL_MIN)
 				{
 				cout << "theta != 0" << endl;
 				cout << "theta = " << theta << endl;
@@ -92,12 +93,121 @@ string loop_choice = aq.loopChoice; //just so that we don't have two full stops 
 string print_choice = aq.printChoice;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//calculated quantities derived from the inputs, and loading eigVec and eigVal	
+//calculated quantities derived from the inputs, and loading eigVec and eigVal
+	
+	//potential functions
+	if (pot[0]=='1')
+		{
+		V_params = &V1_params;
+		dV_params = &dV1_params;
+		ddV_params = &ddV1_params;
+		epsilon = dE;
+		}
+	else if (pot[0]=='2')
+		{
+		V_params = &V2_params;
+		dV_params = &dV2_params;
+		ddV_params = &ddV2_params;
+		epsilon = 0.75;
+		}
+	else
+		{
+		cout << "pot option not available, pot = " << pot << endl;
+		}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding epsilon and root
+
+	//gsl function for dV(phi)
+	struct f_gsl_params fparams = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &fparams;	
+	
+	//finding roots of dV(phi)=0
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
+	sort(root.begin(),root.end());
+	
+	//gsl function for V(root2)-V(root1)-dE
+	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	gsl_function EC;
+	EC.function = &ec_gsl;
+	EC.params = &ec_params;
+	
+	//evaluating epsilon, new root and dE may change slightly
+	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	
+	//evaluating V and a couple of properties of V
+	if (pot[0]=='1')
+		{
+		V = &V1;
+		V0 = &V10;
+		Ve = &V1e;
+		dV = &dV1;
+		ddV = &ddV1;
+		}
+	else if (pot[0]=='2')
+		{
+		V = &V2;
+		V0 = &V20;
+		Ve = &V2e;
+		dV = &dV2;
+		ddV = &ddV2;
+		}
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
+	
+	//finding root0 of dV0(phi)=0;
+	struct void_gsl_params vparams = {};
+	vector<double> root0(3);
+	if (pot[0]=='1')
+		{
+		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		}
+	else if (pot[0]=='2')
+		{
+		gsl_function_fdf DV0DDV0;
+		DV0DDV0.f = dV0_gsl;
+		DV0DDV0.df = ddV0_gsl;
+		DV0DDV0.fdf = dV0ddV0_gsl;
+		DV0DDV0.params = &vparams;	
+		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
+		sort(root0.begin(),root0.end());
+		}
+	
+	//finding S1
+	double S1, S1error;
+	gsl_function S1_integrand;
+	S1_integrand.function = &s1_gsl;
+	S1_integrand.params = &vparams;
+	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_workspace_free(w);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//finding phi profile between minima
+unsigned int profileSize = 50;
+vector<double> phiProfile(profileSize);
+vector<double> rhoProfile(profileSize);
+double rhoMin, rhoMax;
+for (unsigned int j=0;j<profileSize;j++)
+	{
+	phiProfile[j] = root[0] + (root[2]-root[0])*j/(profileSize-1.0);
+	}
+rhoMin = 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//defining some important scalar quantities
+double S1 = 2.0/3.0; //mass of kink multiplied by lambda
+double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 
 //derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
-epsilon = dE;
 R = 2.0/3.0/epsilon;
 alpha *= R;
 L = LoR*R;
@@ -175,33 +285,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
 	printParameters();
 	
-	//potential functions
-	if (pot[0]=='1')
-		{
-		V_params = &V1_params;
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
-		dV_params = &dV1_params;
-		dV = &dV1;
-		ddV_params = &ddV1_params;
-		ddV = &ddV1;
-		}
-	else if (pot[0]=='2')
-		{
-		V_params = &V2_params;
-		V = &V2;
-		V0 = &V20;
-		Ve = &V2e;
-		dV_params = &dV2_params;
-		dV = &dV2;
-		ddV_params = &ddV2_params;
-		ddV = &ddV2;
-		}
-	
-	//defining some important scalar quantities
-	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 	comp action = twaction;
 	double W;
 	double E;
@@ -222,19 +305,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
 	p = Eigen::VectorXd::Zero(2*N*Nb+1);
-	
-	//finding roots of dV
-	struct f_gsl_params params = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &params;
-	
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
 	
 	//defining lambda functions for regularization
 	auto Vr = [&] (const comp & phi)
@@ -436,7 +506,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			
-			if (absolute(Chi0(j))>2.0e-16) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>DBL_MIN) //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -717,7 +787,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
-		        if (absolute(theta)<2.0e-16)
+		        if (absolute(theta)<DBL_MIN)
 					{
 		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
 					linNumA (Na-t) += omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
@@ -801,7 +871,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//checking energy conserved
 	double ergChange = 0.0;
 	double relErgChange = 0.0;
-	if (absolute(real(erg(0)))>2.0e-16)
+	if (absolute(real(erg(0)))>DBL_MIN)
 		{
 		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
 		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));

@@ -1,0 +1,26 @@
+to do:
+matlab:
+	done - quickly replace potFn with a mash up like on c++ program. epsilon=dE and a simple minima finder.
+	done - write zero mode fixing to copy c++ program (just for one row, or 2, i think, we only need to compare the DDS, minusDS and p), chiX and chiT should also be the same as in c++ program.
+	done - run pic and main to generate DDS for a case equivalent to c++ program output. need to make sure that input p is identical so should take in p from output c++ program. check alpha, etc.
+	done - compare minusDS and DDS with c++ output.
+	
+c++:
+	- after comparison with matlab - fix errors.
+	- write code to do what potFn does in matlab. may want to write a whole program to do this. then could read epsilon, minima etc from a file.
+	-may want to check time coord
+	
+	
+	
+	
+	
+agreement between matlab and c++
+	- p input agrees
+	- chiT agrees
+	- chiX agrees
+	- imag(minusDS) agrees
+	- real(minusDS) agrees
+	- DDS agrees to 1e-14
+	- erg agrees to 1e-12
+	- linErg doesn't agree
+	- linNum doesn't agree

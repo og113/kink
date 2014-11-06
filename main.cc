@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <cmath>
+#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
@@ -58,10 +59,10 @@ fmainin.close();
 //sorting out files to load
 
 //getting list of relevant data files, with timeNumbers between minFile and maxFile
-int systemRet = system("dir ./data/* > dataFiles");
-if(systemRet == -1)
+int systemCall = system("dir ./data/* > dataFiles");
+if (systemCall==-1)
 	{
-  	cout << "loading data files failed" << endl;
+	cout << "system call failure, finding dataFiles" << endl;
 	}
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
@@ -211,31 +212,101 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	if (pot[0]=='1')
 		{
 		V_params = &V1_params;
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
 		dV_params = &dV1_params;
-		dV = &dV1;
 		ddV_params = &ddV1_params;
-		ddV = &ddV1;
+		epsilon = dE;
+		epsilon0 = 0.0;
 		}
 	else if (pot[0]=='2')
 		{
 		V_params = &V2_params;
+		dV_params = &dV2_params;
+		ddV_params = &ddV2_params;
+		epsilon = 0.75;
+		epsilon0 = 0.7450777428719992;
+		}
+	else
+		{
+		cout << "pot option not available, pot = " << pot << endl;
+		}
+		
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding epsilon and root
+
+	//gsl function for dV(phi)
+	struct f_gsl_params fparams = { epsilon, A};
+	gsl_function_fdf FDF;
+	FDF.f = f_gsl;
+	FDF.df = df_gsl;
+	FDF.fdf = fdf_gsl;
+	FDF.params = &fparams;	
+	
+	//finding roots of dV(phi)=0
+	root = minimaFn(&FDF, -3.0, 3.0, 20);
+	sort(root.begin(),root.end());
+	
+	//gsl function for V(root2)-V(root1)-dE
+	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	gsl_function EC;
+	EC.function = &ec_gsl;
+	EC.params = &ec_params;
+	
+	//evaluating epsilon, new root and dE may change slightly
+	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	
+	//evaluating V and a couple of properties of V
+	if (pot[0]=='1')
+		{
+		V = &V1;
+		V0 = &V10;
+		Ve = &V1e;
+		dV = &dV1;
+		ddV = &ddV1;
+		}
+	else if (pot[0]=='2')
+		{
 		V = &V2;
 		V0 = &V20;
 		Ve = &V2e;
-		dV_params = &dV2_params;
 		dV = &dV2;
-		ddV_params = &ddV2_params;
 		ddV = &ddV2;
 		}
+	comp ergZero = N*a*V(root[0]);
+	mass2 = real(ddV(root[0]));
+	
+	//finding root0 of dV0(phi)=0;
+	struct void_gsl_params vparams = {};
+	vector<double> root0(3);
+	if (pot[0]=='1')
+		{
+		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		}
+	else if (pot[0]=='2')
+		{
+		gsl_function_fdf DV0DDV0;
+		DV0DDV0.f = dV0_gsl;
+		DV0DDV0.df = ddV0_gsl;
+		DV0DDV0.fdf = dV0ddV0_gsl;
+		DV0DDV0.params = &vparams;	
+		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
+		sort(root0.begin(),root0.end());
+		}
+	
+	//finding S1
+	double S1, S1error;
+	gsl_function S1_integrand;
+	S1_integrand.function = &s1_gsl;
+	S1_integrand.params = &vparams;
+	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_workspace_free(w);
 
-	//derived quantities
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//other derived quantities
 	NT = Na + Nb + Nc;
-	epsilon = dE;
-	R = 2.0/3.0/epsilon;
-	//alpha *= R;
+	R = S1/dE;
+	alpha *= R;
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
 	L = LoR*R;
@@ -267,23 +338,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
-	
-	//defining some important scalar quantities
-	double S1 = 2.0/3.0; //mass of kink multiplied by lambda
-	double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
-	
-	//finding roots of dV
-	struct f_gsl_params params = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &params;
-	
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -321,7 +375,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
 		if (negEigDone==0)
 			{
-			cout << "need to run negVec first and set negEigDone=1 in inputs" << endl;
+			//system("./negEig"); //negEig now needs timeNumber
+			//char * fileNumber = (char *)(fileNumbers[fileLoop]);
+			//system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
+			//cout << "negEig run" << endl;
+			cout << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
 			}
 		negVec = loadVector("data/eigVec.dat",Nb,1);
 		ifstream eigFile;
@@ -344,7 +402,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		{
 		if (loops>1)
 			{
-			if ((absolute(theta-minTheta)>2.0e-16 || absolute(Tb-minTb)>2.0e-16) && loop==0)
+			if ((absolute(theta-minTheta)>DBL_MIN || absolute(Tb-minTb)>DBL_MIN) && loop==0)
 				{
 				cout << "input Tb: " << Tb << endl;
 				cout << "program Tb: " << minTb << endl;
@@ -352,12 +410,12 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				cout << "program theta: " << minTheta << endl;
 				cout << endl;
 				}
-			if (absolute(maxTheta-minTheta)>2.0e-16)
+			if (absolute(maxTheta-minTheta)>DBL_MIN)
 				{
 				theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
 				Gamma = exp(-theta);
 				}
-			else if (absolute(maxTb-minTb)>2.0e-16)
+			else if (absolute(maxTb-minTb)>DBL_MIN)
 				{
 				Tb = minTb + (maxTb - minTb)*loop/(loops-1.0);
 				changeDouble ("Tb",Tb);
@@ -378,6 +436,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vec linNum(NT);
 		
 		//defining the action and bound and W
+		double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		comp action = i*twaction;
 		double bound;
 		double W;
@@ -512,7 +571,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			normX = pow(normX,0.5);
 			double normT = chiT.dot(chiT);
 			normT = pow(normT,0.5);
-			if (absolute(normX)<2.0e-16 || absolute(normT)<2.0e-16)
+			if (absolute(normX)<DBL_MIN || absolute(normT)<DBL_MIN)
 				{
 				cout << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
@@ -575,7 +634,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				comp Dt = DtFn(t);
 				comp dt = dtFn(t);
 			
-				if (absolute(chiX(j))>2.0e-16) //spatial zero mode lagrange constraint
+				if (absolute(chiX(j))>DBL_MIN) //spatial zero mode lagrange constraint
 					{
 					DDS.insert(2*j,2*N*NT) = a*chiX(j); 
 					DDS.insert(2*N*NT,2*j) = a*chiX(j);
@@ -583,7 +642,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					minusDS(2*N*NT) += -a*chiX(j)*p(2*j);
 					}
 					
-				if (absolute(chiT(j))>2.0e-16)
+				if (absolute(chiT(j))>DBL_MIN)
 					{
 					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) += a*chiT(j);
@@ -594,7 +653,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		            minusDS(2*N*NT+1) += - a*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
-				if (absolute(theta)<2.0e-16)
+				if (absolute(theta)<DBL_MIN)
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
@@ -661,7 +720,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			        DDS.coeffRef(2*j+1,2*j) += imag(temp0 - temp1 );
 			        DDS.coeffRef(2*j+1,2*j+1) += real(temp0 - temp1 );
 				    /////////////////////////////////////////////////////////////////////////////////////////
-					if (absolute(theta)<2.0e-16)
+					if (absolute(theta)<DBL_MIN)
 						{
 						//simplest boundary conditions replaced by ones continuously connected to theta!=0 ones
 						//DDS.insert(2*j+1,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
@@ -670,7 +729,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 						/////////////////////////////////////equation R - theta=0//////////////////////////////////////
 						for (unsigned int k=0;k<N;k++)
 							{
-							if (absolute(omega(x,k))>2.0e-16)
+							if (absolute(omega(x,k))>DBL_MIN)
 								{
 								unsigned int m=k*NT;
 								DDS.coeffRef(2*j,2*m+1) += -2.0*omega(x,k);
@@ -1010,11 +1069,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (absolute(maxTheta-minTheta)>2.0e-16)
+		if (absolute(maxTheta-minTheta)>DBL_MIN)
 			{
 			changeInputs(runInputs, "theta", numberToString<double>(theta));
 			}
-		else if (absolute(maxTb-minTb)>2.0e-16)
+		else if (absolute(maxTb-minTb)>DBL_MIN)
 			{
 			changeInputs(runInputs, "Tb", numberToString<double>(Tb));
 			}
