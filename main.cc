@@ -234,25 +234,23 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	//finding epsilon and root
 
 	//gsl function for dV(phi)
-	struct f_gsl_params fparams = { epsilon, A};
-	gsl_function_fdf FDF;
-	FDF.f = f_gsl;
-	FDF.df = df_gsl;
-	FDF.fdf = fdf_gsl;
-	FDF.params = &fparams;	
+	struct V_gsl_params Vparams = { epsilon, A};
+	gsl_function Vgsl;
+	Vgsl.function = &V_gsl;
+	Vgsl.params = &Vparams;	
 	
 	//finding roots of dV(phi)=0
-	root = minimaFn(&FDF, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
+	minima[0] = brentMinima(&Vgsl, -1.0, -3.0, 0.0);
+	minima[1] = brentMinima(&Vgsl, 1.0, 0.0, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
-	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	struct ec_gsl_params ec_params = { A, minima[0], minima[1], dE};
 	gsl_function EC;
 	EC.function = &ec_gsl;
 	EC.params = &ec_params;
 	
 	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&FDF,&EC,&dE,&epsilon,&root);
+	epsilonFn(&Vgsl,&EC,&dE,&epsilon,&root);
 	
 	//evaluating V and a couple of properties of V
 	if (pot[0]=='1')
@@ -271,25 +269,23 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		dV = &dV2;
 		ddV = &ddV2;
 		}
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
+	comp ergZero = N*a*V(minima[0]);
+	mass2 = real(ddV(minima[0]));
 	
 	//finding root0 of dV0(phi)=0;
 	struct void_gsl_params vparams = {};
-	vector<double> root0(3);
+	vector<double> minima0(2);
 	if (pot[0]=='1')
 		{
-		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		minima0[0] = -1.0; minima0[1] = 1.0;
 		}
 	else if (pot[0]=='2')
 		{
-		gsl_function_fdf DV0DDV0;
-		DV0DDV0.f = dV0_gsl;
-		DV0DDV0.df = ddV0_gsl;
-		DV0DDV0.fdf = dV0ddV0_gsl;
-		DV0DDV0.params = &vparams;	
-		root0 = minimaFn(&DV0DDV0, -2.0, 2.0, 20);
-		sort(root0.begin(),root0.end());
+		gsl_function V0;
+		V0.function = &V0_gsl;
+		V0.params = &vparams;	
+		minima0[0] = brentMinima(&V0, -1.0, -3.0, 0.0);
+		minima0[1] = brentMinima(&V0, 1.0, 0.0, 3.0);
 		}
 	
 	//finding S1
@@ -298,7 +294,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	S1_integrand.function = &s1_gsl;
 	S1_integrand.params = &vparams;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_qag(&S1_integrand, minima0[0], minima0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -613,15 +609,15 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//lambda functions for pot_r
 			auto Vr = [&] (const comp & phi)
 				{
-				return -i*reg*VrFn(phi,root[0],root[2]);
+				return -i*reg*VrFn(phi,minima[0],minima[1]);
 				};
 			auto dVr = [&] (const comp & phi)
 				{
-				return -i*reg*dVrFn(phi,root[0],root[2]);
+				return -i*reg*dVrFn(phi,minima[0],minima[1]);
 				};
 			auto ddVr = [&] (const comp & phi)
 				{
-				return -i*reg*ddVrFn(phi,root[0],root[2]);
+				return -i*reg*ddVrFn(phi,minima[0],minima[1]);
 				};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
@@ -658,8 +654,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErg(t) += Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1); //middle sign may be negative - check this
-						linNum(t) += omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0]) + omega(x,k)*p(2*j+1)*p(2*l+1);
+						linErg(t) += Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1); //middle sign may be negative - check this
+						linNum(t) += omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0]) + omega(x,k)*p(2*j+1)*p(2*l+1);
 						}
 					}
 				else
@@ -667,8 +663,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
-						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-root[0])*(p(2*j)-root[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
+						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						}
 					}
 
@@ -747,11 +743,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 								/////////////////////equation I - theta!=0//////////////
 								unsigned int m=k*NT;
 								DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega(x,k)/(1.0+Gamma);
-								minusDS(2*j+1) += -(1.0-Gamma)*omega(x,k)*(p(2*m)-root[0])/(1.0+Gamma);
+								minusDS(2*j+1) += -(1.0-Gamma)*omega(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
 								/////////////////////equation R - theta!=0//////////////
 								minusDS(2*j) += p(2*m+1)*omega(x,k)*(1+Gamma)*theta/(1-Gamma);
 								DDS.coeffRef(2*j,2*m+1) += -omega(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
-								bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-root[0])*(p(2*m)-root[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
+								bound += -(1.0-Gamma)*omega(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
 								}
 							}
 						//////////////////////////////////////equation R - theta!=0//////////////////////////////

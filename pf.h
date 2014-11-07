@@ -19,6 +19,7 @@
 #include <gsl/gsl_poly.h>
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_min.h>
 #include "gnuplot_i.hpp"
 
 using namespace std;
@@ -59,7 +60,7 @@ double a; //step sizes in each spatial dimension
 double b; //step sizes in time
 double Ta;
 double Tc;
-vector<double> root;
+vector<double> minima(2);
 double mass2; //as derived from V''
 
 //determining number of runs
@@ -210,131 +211,142 @@ double brentRootFinder(gsl_function * xF, const double & rootGuess, const double
 	return x;
 	}
 	
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//potential related functions
-comp V1_params (const comp & phi, const double & epsi, const double & aa) //aa is intentionally unused
+//function to find the minimum of a gsl function F
+double brentMinimum (gsl_function * xF, const double & minimumGuess, const double & minimumLower, const double & minimumUpper)
 	{
+	int status;
+	int iter = 0, max_iter = 100;
+	const gsl_min_fminimizer_type *T;
+	gsl_min_fminimizer *s;
+	double m = minimumGuess;
+
+	T = gsl_min_fminimizer_brent;
+	s = gsl_min_fminimizer_alloc (T);
+	gsl_min_fminimizer_set (s, xF, m, minimumLower, minimumUpper);
+	
+	do
+    {
+      iter++;
+      status = gsl_min_fminimizer_iterate (s);
+
+      m = gsl_min_fminimizer_x_minimum (s);
+      a = gsl_min_fminimizer_x_lower (s);
+      b = gsl_min_fminimizer_x_upper (s);
+
+      status = gsl_min_test_interval (minimumLower, minimumUpper, 1.0e-7, DBL_MIN);
+
+      if (status == GSL_SUCCESS)
+      	{
+        //printf ("brentMinimum converged\n");
+        }
+    }
+	while (status == GSL_CONTINUE && iter < max_iter);
+
+	gsl_min_fminimizer_free (s);
+	
+	return m;
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//potential functions and their derivatives
+
+//structs containing parameters
+struct params_for_V {double epsi; double aa;};
+struct params_for_V paramsV {epsilon, A};
+struct params_for_V paramsV0 {epsilon0, A};
+struct void_params {};
+struct void_params paramsVoid {};
+
+//////////////////////////////potentials//////////////////////////////
+//V1
+//NB - gsl doesn't like const T &; default parameters set
+template <class T> T V1 (const T phi, void * parameters = &paramsV)
+	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
 	return pow(pow(phi,2)-1.0,2.0)/8.0 - epsi*(phi-1.0)/2.0;
 	}
 
-comp V1 (const comp & phi)
-	{
-	return V1_params(phi,epsilon,0.0);
-	}
-	
-comp Z (const comp & phi)
+//Z, for V2
+template <class T> T Z (const T phi)
 	{
 	return exp(-pow(phi,2.0))*(phi + pow(phi,3.0) + pow(phi,5.0));
 	}
 	
-comp V2_params (const comp & phi, const double & epsi, const double & aa)
+//V2
+template <class T> T V2 (const T phi, void * parameters = &paramsV)
 	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
 	return 0.5*pow(phi+1.0,2.0)*(1.0-epsi*Z((phi-1.0)/aa));
 	}
-	
-comp V2 (const comp & phi)
-	{
-	return V2_params(phi,epsilon,A);
-	}
-	
+
+//Vr	
 comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
 	return pow(phi-minimaL,4.0)*pow(phi-minimaR,4.0)/4.0;
 	}
-	
-comp (*V) (const comp & phi); //a function pointer
 
-comp (*V_params) (const comp & phi, const double & epsi, const double & aa);
+//declaration of function pointer V
+comp (*V) (const comp phi, void * parameters); //a function pointer
+double (*Vd) (const double phi, void * parameters);
 
-//potentials with degenerate minima, and without regularisation
-comp V10 (const comp & phi)
+//////////////////////////////first derivatives of potentials//////////////////////////////
+//dV1
+template <class T> T dV1 (const T phi, void * parameters = &paramsV)
 	{
-	return V1_params(phi,epsilon0,0.0);
-	}
-	
-comp V20 (const comp & phi)
-	{
-	return V2_params(phi,epsilon0,A); //epsilon0 needs checking
-	}
-	
-comp (*V0) (const comp & phi);
-	
-//change to degenerate potential, still without regulatisation
-comp V1e (const comp & phi)
-	{
-	return -epsilon*(phi-1.0)/2.0;
-	}
-
-comp V2e (const comp & phi)
-	{
-	return V2(phi)-V20(phi);
-	}
-	
-comp (*Ve) (const comp & phi);
-	
-	
-//first derivative of Vs
-comp dV1_params(const comp & phi, const double & epsi, const double & aa) //aa is intentionally unused
-	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
 	return phi*(pow(phi,2)-1.0)/2.0 - epsi/2.0;
-	}
+	}	
 
-comp dV1 (const comp & phi)
-	{
-	return dV1_params(phi,epsilon,0.0);
-	}
-
-comp dZ (const comp & phi)
+//dZ for dV2
+template <class T> T dZ (const T phi)
 	{
 	return exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
 	}
 	
-comp dV2_params(const comp & phi, const double & epsi, const double & aa)
+//dV2
+template <class T> T dV2 (const T phi, void * parameters = &paramsV)
 	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
 	return (phi+1.0)*(1.0-epsi*Z((phi-1.0)/aa)) - 0.5*pow(phi+1.0,2.0)*(epsi/aa)*dZ((phi-1.0)/aa);
 	}
-
-comp dV2 (const comp & phi)
-	{
-	return dV2_params(phi,epsilon,A);
-	}
 	
+//dVr
 comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
 	return pow(phi-minimaL,3.0)*pow(phi-minimaR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
 	}
 	
-comp (*dV) (const comp & phi);
-
-comp (*dV_params)(const comp & phi, const double & epsi, const double & aa);
+comp (*dV) (const comp phi, void * parameters);
+double (*dVd) (const double phi, void * parameters);
 	
-//second derivative of V
-comp ddV1_params (const comp & phi, const double & epsi, const double & aa)
-	{ 
+//////////////////////////////second derivatives of potentials//////////////////////////////
+//ddV1
+template <class T> T ddV1 (const T phi, void * parameters = &paramsVoid)
+	{
 	return (3.0*pow(phi,2)-1.0)/2.0;
 	}
 
-comp ddV1 (const comp & phi)
-	{ 
-	return ddV1_params(phi,epsilon,A);
-	}
-
-comp ddZ (const comp & phi)
+//ddZ for ddV2
+template <class T> T ddZ (const T phi)
 	{
 	return exp(-pow(phi,2.0))*2.0*pow(phi,3.0)*(5.0 - 9.0*pow(phi,2.0) + 2.0*pow(phi,4.0));
 	}
 
-comp ddV2_params (const comp & phi, const double & epsi, const double & aa)
-	{ 
+//ddV2
+template <class T> T ddV2 (const T phi, void * parameters = &paramsV)
+	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
+	double aa = (params->aa);
 	return (1.0-epsi*Z((phi-1.0)/aa)) - (phi+1.0)*(epsi/aa)*dZ((phi-1.0)/aa)\
 					+ 0.5*pow(phi+1.0,2.0)*(epsi/pow(aa,2.0))*ddZ((phi-1.0)/aa);
 	}
-	
-comp ddV2 (const comp & phi)
-	{ 
-	return ddV2_params(phi,epsilon,A);
-	}	
 	
 comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
@@ -342,89 +354,57 @@ comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 				+ 3.0*pow(phi-minimaL,4.0)*pow(phi-minimaR,2.0);
 	}
 
-comp (*ddV) (const comp & phi);
-
-comp (*ddV_params)(const comp & phi, const double & epsi, const double & aa);
+comp (*ddV) (const comp phi, void * parameters);
+double (*ddVd) (const double phi, void * parameters);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//functions for calculating roots
+//extra functions
 	
-//dV as gsl ready functions
-struct f_gsl_params { double epsi; double aa;};
+//V and dV FDF gsl functions	
+void VdV (double x, void * parameters, double * f, double* df) 
+	{
+	*f =  Vd(x,parameters);
+	*df = dVd(x,parameters);
+	}
+	
+void dVddV (double x, void * parameters, double * f, double* df) 
+	{
+	*f =  dVd(x,parameters);
+	*df = ddVd(x,parameters);
+	}
+	
+//energy change gsl function : V(minima[1])-V(minima[0])-dE
+struct ec_params {double aa; double minima0; double minima1; double de; };
 
-double f_gsl (double x, void * parameters) 
+double ec (double epsi, void * parameters)
 	{
-	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
-	double epsi = (params->epsi);
-	double aa = (params->aa);
-	return real(dV_params(x,epsi,aa));
-	}
-	
-double df_gsl (double x, void * parameters) 
-	{
-	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
-	double epsi = (params->epsi);
-	double aa = (params->aa);
-	return real(ddV_params(x,epsi,aa));
-	}
-	
-void fdf_gsl (double x, void * parameters, double * f, double* df) 
-	{
-	struct f_gsl_params * params = (struct f_gsl_params *)parameters;
-	double epsi = (params->epsi);
-	double aa = (params->aa);
-	*f =  real(dV_params(x,epsi,aa));
-	*df = real(ddV_params(x,epsi,aa));
-	}
-	
-//energy change gsl functions : V(root[2])-V(root[0])-dE
-struct ec_gsl_params {double aa; double root0; double root2; double de; };
-
-double ec_gsl (double epsi, void * parameters)
-	{
-	struct ec_gsl_params * params = (struct ec_gsl_params *)parameters;
-	double aa = (params->aa);
-	double root2 = (params->root2);
-	double root0 = (params->root0);
-	double de = (params->de);
-	return real(V_params(root0,epsi,aa) - V_params(root2,epsi,aa) - de);
-	}
-	
-//dV0
-struct void_gsl_params{};
-//dV0 as a gsl function
-double dV0_gsl (double x, void * parameters)
-	{
-	return real(dV_params(x,epsilon0,A));
-	}
-	
-//ddV0 as a gsl_function
-double ddV0_gsl (double x, void * parameters)
-	{
-	return real(ddV_params(x,epsilon0,A));
-	}
-	
-//dV0ddV0 as a void gsl_fdf
-void dV0ddV0_gsl (double x, void * parameters, double * f, double* df) 
-	{
-	*f =  real(dV_params(x,epsilon0,A));
-	*df = real(ddV_params(x,epsilon0,A));
+	struct ec_params * paramsIn = (struct ec_params *)parameters;
+	struct params_for_V paramsOut;
+	paramsOut.epsi = epsi;
+	paramsOut.aa = (paramsIn->aa);
+	double minima1 = (paramsIn->minima1);
+	double minima0 = (paramsIn->minima0);
+	double de = (paramsIn->de);
+	return Vd(minima0,&paramsOut) - Vd(minima1,&paramsOut) - de;
 	}
 	
 //S1 integrand
-double s1_gsl (double x, void * parameters)
+double s1Integrand (double x, void * parameters)
 	{
-	return pow(2.0*real(V0(x)),0.5);
+	return pow(2.0*Vd(x,parameters),0.5);
 	}
 
 //rho integrand
-double rho_gsl (double x, void * parameters)
+double rhoIntegrand (double x, void * parameters)
 	{
-	return pow(2.0*real(V0(x)),-0.5);
+	return pow(2.0*Vd(x,parameters),-0.5);
 	}
 	
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//functions to calculate roots and minima
+	
 //function to give the three roots of FDF given lower and upper limits on them and a number of loops to try
-vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, const double & highLimit,\
+vector <double> rootsFn (gsl_function_fdf * xFDF, const double & lowLimit, const double & highLimit,\
 							const unsigned int & rootLoops)
 	{
 	vector <double> roots;
@@ -456,80 +436,34 @@ vector <double> minimaFn (gsl_function_fdf * xFDF, const double & lowLimit, cons
 	
 		if (roots.size()!=3)
 			{
-			cout << "minimaFn error: only found " << root.size() << " roots, not 3" << endl;
+			cout << "rootsFn error: only found " << roots.size() << " roots, not 3" << endl;
 			}
 	return roots;
 	}
 	
-//function to give the three roots of FDF given lower and upper limits on them and a number of loops to try, using brent method
-vector <double> brentMinimaFn (gsl_function * xF, const double & lowLimit, const double & highLimit,\
-							const unsigned int & rootLoops)
-	{
-	vector <double> roots;
-	double tempLow = lowLimit;
-	double tempHigh = highLimit;
-	unsigned int j = 0;
-	while( roots.size()<3 && j<rootLoops)
-		{
-		double x = lowLimit+(absolute(highLimit)+absolute(lowLimit))*j/(rootLoops-1.0);
-	
-		if (j==0)
-			{
-			roots.push_back(x);
-			tempLow = x + 1.0e-1; //assuming minima are more spaced than 1.0e-1
-			tempHigh = 0.8; //assuming that the middle root is less than 0.8
-			//this is a bad fudge, try accepting errors and just relooping with different tempHigh if nothing was found
-			}
-		else
-			{
-			unsigned int test = 0;
-			for (unsigned int k=0;k<roots.size();k++)
-				{ 
-				if (absolute(x-roots[k])>1.0e-6)
-					{
-					test++;
-					}
-				}
-			if (test==roots.size())
-				{
-				roots.push_back(x);
-				tempLow = x + 1.0e-1; //assuming minima are more spaced than 1.0e-1
-				tempHigh = highLimit;
-				}
-			}
-		j++;
-		}
-	
-		if (roots.size()!=3)
-			{
-			cout << "minimaFn error: only found " << root.size() << " roots, not 3" << endl;
-			}
-	return roots;
-	}
-	
-//program to find epsilon given a gsl function fdf and dE
-void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xRoot)
+//program to find epsilon given gsls function df and dE
+void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xMinima)
 	{
 	double closenessdE =  DBL_MIN;
 	vector<double> dE_test(1);	dE_test[0] = 1.0;
 	double newdE = dE;
-	struct f_gsl_params * Fparameters = (struct f_gsl_params *) (*xF).params;
-	struct ec_gsl_params * ECparameters = (struct ec_gsl_params *) (*xEC).params;
+	struct params_for_V * Fparameters = (struct params_for_V *) (*xF).params;
+	struct ec_params * ECparameters = (struct ec_params *) (*xEC).params;
 	unsigned int counter = 0;
 	unsigned int maxCounter = 100;
 	while (dE_test.back()>closenessdE)
 		{
 		//find roots of ec(epsilon)=0
 		*xEpsilon = brentRootFinder(xEC,*xEpsilon,*xEpsilon/2.0,*xEpsilon*2.0);
-		//assign new value of epsilon to xFDF
+		//assign new value of epsilon to xF
 		(*Fparameters).epsi = *xEpsilon;
 		(*xF).params = Fparameters;
 		//finding new roots of dV(phi)=0
-		*xRoot = brentMinimaFn(xF, -3.0, 3.0, 20);
-		sort((*xRoot).begin(),(*xRoot).end());
+		(*xMinima)[0] = brentMinimum(xF,-1.0,-3.0,0.0);
+		(*xMinima)[1] = brentMinimum(xF,1.0,0.0,3.0);
 		//assign new roots to xECDF
-		(*ECparameters).root0 = (*xRoot)[0];
-		(*ECparameters).root2 = (*xRoot)[2];
+		(*ECparameters).minima0 = (*xMinima)[0];
+		(*ECparameters).minima1 = (*xMinima)[1];
 		(*xEC).params = ECparameters;
 		//evaluating new dE
 		newdE = (*(*xEC).function)(*xEpsilon,ECparameters) + dE;
@@ -751,19 +685,11 @@ void printMoreParameters()
 	{
 	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta","reg");
 	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta,reg);
-	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","NT","Gamma","a","b","Ta","Tc","root[0]","root[1]","root[2]","mass2");
-	printf("%12i%12g%12g%12g%12g%12g%12g%12g%12g%12g\n",NT,Gamma,a,b,Ta,Tc,root[0],root[1],root[2],mass2);
+	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","NT","Gamma","a","b","Ta","Tc","minima[0]","minima[1]","mass2");
+	printf("%12i%12g%12g%12g%12g%12g%12g%12g%12g\n",NT,Gamma,a,b,Ta,Tc,minima[0],minima[1],mass2);
 	printf("\n");
 	}
-	
-//print action and its constituents to the terminal
-void printAction ( const comp& Kinetic, const comp& potL, const comp& potE)
-	{
-	comp action = Kinetic + potL + potE;
-	printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","re(kinetic)","im(kinetic)","re(potL)","im(potL)","re(potE)","im(potE)","re(action)","im(action)");
-	printf("%16g%16g%16g%16g%16g%16g%16g%16g\n",real(Kinetic),imag(Kinetic),real(potL),imag(potL),real(potE),imag(potE),real(action),imag(action));
-	}
-	
+
 //simply print a real vector
 void simplePrintVector(const string& printFile, vec vecToPrint)
 	{
