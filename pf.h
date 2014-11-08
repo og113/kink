@@ -265,7 +265,8 @@ template <class T> T V1 (const T phi, void * parameters = &paramsV)
 	struct params_for_V * params = (struct params_for_V *)parameters;
 	double epsi = (params->epsi);
 	return pow(pow(phi,2)-1.0,2.0)/8.0 - epsi*(phi-1.0)/2.0;
-	}
+	}	
+comp V1c (const comp phi) { return V1(phi); }
 
 //Z, for V2
 template <class T> T Z (const T phi)
@@ -281,6 +282,7 @@ template <class T> T V2 (const T phi, void * parameters = &paramsV)
 	double aa = (params->aa);
 	return 0.5*pow(phi+1.0,2.0)*(1.0-epsi*Z((phi-1.0)/aa));
 	}
+comp V2c (const comp phi) { return V2(phi); }
 
 //Vr	
 comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
@@ -289,7 +291,7 @@ comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	}
 
 //declaration of function pointer V
-comp (*V) (const comp phi, void * parameters); //a function pointer
+comp (*V) (const comp phi); //a function pointer
 double (*Vd) (const double phi, void * parameters);
 
 //////////////////////////////first derivatives of potentials//////////////////////////////
@@ -300,6 +302,7 @@ template <class T> T dV1 (const T phi, void * parameters = &paramsV)
 	double epsi = (params->epsi);
 	return phi*(pow(phi,2)-1.0)/2.0 - epsi/2.0;
 	}	
+comp dV1c (const comp phi) { return dV1(phi); }
 
 //dZ for dV2
 template <class T> T dZ (const T phi)
@@ -315,6 +318,7 @@ template <class T> T dV2 (const T phi, void * parameters = &paramsV)
 	double aa = (params->aa);
 	return (phi+1.0)*(1.0-epsi*Z((phi-1.0)/aa)) - 0.5*pow(phi+1.0,2.0)*(epsi/aa)*dZ((phi-1.0)/aa);
 	}
+comp dV2c (const comp phi) { return dV2(phi); }
 	
 //dVr
 comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
@@ -322,7 +326,7 @@ comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	return pow(phi-minimaL,3.0)*pow(phi-minimaR,4.0) + pow(phi-minimaL,4.0)*pow(phi-minimaR,3.0);
 	}
 	
-comp (*dV) (const comp phi, void * parameters);
+comp (*dV) (const comp phi);
 double (*dVd) (const double phi, void * parameters);
 	
 //////////////////////////////second derivatives of potentials//////////////////////////////
@@ -331,6 +335,7 @@ template <class T> T ddV1 (const T phi, void * parameters = &paramsVoid)
 	{
 	return (3.0*pow(phi,2)-1.0)/2.0;
 	}
+comp ddV1c (const comp phi) { return ddV1(phi); }
 
 //ddZ for ddV2
 template <class T> T ddZ (const T phi)
@@ -347,6 +352,7 @@ template <class T> T ddV2 (const T phi, void * parameters = &paramsV)
 	return (1.0-epsi*Z((phi-1.0)/aa)) - (phi+1.0)*(epsi/aa)*dZ((phi-1.0)/aa)\
 					+ 0.5*pow(phi+1.0,2.0)*(epsi/pow(aa,2.0))*ddZ((phi-1.0)/aa);
 	}
+comp ddV2c (const comp phi) { return ddV2(phi); }
 	
 comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
@@ -354,7 +360,7 @@ comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 				+ 3.0*pow(phi-minimaL,4.0)*pow(phi-minimaR,2.0);
 	}
 
-comp (*ddV) (const comp phi, void * parameters);
+comp (*ddV) (const comp phi);
 double (*ddVd) (const double phi, void * parameters);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

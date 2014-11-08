@@ -98,9 +98,9 @@ string print_choice = aq.printChoice;
 	//potential functions
 	if (pot[0]=='1')
 		{
-		V = &V1;
-		dV = &dV1;
-		ddV = &ddV1;
+		V = &V1c;
+		dV = &dV1c;
+		ddV = &ddV1c;
 		Vd = &V1;
 		dVd = &dV1;
 		ddVd = &ddV1;
@@ -109,9 +109,9 @@ string print_choice = aq.printChoice;
 		}
 	else if (pot[0]=='2')
 		{
-		V = &V2;
-		dV = &dV2;
-		ddV = &ddV2;
+		V = &V2c;
+		dV = &dV2c;
+		ddV = &ddV2c;
 		Vd = &V2;
 		dVd = &dV2;
 		ddVd = &ddV2;
@@ -145,8 +145,8 @@ string print_choice = aq.printChoice;
 	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
 	//evaluating some properties of V
-	double ergZero = N*a*Vd(minima[0]);
-	mass2 = ddVd(minima[0]);
+	double ergZero = N*a*Vd(minima[0],&paramsV);
+	mass2 = ddVd(minima[0],&paramsV);
 	
 	//finding root0 of dV0(phi)=0;
 	vector<double> minima0(3);
@@ -182,11 +182,11 @@ string print_choice = aq.printChoice;
 	double alphaL, alphaR;
 	if (pot[0]=='2' || 1==1)
 		{
-		alphaL = minima0[0]+1.0e-2;
-		alphaR = minima0[1]-1.0e-2;
+		double phiL = minima0[1]-1.0e-2;
+		double phiR = minima0[0]+1.0e-2;
 		for (unsigned int j=0;j<profileSize;j++)
 			{
-			phiProfile[j] = alphaL + (alphaR-alphaL)*j/(profileSize-1.0);
+			phiProfile[j] = phiL + (phiR-phiL)*j/(profileSize-1.0);
 			}
 	
 		double profileError;
@@ -196,10 +196,12 @@ string print_choice = aq.printChoice;
 		w = gsl_integration_workspace_alloc(1e4);
 		for (unsigned int j=0;j<profileSize;j++)
 			{
-			gsl_integration_qags(&rho_integrand, 0, phiProfile[j], DBL_MIN, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
+			gsl_integration_qags(&rho_integrand, phiProfile[j], 0, DBL_MIN, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
 			if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
 			}
 		gsl_integration_workspace_free(w);
+		alphaL = rhoProfile[0];
+		alphaR = rhoProfile.back();
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +285,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing loop name and parameters
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
-	printParameters();
+	printMoreParameters();
 	
 	comp action = twaction;
 	double W;
@@ -367,7 +369,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 				{
 				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
-				if (pot[0]=='1')
+				if (pot[0]=='1' && 1==0)
 					{
 					if ((rho-R)<-alpha)
 						{
@@ -382,13 +384,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
 						}
 					}
-				else if (pot[0]=='2')
+				else if (pot[0]=='2' || 1==1)
 					{
-					if ((rho-R)<alphaL) //alphaL is negative
+					if ((rho-R)<=alphaL)
 						{
 						p(2*j) = minima[1];
 						}
-					else if ((rho-R)>alphaR)
+					else if ((rho-R)>=alphaR)
 						{
 						p(2*j) = minima[0];
 						}
@@ -471,7 +473,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ numberToString<unsigned int>(loop) + "0.dat";
+	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ "_" + numberToString<unsigned int>(loop) + "_0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
