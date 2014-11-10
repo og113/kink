@@ -307,7 +307,7 @@ comp dV1c (const comp phi) { return dV1(phi); }
 //dZ for dV2
 template <class T> T dZ (const T phi)
 	{
-	return exp(-pow(phi,2.0))*(1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) -2.0*pow(phi,6.0));
+	return exp(-pow(phi,2.0))*( 1.0 + pow(phi,2.0) + 3.0*pow(phi,4.0) - 2.0*pow(phi,6.0) );
 	}
 	
 //dV2

@@ -131,8 +131,8 @@ string print_choice = aq.printChoice;
 	F.function = Vd;
 	F.params = &paramsV;	
 	
-	//finding roots of dV(phi)=0
-	minima[0] = brentMinimum(&F, -1.0, -3.0, 0.0);
+	//finding preliminary roots of dV(phi)=0
+	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
 	minima[1] = brentMinimum(&F, 1.0, 0.0, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
