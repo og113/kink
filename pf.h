@@ -716,7 +716,7 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << vecToPrint(j) << endl;
+		F << setw(25) << j << setw(25) << vecToPrint(j) << endl;
 		}
 	F.close();
 	}
@@ -731,7 +731,7 @@ void simplePrintCVector(const string& printFile, cVec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
+		F << setw(25) << j << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
 		}
 	F.close();
 	}
@@ -848,7 +848,7 @@ void gpSimple(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1 with lines";
+	string command1Str = "plot \"" + readFile + "\" using 1:2 with points";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();

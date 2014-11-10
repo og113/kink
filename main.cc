@@ -278,8 +278,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	//evaluating epsilon, new root and dE may change slightly
 	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
-	//evaluating some properties of V
-	double ergZero = N*a*Vd(minima[0],&paramsV);
+	//evaluating mass about false vac
 	mass2 = ddVd(minima[0],&paramsV);
 	
 	//finding root0 of dV0(phi)=0;
@@ -336,6 +335,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b = " << b << endl << endl;}
 	Ta = b*Na;
 	Tc = b*Nc;
+	double ergZero = N*a*Vd(minima[0],&paramsV);
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
