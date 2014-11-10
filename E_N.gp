@@ -13,6 +13,6 @@ set ytic auto
 set title "E vs N"
 set xlabel "N"
 set ylabel "E"
-plot f using 9:8 with points
+plot "./data/mainAction.dat" using 9:8 with points
 
 pause -1

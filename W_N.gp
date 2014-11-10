@@ -13,6 +13,6 @@ set ytic auto
 set title "W(N)"
 set xlabel "N"
 set ylabel "W"
-plot f using 9:10 with points
+plot "./data/mainAction.dat" using 9:10 with points
 
 pause -1
