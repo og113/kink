@@ -49,7 +49,7 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta)>DBL_MIN)
+			if (absolute(theta)>1.0e-16)
 				{
 				cout << "theta != 0" << endl;
 				cout << "theta = " << theta << endl;
@@ -115,13 +115,16 @@ string print_choice = aq.printChoice;
 		Vd = &V2;
 		dVd = &dV2;
 		ddVd = &ddV2;
-		epsilon0 = 0.7450777428719992;
+		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
 		}
 	else
 		{
 		cout << "pot option not available, pot = " << pot << endl;
 		}
+	paramsV  = {epsilon, A};
+	paramsV0 = {epsilon0, A};
+	paramsVoid = {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon and root
@@ -133,14 +136,14 @@ string print_choice = aq.printChoice;
 	
 	//finding preliminary roots of dV(phi)=0
 	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
-	minima[1] = brentMinimum(&F, 1.0, 0.0, 3.0);
+	minima[1] = brentMinimum(&F, 1.5, 0.5, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
 	struct ec_params ec_params = { A, minima[0], minima[1], dE};
 	gsl_function EC;
 	EC.function = &ec;
 	EC.params = &ec_params;
-	
+
 	//evaluating epsilon, new root and dE may change slightly
 	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
@@ -160,16 +163,22 @@ string print_choice = aq.printChoice;
 		V0.function = Vd;
 		V0.params = &paramsV0;	
 		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
-		minima0[0] = brentMinimum(&V0, 1.0, 0.0, 3.0);
+		minima0[0] = brentMinimum(&V0, 1.5, 0.5, 3.0);
+		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
+		gsl_function EC0;
+		EC0.function = &ec;
+		EC0.params = &ec0_params;
+		double dE0 = 0.0;
+		epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
 		}
 	
 	//finding S1
-	double S1, S1error;
+	double S1error;
 	gsl_function S1_integrand;
 	S1_integrand.function = &s1Integrand;
 	S1_integrand.params = &paramsV0;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
 	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
 	
@@ -196,7 +205,7 @@ string print_choice = aq.printChoice;
 		w = gsl_integration_workspace_alloc(1e4);
 		for (unsigned int j=0;j<profileSize;j++)
 			{
-			gsl_integration_qags(&rho_integrand, phiProfile[j], 0, DBL_MIN, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
+			gsl_integration_qags(&rho_integrand, phiProfile[j], 0, 1.0e-16, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
 			if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
 			}
 		gsl_integration_workspace_free(w);
@@ -209,7 +218,7 @@ string print_choice = aq.printChoice;
 //other derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
-R = 2.0/3.0/epsilon;
+R = S1/dE;
 double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 alpha *= R;
 L = LoR*R;
@@ -284,7 +293,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	time = clock();
 	
 	//printing loop name and parameters
-	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
+	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
+	//printParameters();
 	printMoreParameters();
 	
 	comp action = twaction;
@@ -531,7 +541,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			
-			if (absolute(Chi0(j))>DBL_MIN) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>1.0e-16) //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -800,7 +810,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
-		        if (absolute(theta)<DBL_MIN)
+		        if (absolute(theta)<1.0e-16)
 					{
 		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
 					linNumA (Na-t) += omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
@@ -884,7 +894,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//checking energy conserved
 	double ergChange = 0.0;
 	double relErgChange = 0.0;
-	if (absolute(real(erg(0)))>DBL_MIN)
+	if (absolute(real(erg(0)))>1.0e-16)
 		{
 		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
 		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));

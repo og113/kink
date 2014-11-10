@@ -104,6 +104,7 @@ unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 string zmt; //dictates how time zero mode is dealt with
 string zmx; //dictates how x zero mode is dealt with
 double epsilon0; //the value of epsilon when the minima are degenerate
+double S1;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,10 +253,9 @@ double brentMinimum (gsl_function * xF, const double & minimumGuess, const doubl
 
 //structs containing parameters
 struct params_for_V {double epsi; double aa;};
-struct params_for_V paramsV {epsilon, A};
-struct params_for_V paramsV0 {epsilon0, A};
+struct params_for_V paramsV, paramsV0;
 struct void_params {};
-struct void_params paramsVoid {};
+struct void_params paramsVoid;
 
 //////////////////////////////potentials//////////////////////////////
 //V1
@@ -450,13 +450,13 @@ vector <double> rootsFn (gsl_function_fdf * xFDF, const double & lowLimit, const
 //program to find epsilon given gsls function df and dE
 void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xMinima)
 	{
-	double closenessdE =  DBL_MIN;
+	double closenessdE = 1.0e-14;
 	vector<double> dE_test(1);	dE_test[0] = 1.0;
 	double newdE = dE;
 	struct params_for_V * Fparameters = (struct params_for_V *) (*xF).params;
 	struct ec_params * ECparameters = (struct ec_params *) (*xEC).params;
 	unsigned int counter = 0;
-	unsigned int maxCounter = 100;
+	unsigned int maxCounter = 1e4;
 	while (dE_test.back()>closenessdE)
 		{
 		//find roots of ec(epsilon)=0
@@ -466,21 +466,31 @@ void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xE
 		(*xF).params = Fparameters;
 		//finding new roots of dV(phi)=0
 		(*xMinima)[0] = brentMinimum(xF,-1.0,-3.0,0.0);
-		(*xMinima)[1] = brentMinimum(xF,1.0,0.0,3.0);
+		(*xMinima)[1] = brentMinimum(xF,1.5,0.5,3.0);
 		//assign new roots to xECDF
 		(*ECparameters).minima0 = (*xMinima)[0];
 		(*ECparameters).minima1 = (*xMinima)[1];
 		(*xEC).params = ECparameters;
 		//evaluating new dE
-		newdE = (*(*xEC).function)(*xEpsilon,ECparameters) + dE;
+		newdE = (*(*xEC).function)(*xEpsilon,ECparameters) + *xdE;
 		//evaluating test
-		dE_test.push_back(absolute((newdE-(*xdE))/(*xdE)));
+		if (absolute(*xdE)>1.0e-16)
+			{
+			dE_test.push_back(absolute((newdE-(*xdE))/(*xdE)));
+			}
+		else
+			{
+			dE_test.push_back(absolute(newdE-(*xdE)));
+			}
 		counter++;
 		//test if too many runs
 		if (counter>maxCounter)
 			{
 			cout << "epsilonFn error, more that " << maxCounter << " loops, consider reducing closenessdE" << endl;
-			cout << "dE_test.back() = " << dE_test.back() << endl;
+			cout << "dE_test.back() = " << dE_test.back() << " , closenessdE = " << closenessdE << endl;
+			cout << "dE = " << *xdE << " , minima[0] = " << (*xMinima)[0] << " , minima[1] = " << (*xMinima)[1];
+			cout << " , epsilon = " << *xEpsilon << endl << endl;
+			break;
 			}
 		}
 	*xdE = newdE;
@@ -682,8 +692,8 @@ comp DtFn (const unsigned int& time)
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%12s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%12g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
+	printf("%8s%8s%8s%8s%8s%8s%8s%12s%8s%8s%8s%12s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
+	printf("%8s%8i%8i%8i%8i%8g%8g%12g%8g%8g%8g%12g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 
@@ -691,8 +701,8 @@ void printMoreParameters()
 	{
 	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","epsilon","theta","reg");
 	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,epsilon,theta,reg);
-	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","NT","Gamma","a","b","Ta","Tc","minima[0]","minima[1]","mass2");
-	printf("%12i%12g%12g%12g%12g%12g%12g%12g%12g\n",NT,Gamma,a,b,Ta,Tc,minima[0],minima[1],mass2);
+	printf("%12s%12s%12s%12s%12s%12s%12s%12s%12s%12s\n","NT","Gamma","a","b","Ta","Tc","minima[0]","minima[1]","S1","mass2");
+	printf("%12i%12g%12g%12g%12g%12g%12g%12g%12g%12g\n",NT,Gamma,a,b,Ta,Tc,minima[0],minima[1],S1,mass2);
 	printf("\n");
 	}
 
@@ -931,7 +941,7 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 			{
 			istringstream ss(line);
 			ss >> row >> column >> value;
-			if (absolute(value)>DBL_MIN)
+			if (absolute(value)>1.0e-16)
 				{
 				M.insert(row-1,column-1) = value;
 				nnz++;
