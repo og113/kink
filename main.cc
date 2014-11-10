@@ -266,7 +266,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	F.params = &paramsV;	
 	
 	//finding preliminary roots of dV(phi)=0
-	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
+	minima[0] = brentMinimum(&F, -1.0, -3.0, 0.0);
 	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
@@ -333,6 +333,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	a = L/(N-1.0);
 	b = Tb/(Nb-1.0);
+	if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b = " << b << endl << endl;}
 	Ta = b*Na;
 	Tc = b*Nc;
 
