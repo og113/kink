@@ -466,7 +466,7 @@ void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xE
 		(*xF).params = Fparameters;
 		//finding new roots of dV(phi)=0
 		(*xMinima)[0] = brentMinimum(xF,-1.0,-3.0,0.0);
-		(*xMinima)[1] = brentMinimum(xF,1.5,0.5,3.0);
+		(*xMinima)[1] = brentMinimum(xF,1.2,0.5,3.0);
 		//assign new roots to xECDF
 		(*ECparameters).minima0 = (*xMinima)[0];
 		(*ECparameters).minima1 = (*xMinima)[1];

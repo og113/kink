@@ -93,7 +93,7 @@ string loop_choice = aq.loopChoice; //just so that we don't have two full stops 
 string print_choice = aq.printChoice;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//calculated quantities derived from the inputs, and loading eigVec and eigVal
+//potential functions
 	
 	//potential functions
 	if (pot[0]=='1')
@@ -136,7 +136,7 @@ string print_choice = aq.printChoice;
 	
 	//finding preliminary roots of dV(phi)=0
 	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
-	minima[1] = brentMinimum(&F, 1.5, 0.5, 3.0);
+	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
 	struct ec_params ec_params = { A, minima[0], minima[1], dE};
@@ -163,7 +163,7 @@ string print_choice = aq.printChoice;
 		V0.function = Vd;
 		V0.params = &paramsV0;	
 		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
-		minima0[0] = brentMinimum(&V0, 1.5, 0.5, 3.0);
+		minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
 		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
 		gsl_function EC0;
 		EC0.function = &ec;
@@ -294,8 +294,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing loop name and parameters
 	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
-	//printParameters();
-	printMoreParameters();
+	printParameters();
+	//printMoreParameters();
 	
 	comp action = twaction;
 	double W;
@@ -379,7 +379,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 				{
 				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
-				if (pot[0]=='1' && 1==0)
+				if (pot[0]=='1')
 					{
 					if ((rho-R)<-alpha)
 						{
@@ -394,7 +394,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
 						}
 					}
-				else if (pot[0]=='2' || 1==1)
+				else if (pot[0]=='2')
 					{
 					if ((rho-R)<=alphaL)
 						{

@@ -208,73 +208,82 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	fin.close();
 	inP = aq.inputChoice;
 	
+	//determining number of runs
+	closenessA = 1.0;
+	closenessS = 1.0e-6;
+	closenessSM = 1.0e-5;
+	closenessD = 1.0;
+	closenessC = 1.0e-12;
+	closenessE = 1.0e-2;
+	closenessL = 1.0e-2;
+	closenessT = 1.0e-5;
+	closenessP = 0.5;
+	closenessR = 1.0e-4;
+
+	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
+	string print_choice = aq.printChoice;
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//potential function
+	
 	//potential functions
 	if (pot[0]=='1')
 		{
-		V_params = &V1_params;
-		dV_params = &dV1_params;
-		ddV_params = &ddV1_params;
-		epsilon = dE;
+		V = &V1c;
+		dV = &dV1c;
+		ddV = &ddV1c;
+		Vd = &V1;
+		dVd = &dV1;
+		ddVd = &ddV1;
 		epsilon0 = 0.0;
+		epsilon = dE;
 		}
 	else if (pot[0]=='2')
 		{
-		V_params = &V2_params;
-		dV_params = &dV2_params;
-		ddV_params = &ddV2_params;
+		V = &V2c;
+		dV = &dV2c;
+		ddV = &ddV2c;
+		Vd = &V2;
+		dVd = &dV2;
+		ddVd = &ddV2;
+		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
-		epsilon0 = 0.7450777428719992;
 		}
 	else
 		{
 		cout << "pot option not available, pot = " << pot << endl;
 		}
+	paramsV  = {epsilon, A};
+	paramsV0 = {epsilon0, A};
+	paramsVoid = {};
+
 		
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//finding epsilon and root
+//finding epsilon and root
 
 	//gsl function for dV(phi)
-	struct V_gsl_params Vparams = { epsilon, A};
-	gsl_function Vgsl;
-	Vgsl.function = &V_gsl;
-	Vgsl.params = &Vparams;	
+	gsl_function F;
+	F.function = Vd;
+	F.params = &paramsV;	
 	
-	//finding roots of dV(phi)=0
-	minima[0] = brentMinima(&Vgsl, -1.0, -3.0, 0.0);
-	minima[1] = brentMinima(&Vgsl, 1.0, 0.0, 3.0);
+	//finding preliminary roots of dV(phi)=0
+	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
+	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
-	struct ec_gsl_params ec_params = { A, minima[0], minima[1], dE};
+	struct ec_params ec_params = { A, minima[0], minima[1], dE};
 	gsl_function EC;
-	EC.function = &ec_gsl;
+	EC.function = &ec;
 	EC.params = &ec_params;
-	
+
 	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&Vgsl,&EC,&dE,&epsilon,&root);
+	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
-	//evaluating V and a couple of properties of V
-	if (pot[0]=='1')
-		{
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
-		dV = &dV1;
-		ddV = &ddV1;
-		}
-	else if (pot[0]=='2')
-		{
-		V = &V2;
-		V0 = &V20;
-		Ve = &V2e;
-		dV = &dV2;
-		ddV = &ddV2;
-		}
-	comp ergZero = N*a*V(minima[0]);
-	mass2 = real(ddV(minima[0]));
+	//evaluating some properties of V
+	double ergZero = N*a*Vd(minima[0],&paramsV);
+	mass2 = ddVd(minima[0],&paramsV);
 	
 	//finding root0 of dV0(phi)=0;
-	struct void_gsl_params vparams = {};
-	vector<double> minima0(2);
+	vector<double> minima0(3);
 	if (pot[0]=='1')
 		{
 		minima0[0] = -1.0; minima0[1] = 1.0;
@@ -282,21 +291,28 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	else if (pot[0]=='2')
 		{
 		gsl_function V0;
-		V0.function = &V0_gsl;
-		V0.params = &vparams;	
-		minima0[0] = brentMinima(&V0, -1.0, -3.0, 0.0);
-		minima0[1] = brentMinima(&V0, 1.0, 0.0, 3.0);
+		V0.function = Vd;
+		V0.params = &paramsV0;	
+		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
+		minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
+		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
+		gsl_function EC0;
+		EC0.function = &ec;
+		EC0.params = &ec0_params;
+		double dE0 = 0.0;
+		epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
 		}
 	
 	//finding S1
-	double S1, S1error;
+	double S1error;
 	gsl_function S1_integrand;
-	S1_integrand.function = &s1_gsl;
-	S1_integrand.params = &vparams;
+	S1_integrand.function = &s1Integrand;
+	S1_integrand.params = &paramsV0;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, minima0[0], minima0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
-
+	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//other derived quantities
@@ -319,21 +335,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	b = Tb/(Nb-1.0);
 	Ta = b*Na;
 	Tc = b*Nc;
-
-	//determining number of runs
-	closenessA = 1.0;
-	closenessS = 1.0e-6;
-	closenessSM = 1.0e-5;
-	closenessD = 1.0;
-	closenessC = 1.0e-12;
-	closenessE = 1.0e-2;
-	closenessL = 1.0e-2;
-	closenessT = 1.0e-5;
-	closenessP = 0.5;
-	closenessR = 1.0e-4;
-
-	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
-	string print_choice = aq.printChoice;
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -598,8 +599,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//initializing to zero
 			comp kineticS = 0.0;
 			comp kineticT = 0.0;
-			comp pot_l = 0.0;
-			comp pot_e = 0.0;
+			comp pot = 0.0;
 			comp pot_r = 0.0;
 			bound = 0.0;
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
@@ -673,8 +673,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				if (t==(NT-1))
 					{
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
-					pot_l += Dt*a*V0(Cp(j));
-					pot_e += Dt*a*Ve(Cp(j));
+					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -685,8 +684,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					{
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-					pot_l += Dt*a*V0(Cp(j));
-					pot_e += Dt*a*Ve(Cp(j));
+					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 					
@@ -780,8 +778,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					{
 					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-					pot_l += Dt*a*V0(Cp(j));
-					pot_e += Dt*a*Ve(Cp(j));
+					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -824,18 +821,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 		            }
 		        }
-		    action = kineticT - kineticS - pot_l - pot_e - pot_r;   
+		    action = kineticT - kineticS - pot - pot_r;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
 			
 			//checking pot_r is much smaller than the other potential terms
-			reg_test.push_back(abs(pot_r/pot_l));
-			if (reg_test.back()<abs(pot_r/pot_e))
-				{
-				reg_test.back() = abs(pot_r/pot_e);
-				}
-
+			reg_test.push_back(abs(pot_r/pot));
 			if (reg_test.back()>closenessR)
 				{
 				cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
@@ -907,10 +899,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			{
 			string prefix = "./data/" + timeNumber;
 			string suffix = "_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
-			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0)
-				{
-				printAction(kineticT-kineticS,pot_l,pot_e);
-				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
 				{
 				string minusDSfile = prefix + "mainminusDSE"+suffix;
