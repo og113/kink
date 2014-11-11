@@ -80,7 +80,8 @@ double closenessR; //regularization
 struct aqStruct
 	{
 	string inputChoice;
-	string inputFile;
+	string inputTimeNumber;
+	string inputLoop;
 	double maxTheta;
 	unsigned int totalLoops;
 	string loopChoice;
@@ -623,7 +624,7 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 	return XcoordC;
 	}
 	
-long int neigh(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
+long int neigh(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
 	{
 	long int neighLocation = -1; //this is the result if there are no neighbours for the given values of the argument
 	unsigned int c = intCoord(locNum,direction,xNt);
@@ -640,11 +641,11 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 		}
 	else if (c==0 and sign==-1)
 		{
-		neighLocation = locNum+(N-1)*xNt;
+		neighLocation = locNum+(xNx-1)*xNt;
 		}
 	else if (c==(N-1) and sign==1)
 		{
-		neighLocation = locNum-(N-1)*(int)xNt;
+		neighLocation = locNum-(xNx-1)*(int)xNt;
 		}
 	else
 		{
@@ -685,6 +686,59 @@ comp DtFn (const unsigned int& time)
 	return xDt;
 	}
 	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//interpolate vector function
+vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<2*N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , 2*N_old*Nt_old = " << 2*N_old*Nt_old << endl;}
+	unsigned int zero_modes = old_size - 2*N_old*Nt_old;
+	vec vec_new (2*N_new*Nt_new+zero_modes);
+	
+	unsigned int x_new, t_new, x_old, t_old;
+	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
+	unsigned int pos;
+	
+	
+	for (unsigned int l=0;l<N_new*Nt_new;l++)
+		{
+		t_new = intCoord(l,0,Nt_new);
+		x_new = intCoord(l,1,Nt_new);
+		exact_t_old = t_new*(Nt_old-1.0)/(Nt_new-1.0);
+		exact_x_old = x_new*(N_old-1.0)/(N_new-1.0);
+		t_old = (unsigned int)exact_t_old;
+		x_old = (unsigned int)exact_x_old;
+		rem_t_old = exact_t_old;
+		rem_t_old -= (double)(t_old);
+		rem_x_old = exact_x_old;
+		rem_x_old -= (double)(x_old);
+		pos = t_old + Nt_old*x_old;
+		if  (t_old<(Nt_old-1) )
+			{
+			vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
+							+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)) \
+							+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1));
+			vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
+			 				+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)+1)\
+						 	+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1)+1);
+			}
+		else
+			{
+			vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
+			vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+			}
+		}
+	for (unsigned int l=0; l<zero_modes; l++)
+		{
+		vec_new(2*N_new*Nt_new+l) = vec_old(2*N_old*Nt_old+l);
+		}
+	return vec_new;
+	}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //printing functions
@@ -878,9 +932,9 @@ void gpSimple2(const string & readFile)
 //loading functions
 
 //load vector from file
-vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned int zeroModes)
+vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned int& Nx, const unsigned int zeroModes)
 	{
-	vec outputVec(2*Nt*N+zeroModes);
+	vec outputVec(2*Nt*Nx+zeroModes);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
 	string line;
@@ -907,12 +961,12 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 				}
 			}
 		}
-	if (j==Nt*N && k==(zeroModes-1))
+	if (j==Nt*Nx && k==(zeroModes-1))
 		{
 		outputVec(2*j+k) = 0.5; //obviously a random guess
 		k++;
 		}
-	if ((j+k)!=(Nt*N+zeroModes))
+	if ((j+k)!=(Nt*Nx+zeroModes))
 		{
 		cout << "loadVector error in: << " << loadFile << endl;
 		cout << "j+k = " << j+k << endl;

@@ -57,7 +57,7 @@ if (fin.is_open())
 			}
 		else if (lineNumber==1)
 			{
-			ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+			ss >> aq.inputChoice >> aq.inputTimeNumber >> aq.inputLoop >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 			lineNumber++;
 			}
 		else if(lineNumber==2)
@@ -235,7 +235,7 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 			{
 			cout << "need to run negEig and set negEigDone=1" << endl;
 			}
-		negVec = loadVector("./data/eigVec.dat",Nb,1);
+		negVec = loadVector("./data/eigVec.dat",Nb,N,1);
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
@@ -455,15 +455,49 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		string loadfile;
 		if (inP.compare("f")==0)
 			{
-			loadfile = "./data/" + aq.inputFile + ".dat";
+			loadfile = "./data/" + aq.inputTimeNumber + "pip_" + aq.inputLoop + ".dat";
 			cout << "input: " << loadfile << endl;
 			inP = "p";
 			}
 		else
 			{
 			loadfile = "./data/" + timeNumber + "pi"+inP+"_" + numberToString<int>(loop-1)+".dat";
-			}		
-		p = loadVector(loadfile,Nb,1);
+			}
+		unsigned int fileLength = countLines(loadfile);
+		if (fileLength==(2*N*Nb+1))
+			{
+			p = loadVector(loadfile,Nb,N,1);
+			}
+		else if (fileLength % 2) //if its odd
+			{
+			unsigned int Nin, Ntin;
+			cout << "interpolating input" << endl;
+			string inputsF = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
+			ifstream fin;
+			fin.open(inputsF.c_str());
+			if (fin.is_open())
+				{
+				string line, temp;
+				while(getline(fin,line))
+					{
+					if(line[0] == '#')
+						{
+						continue;
+						}
+					istringstream ss(line);
+					ss >> Nin >> temp >> Ntin;
+					break;
+					}
+				}
+			else{cout << "unable to open" << inputsF << endl;}
+			fin.close();
+			vec temp_p = loadVector(loadfile,Ntin,Nin,1);
+			p = interpolate(temp_p,Ntin,Nin,Nb,N);
+			}
+		else
+			{
+			cout << "vector in file: " << loadfile << " has length " << fileLength << " so cannot load into p" << endl;
+			}
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
@@ -508,8 +542,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
-            Chi0(pos) = p(2*neigh(pos,1,1,Nb))-p(2*neigh(pos,1,-1,Nb)); //final time slice
-            //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb))-p(2*neigh(pos-1,1,-1,Nb)); //penultimate time slice
+            Chi0(pos) = p(2*neigh(pos,1,1,Nb,N))-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
+            //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
             }
         if (runs_count==1) //printing Chi0
         	{
@@ -541,6 +575,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned long int j = 0; j < N*Nb; j++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
+			unsigned int neighPosX = neigh(j,1,1,Nb,N);
 			
 			if (absolute(Chi0(j))>1.0e-16) //zero mode lagrange constraint
 				{
@@ -555,10 +590,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
 				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
-				erg(t+Na) += pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+				erg(t+Na) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -569,10 +604,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp dt = -b*i;
 				comp Dt = -b*i/2.0;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
-				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 				if (inP.compare("b")==0)
 					{
@@ -593,10 +628,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp dt = -b*i;
 				comp Dt = -b*i;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
+				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
-				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
                 for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -613,7 +648,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         }
                     else
                     	{
-                        unsigned int neighb = neigh(j,direc,sign,Nb);
+                        unsigned int neighb = neigh(j,direc,sign,Nb,N);
                         
                         minusDS(2*j) += - real(Dt*Cp(neighb)/a);
                         minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
@@ -782,7 +817,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Na+1);
-        accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1))+ap(neigh(l,1,-1,Na+1))-2.0*ap(l)) \
+        accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
             -Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
     	}
     	
@@ -804,9 +839,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         for (unsigned int x=0; x<N; x++)
         	{
             unsigned int m = t+x*(Na+1);
-            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1))+ap(neigh(m,1,-1,Na+1))-2.0*ap(m)) \
+            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
             -dV(ap(m)) - dVr(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1))-ap(m),2.0)/a/2.0 \
+            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
             + a*V(ap(m)) + a*Vr(ap(m));
             for (unsigned int y=0; y<N; y++)
             	{
@@ -864,7 +899,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+        accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
             -Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
     	}
 
@@ -882,11 +917,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int x=0; x<N; x++)
 			{
 		    unsigned int l = t+x*(Nc+1);
-		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1))+ccp(neigh(l,1,-1,Nc+1))-2.0*ccp(l)) \
+		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
 		    -dV(ccp(l));
 		    if (t>1)
 		    	{
-		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1))-ccp(l-1),2.0)/a/2.0\
+		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
 		    	+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
 			}

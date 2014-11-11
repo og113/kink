@@ -185,7 +185,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			else if (lineNumber==1)
 				{
-				ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+				ss >> aq.inputChoice >> aq.inputTimeNumber >> aq.inputLoop >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 				lineNumber++;
 				}
 			else if(lineNumber==2)
@@ -379,7 +379,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			//cout << "negEig run" << endl;
 			cout << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
 			}
-		negVec = loadVector("data/eigVec.dat",Nb,1);
+		negVec = loadVector("data/eigVec.dat",Nb,N,1);
 		ifstream eigFile;
 		eigFile.open("data/eigValue.dat");
 		string lastLine = getLastLine(eigFile);
@@ -460,13 +460,13 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		vec p(2*N*NT+2);
 		if (loop==0)
 			{
-			p = loadVector(piFiles[fileLoop],NT,2);
+			p = loadVector(piFiles[fileLoop],NT,N,2);
 			printf("%12s%30s\n","input: ",(piFiles[fileLoop]).c_str());
 			}
 		else
 			{
 			string loadfile = "./data/" + timeNumber + "mainpi_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop-1)+".dat";
-			p = loadVector(loadfile,NT,2);
+			p = loadVector(loadfile,NT,N,2);
 			printf("%12s%30s\n","input: ",loadfile.c_str());
 			}
 			
@@ -628,6 +628,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{		
 				unsigned int t = intCoord(j,0,NT); //coordinates
 				unsigned int x = intCoord(j,1,NT);
+				unsigned int neighPosX = neigh(j,1,1,NT,N);
 				comp Dt = DtFn(t);
 				comp dt = dtFn(t);
 			
@@ -664,8 +665,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
-						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) - 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
+						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						}
 					}
 
@@ -673,21 +674,21 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				//boundaries			
 				if (t==(NT-1))
 					{
-					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
-					erg(t) += pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+					erg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
 					DDS.insert(2*j+1,2*j+1) = 1.0; //zero imaginary part
 					}
 				else if (t==0)
 					{
-					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
-					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 					
 					//////////////////////////////////////equation I - both///////////////////////////////////
 					for (unsigned int k=1; k<2*2; k++)
@@ -702,7 +703,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			                }
 			            else
 			            	{
-			                unsigned int neighb = neigh(j,direc,sign,NT);
+			                unsigned int neighb = neigh(j,direc,sign,NT,N);
 			                minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
 			                DDS.coeffRef(2*j+1,2*neighb) += imag(Dt)/a;
 			                DDS.coeffRef(2*j+1,2*neighb+1) += real(Dt)/a;
@@ -762,7 +763,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				                }
 				            else
 				            	{
-				                unsigned int neighb = neigh(j,direc,sign,NT);
+				                unsigned int neighb = neigh(j,direc,sign,NT,N);
 				                minusDS(2*j) += - real(Dt*Cp(neighb))*theta/a;
 				                DDS.coeffRef(2*j,2*neighb) += real(Dt)*theta/a;
 			                	DDS.coeffRef(2*j,2*neighb+1) += -imag(Dt)*theta/a;
@@ -777,11 +778,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				//bulk
 				else
 					{
-					kineticS += Dt*pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0;
+					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					pot += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
-					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,NT))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
 		            for (unsigned int k=0; k<2*2; k++)
                 	{
