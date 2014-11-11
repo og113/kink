@@ -4,7 +4,7 @@
 #in the format yymmdd-hhmmss
 #
 #inF		min fileNo			max fileNo		firstLoop     lastLoop		
-p			141111162425        141111162425    0             0
+m			141111180851        141111180851    0             0
 #
 #minTb		maxTb      minTheta	  maxTheta	 loops	zmt     zmx
-17.00       17.00      0.00       0.50       101    nAD1    dC9
+15.00       14.00      0.00       0.00       51     nAD1    dC9

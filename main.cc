@@ -439,6 +439,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		double bound;
 		double W;
 		double E;
+		double Elin;
 		double Num;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -839,7 +840,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			double linTestE;	double linTestN;
 			double linEMax = 0.0;	double linEMin = 5.0e15; //surely it's going to be less than this
 			double linNMax = 0.0;	double linNMin = 5.0e15;
-			unsigned int linearInt = (int)(Na/6);
+			unsigned int linearInt = (int)(Na/3);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
 				if (absolute(linErg(j))>linEMax)
@@ -866,12 +867,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				{
 				lin_test.back() = linTestN;
 				}
-				
-			//checking agreement between erg and linErg
-			double trueTest = real(erg(1))-linErg(1); //not using zero as boundaries are funny
-			trueTest = trueTest*2.0/(real(erg(1))+linErg(1));
-			trueTest = absolute(trueTest);
-			true_test.push_back(trueTest);
 			
 			//checking conservation of E
 			double ergTest = real(erg(1)-erg(NT-2));
@@ -881,15 +876,23 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 						
 			//defining E, Num and cW
 			E = 0;
+			Elin = 0;
 			Num = 0;
 			for (unsigned int j=0; j<linearInt; j++)
 				{
-				E += real(linErg(j));
+				E += real(erg(j));
+				Elin += real(linErg(j));
 				Num += real(linNum(j));
 				}
 			E /= linearInt;
 			Num /= linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
+			
+			//checking agreement between erg and linErg
+			double trueTest = E - Elin; //not using zero as boundaries are funny
+			trueTest = trueTest*2.0/(E + Elin);
+			trueTest = absolute(trueTest);
+			true_test.push_back(trueTest);
 			
 			//checking lattice small enough for E, should have parameter for this
 			double momTest = E*b/Num*pi; //perhaps should have a not b here
