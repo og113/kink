@@ -2,14 +2,14 @@
 ##the following are input to pi.cc:
 ##
 #N      Na      Nb      Nc      dE      LoR     Tb      theta
-100     64      64      32      0.20    3.2     18.0    0.0
+500     500     500     32      0.200   3.2     18.0    0.0
 ##
 #inputChoice    file                 totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
-b               141104163950pip_20   1           n           13.0        10.0        n               0       
+b               141104163950pip_20   1           n           0.05        0.04        n               0       
 ##
 #alpha     open     amp     pot     A     reg
 0.4        1.0      0.4     2n      0.4   0.0
 ##
 ##negEig inputs
 #P          c           done
-30000       0.0030      1
+40000       0.00200     1

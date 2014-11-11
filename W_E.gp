@@ -1,4 +1,4 @@
-#gnuplot program to plot action versus energy, or something similar
+#gnuplot program to plot W against E from mainAction.dat
 
 #if you want to save directly to a file, use the following two lines of code
 #set terminal postscript eps color enhanced size 10,5
@@ -10,9 +10,9 @@ unset key
 set autoscale
 set xtic auto
 set ytic auto
-set title "W"
+set title "W(E,N)"
 set xlabel "E"
-set ylabel "W(E,N)"
+set ylabel "W"
 set grid
 plot "./data/mainAction.dat" using 8:10 with points
 

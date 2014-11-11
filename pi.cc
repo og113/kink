@@ -49,7 +49,7 @@ if (fin.is_open())
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta)>DBL_MIN)
+			if (absolute(theta)>1.0e-16)
 				{
 				cout << "theta != 0" << endl;
 				cout << "theta = " << theta << endl;
@@ -79,137 +79,128 @@ else
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
-	
-//determining number of runs
-closenessA = 1.0;
-closenessS = 1.0e-5;
-closenessSM = 1.0e-4;
-closenessD = 1.0;
-closenessC = 1.0e-12;
-closenessE = 1.0e-2;
-closenessR = 1.0e-4;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//calculated quantities derived from the inputs, and loading eigVec and eigVal
+//potential functions
 	
 	//potential functions
 	if (pot[0]=='1')
 		{
-		V_params = &V1_params;
-		dV_params = &dV1_params;
-		ddV_params = &ddV1_params;
+		V = &V1c;
+		dV = &dV1c;
+		ddV = &ddV1c;
+		Vd = &V1;
+		dVd = &dV1;
+		ddVd = &ddV1;
+		epsilon0 = 0.0;
 		epsilon = dE;
 		}
 	else if (pot[0]=='2')
 		{
-		V_params = &V2_params;
-		dV_params = &dV2_params;
-		ddV_params = &ddV2_params;
+		V = &V2c;
+		dV = &dV2c;
+		ddV = &ddV2c;
+		Vd = &V2;
+		dVd = &dV2;
+		ddVd = &ddV2;
+		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
 		}
 	else
 		{
 		cout << "pot option not available, pot = " << pot << endl;
 		}
+	paramsV  = {epsilon, A};
+	paramsV0 = {epsilon0, A};
+	paramsVoid = {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon and root
 
 	//gsl function for dV(phi)
-	struct f_gsl_params fparams = { epsilon, A};
 	gsl_function F;
-	F.function = &f_gsl;
-	F.params = &fparams;	
+	F.function = Vd;
+	F.params = &paramsV;	
 	
-	//finding roots of dV(phi)=0
-	root = brentMinimaFn(&F, -3.0, 3.0, 20);
-	sort(root.begin(),root.end());
+	//finding preliminary roots of dV(phi)=0
+	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
+	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
 	
 	//gsl function for V(root2)-V(root1)-dE
-	struct ec_gsl_params ec_params = { A, root[0], root[2], dE};
+	struct ec_params ec_params = { A, minima[0], minima[1], dE};
 	gsl_function EC;
-	EC.function = &ec_gsl;
+	EC.function = &ec;
 	EC.params = &ec_params;
-	
+
 	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&F,&EC,&dE,&epsilon,&root);
+	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
-	//evaluating V and a couple of properties of V
-	if (pot[0]=='1')
-		{
-		V = &V1;
-		V0 = &V10;
-		Ve = &V1e;
-		dV = &dV1;
-		ddV = &ddV1;
-		}
-	else if (pot[0]=='2')
-		{
-		V = &V2;
-		V0 = &V20;
-		Ve = &V2e;
-		dV = &dV2;
-		ddV = &ddV2;
-		}
-	comp ergZero = N*a*V(root[0]);
-	mass2 = real(ddV(root[0]));
+	//evaluating some properties of V
+	mass2 = ddVd(minima[0],&paramsV);
 	
 	//finding root0 of dV0(phi)=0;
-	struct void_gsl_params vparams = {};
-	vector<double> root0(3);
+	vector<double> minima0(3);
 	if (pot[0]=='1')
 		{
-		root0[0] = -1.0; root0[1] = 0.0; root0[2] = 1.0;
+		minima0[0] = -1.0; minima0[1] = 1.0;
 		}
 	else if (pot[0]=='2')
 		{
-		gsl_function DV0;
-		DV0.function = dV0_gsl;
-		DV0.params = &vparams;	
-		root0 = brentMinimaFn(&DV0, -3.0, 3.0, 20);
-		sort(root0.begin(),root0.end());
+		gsl_function V0;
+		V0.function = Vd;
+		V0.params = &paramsV0;	
+		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
+		minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
+		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
+		gsl_function EC0;
+		EC0.function = &ec;
+		EC0.params = &ec0_params;
+		double dE0 = 0.0;
+		epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
 		}
 	
 	//finding S1
-	double S1, S1error;
+	double S1error;
 	gsl_function S1_integrand;
-	S1_integrand.function = &s1_gsl;
-	S1_integrand.params = &vparams;
+	S1_integrand.function = &s1Integrand;
+	S1_integrand.params = &paramsV0;
 	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, root0[0], root0[2], DBL_MIN, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 	gsl_integration_workspace_free(w);
 	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//finding phi profile between minima
-	unsigned int profileSize = 50;
+	unsigned int profileSize = Nb; //more than the minimum
 	vector<double> phiProfile(profileSize);
 	vector<double> rhoProfile(profileSize);
 	double alphaL, alphaR;
-	if (pot[0]=='2' || 1==1)
+	if (pot[0]=='2')
 		{
-		alphaL = root0[0]+1.0e-2;
-		alphaR = root0[2]-1.0e-2;
+		double phiL = minima0[1]-1.0e-2;
+		double phiR = minima0[0]+1.0e-2;
 		for (unsigned int j=0;j<profileSize;j++)
 			{
-			phiProfile[j] = alphaL + (alphaR-alphaL)*j/(profileSize-1.0);
+			phiProfile[j] = phiL + (phiR-phiL)*j/(profileSize-1.0);
 			}
 	
 		double profileError;
 		gsl_function rho_integrand;
-		rho_integrand.function = &rho_gsl;
-		rho_integrand.params = &vparams;
+		rho_integrand.function = &rhoIntegrand;
+		rho_integrand.params = &paramsV0;
 		w = gsl_integration_workspace_alloc(1e4);
 		for (unsigned int j=0;j<profileSize;j++)
 			{
-			gsl_integration_qags(&rho_integrand, 0, phiProfile[j], DBL_MIN, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
+			gsl_integration_qags(&rho_integrand, phiProfile[j], 0, 1.0e-16, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
 			if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
 			}
 		gsl_integration_workspace_free(w);
+		alphaL = rhoProfile[0];
+		alphaR = rhoProfile.back();
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +208,7 @@ string print_choice = aq.printChoice;
 //other derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
-R = 2.0/3.0/epsilon;
+R = S1/dE;
 double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 alpha *= R;
 L = LoR*R;
@@ -264,8 +255,19 @@ else if (inP.compare("b") == 0)
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
+if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b = " << b << endl << endl;}
 Ta = b*Na;
 Tc = b*Nc;
+double ergZero = N*a*Vd(minima[0],&paramsV);
+
+//determining number of runs
+closenessA = 1.0;
+closenessS = 1.0e-5;
+closenessSM = 1.0e-4;
+closenessD = 1.0;
+closenessC = 1.0e-16*N*NT;
+closenessE = 1.0e-2;
+closenessR = 1.0e-4;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -292,8 +294,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	time = clock();
 	
 	//printing loop name and parameters
-	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());		
+	printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
 	printParameters();
+	//printMoreParameters();
 	
 	comp action = twaction;
 	double W;
@@ -319,15 +322,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining lambda functions for regularization
 	auto Vr = [&] (const comp & phi)
 		{
-		return -i*reg*VrFn(phi,root[0],root[2]);
+		return -i*reg*VrFn(phi,minima[0],minima[1]);
 		};
 	auto dVr = [&] (const comp & phi)
 		{
-		return -i*reg*dVrFn(phi,root[0],root[2]);
+		return -i*reg*dVrFn(phi,minima[0],minima[1]);
 		};
 	auto ddVr = [&] (const comp & phi)
 		{
-		return -i*reg*ddVrFn(phi,root[0],root[2]);
+		return -i*reg*ddVrFn(phi,minima[0],minima[1]);
 		};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
@@ -381,26 +384,26 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					if ((rho-R)<-alpha)
 						{
-						p(2*j) = root[2];
+						p(2*j) = minima[1];
 						}
 					else if ((rho-R)>alpha)
 						{
-						p(2*j) = root[0];
+						p(2*j) = minima[0];
 						}
 					else
 						{
-						p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho-R)/2.0)/2.0;
+						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
 						}
 					}
 				else if (pot[0]=='2')
 					{
-					if ((rho-R)<alphaL) //alphaL is negative
+					if ((rho-R)<=alphaL)
 						{
-						p(2*j) = root[2];
+						p(2*j) = minima[1];
 						}
-					else if ((rho-R)>alphaR)
+					else if ((rho-R)>=alphaR)
 						{
-						p(2*j) = root[0];
+						p(2*j) = minima[0];
 						}
 					else
 						{
@@ -425,23 +428,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
 				if ((rho1-R)<-alpha && (rho2-R)<-alpha)
 					{
-					p(2*j) = root[2];
+					p(2*j) = minima[1];
 					}
 				else if ((rho1-R)>alpha || (rho2-R)>alpha)
 					{
-					p(2*j) = root[0];
+					p(2*j) = minima[0];
 					}
 				else if (real(x)>0) //note that the coord should be real
 					{
-					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho1-R)/2.0)/2.0;
+					p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho1-R)/2.0)/2.0;
 					}
 				else if (real(x)<0)
 					{
-					p(2*j) = (root[2]+root[0])/2.0 + (root[0]-root[2])*tanh((rho2-R)/2.0)/2.0;
+					p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho2-R)/2.0)/2.0;
 					}
 				else
 					{
-					p(2*j) = root[2]; //i.e. if coordB(j,1) == 0
+					p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
 					}
 				}
 			}
@@ -481,7 +484,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 		
 	//very early vector print
-	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ numberToString<unsigned int>(loop) + "0.dat";
+	string earlyPrintFile = "data/" + timeNumber + "piE"+inP+ "_" + numberToString<unsigned int>(loop) + "_0.dat";
 	printVectorB(earlyPrintFile,p);
 		
 	//defining complexified vector Cp
@@ -528,8 +531,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//initializing to zero
 		comp kineticS = 0.0;
 		comp kineticT = 0.0;
-		comp pot_l = 0.0;
-		comp pot_e = 0.0;
+		comp pot_0 = 0.0;
 		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 
@@ -540,7 +542,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			
-			if (absolute(Chi0(j))>DBL_MIN) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>1.0e-16) //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -554,8 +556,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				comp Dt = -b*i/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
-				pot_l += Dt*a*V0(Cp(j));
-				pot_e += Dt*a*Ve(Cp(j));
+				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -569,8 +570,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i/2.0;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += Dt*a*V0(Cp(j));
-				pot_e += Dt*a*Ve(Cp(j));
+				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -594,8 +594,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				comp Dt = -b*i;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0;
-				pot_l += Dt*a*V0(Cp(j));
-				pot_e += Dt*a*Ve(Cp(j));
+				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
 				erg(t+Na) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neigh(j,1,1,Nb))-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -636,7 +635,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
-        action = kineticT - kineticS - pot_l - pot_e - pot_r;
+        action = kineticT - kineticS - pot_0 - pot_r;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -644,10 +643,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			string prefix = "./data/" + timeNumber;
 			string suffix = inP+"_" + numberToString<unsigned int>(loop)+"_" + numberToString<unsigned int>(runs_count)+".dat";
-			if ((print_choice.compare("a")==0 || print_choice.compare("e")==0) && 1==0) //have stopped this one as it's annoying
-				{
-				printAction(kineticT-kineticS,pot_l,pot_e);
-				}
 			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
 				{
 				string minusDSfile = prefix + "minusDSE"+suffix;
@@ -717,12 +712,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//convergence issues
 		
 		//checking pot_r is much smaller than the other potential terms
-		reg_test.push_back(abs(pot_r/pot_l));
-		if (reg_test.back()<abs(pot_r/pot_e))
-			{
-			reg_test.back() = abs(pot_r/pot_e);
-			}
-
+		reg_test.push_back(abs(pot_r/pot_0));
 		if (reg_test.back()>closenessR)
 			{
 			cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
@@ -821,15 +811,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
-		        if (absolute(theta)<DBL_MIN)
+		        if (absolute(theta)<1.0e-16)
 					{
-		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
-					linNumA (Na-t) += omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
+		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
+					linNumA (Na-t) += omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
 		        	}
 				else
 					{
-					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
-					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-root[0])*(real(ap(n))-root[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
 					}
 				}
         	}
@@ -905,7 +895,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//checking energy conserved
 	double ergChange = 0.0;
 	double relErgChange = 0.0;
-	if (absolute(real(erg(0)))>DBL_MIN)
+	if (absolute(real(erg(0)))>1.0e-16)
 		{
 		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
 		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));

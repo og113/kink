@@ -1,4 +1,4 @@
-#gnuplot program to plot energy versus number of particles, or something similar
+#gnuplot program to plot W against N from mainAction.dat
 
 #if you want to save directly to a file, use the following two lines of code
 #set terminal postscript eps color enhanced size 10,5
@@ -10,9 +10,9 @@ unset key
 set autoscale
 set xtic auto
 set ytic auto
-set title "E vs N"
+set title "W(N)"
 set xlabel "N"
-set ylabel "E"
-plot "./data/mainAction.dat" using 9:8 with points
+set ylabel "W"
+plot "./data/mainAction.dat" using 9:10 with points
 
 pause -1
