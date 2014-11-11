@@ -207,18 +207,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	fin.close();
 	inP = aq.inputChoice;
-	
-	//determining number of runs
-	closenessA = 1.0;
-	closenessS = 1.0e-6;
-	closenessSM = 1.0e-5;
-	closenessD = 1.0;
-	closenessC = 1.0e-12;
-	closenessE = 1.0e-2;
-	closenessL = 1.0e-2;
-	closenessT = 1.0e-5;
-	closenessP = 0.5;
-	closenessR = 1.0e-4;
 
 	string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 	string print_choice = aq.printChoice;
@@ -336,6 +324,18 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	Ta = b*Na;
 	Tc = b*Nc;
 	double ergZero = N*a*Vd(minima[0],&paramsV);
+	
+	//determining number of runs
+	closenessA = 1.0;
+	closenessS = 1.0e-6;
+	closenessSM = 1.0e-5;
+	closenessD = 1.0;
+	closenessC = 1.0e-16*N*NT;
+	closenessE = 1.0e-2;
+	closenessL = 1.0e-2;
+	closenessT = 1.0e-5;
+	closenessP = 0.5;
+	closenessR = 1.0e-4;
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);

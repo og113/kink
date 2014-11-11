@@ -79,15 +79,6 @@ else
 	}
 fin.close();
 inP = aq.inputChoice; //just because I write this a lot
-	
-//determining number of runs
-closenessA = 1.0;
-closenessS = 1.0e-5;
-closenessSM = 1.0e-4;
-closenessD = 1.0;
-closenessC = 1.0e-12;
-closenessE = 1.0e-2;
-closenessR = 1.0e-4;
 
 string loop_choice = aq.loopChoice; //just so that we don't have two full stops when comparing strings
 string print_choice = aq.printChoice;
@@ -184,11 +175,11 @@ string print_choice = aq.printChoice;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//finding phi profile between minima
-	unsigned int profileSize = 100;
+	unsigned int profileSize = Nb; //more than the minimum
 	vector<double> phiProfile(profileSize);
 	vector<double> rhoProfile(profileSize);
 	double alphaL, alphaR;
-	if (pot[0]=='2' || 1==1)
+	if (pot[0]=='2')
 		{
 		double phiL = minima0[1]-1.0e-2;
 		double phiR = minima0[0]+1.0e-2;
@@ -268,6 +259,15 @@ if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b 
 Ta = b*Na;
 Tc = b*Nc;
 double ergZero = N*a*Vd(minima[0],&paramsV);
+
+//determining number of runs
+closenessA = 1.0;
+closenessS = 1.0e-5;
+closenessSM = 1.0e-4;
+closenessD = 1.0;
+closenessC = 1.0e-16*N*NT;
+closenessE = 1.0e-2;
+closenessR = 1.0e-4;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
