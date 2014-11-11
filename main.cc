@@ -555,7 +555,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 								}
 							else if (zmx[0]=='d')
 								{
-								chiX(posX+k) = p(2*neigh(posX+k,1,1,NT))-p(2*neigh(posX+k,1,-1,NT));
+								chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
 								}
 							else
 								{
@@ -801,7 +801,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
                         }
                     else
                     	{
-                        unsigned int neighb = neigh(j,direc,sign,NT);
+                        unsigned int neighb = neigh(j,direc,sign,NT,N);
                         
                         minusDS(2*j) += - real(Dt*Cp(neighb)/a);
                         minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
@@ -1072,7 +1072,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing output phi
 		string tpifile =  prefix + "mainpi"+suffix;
 		printVector(tpifile,p);
-		gp(tpifile,"repi.gp");
+		//gp(tpifile,"repi.gp");
 		printf("%12s%30s\n"," ",tpifile.c_str());
 	
 		//printing output minusDS				
