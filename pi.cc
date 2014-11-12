@@ -278,7 +278,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//giving values of varying parameters
 	int intLoopParameter;
 	double doubleLoopParameter;
-	if (loop_choice.compare("N") == 0)
+	if (loop_choice[0] == 'N')
 		{
 		intLoopParameter = aq.minValue + (int)(aq.maxValue - aq.minValue)*loop/(aq.totalLoops-1);
 		changeInt (loop_choice,intLoopParameter);
@@ -464,14 +464,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			loadfile = "./data/" + timeNumber + "pi"+inP+"_" + numberToString<int>(loop-1)+".dat";
 			}
 		unsigned int fileLength = countLines(loadfile);
-		if (fileLength==(2*N*Nb+1))
+		if (fileLength==(N*Nb+1))
 			{
 			p = loadVector(loadfile,Nb,N,1);
 			}
 		else if (fileLength % 2) //if its odd
 			{
 			unsigned int Nin, Ntin;
-			cout << "interpolating input" << endl;
+			cout << "interpolating input, filelength = " << fileLength << " , Cp.size() = " << N*Nb+1 << endl;
 			string inputsF = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
 			ifstream fin;
 			fin.open(inputsF.c_str());
@@ -489,7 +489,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					break;
 					}
 				}
-			else{cout << "unable to open" << inputsF << endl;}
+			else{cout << "unable to open " << inputsF << endl;}
 			fin.close();
 			vec temp_p = loadVector(loadfile,Ntin,Nin,1);
 			p = interpolate(temp_p,Ntin,Nin,Nb,N);
@@ -998,9 +998,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//copying a version of inputs with timeNumber
 	string runInputs = prefix + "inputsPi" + "_" + numberToString<unsigned int>(loop);
-	if (loop_choice.compare("N") == 0)
+	if (loop_choice[0]=='N')
 		{
-		changeInputs(runInputs,"N", numberToString<unsigned int>(intLoopParameter));
+		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(intLoopParameter));
 		}
 	else if (loop_choice.compare("n")!=0)
 		{
