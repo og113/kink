@@ -8,7 +8,7 @@
 f               141112074703    20        5           Na          120         200         n               0       
 ##
 #alpha     open     amp     pot     A     reg
-0.4        1.0      0.4     1n      0.4   0.0
+0.4        1.0      0.4     1n      0.4   1.0e-3
 ##
 ##negEig inputs
 #P          c           done

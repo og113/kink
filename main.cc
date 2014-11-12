@@ -151,15 +151,16 @@ for (unsigned int j=0; j<inputsFiles.size();j++)
 	cout << inputsFiles[j] << " " << piFiles[j] << endl;
 	}
 cout << endl;
+
+//defining the timeNumber
+string timeNumber = currentDateTime();
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //beginning file loop
 for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//getting variables from inputs
-	
-	//defining the timeNumber
-	string timeNumber = currentDateTime();
 
 	//copying a version of mainInputs with timeNumber
 	string runInputs = "./data/" + timeNumber + "mainInputs";
