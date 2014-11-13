@@ -4,8 +4,8 @@
 #plots real part only
 
 #if you want to save directly to a file, use the following two lines of code
-set terminal postscript eps color enhanced size 10,5
-set output './pics/fig2.eps';
+#set term png size 1600,800
+#set output './pics/fig2.png';
 
 unset log
 unset label

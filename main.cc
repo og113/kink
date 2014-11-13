@@ -332,7 +332,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessSM = 1.0e-5;
 	closenessD = 1.0;
 	closenessC = 1.0e-16*N*NT;
-	closenessE = 1.0e-2;
+	closenessE = 1.0/3.0;
 	closenessL = 1.0e-2;
 	closenessT = 1.0e-5;
 	closenessP = 0.5;
@@ -440,7 +440,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		double bound;
 		double W;
 		double E;
-		double Elin;
+		double E_exact;
 		double Num;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -876,22 +876,21 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
-			E = 0;
-			Elin = 0;
-			Num = 0;
+			//E = 0;
+			E_exact = 0;
+			//Num = 0;
 			for (unsigned int j=0; j<linearInt; j++)
 				{
-				E += real(erg(j));
-				Elin += real(linErg(j));
-				Num += real(linNum(j));
+				E_exact += real(erg(j));
 				}
-			E /= linearInt;
-			Num /= linearInt;
+			E_exact /= linearInt;
+			E = linErg(0);
+			Num = linNum(0);
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking agreement between erg and linErg
-			double trueTest = E - Elin; //not using zero as boundaries are funny
-			trueTest = trueTest*2.0/(E + Elin);
+			double trueTest = E - E_exact; //not using zero as boundaries are funny
+			trueTest = trueTest*2.0/(E + E_exact);
 			trueTest = absolute(trueTest);
 			true_test.push_back(trueTest);
 			
@@ -1050,8 +1049,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%14s%6i%6i%8g%8g%8g%6g%14g%14g%12g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
-		,real(W),sol_test.back(),lin_test.back());
+		fprintf(actionfile,"%14s%6i%6i%8g%8g%8g%6g%14g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
+		,real(W),sol_test.back(),lin_test.back(),true_test.back());
 		fclose(actionfile);
 		
 		string prefix = "./data/" + timeNumber;
