@@ -5,7 +5,7 @@
 150     300     100     32      0.050   3.2     17.0    0.0
 ##
 #inputChoice    fileNumberIn    loopIn    totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
-f               141112074703    20        1           n           120         200         n               0       
+f               141112074703    20        2           N           100         150         n               0       
 ##
 #alpha     open     amp     pot     A     reg
 0.4        1.0      0.4     1n      0.4   0.0
