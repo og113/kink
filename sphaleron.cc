@@ -134,9 +134,10 @@ paramsVoid = {};
 gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 
 double F = 1.0, dF;
+double aim = 0.0;
 double closeness = 1.0e-6;
 double t0 = 1.0e-2, t1 = 1.0;
-const unsigned int steps = 1e2;
+const unsigned int steps = 1e3;
 double h = t1-t0;
 h /= (double)steps;
 vector<double> y0Vec(steps+1), y2Vec(steps+1);
@@ -148,7 +149,7 @@ double vel = -1.0/t0 - 1.0; //initial guess
 
 printf("%16s%16s%16s%16s%16s%16s%16s\n","run","steps","y(t1)","yMin","velOld","velNew","-F/dF");
 
-while (absolute(F)>closeness)
+while (absolute(F-aim)>closeness)
 	{
 	runsCount++;
 	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sys,  gsl_odeiv2_step_rk8pd, 1.0e-6, 1.0e-6, 0.0);
@@ -157,7 +158,7 @@ while (absolute(F)>closeness)
 	double y0[4] = { 1.0, vel, 0.0, 1.0};
 	double y[4];
 	memcpy(y, y0, sizeof(y0));
-	double yMin = y[0];
+	double yMin = absolute(y[0]-aim);
 	y0Vec[0] = y[0];
 	y2Vec[0] = y[2];
 	int status;
@@ -175,23 +176,23 @@ while (absolute(F)>closeness)
 			printf ("i = %3i, t = %3g\n",i,t);
 			break;
 			}
-		if (y[0]<yMin && y[0]>0.0)
+		if ((y[0]-aim)<yMin && (y[0]-aim)>0.0)
 			{
-			yMin = y[0];
+			yMin = y[0]-aim;
 			iMin = i;
 			}
 		y0Vec[i] = y[0];
 		y2Vec[i] = y[2];
 		//printf ("%.5e %.5e %.5e\n", t, y[0], y[1]);
-		if (y[0]<0.0)
+		if ((y[0]-aim)<0.0)
 			{
 			iMin = i;
-			if (y[0]<-0.2) { break; }
+			if ((y[0]-aim)<-0.2) { break; }
 			}
 		}
 	if (status != GSL_SUCCESS){break;}
 		
-	F = y0Vec[iMin]; //as final boundary condition is y(t1)=0.0;
+	F = y0Vec[iMin]-aim; //as final boundary condition is y(t1)=0.0;
 	dF = y2Vec[iMin];
 	printf("%16i%16i%16g%16g%16.12g",runsCount,i,y[0],yMin,vel);
 	if (absolute(dF)>2.0e-16)
