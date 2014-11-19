@@ -134,9 +134,9 @@ paramsVoid = {};
 gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 
 double F = 1.0, dF;
-double closeness = 1.0e-8;
-double t0 = 1.0e-2, t1 = 5.0;
-unsigned int steps = 1e6;
+double closeness = 1.0e-6;
+double t0 = 1.0e-2, t1 = 1.0;
+const unsigned int steps = 1e2;
 double h = t1-t0;
 h /= (double)steps;
 vector<double> y0Vec(steps+1), y2Vec(steps+1);
@@ -151,27 +151,28 @@ printf("%16s%16s%16s%16s%16s%16s%16s\n","run","steps","y(t1)","yMin","velOld","v
 while (absolute(F)>closeness)
 	{
 	runsCount++;
-	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_y_new (&sys, gsl_odeiv2_step_rk4, h, 1.0e-6, 0.0);
+	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sys,  gsl_odeiv2_step_rk8pd, 1.0e-6, 1.0e-6, 0.0);
 
-	double ti;
-	double t = t0;
+	double t = t0, ti;
 	double y0[4] = { 1.0, vel, 0.0, 1.0};
 	double y[4];
 	memcpy(y, y0, sizeof(y0));
 	double yMin = y[0];
 	y0Vec[0] = y[0];
 	y2Vec[0] = y[2];
-	
+	int status;
 	unsigned int i, iMin;
-
+	
 	for (i = 1; i <= steps; i++)
 		{
-		ti = (double)i;
+		ti =(double)i;
 		ti *= h;
-		int status = gsl_odeiv2_driver_apply_fixed_step (d, &t, h, ti, y);
+		ti += t0;
+		status = gsl_odeiv2_driver_apply (d, &t, ti, y);
 		if (status != GSL_SUCCESS)
 			{
 			printf ("error, return value=%d\n", status);
+			printf ("i = %3i, t = %3g\n",i,t);
 			break;
 			}
 		if (y[0]<yMin && y[0]>0.0)
@@ -188,6 +189,7 @@ while (absolute(F)>closeness)
 			if (y[0]<-0.2) { break; }
 			}
 		}
+	if (status != GSL_SUCCESS){break;}
 		
 	F = y0Vec[iMin]; //as final boundary condition is y(t1)=0.0;
 	dF = y2Vec[iMin];
