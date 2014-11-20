@@ -149,11 +149,11 @@ h /= (double)steps;
 vector<double> y0Vec(steps+1), y2Vec(steps+1);
 unsigned int runsCount = 0;
 
-double vel = -1.0/t0 - 1.0; //initial guess
-//cout << "initial vel: ";
-//cin >> vel;
+double Y0 = 7.55;//initial guess
+//cout << "initial y0: ";
+//cin >> Y0;
 
-printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","steps","y(t1)","yMin","F-aim","velOld","velNew","-F/dF");
+printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","steps","y(t1)","yMin","F-aim","Y0Old","Y0New","-F/dF");
 
 while (absolute(F-aim)>closeness)
 	{
@@ -161,7 +161,7 @@ while (absolute(F-aim)>closeness)
 	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sys,  gsl_odeiv2_step_rk8pd, 1.0e-6, 1.0e-6, 0.0);
 
 	double t = t0, ti;
-	double y0[4] = { 1.0, vel, 0.0, 1.0};
+	double y0[4] = { Y0, 0.0, 1.0, 0.0};
 	double y[4];
 	memcpy(y, y0, sizeof(y0));
 	double yMin = absolute(y[0]-aim);
@@ -200,11 +200,11 @@ while (absolute(F-aim)>closeness)
 		
 	F = y0Vec[iMin]-aim; //as final boundary condition is y(t1)=0.0;
 	dF = y2Vec[iMin];
-	printf("%16i%16i%16g%16g%16g%16.12g",runsCount,i,y[0],yMin,F-aim,vel);
+	printf("%16i%16i%16g%16g%16g%16.12g",runsCount,i,y[0],yMin,F-aim,Y0);
 	if (absolute(dF)>2.0e-16)
 		{
-		vel += -F/dF;
-		printf("%16.12g%16g\n",vel,-F/dF);
+		Y0 += -F/dF;
+		printf("%16.12g%16g\n",Y0,-F/dF);
 		}
 	gsl_odeiv2_driver_free (d);
 	if (i==(steps+1))
