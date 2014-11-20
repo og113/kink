@@ -28,6 +28,8 @@ using namespace std;
 struct void_params {};
 struct void_params paramsVoid;
 
+#define pi 3.14159265359
+
 int func (double t, const double y[], double f[], void *params)
 	{
 	f[0] = y[1];
@@ -113,6 +115,42 @@ void gpSimple(const string & readFile)
 	fprintf(gnuplotPipe, "%s \n", command2);
 	pclose(gnuplotPipe);
 	}
+	
+struct paramsStruct {double Y_0;};
+struct paramsStruct p;
+	
+//Energy integrand
+double EIntegrand (double x, void * parameters)
+	{
+	if (x<0.0)
+		{
+		printf ("error in EIntegrand, R<0");
+		return 0.0;
+		}
+	else
+		{
+		struct paramsStruct * params = (struct paramsStruct *)parameters;
+		double Y_0 = (params->Y_0);
+		double y_R[4] = { Y_0, 0.0, 1.0, 0.0};
+		int status;
+		double t = 1.0e-16;
+		gsl_odeiv2_system syse = {func, jac, 4, &paramsVoid};
+		gsl_odeiv2_driver * de = gsl_odeiv2_driver_alloc_yp_new (&syse,  gsl_odeiv2_step_rk8pd, 1.0e-9, 1.0e-9, 0.0);
+		status = gsl_odeiv2_driver_apply (de, &t, x, y_R);
+		if (status != GSL_SUCCESS)
+			{
+			printf ("error in EIntegrand, return value=%d\n", status);
+			gsl_odeiv2_driver_free (de);
+			return (double)status;
+			}
+		else
+			{
+			double to_return = 4.0*pi*pow(x,2.0)*( 0.5*pow(y_R[1],2.0) + 0.5*pow(y_R[0],2.0) - 0.25*pow(y_R[0],4.0) );
+			gsl_odeiv2_driver_free (de);
+			return to_return;
+			}
+		}
+	}
 
 int main()
 {
@@ -141,7 +179,7 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 
 double F = 1.0, dF;
 double aim = 0.0;
-double closeness = 1.0e-6;
+double closeness = 1.0e-9;
 double t0 = 1.0e-16, t1 = 10.0;
 const unsigned int steps = 1e3;
 double h = t1-t0;
@@ -212,6 +250,19 @@ while (absolute(F-aim)>closeness)
 		F = y[0];
 		}
 	}
+	
+p  = {Y0};
+
+//finding E
+double E, Eerror;
+gsl_function E_integrand;
+E_integrand.function = &EIntegrand;
+E_integrand.params = &p;
+gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+gsl_integration_qag(&E_integrand, 1.0e-16, 10.0, 1.0e-10, 1.0e-9, 1e4, 4, w, &E, &Eerror);
+gsl_integration_workspace_free(w);
+if (Eerror>1.0e-8) { cout << "E error = " << Eerror << endl;}
+else { cout << "E = " << E << endl;}
 	
 string filename = "./data/sphaleron.dat";
 simplePrintVector(filename,y0Vec);
