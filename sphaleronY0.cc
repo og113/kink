@@ -142,14 +142,14 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-6;
-double t0 = 1.0e-2, t1 = 1.0;
+double t0 = 1.0e-16, t1 = 10.0;
 const unsigned int steps = 1e3;
 double h = t1-t0;
 h /= (double)steps;
 vector<double> y0Vec(steps+1), y2Vec(steps+1);
 unsigned int runsCount = 0;
 
-double Y0 = 7.55;//initial guess
+double Y0 = 4.337;//initial guess
 //cout << "initial y0: ";
 //cin >> Y0;
 
