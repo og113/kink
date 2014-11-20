@@ -336,7 +336,21 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	closenessL = 1.0e-2;
 	closenessT = 1.0e-5;
 	closenessP = 0.5;
-	closenessR = 1.0e-4;
+	closenessR = 1.0e-2;
+	
+	//lambda functions for pot_r
+auto Vr = [&] (const comp & phi)
+	{
+	return -i*reg*VrFn(phi,minima[0],minima[1]);
+	};
+auto dVr = [&] (const comp & phi)
+	{
+	return -i*reg*dVrFn(phi,minima[0],minima[1]);
+	};
+auto ddVr = [&] (const comp & phi)
+	{
+	return -i*reg*ddVrFn(phi,minima[0],minima[1]);
+	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
 	mat h(N,N);
@@ -440,7 +454,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		double bound;
 		double W;
 		double E;
-		double Elin;
+		double E_exact;
 		double Num;
 		
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
@@ -608,24 +622,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 			linErg = Eigen::VectorXd::Zero(NT);
 			linNum = Eigen::VectorXd::Zero(NT);
-			
-			//lambda functions for pot_r
-			auto Vr = [&] (const comp & phi)
-				{
-				return -i*reg*VrFn(phi,minima[0],minima[1]);
-				};
-			auto dVr = [&] (const comp & phi)
-				{
-				return -i*reg*dVrFn(phi,minima[0],minima[1]);
-				};
-			auto ddVr = [&] (const comp & phi)
-				{
-				return -i*reg*ddVrFn(phi,minima[0],minima[1]);
-				};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//assigning values to minusDS and DDS and evaluating action
+			#pragma omp parallel for
 			for (unsigned long int j = 0; j < N*NT; j++)
 				{		
 				unsigned int t = intCoord(j,0,NT); //coordinates
@@ -876,22 +877,19 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
-			E = 0;
-			Elin = 0;
-			Num = 0;
+			E = linErg(0);
+			Num =linNum(0);
+			E_exact = 0;
 			for (unsigned int j=0; j<linearInt; j++)
 				{
-				E += real(erg(j));
-				Elin += real(linErg(j));
-				Num += real(linNum(j));
+				E_exact += real(erg(j));
 				}
-			E /= linearInt;
-			Num /= linearInt;
+			E_exact /= (double)linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking agreement between erg and linErg
-			double trueTest = E - Elin; //not using zero as boundaries are funny
-			trueTest = trueTest*2.0/(E + Elin);
+			double trueTest = E - E_exact; //not using zero as boundaries are funny
+			trueTest = trueTest*2.0/(E + E_exact);
 			trueTest = absolute(trueTest);
 			true_test.push_back(trueTest);
 			

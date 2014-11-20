@@ -643,7 +643,7 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 		{
 		neighLocation = locNum+(xNx-1)*xNt;
 		}
-	else if (c==(N-1) and sign==1)
+	else if (c==(xNx-1) and sign==1)
 		{
 		neighLocation = locNum-(xNx-1)*(int)xNt;
 		}
@@ -902,7 +902,7 @@ void gpSimple(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1:2 with points";
+	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -917,7 +917,7 @@ void gpSimple2(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1:2 with points";
+	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -944,7 +944,7 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 		{
 		if (!line.empty())
 			{
-			if (j<Nt*N)
+			if (j<Nt*Nx)
 				{
 				double temp;
 				istringstream ss(line);

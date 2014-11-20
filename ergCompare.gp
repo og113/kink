@@ -2,7 +2,7 @@
 
 #if you want to save directly to a file, use the following two lines of code
 set term png size 1600,800
-set output './pics/linE_Na200.png';
+set output './pics/linE_Na300.png';
 
 unset log
 unset label
@@ -20,19 +20,19 @@ set key
 #fit f(x) "./data/141112082242mainlinErg_0_0.dat" using ($1*17.0/199.0):2 via a, b, c, d
 #title_f(a,b,c,d) = sprintf('f(x) = %.4g * sin( %.4g * (x - %.4g ) ) + %.4g ', a, b,c, d)
 
-g(x) = i*sin(j*(x+k))*exp(l*x) + m 
-i = 0.002; j = 3.2; k = 2.0; l = 0.01; m = 0.03;
+g(x) = i*sin(j*(x+k))*(l*x+m) + n 
+i = 0.004; j = 2.0; k = 0.5; l = 0.001; m = 90; n=0.03;
 FIT_LIMIT = 1e-5;
-fit g(x) "./data/141112082641mainlinErg_4_0.dat" using ($1*17.0/199.0):2 via i, j, k, l, m
-title_g(i,j,k,l,m) = sprintf('g(x) = %.4g * sin( %.4g * (x + %.4g ) )*exp(%.4g * x) + %.4g ', i, j, k, l, m)
+fit g(x) "./data/141113110734mainlinErg_0_0.dat" using ($1*18.0/79.0):2 via i, j, k, l, m, n
+title_g(i,j,k,l,m,n) = sprintf('g(x) = %.4g * sin( %.4g * (x + %.4g ) )*( %.4g * x - %.4g ) + %.4g ', i, j, k, l, m, n)
 
 #h(x) = m*sin(n*(x-o)) + p 
 #m = 0.0002; n = 2.0; o = 1.5; p = 0.005;
 #fit h(x) "./data/141111183022mainlinErg_0_7.dat" using ($1*18.0/119.0):2 via m, n, o, p
 #title_h(m,n,o,p) = sprintf('h(x) = %.4g * sin( %.4g * (x - %.4g ) ) + %.4g ', m, n, o, p)
 
-plot "./data/141112082641mainlinErg_4_0.dat" using ($1*17.0/199.0):2 title 'Na = 200' with lines, \
-	g(x) title title_g(i,j,k,l,m)#, \
+plot "./data/141113110734mainlinErg_0_0.dat" using ($1*18.0/79.0):2 title 'Na = 300' with lines, \
+	g(x) title title_g(i,j,k,l,m,n)#, \
 	#"./data/141112082242mainlinErg_0_0.dat" using ($1*17.0/119.0):2 title 'Na = 120' with lines, \
     #f(x) title title_f(a,b,c,d) , \
     #"./data/141110210450mainlinErg_0_0.dat" using ($1*18.0/119.0):2 title 'dE=0.05' with lines, \
