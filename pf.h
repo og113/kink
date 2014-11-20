@@ -32,7 +32,6 @@ typedef Eigen::MatrixXd mat;
 typedef Eigen::MatrixXcd cMat;
 typedef Eigen::VectorXd vec;
 typedef Eigen::VectorXcd cVec;
-typedef Eigen::Triplet<double> triplet;
 
 complex<double> i(0.0,1.0);
 #define pi 3.14159265359
@@ -670,20 +669,26 @@ comp dtFn (const unsigned int& time)
 	
 comp DtFn (const unsigned int& time)
 	{
-	comp xDt;
-	if (time==(NT-1))
+	return a;
+	}
+	
+double dxFn (const unsigned int& time)
+	{
+	return a;
+	}
+	
+double DxFn (const unsigned int& time)
+	{
+	comp xdt;
+	if (time<(NT-1))
 		{
-		xDt = (simpleTime(time)-simpleTime(time-1))/2.0;
-		}
-	else if (time==0)
-		{
-		xDt = (simpleTime(time+1) - simpleTime(time))/2.0;
+		xdt = simpleTime(time+1)-simpleTime(time);
 		}
 	else
 		{
-		xDt = (simpleTime(time+1)-simpleTime(time-1))/2.0;
+		xdt = 0;
 		}
-	return xDt;
+	return xdt;
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -903,6 +908,7 @@ void gpSimple(const string & readFile)
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
+<<<<<<< HEAD
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -918,6 +924,8 @@ void gpSimple2(const string & readFile)
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
+=======
+>>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -968,7 +976,7 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 		}
 	if ((j+k)!=(Nt*Nx+zeroModes))
 		{
-		cout << "loadVector error in: << " << loadFile << endl;
+		cout << "loadVector error in: " << loadFile << endl;
 		cout << "j+k = " << j+k << endl;
 		}
 	F.close();

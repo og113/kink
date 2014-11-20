@@ -861,6 +861,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	}
     	}
 		
+<<<<<<< HEAD
 	E = 0;
 	unsigned int linearInt = (unsigned int)(Na/6);
 	//#pragma omp parallel for
@@ -869,6 +870,17 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		E += real(erg(j));
 		}
 	E /= linearInt;
+=======
+	//E = 0;
+	//unsigned int linearInt = (unsigned int)(Na/6);
+	//#pragma omp parallel for
+	//for (unsigned int j=0; j<linearInt; j++)
+	//	{
+	//	E += real(erg(j));
+	//	}
+	//E /= linearInt;
+	E = linErg(0);
+>>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
 	W = - E*2.0*Tb + 2.0*imag(action);
 
     //now propagating forwards along c
