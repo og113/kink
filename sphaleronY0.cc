@@ -1,4 +1,6 @@
 //parameters and functions for pi.cc
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
 #include <vector>
 #include <algorithm>
 #include <fstream>
@@ -24,6 +26,11 @@
 #include "gnuplot_i.hpp"
 
 using namespace std;
+
+typedef Eigen::SparseMatrix<double> spMat;
+typedef Eigen::MatrixXd mat;
+typedef Eigen::MatrixXcd cMat;
+typedef Eigen::VectorXd vec;
 
 struct void_params {};
 struct void_params paramsVoid;
@@ -80,7 +87,8 @@ double absolute (const double& amplitude)
 		}
 	return abs_amplitude;
 	}
-	
+
+//simple function to print a vector to file	
 void simplePrintVector(const string& printFile, vector<double> vecToPrint)
 	{
 	fstream F;
@@ -151,7 +159,103 @@ double EIntegrand (double x, void * parameters)
 			}
 		}
 	}
-
+	
+//print sparse matrix to file
+void printSpmat (const string & printFile, spMat spmatToPrint)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F << left;
+	F.precision(16);
+	for (int l=0; l<spmatToPrint.outerSize(); ++l)
+		{
+		for (Eigen::SparseMatrix<double>::InnerIterator it(spmatToPrint,l); it; ++it)
+			{
+			F << setw(25) << it.row()+1 << setw(25) << it.col()+1 << setw(25) << it.value() << endl;
+			}
+		}
+	F.close();
+	}
+	
+//count non-empty lines of a file
+unsigned int countLines(const string & file_to_count)
+	{
+	ifstream fin;
+	fin.open(file_to_count.c_str());
+	string line;
+	unsigned int counter = 0;
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line.empty())
+			{
+			continue;
+			}
+		counter++;
+		}		
+	fin.close();
+    return counter;
+	}
+	
+//load simple vector from file
+vec loadSimpleVector (const string& loadFile)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	vec outputVec(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line;
+	unsigned int j=0;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			ss >> outputVec(j);
+			j++;
+			}
+		}
+	F.close();
+	return outputVec;
+	}
+	
+//print three vectors
+void printThreeVectors(const string& printFile, vec vec1, vec vec2, vec vec3)
+	{
+	fstream F;
+	F.open((printFile).c_str(), ios::out);
+	F.precision(20);
+	F << left;
+	unsigned int length1 = vec1.size();
+	unsigned int length2 = vec2.size();
+	unsigned int length3 = vec3.size();
+	if (length1==length2 && length1==length3)
+		{
+		for (unsigned int j=0; j<length1; j++)
+			{
+			F << setw(25) << vec1(j) << setw(25) << vec2(j) << setw(25) << vec3(j) << endl;
+			}
+		}
+	else
+		{
+		cout << "printThreeVectors error, vectors different lengths: " << length1 << " " << length2 << " " << length3 << endl;
+		}
+	F.close();
+	}
+	
+//print p via gnuplot, using repi or pi or some such like
+void gp(const string & readFile, const string & gnuplotFile) 
+	{
+	string prefix = "gnuplot -e \"f='";
+	string middle = "'\" ";
+	string suffix = " -persistent";
+	string commandStr = prefix + readFile + middle + gnuplotFile + suffix;
+	const char * command = commandStr.c_str();
+	FILE * gnuplotPipe = popen (command,"w");
+	fprintf(gnuplotPipe, "%s \n", " ");
+	pclose(gnuplotPipe);
+	}
+	
 int main()
 {
 /* first of all just writing something to solve the ode as an initial value plot
@@ -170,9 +274,14 @@ next, have to implement shooting by applying newton's method to F, the differenc
 
 then,
 - calculate energy of solution
-- calculate number of particles
 - find negative mode
+- calculate number of particles
+	- to do this need to evolve sphaleron + small amount of negative mode in time
+	- then model N(k) and E(K) and N_lin and E_lin with time
+	- this requires taking something like the fourier transform of the field configuration
 */
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//solving 1d boundary value problem via shooting method
 paramsVoid = {};
 
 gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
@@ -180,18 +289,18 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-9;
-double t0 = 1.0e-16, t1 = 10.0;
-const unsigned int steps = 1e3;
+double t0 = 1.0e-16, t1 = 5.0;
+const unsigned int N = 2e2;
 double h = t1-t0;
-h /= (double)steps;
-vector<double> y0Vec(steps+1), y2Vec(steps+1);
+h /= (double)N;
+vector<double> y0Vec(N+1), y2Vec(N+1);
 unsigned int runsCount = 0;
 
 double Y0 = 4.337;//initial guess
 //cout << "initial y0: ";
 //cin >> Y0;
 
-printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","steps","y(t1)","yMin","F-aim","Y0Old","Y0New","-F/dF");
+printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","N","y(t1)","yMin","F-aim","Y0Old","Y0New","-F/dF");
 
 while (absolute(F-aim)>closeness)
 	{
@@ -206,9 +315,9 @@ while (absolute(F-aim)>closeness)
 	y0Vec[0] = y[0];
 	y2Vec[0] = y[2];
 	int status;
-	unsigned int i, iMin;
+	unsigned int i, iMin = 0;
 	
-	for (i = 1; i <= steps; i++)
+	for (i = 1; i <= N; i++)
 		{
 		ti =(double)i;
 		ti *= h;
@@ -245,29 +354,147 @@ while (absolute(F-aim)>closeness)
 		printf("%16.12g%16g\n",Y0,-F/dF);
 		}
 	gsl_odeiv2_driver_free (d);
-	if (i==(steps+1))
+	if (i==(N+1))
 		{
 		F = y[0];
 		}
 	}
-	
-p  = {Y0};
 
+//printing solution
+string filename = "./data/sphaleron.dat";
+simplePrintVector(filename,y0Vec);
+printf("\n%16s%20s%20s\n\n","Solution printed: ",filename.c_str()," ./pics/sphaleron.png");
+gpSimple(filename);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //finding E
 double E, Eerror;
+p  = {Y0};
 gsl_function E_integrand;
 E_integrand.function = &EIntegrand;
 E_integrand.params = &p;
 gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-gsl_integration_qag(&E_integrand, 1.0e-16, 10.0, 1.0e-10, 1.0e-9, 1e4, 4, w, &E, &Eerror);
+gsl_integration_qag(&E_integrand, t0, t1, 1.0e-10, 1.0e-9, 1e4, 4, w, &E, &Eerror);
 gsl_integration_workspace_free(w);
 if (Eerror>1.0e-8) { cout << "E error = " << Eerror << endl;}
 else { cout << "E = " << E << endl;}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//computing and printing linear fluctuation operator as sparse matrix
+//in order to calulate negative eigenvalue and eigenvector
+spMat D1(N+1,N+1), D2(N+1,N+1);
+D1.setZero();
+D2.setZero();
+double t = t0;
+for (unsigned int j=0; j<(N+1); j++)
+	{
+	if (j==0)
+		{
+		D1.insert(j,j) = pow(t,2.0)/h + pow(t,2.0)*h*( 1.0 - 3.0*pow(y0Vec[j],2.0) );
+		D1.insert(j,j+1) = -pow(t,2.0)/h;
+		D2.insert(j,j) = 1.0/pow(h,2.0) + 2.0/h/t + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D2.insert(j,j+1) = -1.0/pow(h,2.0) - 2.0/h/t;
+		/*D1.insert(j,j) = -1.0; //derivative of phi is zero at r=0
+		D1.insert(j,j+1) = 1.0;
+		D2.insert(j,j) = -1.0;
+		D2.insert(j,j+1) = 1.0;*/
+		}
+	else if (j==N)
+		{
+		D1.insert(j,j) = pow(t-h,2.0)/h + pow(t,2.0)*h*( 1.0 - 3.0*pow(y0Vec[j],2.0) );
+		D1.insert(j,j-1) = -pow(t-h,2.0)/h;
+		D2.insert(j,j) = 1.0/pow(h,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D2.insert(j,j-1) = -1.0/pow(h,2.0);
+		/*D1.insert(j,j) = 1.0; //phi goes to zero as r->infty
+		D2.insert(j,j) = 1.0;*/
+		}
+	else
+		{
+		D1.insert(j,j) = pow(t,2.0)/h + pow(t-h,2.0)/h + pow(t,2.0)*h*( 1.0 - 3.0*pow(y0Vec[j],2.0) );
+		D1.insert(j,j+1) = -pow(t,2.0)/h;
+		D1.insert(j,j-1) = -pow(t-h,2.0)/h;
+		D2.insert(j,j) = 2.0/pow(h,2.0) + 2.0/h/t + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D2.insert(j,j+1) = -1.0/pow(h,2.0) - 2.0/h/t;
+		D2.insert(j,j-1) = -1.0/pow(h,2.0);
+		}
+	t += h;
+	}
+D1.makeCompressed();
+D2.makeCompressed();
+printSpmat("./data/D1.dat",D1);
+printSpmat("./data/D2.dat",D2);
+printf("\nMatrices printed: ./data/D1.dat ./data/D2.dat\n\n");
+printf("From Matlab, omega^2_- = -15.3060\n\n");
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//propagating sphaleron plus a small amount of negative mode forward in time
+//in order to calculate E_lin and N_lin
+
+unsigned int Nt = 1e3;
+double T = 10.0, amp = 1.0e-3;
+double dt = T/Nt; //equals Dt
+vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, xVec((Nt+1)*(N+1)), tVec((Nt+1)*(N+1));
+
+//getting eigVec from file
+eigVec = loadSimpleVector("data/sphaleronEigVec.dat");
+
+//defining phi on initial time slice
+for (unsigned int j=0;j<(N+1);j++)
+	{
+	unsigned int l = j*(Nt+1);
+	tVec(l) = 0.0;
+	xVec(l) = t0+j*h;
+	phi(l) = y0Vec[j] + amp*eigVec(j);
+	}
+
+//intitialize velocity
+for (unsigned int j=0; j<(N+1); j++)
+	{
+	unsigned int l = j*(Nt+1);
+    vel(l) = 0.0; //not sure about this initial condition
+	}
+
+
+//initialize acc using phi and expression from equation of motion
+acc(0) = (phi((Nt+1)) - phi(0))/pow(h,2.0) - phi(0) + pow(phi(0),3.0);
+unsigned int l = N*(Nt+1);
+acc(l) = (phi(l-(Nt+1))*t1/(t1-h) - phi(l)*t1/(t1-h))/pow(h,2.0) - phi(l) + pow(phi(l),3.0);
+for (unsigned int j=1; j<N; j++)
+	{
+	l = j*(Nt+1);
+	double r = t0 + h*j;
+    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1))*r/(r-h) - phi(l)*(1.0+r/(r-h)))/pow(h,2.0) - phi(l) + pow(phi(l),3.0);
+	}
 	
-string filename = "./data/sphaleron.dat";
-simplePrintVector(filename,y0Vec);
-printf("\n%16s%20s%20s\n","Solution printed: ",filename.c_str()," ./pics/sphaleron.png");
-gpSimple(filename);
+//A4.5 starting the energy and particle number off
+//vec linErg(Nt+1); linErg = Eigen::VectorXd::Zero(Nt+1);
+//vec linNum(Nt+1); linNum = Eigen::VectorXd::Zero(Nt+1);
+
+//A7. run loop
+for (unsigned int u=1; u<(Nt+1); u++)
+	{
+    for (unsigned int x=0; x<(N+1); x++)
+    	{
+        unsigned int m = u+x*(Nt+1);
+        tVec(l) = u*dt;
+		xVec(l) = t0+x*h;
+        vel(m) = vel(m-1) + dt*acc(m-1);
+        phi(m) = phi(m-1) + dt*vel(m);
+    	}
+    acc(u) = (phi(u+(Nt+1)) - phi(u))/pow(h,2.0) - phi(u) + pow(phi(u),3.0);
+    unsigned int v = u+N*(Nt+1);
+    acc(v) = (phi(v-(Nt+1))*t1/(t1-h) - phi(v)*t1/(t1-h))/pow(h,2.0) - phi(v) + pow(phi(v),3.0);
+    for (unsigned int x=1; x<N; x++)
+    	{
+        unsigned int m = u+x*(Nt+1);
+        double r = t0 + x*h;
+        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1))*r/(r-h) - phi(m)*(1.0+r/(r-h)))/pow(h,2.0) - phi(m) + pow(phi(m),3.0);
+    	}
+	}
+	
+printThreeVectors("data/sphaleronEvolution.dat",tVec,xVec,phi);
+gp("data/sphaleronEvolution.dat","sphaleron.gp");
+printf("Time evolution printed: data/sphaleronEvolution.dat pics/sphaleronEvolution.png\n");
 
 return 0;
 }

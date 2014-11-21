@@ -642,7 +642,7 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 		{
 		neighLocation = locNum+(xNx-1)*xNt;
 		}
-	else if (c==(N-1) and sign==1)
+	else if (c==(xNx-1) and sign==1)
 		{
 		neighLocation = locNum-(xNx-1)*(int)xNt;
 		}
@@ -679,16 +679,14 @@ double dxFn (const unsigned int& time)
 	
 double DxFn (const unsigned int& time)
 	{
-	comp xdt;
-	if (time<(NT-1))
+	if (time==(N-1) || time==0)
 		{
-		xdt = simpleTime(time+1)-simpleTime(time);
+		return a/2.0;
 		}
 	else
 		{
-		xdt = 0;
+		return a;
 		}
-	return xdt;
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -921,6 +919,28 @@ void gpSimple(const string & readFile)
 
 //loading functions
 
+//load simple vector from file
+vec loadSimpleVector (const string& loadFile)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	vec outputVec(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line;
+	unsigned int j=0;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			ss >> outputVec(j));
+			j++;
+			}
+		}
+	F.close();
+	return outputVec;
+	}
+
 //load vector from file
 vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned int& Nx, const unsigned int zeroModes)
 	{
@@ -1000,6 +1020,60 @@ spMat loadSpmat (const string & loadFile, Eigen::VectorXi to_reserve)
 	return M;
 	}
 
+//load DDS from file
+unsigned int countLines(const string & file_to_count); //here so it can be used, defined in files.h
+spMat cleverLoadSpmat (const string & loadFile)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	Eigen::VectorXi to_reserve(fileLength); //an overestimate
+	to_reserve.setZero(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line;
+	unsigned int nnz = 0, length = 0, count = 0, row, column;
+	double value;	
+	Eigen::VectorXi rowVec(fileLength), columnVec(fileLength);
+	vec valueVec(fileLength);
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			ss >> row >> column >> value;
+			if (absolute(value)>1.0e-16)
+				{
+				rowVec(count) = row-1;
+				columnVec(count) = column-1;
+				valueVec(count) = value;
+				to_reserve(row-1) = to_reserve(row-1) + 1;
+				nnz++;
+				count++;
+				if (row>length)
+					{
+					length = row;
+					}
+				}
+			}
+		}
+	if (nnz==0)
+		{
+		cout << "loadSpMat failed, no data in file: " << loadFile << endl;
+		}
+	to_reserve.conservativeResize(length);
+	rowVec.conservativeResize(count);
+	columnVec.conservativeResize(count);
+	valueVec.conservativeResize(count);
+	spMat M(length,length);
+	M.setZero(); //just making sure
+	M.reserve(to_reserve);
+	for (unsigned int l=0;l<count;l++)
+		{
+		M.insert(rowVec(l),columnVec(l)) = valueVec(l);
+		}
+	M.makeCompressed();
+	return M;
+	}
+	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //askQuestions and changeParameters

@@ -183,12 +183,12 @@ temp += -eigenvalue*r;
 error = temp.dot(temp);
 error = pow(error,0.5);
 
-//checking that epsilon*lambda*N<1 - is this really what we need
-double check = absolute(c*eigenvalue*N);
-if (check>1)
-	{
+//checking that epsilon*lambda*P<1 - is this really what we need
+double check = absolute(c*eigenvalue*P);
+//if (check>1)
+	//{
 	//cout << "check>1" << endl;//not sure about the relevance of this
-	}
+	//}
 	
 //stopping clock
 time = clock() - time;
