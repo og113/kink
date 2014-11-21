@@ -476,7 +476,7 @@ for (unsigned int u=1; u<(Nt+1); u++)
     for (unsigned int x=0; x<(N+1); x++)
     	{
         unsigned int m = u+x*(Nt+1);
-        tVecm(m) = u*dt;
+        tVec(m) = u*dt;
 		xVec(m) = t0+x*h;
         vel(m) = vel(m-1) + dt*acc(m-1);
         phi(m) = phi(m-1) + dt*vel(m);
