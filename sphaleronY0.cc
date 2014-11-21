@@ -431,7 +431,7 @@ printf("From Matlab, omega^2_- = -15.3060\n\n");
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = 1e3;
-double T = 10.0, amp = 1.0e-3;
+double T = 10.0, amp = 1.0e-4;
 double dt = T/Nt; //equals Dt
 vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, xVec((Nt+1)*(N+1)), tVec((Nt+1)*(N+1));
 
@@ -476,8 +476,8 @@ for (unsigned int u=1; u<(Nt+1); u++)
     for (unsigned int x=0; x<(N+1); x++)
     	{
         unsigned int m = u+x*(Nt+1);
-        tVec(l) = u*dt;
-		xVec(l) = t0+x*h;
+        tVecm(m) = u*dt;
+		xVec(m) = t0+x*h;
         vel(m) = vel(m-1) + dt*acc(m-1);
         phi(m) = phi(m-1) + dt*vel(m);
     	}
