@@ -256,6 +256,65 @@ void gp(const string & readFile, const string & gnuplotFile)
 	pclose(gnuplotPipe);
 	}
 	
+//function which find integer coordinates in 2d
+unsigned int intCoord(const unsigned int& locNum, const int& direction, const unsigned int& xNt)
+	{
+	unsigned int XintCoord;
+	unsigned int x = floor(locNum/xNt);
+	if (direction==1)
+		{
+		XintCoord = x;
+		}
+	else
+		{
+		XintCoord = locNum - x*xNt;
+		}
+	return XintCoord;	
+	}
+	
+//interpolate vector function
+vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
+	vec vec_new (N_new*Nt_new);
+	
+	unsigned int x_new, t_new, x_old, t_old;
+	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
+	unsigned int pos;	
+	
+	for (unsigned int l=0;l<N_new*Nt_new;l++)
+		{
+		t_new = intCoord(l,0,Nt_new);
+		x_new = intCoord(l,1,Nt_new);
+		exact_t_old = t_new*(Nt_old-1.0)/(Nt_new-1.0);
+		exact_x_old = x_new*(N_old-1.0)/(N_new-1.0);
+		t_old = (unsigned int)exact_t_old;
+		x_old = (unsigned int)exact_x_old;
+		rem_t_old = exact_t_old;
+		rem_t_old -= (double)(t_old);
+		rem_x_old = exact_x_old;
+		rem_x_old -= (double)(x_old);
+		pos = t_old + Nt_old*x_old;
+		if  (t_old<(Nt_old-1) && x_old<(N_old-1))
+			{
+			vec_new(l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(pos) \
+							+ (1.0-rem_t_old)*rem_x_old*vec_old(pos+Nt_old) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(pos+1) \
+							+ rem_t_old*rem_x_old*vec_old(pos+Nt_old+1);
+			}
+		else if (x_old<(N_old-1))
+			{
+			vec_new(l) = (1.0-rem_x_old)*vec_old(pos) + rem_x_old*vec_old(pos+Nt_old);
+			}
+		else
+			{
+			vec_new(l) = vec_old(pos);
+			}
+		}
+	return vec_new;
+	}
+	
 int main()
 {
 /* first of all just writing something to solve the ode as an initial value plot
@@ -431,7 +490,8 @@ printf("From Matlab, omega^2_- = -15.3060\n\n");
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = N*3;
-double T = 10.0, amp = -1.0e-2;
+double T = 12.0, amp = -5.0e-3;
+//if (T>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
 //cout << "amp of negative mode: ";
 //cin >> amp;
 double dt = T/Nt; //equals Dt
@@ -440,7 +500,7 @@ if (dt>0.5*dr)
 	cout << "dt too large. dt = "<< dt << ", dr = " << dr << endl;
 	return 0;
 	}
-vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, rVec((Nt+1)*(N+1)), tVec((Nt+1)*(N+1));
+vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec;
 
 //getting eigVec from file
 eigVec = loadSimpleVector("data/sphaleronEigVec.dat");
@@ -450,8 +510,6 @@ eigVec = loadSimpleVector("data/sphaleronEigVec.dat");
 for (unsigned int j=0;j<(N+1);j++)
 	{
 	unsigned int l = j*(Nt+1);
-	tVec(l) = 0.0;
-	rVec(l) = r0+j*dr;
 	phi(l) = y0Vec[j] + amp*eigVec(j);
 	}
 
@@ -468,8 +526,6 @@ for (unsigned int j=0; j<(N+1); j++)
 for (unsigned int j=0;j<(Nt+1);j++)
 	{
 	unsigned int l = N*(Nt+1) + j;
-	tVec(l) = j*dt;
-	rVec(l) = r1;
 	phi(l) = 0.0;
 	}
 
@@ -497,8 +553,6 @@ for (unsigned int u=1; u<(Nt+1); u++)
     for (unsigned int x=0; x<N; x++) //don't loop over last x position as fixed by boundary condition 1)
     	{
         unsigned int m = u+x*(Nt+1);
-        tVec(m) = u*dt;
-		rVec(m) = r0+x*dr;
         vel(m) = vel(m-1) + dt*acc(m-1);
         phi(m) = phi(m-1) + dt*vel(m);
     	}
@@ -511,7 +565,23 @@ for (unsigned int u=1; u<(Nt+1); u++)
     	}
 	}
 	
-printThreeVectors("data/sphaleronEvolution.dat",tVec,rVec,phi);
+unsigned int N_print = 100, Nt_print = 100;
+vec tVec(Nt_print*N_print), rVec(Nt_print*N_print);
+double dtPrint = T/(Nt_print-1.0);
+double dxPrint = (r1-r0)/(N_print-1.0);
+for (unsigned int t=0;t<Nt_print;t++)
+	{
+	for (unsigned int r=0; r<N_print; r++)
+		{
+		unsigned int j= t + r*Nt_print;
+		tVec(j) = t*dtPrint;
+		rVec(j) = r0 + r*dxPrint;
+		}
+	}
+	
+vec phiToPrint;
+phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
+printThreeVectors("data/sphaleronEvolution.dat",tVec,rVec,phiToPrint);
 gp("data/sphaleronEvolution.dat","sphaleron.gp");
 printf("Time evolution printed: data/sphaleronEvolution.dat pics/sphaleronEvolution.png\n");
 
