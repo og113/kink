@@ -4,8 +4,8 @@
 #plots real part only
 
 #if you want to save directly to a file, use the following two lines of code
-#set term png size 1600,800
-#set output './pics/sphaleronEvolution.png'
+set term png size 1600,800
+set output './pics/sphaleronEvolution.png'
 
 unset log
 unset label

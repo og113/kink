@@ -348,8 +348,8 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-9;
-double r0 = 1.0e-16, r1 = 10.0;
-const unsigned int N = 8e2;
+double r0 = 1.0e-16, r1 = 14.0;
+const unsigned int N = 2e3;
 double dr = r1-r0;
 dr /= (double)N;
 vector<double> y0Vec(N+1), y2Vec(N+1);
@@ -490,8 +490,8 @@ printf("From Matlab, omega^2_- = -15.3060\n\n");
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = N*3;
-double T = 12.0, amp = -5.0e-3;
-//if (T>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
+double T = 16.0, amp = -5.0e-3;
+if ((T-4.0)>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
 //cout << "amp of negative mode: ";
 //cin >> amp;
 double dt = T/Nt; //equals Dt
