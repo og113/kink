@@ -569,6 +569,29 @@ for (unsigned int u=1; u<(Nt+1); u++)
     	}
 	}
 	
+//h_ij matrix
+mat h(N+1,N+1);
+double diag = 1.0 + 2.0/pow(dr.2.0);
+double offDiag; = -1.0/pow(dr,2.0);
+for (unsigned int j=0;j<(N+1);j++)
+	{
+	if (j==0)
+		{
+		
+		}
+	else if (j==N)
+		{
+		
+		}
+	else
+		{
+		h(j,j) = diag;
+		h(j,j+1) = offDiag;
+		h(j,j-1) = offDiag;
+		}
+	}
+
+	
 unsigned int N_print = 100, Nt_print = 100;
 vec tVec(Nt_print*N_print), rVec(Nt_print*N_print);
 double dtPrint = T/(Nt_print-1.0);
