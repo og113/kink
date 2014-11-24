@@ -1,4 +1,26 @@
 //parameters and functions for pi.cc
+/* first of all just writing something to solve the ode as an initial value plot
+only once that works will i add the newton raphson loop to do the shooting
+to do:
+- define gsl functions for first order odes
+- define jacobian functions
+- define boundary values
+- follow gsl example for implementation
+
+next, have to implement shooting by applying newton's method to F, the difference between the final boundary value and the one shot at
+- define function F
+- write loop with convergence test
+- write newton's method
+- print tests for convergence on each iteration
+
+then,
+- calculate energy of solution
+- find negative mode
+- calculate number of particles
+	- to do this need to evolve sphaleron + small amount of negative mode in time
+	- then model N(k) and E(K) and N_lin and E_lin with time
+	- this requires taking something like the fourier transform of the field configuration
+*/
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <vector>
@@ -317,28 +339,6 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 	
 int main()
 {
-/* first of all just writing something to solve the ode as an initial value plot
-only once that works will i add the newton raphson loop to do the shooting
-to do:
-- define gsl functions for first order odes
-- define jacobian functions
-- define boundary values
-- follow gsl example for implementation
-
-next, have to implement shooting by applying newton's method to F, the difference between the final boundary value and the one shot at
-- define function F
-- write loop with convergence test
-- write newton's method
-- print tests for convergence on each iteration
-
-then,
-- calculate energy of solution
-- find negative mode
-- calculate number of particles
-	- to do this need to evolve sphaleron + small amount of negative mode in time
-	- then model N(k) and E(K) and N_lin and E_lin with time
-	- this requires taking something like the fourier transform of the field configuration
-*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //solving 1d boundary value problem via shooting method
 paramsVoid = {};
