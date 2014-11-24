@@ -25,83 +25,14 @@ using namespace std;
 int main()
 {
 //taking in timeNumber
-string timeNumber;
+string filename;
 cout << endl;
-cout << "timeNumber: ";
-cin >> timeNumber;
+cout << "filename: ";
+cin >> filename;
 
 //starting clock
 clock_t time;
 time = clock();
-
-//load parameters
-//getting variables and user inputs from inputs
-ifstream fin;
-fin.open("inputs");
-if (fin.is_open())
-	{
-	string line;
-	unsigned int lineNumber = 0;
-	while(getline(fin,line))
-		{
-		if(line[0] == '#')
-			{
-			continue;
-			}
-		istringstream ss(line);
-		if (lineNumber==0)
-			{
-			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
-			lineNumber++;
-			}
-		else if (lineNumber==1)
-			{
-			ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
-			lineNumber++;
-			}
-		else if(lineNumber==2)
-			{
-			ss >> alpha >> open >> amp >> pot >> A >> reg;
-			lineNumber++;
-			}
-		else if(lineNumber==3)
-			{
-			double temp;
-			ss >> temp >> temp >> negEigDone;
-			lineNumber++;
-			}
-		}
-	}
-else
-	{
-	cout << "unable to open inputs" << endl;
-	}
-fin.close();
-inP = aq.inputChoice; //just because I write this a lot
-
-//derived quantities
-NT = Na + Nb + Nc;
-epsilon = dE;
-R = 2.0/3.0/epsilon;
-L = LoR*R;
-if (inP.compare("p") == 0)
-	{
-	if (Tb<R)
-		{
-		angle = asin(Tb/R);
-		double Ltemp = 1.5*(1.5*Tb*tan(angle));
-		if (Ltemp<L) //making sure to use the smaller of the two possible Ls
-			{
-			L=Ltemp;
-			}
-		}
-	}
-else if (inP.compare("b") == 0)
-	{
-	Tb = 1.5*R;
-	}
-a = L/(N-1.0);
-b = Tb/(Nb-1.0);
 
 //define the numbers P and c
 unsigned int P; //number of times multiplied
@@ -116,20 +47,9 @@ cout << "P: " << P << endl;
 cout << "c: " << c << endl;
 cout << endl;
 
-//load DDS from file into matrix M
-unsigned int zeroModes = 1;
-unsigned int matSize = 2*N*Nb+zeroModes;
-Eigen::VectorXi to_reserve(matSize);
-to_reserve = Eigen::VectorXi::Constant(matSize,11);
-to_reserve(0) = 3; //these need to be changed when boundary conditions need to be more compicated
-to_reserve(1) = 3;
-to_reserve(2*N*Nb-2) = 3;
-to_reserve(2*N*Nb-1) = 3;
-to_reserve(2*N*Nb) = N;
-unsigned int fileNumber = 0;
-string loadFile = "./data/" + timeNumber + "DDSb" + "_" + numberToString<unsigned int>(fileNumber) + ".dat";
-
-spMat M = loadSpmat(loadFile,to_reserve);
+//load matrix from file into matrix M
+spMat M = cleverLoadSpmat(filename);
+unsigned int matSize = M.rows();
 
 //define random vectors r, s, t
 vec r = Eigen::VectorXd::Random(matSize);
@@ -183,7 +103,7 @@ temp += -eigenvalue*r;
 error = temp.dot(temp);
 error = pow(error,0.5);
 
-//checking that epsilon*lambda*P<1 - is this really what we need
+//checking that epsilon*lambda*M<1 - is this really what we need
 double check = absolute(c*eigenvalue*P);
 //if (check>1)
 	//{
@@ -206,8 +126,8 @@ fprintf(scalarFile,"%16i%16g%16g%16g%16g\n",P,c,check,error,eigenvalue);
 fclose(scalarFile);
 
 //printing eigenvector to file
-string vecFile = "./data/eigVec.dat";
-printVectorB(vecFile,r);
+//string vecFile = "./data/eigVec.dat";
+//printVectorB(vecFile,r);
 
 return 0;
 }
