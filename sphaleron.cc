@@ -349,7 +349,7 @@ double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-9;
 double r0 = 1.0e-16, r1 = 5.0;
-const unsigned int N = 5e3;
+const unsigned int N = 1e4;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
@@ -444,13 +444,13 @@ else { cout << "E = " << E << endl;}
 spMat D1(N+1,N+1), D2(N+1,N+1);
 D1.setZero();
 D2.setZero();
+double r = r0;
 for (unsigned int j=0; j<(N+1); j++)
 	{
-	double r = r0;
 	if (j==0)
 		{
-		D1.insert(j,j) = 1.0*pow(dr,2.0) + (1.0 - 3.0*pow(y0Vec[j],2.0))*pow(dr,2.0);
-		D1.insert(j,j+1) = -1.0;
+		D1.insert(j,j) = 1.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D1.insert(j,j+1) = -1.0/pow(dr,2.0);
 		D2.insert(j,j) = 1.0/pow(dr,2.0) + 2.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
 		D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 2.0/dr/r;
 		/*D1.insert(j,j) = -1.0; //derivative of phi is zero at r=0
@@ -460,8 +460,8 @@ for (unsigned int j=0; j<(N+1); j++)
 		}
 	else if (j==N)
 		{
-		D1.insert(j,j) = 1.0 + 2.0*(r-dr)/pow(r,2.0)*dr + (1.0 - 3.0*pow(y0Vec[j],2.0))*pow(dr,2.0);
-		D1.insert(j,j-1) = -1.0 - 2.0*(r-dr)/pow(r,2.0)*dr;
+		D1.insert(j,j) = 1.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D1.insert(j,j-1) = -1.0/pow(dr,2.0) + 2.0*(1.0-dr/r)/r/dr;
 		D2.insert(j,j) = 1.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
 		D2.insert(j,j-1) = -1.0/pow(dr,2.0);
 		/*D1.insert(j,j) = 1.0; //phi goes to zero as r->infty
@@ -469,9 +469,9 @@ for (unsigned int j=0; j<(N+1); j++)
 		}
 	else
 		{
-		D1.insert(j,j) = 2.0 + 2.0*(r-dr)/pow(r,2.0)*dr + (1.0 - 3.0*pow(y0Vec[j],2.0))*pow(dr,2.0);
-		D1.insert(j,j+1) = -1.0;
-		D1.insert(j,j-1) = -1.0 - 2.0*(r-dr)/pow(r,2.0)*dr;
+		D1.insert(j,j) = 2.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D1.insert(j,j+1) = -1.0/pow(dr,2.0);
+		D1.insert(j,j-1) = -1.0/pow(dr,2.0) + 2.0*(1.0-dr/r)/r/dr;
 		D2.insert(j,j) = 2.0/pow(dr,2.0) + 2.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
 		D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 2.0/dr/r;
 		D2.insert(j,j-1) = -1.0/pow(dr,2.0);
