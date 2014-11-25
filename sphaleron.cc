@@ -348,8 +348,8 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-9;
-double r0 = 1.0e-16, r1 = 5.0;
-const unsigned int N = 1e4;
+double r0 = 1.0e-16, r1 = 20.0;
+const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
@@ -449,7 +449,7 @@ for (unsigned int j=0; j<(N+1); j++)
 	{
 	if (j==0)
 		{
-		D1.insert(j,j) = 1.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D1.insert(j,j) = 1.0/pow(dr,2.0) + (1.0 - 3.0*pow(y0Vec[j],2.0))/2.0;
 		D1.insert(j,j+1) = -1.0/pow(dr,2.0);
 		D2.insert(j,j) = 1.0/pow(dr,2.0) + 2.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
 		D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 2.0/dr/r;
@@ -460,7 +460,7 @@ for (unsigned int j=0; j<(N+1); j++)
 		}
 	else if (j==N)
 		{
-		D1.insert(j,j) = 1.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + 1.0 - 3.0*pow(y0Vec[j],2.0);
+		D1.insert(j,j) = 1.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + (1.0 - 3.0*pow(y0Vec[j],2.0))/2.0;
 		D1.insert(j,j-1) = -1.0/pow(dr,2.0) + 2.0*(1.0-dr/r)/r/dr;
 		D2.insert(j,j) = 1.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
 		D2.insert(j,j-1) = -1.0/pow(dr,2.0);
@@ -483,8 +483,8 @@ D2.makeCompressed();
 printSpmat("./data/D1.dat",D1);
 printSpmat("./data/D2.dat",D2);
 printf("\nMatrices printed: ./data/D1.dat ./data/D2.dat\n\n");
-printf("From Matlab, omega^2_- = -15.3060\n\n");
-return 0;
+printf("From Matlab: D1 gives omega^2_- = -15.31,\n");
+printf("             D2 gives omega^2_- = -15.34\n\n");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //assembling material to calculate occupation of modes
@@ -495,12 +495,12 @@ for (unsigned int j=0;j<(N+1);j++)
 	{
 	if (j==0)
 		{
-		h(j,j) = 1.0 + 1.0/pow(dr,2.0);
+		h(j,j) = 0.5 + 1.0/pow(dr,2.0);
 		h(j,j+1) = -1.0/pow(dr,2.0);
 		}
 	else if (j==N)
 		{
-		h(j,j) = 1.0/pow(dr,2.0);
+		h(j,j) = 0.5 + 1.0/pow(dr,2.0);
 		h(j,j-1) = -1.0/pow(dr,2.0);
 		}
 	else
@@ -544,7 +544,7 @@ for (unsigned int j=0; j<N; j++)
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = N*3;
-double T = 16.0, amp = -5.0e-3;
+double T = 20.0, amp = -1.0e-2;
 if ((T-4.0)>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
 //cout << "amp of negative mode: ";
 //cin >> amp;
@@ -555,8 +555,8 @@ if (dt>0.5*dr)
 	return 0;
 	}
 vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, linNum(Nt+1), linErg(Nt+1);
-linErg = Eigen::VectorXd::Zero(Nt);
-linNum = Eigen::VectorXd::Zero(Nt);
+linErg = Eigen::VectorXd::Zero(Nt+1);
+linNum = Eigen::VectorXd::Zero(Nt+1);
 
 //getting eigVec from file
 eigVec = loadSimpleVector("data/sphaleronEigVec.dat");
@@ -601,14 +601,14 @@ for (unsigned int j=0;j<(Nt+1);j++)
 //initialize acc using phi and expression from equation of motion
 /*the unusual d^2phi/dr^2 term and the absence of the first derivative term
 are due to the boundary condition 2) which, to second order, is phi(t,-dr) = phi(t,dr)*/
-//acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) - phi(0) + pow(phi(0),3.0);
-acc(0) *= 0.5; //as initial time slice, generated from taylor expansion and equation of motion
+acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(0)-phi(Nt+1))/r/dr + (- phi(0) + pow(phi(0),3.0))/2.0;
+//acc(0) *= 0.5; //as initial time slice, generated from taylor expansion and equation of motion
 for (unsigned int j=1; j<N; j++)
 	{
 	unsigned int l = j*(Nt+1);
 	double r = r0 + dr*j;
     //acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
-    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + 2.0*(r-dr)*(phi(l)-phi(l-(Nt+1)))/pow(r,2.0)/dr - phi(l) + pow(phi(l),3.0);
+    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(l)-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
     acc(l) *= 0.5;
 	}
 	
@@ -625,14 +625,14 @@ for (unsigned int u=1; u<(Nt+1); u++)
         vel(m) = vel(m-1) + dt*acc(m-1);
         phi(m) = phi(m-1) + dt*vel(m);
     	}
-    //acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
-    acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
+    //acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) + (- phi(u) + pow(phi(u),3.0))/2.0;
+    acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(u)-phi(u+(Nt+1)))/r/dr + (- phi(u) + pow(phi(u),3.0))/2.0;
     for (unsigned int x=1; x<N; x++)
     	{
         unsigned int m = u+x*(Nt+1);
         double r = r0 + x*dr;
         //acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
-        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + 2.0*(r-dr)*(phi(m)-phi(m-(Nt+1)))/pow(r,2.0)/dr - phi(m) + pow(phi(m),3.0);
+        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(m)-phi(m-(Nt+1)))/r/dr + (- phi(m) + pow(phi(m),3.0))/2.0;
         for (unsigned int k=0;k<N;k++)
 			{
 			unsigned int j = u+k*Nt;
@@ -666,7 +666,9 @@ printThreeVectors("data/sphaleronEvolution.dat",tVec,rVec,phiToPrint);
 gp("data/sphaleronEvolution.dat","sphaleron.gp");
 printf("Time evolution printed: data/sphaleronEvolution.dat pics/sphaleronEvolution.png\n");
 printf("                        data/sphaleronLinNum.dat pics/sphaleronLinNum.png\n");
-printf("                        data/sphaleronLinErg.dat pics/sphaleronLinErg.png\n");
+printf("                        data/sphaleronLinErg.dat pics/sphaleronLinErg.png\n\n");
+printf("linNum(Nt) = %8.4g\n",linNum(Nt));
+printf("linErg(Nt) = %8.4g\n\n",linErg(Nt));
 
 return 0;
 }

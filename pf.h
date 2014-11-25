@@ -1260,25 +1260,23 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
-	double diag = mass2 + 2.0/pow(xa,2.0); //diagonal terms
-	double offDiag = -1.0/pow(xa,2.0); //off diagonal terms
 	for (unsigned int l=0; l<xN; l++)
 		{
 		if (l==0)
 			{
-			xh(l,l) = diag;
-			xh(l,l+1) = offDiag;			
+			xh(l,l) = mass2/2.0 + 1.0/pow(xa,2.0);
+			xh(l,l+1) = -1.0/pow(xa,2.0);			
 			}
 		else if (l==(xN-1))
 			{
-			xh(l,l) = diag;
-			xh(l,l-1) = offDiag;
+			xh(l,l) = mass2/2.0 + 1.0/pow(xa,2.0);
+			xh(l,l-1) = -1.0/pow(xa,2.0);
 			}
 		else
 			{
-			xh(l,l) = diag;
-			xh(l,l+1) = offDiag;
-			xh(l,l-1) = offDiag;	
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			xh(l,l+1) = -1.0/pow(xa,2.0);
+			xh(l,l-1) = -1.0/pow(xa,2.0);	
 			}
 		}
 	return xh;
