@@ -347,7 +347,7 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 
 double F = 1.0, dF;
 double aim = 0.0;
-double closeness = 1.0e-9;
+double closeness = 1.0e-8;
 double r0 = 1.0e-16, r1 = 20.0;
 const unsigned int N = 1e3;
 double dr = r1-r0;
@@ -510,10 +510,10 @@ for (unsigned int j=0;j<(N+1);j++)
 		h(j,j-1) = -1.0/pow(dr,2.0);
 		}
 	}
-mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
-mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
-vec eigenValues(N);
-mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
+mat omega(N+1,N+1); 	omega = Eigen::MatrixXd::Zero(N+1,N+1);
+mat Eomega(N+1,N+1); 	Eomega = Eigen::MatrixXd::Zero(N+1,N+1);
+vec eigenValues(N+1);
+mat eigenVectors(N+1,N+1); //eigenvectors correspond to columns of this matrix
 Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
 if (eigensolver.info() != Eigen::Success)
 	{
@@ -524,17 +524,20 @@ else
 	eigenValues = eigensolver.eigenvalues();
 	eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 	}
+simplePrintVector("data/sphaleronhEigs.dat",eigenValues);
 	
-for (unsigned int j=0; j<N; j++)
+for (unsigned int j=0; j<(N+1); j++)
 	{
-	for (unsigned int k=0; k<N; k++)
+	for (unsigned int k=0; k<(N+1); k++)
 		{
-		double dj_sqrt = (r0 + j*dr)*pow(dr,0.5);
-		double dk_sqrt = (r0 + k*dr)*pow(dr,0.5);
-		for (unsigned int l=0; l<N; l++)
+		double dj = pow(4.0*pi,0.5)*(r0 + j*dr)*pow(dr,0.5);
+		double dk = pow(4.0*pi,0.5)*(r0 + k*dr)*pow(dr,0.5);
+		if (j==0 || j==N) {dj/=2.0;}
+		if (k==0 || k==N) {dk/=2.0;}
+		for (unsigned int l=0; l<(N+1); l++)
 			{
-			omega(j,k) += dj_sqrt*dk_sqrt*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-			Eomega(j,k) += dj_sqrt*dk_sqrt*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+			omega(j,k) += dj*dk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+			Eomega(j,k) += dj*dk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 			}
 		}
 	}
@@ -544,7 +547,7 @@ for (unsigned int j=0; j<N; j++)
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = N*3;
-double T = 20.0, amp = -1.0e-2;
+double T = 0.8*(r1-r0), amp = -1.0e-2;
 if ((T-4.0)>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
 //cout << "amp of negative mode: ";
 //cin >> amp;
@@ -554,8 +557,9 @@ if (dt>0.5*dr)
 	cout << "dt too large. dt = "<< dt << ", dr = " << dr << endl;
 	return 0;
 	}
-vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, linNum(Nt+1), linErg(Nt+1);
+vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, linNum(Nt+1), linErg(Nt+1), linErgField(Nt+1);
 linErg = Eigen::VectorXd::Zero(Nt+1);
+linErgField = Eigen::VectorXd::Zero(Nt+1);
 linNum = Eigen::VectorXd::Zero(Nt+1);
 
 //getting eigVec from file
@@ -570,14 +574,21 @@ for (unsigned int j=0;j<(N+1);j++)
 	}
 	
 //initialising linErg and linNum	
-for (unsigned int x=0;x<N;x++)
+for (unsigned int x=0;x<(N+1);x++)
 	{
-	for (unsigned int k=0;k<N;k++)
+	unsigned int j = x*(Nt+1);
+	double r = r0 + x*dr, sigma = 1.0;
+	if (x==0 || x==N) {sigma/=2.0;}
+	linErgField(0) += 4.0*pi*pow(r,2.0)*sigma*0.5*pow(phi(j),2.0)*dr;
+	if (x<N)
 		{
-		unsigned int j = x*Nt;
-		unsigned int l = k*Nt;
+		linErgField(0) += 4.0*pi*pow(r,2.0)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
+		}
+	for (unsigned int k=0;k<(N+1);k++)
+		{
+		unsigned int l = k*(Nt+1);
 		linErg(0) += Eomega(x,k)*phi(l)*phi(j);
-		linNum(0) += omega(x,k)*phi(l)*phi(j);
+		linNum(0) += omega(x,k)*phi(l)*phi(j);	
 		}
 	}
 
@@ -627,15 +638,18 @@ for (unsigned int u=1; u<(Nt+1); u++)
     	}
     //acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) + (- phi(u) + pow(phi(u),3.0))/2.0;
     acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(u)-phi(u+(Nt+1)))/r/dr + (- phi(u) + pow(phi(u),3.0))/2.0;
+    linErgField(u) += 4.0*pi*pow(r0,2.0)*( 0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr + 0.5*dr*0.5*pow(phi(u),2.0));
+    linErgField(u) += 2.0*pi*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0)*dr;
     for (unsigned int x=1; x<N; x++)
     	{
         unsigned int m = u+x*(Nt+1);
         double r = r0 + x*dr;
         //acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
         acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(m)-phi(m-(Nt+1)))/r/dr + (- phi(m) + pow(phi(m),3.0))/2.0;
-        for (unsigned int k=0;k<N;k++)
+		linErgField(u) += 4.0*pi*pow(r,2.0)*( 0.5*pow(phi(m+(Nt+1))-phi(m),2.0)/dr + dr*0.5*pow(phi(m),2.0));
+        for (unsigned int k=0;k<(N+1);k++)
 			{
-			unsigned int j = u+k*Nt;
+			unsigned int j = u+k*(Nt+1);
 			linErg(u) += Eomega(x,k)*phi(m)*phi(j);
 			linNum(u) += omega(x,k)*phi(m)*phi(j);
 			}
@@ -660,15 +674,18 @@ vec phiToPrint;
 phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
 simplePrintVector("data/sphaleronLinNum.dat",linNum);
 simplePrintVector("data/sphaleronLinErg.dat",linErg);
+simplePrintVector("data/sphaleronLinErgField.dat",linErgField);
 gpSimple("data/sphaleronLinNum.dat","pics/sphaleronLinNum.png");
 gpSimple("data/sphaleronLinErg.dat","pics/sphaleronLinErg.png");
+gpSimple("data/sphaleronLinErgField.dat","pics/sphaleronLinErgField.png");
 printThreeVectors("data/sphaleronEvolution.dat",tVec,rVec,phiToPrint);
 gp("data/sphaleronEvolution.dat","sphaleron.gp");
 printf("Time evolution printed: data/sphaleronEvolution.dat pics/sphaleronEvolution.png\n");
 printf("                        data/sphaleronLinNum.dat pics/sphaleronLinNum.png\n");
 printf("                        data/sphaleronLinErg.dat pics/sphaleronLinErg.png\n\n");
 printf("linNum(Nt) = %8.4g\n",linNum(Nt));
-printf("linErg(Nt) = %8.4g\n\n",linErg(Nt));
+printf("linErg(Nt) = %8.4g\n",linErg(Nt));
+printf("linErgField(Nt) = %8.4g\n\n",linErgField(Nt));
 
 return 0;
 }
