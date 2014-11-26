@@ -304,8 +304,8 @@ void gp(const string & readFile, const string & gnuplotFile)
 	{
 	string prefix = "gnuplot -e \"f='";
 	string middle = "'\" ";
-	string suffix = " -persistent";
-	string commandStr = prefix + readFile + middle + gnuplotFile + suffix;
+	//string suffix = " -persistent";
+	string commandStr = prefix + readFile + middle + gnuplotFile;// + suffix;
 	const char * command = commandStr.c_str();
 	FILE * gnuplotPipe = popen (command,"w");
 	fprintf(gnuplotPipe, "%s \n", " ");
@@ -382,7 +382,7 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 10.0;
+double r0 = 1.0e-16, r1 = 16.0;
 const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;
@@ -487,8 +487,8 @@ if (false)
 			{
 			D1.insert(j,j) = 1.0/pow(dr,2.0) + (1.0 - 3.0*pow(y0Vec[j],2.0))/2.0;
 			D1.insert(j,j+1) = -1.0/pow(dr,2.0);
-			D2.insert(j,j) = 1.0/pow(dr,2.0) + 2.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
-			D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 2.0/dr/r;
+			D2.insert(j,j) = 1.0/pow(dr,2.0) + 1.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
+			D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 1.0/dr/r;
 			/*D1.insert(j,j) = -1.0; //derivative of phi is zero at r=0
 			D1.insert(j,j+1) = 1.0;
 			D2.insert(j,j) = -1.0;
@@ -498,8 +498,8 @@ if (false)
 			{
 			D1.insert(j,j) = 1.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + (1.0 - 3.0*pow(y0Vec[j],2.0))/2.0;
 			D1.insert(j,j-1) = -1.0/pow(dr,2.0) + 2.0*(1.0-dr/r)/r/dr;
-			D2.insert(j,j) = 1.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
-			D2.insert(j,j-1) = -1.0/pow(dr,2.0);
+			D2.insert(j,j) = 1.0/pow(dr,2.0) - 1.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
+			D2.insert(j,j-1) = -1.0/pow(dr,2.0) + 1.0/dr/r;
 			/*D1.insert(j,j) = 1.0; //phi goes to zero as r->infty
 			D2.insert(j,j) = 1.0;*/
 			}
@@ -508,9 +508,9 @@ if (false)
 			D1.insert(j,j) = 2.0/pow(dr,2.0) - 2.0*(1.0-dr/r)/r/dr + 1.0 - 3.0*pow(y0Vec[j],2.0);
 			D1.insert(j,j+1) = -1.0/pow(dr,2.0);
 			D1.insert(j,j-1) = -1.0/pow(dr,2.0) + 2.0*(1.0-dr/r)/r/dr;
-			D2.insert(j,j) = 2.0/pow(dr,2.0) + 2.0/dr/r + 1.0 - 3.0*pow(y0Vec[j],2.0);
-			D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 2.0/dr/r;
-			D2.insert(j,j-1) = -1.0/pow(dr,2.0);
+			D2.insert(j,j) = 2.0/pow(dr,2.0) + 1.0 - 3.0*pow(y0Vec[j],2.0);
+			D2.insert(j,j+1) = -1.0/pow(dr,2.0) - 1.0/dr/r;
+			D2.insert(j,j-1) = -1.0/pow(dr,2.0) + 1.0/dr/r;
 			}
 		r += dr;
 		}
@@ -536,12 +536,12 @@ if (false)
 		{
 		if (j==0)
 			{
-			h(j,j) = 0.5 + 1.0/pow(dr,2.0);
+			h(j,j) = 1.0 + 1.0/pow(dr,2.0);
 			h(j,j+1) = -1.0/pow(dr,2.0);
 			}
 		else if (j==N)
 			{
-			h(j,j) = 0.5 + 1.0/pow(dr,2.0);
+			h(j,j) = 1.0 + 1.0/pow(dr,2.0);
 			h(j,j-1) = -1.0/pow(dr,2.0);
 			}
 		else
@@ -571,8 +571,9 @@ if (false)
 		{
 		for (unsigned int k=0; k<(N+1); k++)
 			{
-			double dj = pow(4.0*pi,0.5)*(r0 + j*dr)*pow(dr,0.5);
-			double dk = pow(4.0*pi,0.5)*(r0 + k*dr)*pow(dr,0.5);
+			double rj = r0 + j*dr, rk = r0 + k*dr;
+			double dj = pow(4.0*pi,0.5)*rj*pow(dr,0.5);
+			double dk = pow(4.0*pi,0.5)*rk*pow(dr,0.5);
 			if (j==0 || j==N) {dj/=2.0;}
 			if (k==0 || k==N) {dk/=2.0;}
 			for (unsigned int l=0; l<(N+1); l++)
@@ -584,6 +585,8 @@ if (false)
 		}
 	printMat("data/sphaleronOmega.dat",omega);
 	printMat("data/sphaleronEomega.dat",Eomega);
+	printf("omega printed: data/sphaleronOmega.dat\n");
+	printf("Eomega printed: data/sphaleronOmega.dat\n\n");
 	}
 else
 	{
@@ -596,8 +599,8 @@ else
 //propagating sphaleron plus a small amount of negative mode forward in time
 //in order to calculate E_lin and N_lin
 
-unsigned int Nt = N*4;
-double T = 0.8*(r1-r0), amp = -7.0e-3;
+unsigned int Nt = N*3;
+double T = 0.8*(r1-r0), amp = -1.0e-2;
 if ((T-4.0)>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
 //cout << "amp of negative mode: ";
 //cin >> amp;
@@ -636,7 +639,7 @@ for (unsigned int x=0;x<(N+1);x++)
 	linErgField(0) += 4.0*pi*pow(r,2.0)*sigma*0.5*pow(phi(j),2.0)*dr;
 	if (x<N)
 		{
-		linErgField(0) += 4.0*pi*pow(r,2.0)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
+		linErgField(0) += 4.0*pi*r*(r+dr)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
 		}
 	for (unsigned int k=0;k<(N+1);k++)
 		{
@@ -666,14 +669,13 @@ for (unsigned int j=0;j<(Nt+1);j++)
 //initialize acc using phi and expression from equation of motion
 /*the unusual d^2phi/dr^2 term and the absence of the first derivative term
 are due to the boundary condition 2) which, to second order, is phi(t,-dr) = phi(t,dr)*/
-acc(0) = (phi(Nt+1) - phi(0))/pow(dr,2.0) + (- phi(0) + pow(phi(0),3.0))/2.0;
+acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) - phi(0) + pow(phi(0),3.0);
 acc(0) *= 0.5; //as initial time slice, generated from taylor expansion and equation of motion
 for (unsigned int j=1; j<N; j++)
 	{
 	unsigned int l = j*(Nt+1);
 	double r = r0 + dr*j;
-    //acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
-    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(l)-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
+    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
     acc(l) *= 0.5;
 	}
 
@@ -686,22 +688,20 @@ for (unsigned int u=1; u<(Nt+1); u++)
         vel(m) = vel(m-1) + dt*acc(m-1);
         phi(m) = phi(m-1) + dt*vel(m);
     	}
-    //acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) + (- phi(u) + pow(phi(u),3.0))/2.0;
-    acc(u) = (phi(u+Nt+1) - phi(u))/pow(dr,2.0) + (- phi(u) + pow(phi(u),3.0))/2.0;
-    linErgField(u-1) +=  4.0*pi*pow(r0,2.0)*dr*0.25*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
-    linErgField(u-1) +=  4.0*pi*pow(r1,2.0)*dr*0.25*pow(phi(u+N*(Nt+1))-phi(u+N*(Nt+1)-1),2.0)/pow(dt,2.0);
-    linErgField(u) += 4.0*pi*pow(r0,2.0)*0.5*( pow(phi(u+(Nt+1))-phi(u),2.0)/dr + dr*0.5*pow(phi(u),2.0));
-    linErgField(u) += 2.0*pi*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0)*dr;
-    nonLinErg(u) += 4.0*pi*pow(r0,2.0)*0.5*0.25*pow(phi(u),4.0)*dr;
-    nonLinErg(u) += 4.0*pi*pow(r1,2.0)*0.5*0.25*pow(phi(u+N*(Nt+1)),4.0)*dr;
+    acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
+    linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
+    linErgField(u-1) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1))-phi(u+N*(Nt+1)-1),2.0)/pow(dt,2.0);
+    linErgField(u) += 4.0*pi*( r0*(r0+dr)*0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr + dr*pow(r0,2.0)*0.5*pow(phi(u),2.0) );
+    linErgField(u) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0);
+    nonLinErg(u) += 4.0*pi*dr*pow(r0,2.0)*0.25*pow(phi(u),4.0);
+    nonLinErg(u) += 4.0*pi*dr*pow(r1,2.0)*0.25*pow(phi(u+N*(Nt+1)),4.0);
     for (unsigned int x=1; x<N; x++)
     	{
         unsigned int m = u+x*(Nt+1);
         double r = r0 + x*dr;
-        //acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
-        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + 2.0*(1.0-dr/r)*(phi(m)-phi(m-(Nt+1)))/r/dr + (- phi(m) + pow(phi(m),3.0))/2.0;
+        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
         linErgField(u-1) +=  4.0*pi*pow(r,2.0)*dr*0.5*pow(phi(m)-phi(m-1),2.0)/pow(dt,2.0);
-		linErgField(u) += 4.0*pi*pow(r,2.0)*0.5*( pow(phi(m+(Nt+1))-phi(m),2.0)/dr + dr*pow(phi(m),2.0));
+		linErgField(u) += 4.0*pi*(r*(r+dr)*0.5*pow(phi(m+(Nt+1))-phi(m),2.0)/dr + pow(r,2.0)*0.5*dr*pow(phi(m),2.0));
 		nonLinErg(u) += 4.0*pi*pow(r,2.0)*0.25*pow(phi(m),4.0)*dr;
         for (unsigned int k=0;k<(N+1);k++)
 			{
