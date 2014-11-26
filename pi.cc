@@ -109,6 +109,18 @@ string print_choice = aq.printChoice;
 		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
 		}
+	else if (pot[0]=='3')
+		{
+		V = &V3c;
+		dV = &dV3c;
+		ddV = &ddV3c;
+		Vd = &V3;
+		dVd = &dV3;
+		ddVd = &ddV3;
+		epsilon0 = 0.0;
+		epsilon = 0.0;
+		r0 = 1.0e-16;
+		}
 	else
 		{
 		cout << "pot option not available, pot = " << pot << endl;
@@ -120,87 +132,99 @@ string print_choice = aq.printChoice;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon and root
 
-	//gsl function for dV(phi)
-	gsl_function F;
-	F.function = Vd;
-	F.params = &paramsV;	
+	if (pot[0]!='3')
+		{
+		//gsl function for dV(phi)
+		gsl_function F;
+		F.function = Vd;
+		F.params = &paramsV;	
 	
-	//finding preliminary roots of dV(phi)=0
-	minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
-	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
+		//finding preliminary roots of dV(phi)=0
+		minima[0] = brentMinimum(&F, -1.1, -3.0, 0.0);
+		minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
 	
-	//gsl function for V(root2)-V(root1)-dE
-	struct ec_params ec_params = { A, minima[0], minima[1], dE};
-	gsl_function EC;
-	EC.function = &ec;
-	EC.params = &ec_params;
+		//gsl function for V(root2)-V(root1)-dE
+		struct ec_params ec_params = { A, minima[0], minima[1], dE};
+		gsl_function EC;
+		EC.function = &ec;
+		EC.params = &ec_params;
 
-	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
+		//evaluating epsilon, new root and dE may change slightly
+		epsilonFn(&F,&EC,&dE,&epsilon,&minima);
 	
-	//evaluating some properties of V
-	mass2 = ddVd(minima[0],&paramsV);
+		//evaluating some properties of V
+		mass2 = ddVd(minima[0],&paramsV);
 	
-	//finding root0 of dV0(phi)=0;
-	vector<double> minima0(3);
-	if (pot[0]=='1')
-		{
-		minima0[0] = -1.0; minima0[1] = 1.0;
+		//finding root0 of dV0(phi)=0;
+		vector<double> minima0(3);
+		if (pot[0]=='1')
+			{
+			minima0[0] = -1.0; minima0[1] = 1.0;
+			}
+		else if (pot[0]=='2')
+			{
+			gsl_function V0;
+			V0.function = Vd;
+			V0.params = &paramsV0;	
+			minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
+			minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
+			struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
+			gsl_function EC0;
+			EC0.function = &ec;
+			EC0.params = &ec0_params;
+			double dE0 = 0.0;
+			epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
+			}
+	
+		//finding S1
+		double S1error;
+		gsl_function S1_integrand;
+		S1_integrand.function = &s1Integrand;
+		S1_integrand.params = &paramsV0;
+		gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+		gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+		gsl_integration_workspace_free(w);
+		if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
 		}
-	else if (pot[0]=='2')
+	else
 		{
-		gsl_function V0;
-		V0.function = Vd;
-		V0.params = &paramsV0;	
-		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
-		minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
-		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
-		gsl_function EC0;
-		EC0.function = &ec;
-		EC0.params = &ec0_params;
-		double dE0 = 0.0;
-		epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
+		mass2 = 1.0;
+		minima[0] = 0.0; //only one minimum
+		R = 1.0; alpha = 0.0; //not used
 		}
-	
-	//finding S1
-	double S1error;
-	gsl_function S1_integrand;
-	S1_integrand.function = &s1Integrand;
-	S1_integrand.params = &paramsV0;
-	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
-	gsl_integration_workspace_free(w);
-	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//finding phi profile between minima
-	unsigned int profileSize = Nb; //more than the minimum
-	vector<double> phiProfile(profileSize);
-	vector<double> rhoProfile(profileSize);
-	double alphaL, alphaR;
-	if (pot[0]=='2')
+	if (pot[0]!='3')
 		{
-		double phiL = minima0[1]-1.0e-2;
-		double phiR = minima0[0]+1.0e-2;
-		for (unsigned int j=0;j<profileSize;j++)
+		//finding phi profile between minima
+		unsigned int profileSize = Nb; //more than the minimum
+		vector<double> phiProfile(profileSize);
+		vector<double> rhoProfile(profileSize);
+		double alphaL, alphaR;
+		if (pot[0]=='2')
 			{
-			phiProfile[j] = phiL + (phiR-phiL)*j/(profileSize-1.0);
-			}
+			double phiL = minima0[1]-1.0e-2;
+			double phiR = minima0[0]+1.0e-2;
+			for (unsigned int j=0;j<profileSize;j++)
+				{
+				phiProfile[j] = phiL + (phiR-phiL)*j/(profileSize-1.0);
+				}
 	
-		double profileError;
-		gsl_function rho_integrand;
-		rho_integrand.function = &rhoIntegrand;
-		rho_integrand.params = &paramsV0;
-		w = gsl_integration_workspace_alloc(1e4);
-		for (unsigned int j=0;j<profileSize;j++)
-			{
-			gsl_integration_qags(&rho_integrand, phiProfile[j], 0, 1.0e-16, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
-			if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
+			double profileError;
+			gsl_function rho_integrand;
+			rho_integrand.function = &rhoIntegrand;
+			rho_integrand.params = &paramsV0;
+			w = gsl_integration_workspace_alloc(1e4);
+			for (unsigned int j=0;j<profileSize;j++)
+				{
+				gsl_integration_qags(&rho_integrand, phiProfile[j], 0, 1.0e-16, 1.0e-6, 1e4, w, &(rhoProfile[j]), &profileError);
+				if (profileError>1.0e-5) { cout << "profile error = " << profileError << " , for j = " << j << endl;}
+				}
+			gsl_integration_workspace_free(w);
+			alphaL = rhoProfile[0];
+			alphaR = rhoProfile.back();
 			}
-		gsl_integration_workspace_free(w);
-		alphaL = rhoProfile[0];
-		alphaR = rhoProfile.back();
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,16 +232,26 @@ string print_choice = aq.printChoice;
 //other derived quantities
 NT = Na + Nb + Nc;
 Gamma = exp(-theta);
-R = S1/dE;
-double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
-alpha *= R;
-L = LoR*R;
+double twaction;
+if (pot[0]!='3')
+	{
+	R = S1/dE;
+	twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
+	alpha *= R;
+	L = LoR*R;
+	}
+else
+	{
+	twaction = 8.0*pow(pi,2.0)/3.0; //massless limit
+	L = LoR*10.0;
+	//no need for R or alpha
+	}
 vec negVec(2*N*Nb+1);
 unsigned int negP;
 double negc;
 double negcheck;
 double negerror; //should be <<1
-if (inP.compare("p") == 0 || inP.compare("f") == 0)
+if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 	{
 	if (Tb<R)
 		{
@@ -249,9 +283,13 @@ if (inP.compare("p") == 0 || inP.compare("f") == 0)
 			}
 		}
 	}
-else if (inP.compare("b") == 0)
+else if ((inP.compare("b") == 0) && pot[0]!='3')
 	{
 	Tb = 1.5*R;
+	}
+else
+	{
+	negVec = loadVector("data/sphaleron
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
@@ -357,8 +395,19 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			for (unsigned int l=0; l<N; l++)
 				{
-				omega(j,k) += a*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				Eomega(j,k) += a*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				double djdk;
+				if (pot[0]=='3')
+					{
+					double rj = r0 + j*a, rk = r0 + k*a;
+					djdk = 4.0*pi*rj*rk*dr;			
+					}
+				else
+					{
+					djdk=a;
+					}
+				if (j==0 || j==N || k==0 || k==N) {djdk/=2.0;}
+				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 				}
 			}
 		}
@@ -377,75 +426,82 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp t = coordB(j,0);
 			comp x = coordB(j,1);
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-			if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
+			if (pot[3]!='3')
 				{
-				double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
-				if (pot[0]=='1')
+				if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 					{
-					if ((rho-R)<-alpha)
+					double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
+					if (pot[0]=='1')
 						{
-						p(2*j) = minima[1];
-						}
-					else if ((rho-R)>alpha)
-						{
-						p(2*j) = minima[0];
-						}
-					else
-						{
-						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
-						}
-					}
-				else if (pot[0]=='2')
-					{
-					if ((rho-R)<=alphaL)
-						{
-						p(2*j) = minima[1];
-						}
-					else if ((rho-R)>=alphaR)
-						{
-						p(2*j) = minima[0];
-						}
-					else
-						{
-						vector<double> rhoPos (profileSize,rho-R);
-						for (unsigned int k=0; k<profileSize; k++)
+						if ((rho-R)<-alpha)
 							{
-							rhoPos[k] -= rhoProfile[k];
+							p(2*j) = minima[1];
 							}
-						unsigned int minLoc = smallestLoc(rhoPos);
-                        p(2*j) = phiProfile[minLoc];
+						else if ((rho-R)>alpha)
+							{
+							p(2*j) = minima[0];
+							}
+						else
+							{
+							p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
+							}
+						}
+					else if (pot[0]=='2')
+						{
+						if ((rho-R)<=alphaL)
+							{
+							p(2*j) = minima[1];
+							}
+						else if ((rho-R)>=alphaR)
+							{
+							p(2*j) = minima[0];
+							}
+						else
+							{
+							vector<double> rhoPos (profileSize,rho-R);
+							for (unsigned int k=0; k<profileSize; k++)
+								{
+								rhoPos[k] -= rhoProfile[k];
+								}
+							unsigned int minLoc = smallestLoc(rhoPos);
+		                    p(2*j) = phiProfile[minLoc];
+							}
+						}
+					if (inP.compare("p")==0)
+						{
+						p(2*j) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j);
+						p(2*j+1) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j+1);
 						}
 					}
-				if (inP.compare("p")==0)
+				else if (inP.compare("p")==0 && Tb<R)
 					{
-					p(2*j) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j);
-					p(2*j+1) += amp*cos(sqrt(-negVal)*imag(t))*negVec(2*j+1);
+					double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
+					double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
+					if ((rho1-R)<-alpha && (rho2-R)<-alpha)
+						{
+						p(2*j) = minima[1];
+						}
+					else if ((rho1-R)>alpha || (rho2-R)>alpha)
+						{
+						p(2*j) = minima[0];
+						}
+					else if (real(x)>0) //note that the coord should be real
+						{
+						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho1-R)/2.0)/2.0;
+						}
+					else if (real(x)<0)
+						{
+						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho2-R)/2.0)/2.0;
+						}
+					else
+						{
+						p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
+						}
 					}
 				}
-			else if (inP.compare("p")==0 && Tb<R)
+			else if (pot[0]=='3') //redundant, just for clarity
 				{
-				double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
-				double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
-				if ((rho1-R)<-alpha && (rho2-R)<-alpha)
-					{
-					p(2*j) = minima[1];
-					}
-				else if ((rho1-R)>alpha || (rho2-R)>alpha)
-					{
-					p(2*j) = minima[0];
-					}
-				else if (real(x)>0) //note that the coord should be real
-					{
-					p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho1-R)/2.0)/2.0;
-					}
-				else if (real(x)<0)
-					{
-					p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho2-R)/2.0)/2.0;
-					}
-				else
-					{
-					p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
-					}
+				
 				}
 			}
 		p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode

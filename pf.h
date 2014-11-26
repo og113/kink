@@ -105,6 +105,7 @@ string zmt; //dictates how time zero mode is dealt with
 string zmx; //dictates how x zero mode is dealt with
 double epsilon0; //the value of epsilon when the minima are degenerate
 double S1;
+double r0; //the minimum radius if pot[0]=='3'
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -284,6 +285,15 @@ template <class T> T V2 (const T phi, void * parameters = &paramsV)
 	}
 comp V2c (const comp phi) { return V2(phi); }
 
+//V3
+template <class T> T V3 (const T phi, void * parameters = &paramsV)
+	{
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	return pow(phi,2.0)/2.0 - pow(phi,4.0)/4.0;
+	}
+comp V3c (const comp phi) { return V3(phi); }
+
+
 //Vr	
 comp VrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
@@ -319,6 +329,13 @@ template <class T> T dV2 (const T phi, void * parameters = &paramsV)
 	return (phi+1.0)*(1.0-epsi*Z((phi-1.0)/aa)) - 0.5*pow(phi+1.0,2.0)*(epsi/aa)*dZ((phi-1.0)/aa);
 	}
 comp dV2c (const comp phi) { return dV2(phi); }
+
+//dV3
+template <class T> T dV3 (const T phi, void * parameters = &paramsV)
+	{
+	return phi - pow(phi,3.0);
+	}	
+comp dV3c (const comp phi) { return dV3(phi); }
 	
 //dVr
 comp dVrFn (const comp & phi, const double & minimaL, const double & minimaR)
@@ -353,7 +370,15 @@ template <class T> T ddV2 (const T phi, void * parameters = &paramsV)
 					+ 0.5*pow(phi+1.0,2.0)*(epsi/pow(aa,2.0))*ddZ((phi-1.0)/aa);
 	}
 comp ddV2c (const comp phi) { return ddV2(phi); }
-	
+
+//ddV3
+template <class T> T ddV3 (const T phi, void * parameters = &paramsVoid)
+	{
+	return 1.0 - 3.0*pow(phi,2.0);
+	}
+comp ddV3c (const comp phi) { return ddV3(phi); }
+
+//ddVr	
 comp ddVrFn (const comp & phi, const double & minimaL, const double & minimaR)
 	{
 	return 3.0*pow(phi-minimaL,2.0)*pow(phi-minimaR,4.0) + 8.0*pow(phi-minimaL,3.0)*pow(phi-minimaR,3.0)\

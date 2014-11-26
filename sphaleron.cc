@@ -574,8 +574,6 @@ if (false)
 			double rj = r0 + j*dr, rk = r0 + k*dr;
 			double dj = pow(4.0*pi,0.5)*rj*pow(dr,0.5);
 			double dk = pow(4.0*pi,0.5)*rk*pow(dr,0.5);
-			if (j==0 || j==N) {dj/=2.0;}
-			if (k==0 || k==N) {dk/=2.0;}
 			for (unsigned int l=0; l<(N+1); l++)
 				{
 				omega(j,k) += dj*dk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
