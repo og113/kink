@@ -501,6 +501,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (pot[0]=='3') //redundant, just for clarity
 				{
+				string loadfile= "data/" + aq.inputTimeNumber + "sphaleronEvo.dat";
 				
 				}
 			}

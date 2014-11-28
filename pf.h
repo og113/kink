@@ -289,7 +289,8 @@ comp V2c (const comp phi) { return V2(phi); }
 template <class T> T V3 (const T phi, void * parameters = &paramsV)
 	{
 	struct params_for_V * params = (struct params_for_V *)parameters;
-	return pow(phi,2.0)/2.0 - pow(phi,4.0)/4.0;
+	double epsi = (params->epsi); //epsi here takes the role of r
+	return pow(phi,2.0)/2.0 - pow(phi,4.0)/4.0/pow(epsi,2.0);
 	}
 comp V3c (const comp phi) { return V3(phi); }
 
@@ -333,7 +334,9 @@ comp dV2c (const comp phi) { return dV2(phi); }
 //dV3
 template <class T> T dV3 (const T phi, void * parameters = &paramsV)
 	{
-	return phi - pow(phi,3.0);
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
+	return phi - pow(phi,3.0)/pow(epsi,2.0);
 	}	
 comp dV3c (const comp phi) { return dV3(phi); }
 	
@@ -372,9 +375,11 @@ template <class T> T ddV2 (const T phi, void * parameters = &paramsV)
 comp ddV2c (const comp phi) { return ddV2(phi); }
 
 //ddV3
-template <class T> T ddV3 (const T phi, void * parameters = &paramsVoid)
+template <class T> T ddV3 (const T phi, void * parameters = &paramsV)
 	{
-	return 1.0 - 3.0*pow(phi,2.0);
+	struct params_for_V * params = (struct params_for_V *)parameters;
+	double epsi = (params->epsi);
+	return 1.0 - 3.0*pow(phi,2.0)/pow(epsi,2.0);
 	}
 comp ddV3c (const comp phi) { return ddV3(phi); }
 
@@ -1289,19 +1294,21 @@ mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 		{
 		if (l==0)
 			{
-			xh(l,l) = mass2/2.0 + 1.0/pow(xa,2.0);
-			xh(l,l+1) = -1.0/pow(xa,2.0);			
+			xh(l,l) = mass2 + 2.0/pow(dr,2.0);
+			xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);			
 			}
 		else if (l==(xN-1))
 			{
-			xh(l,l) = mass2/2.0 + 1.0/pow(xa,2.0);
-			xh(l,l-1) = -1.0/pow(xa,2.0);
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);
 			}
 		else
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			xh(l,l+1) = -1.0/pow(xa,2.0);
-			xh(l,l-1) = -1.0/pow(xa,2.0);	
+			xh(l,l) = mass2 + 2.0/pow(dr,2.0);
+			if ((l+1)==N)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(dr,2.0);}
+			else			{	xh(l,l+1) = -1.0/pow(dr,2.0);}
+			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(dr,2.0);}
+			else			{	xh(l,l-1) = -1.0/pow(dr,2.0);}
 			}
 		}
 	return xh;

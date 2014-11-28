@@ -1,24 +1,27 @@
-/* first of all just writing something to solve the ode as an initial value plot
-only once that works will i add the newton raphson loop to do the shooting
-to do:
-- define gsl functions for first order odes
-- define jacobian functions
-- define boundary values
-- follow gsl example for implementation
+/*this is the second sphaleron program
+it is written in order to provide an input to pi.cc
+hence it needs to give an output sphaleron plus small amount of negative mode, along BC,
+the euclidean part of the contour.
+the negative mode should be such that the sphaleron rolls down off to infinity at positive minkowskian time
+hence we should reduce the size of the CD part of the contour to two sites, or eliminate it altogether.
+following kuznetsov and tinyakov we can impose the reality condition at C
+we should then evolve time forwards to check that the field gets very large in finite time.
+it is also worth noting the time taken to do this.
 
-next, have to implement shooting by applying newton's method to F, the difference between the final boundary value and the one shot at
-- define function F
-- write loop with convergence test
-- write newton's method
-- print tests for convergence on each iteration
+28/11/14
+it seems that the euclidean evolution is unstable.
+my first approach is to try to try a higher order discretization scheme,
+which may be more stable.
+it may also be worth discretizing the equation for chi=phi*r,
+which has a simpler derivative structure.
+it may be worth using a gsl ode solver to step the equations forward step by step,
+i.e. discretize one direction, space, first, then step forwards in time using ode solvers.
+that way it is easier to change to higher order schemes.
 
-then,
-- calculate energy of solution
-- find negative mode
-- calculate number of particles
-	- to do this need to evolve sphaleron + small amount of negative mode in time
-	- then model N(k) and E(K) and N_lin and E_lin with time
-	- this requires taking something like the fourier transform of the field configuration
+or, could just code this all into matlab, which has an initial value pde solver which tries to do all of this
+automatically. to input the initial value function just write an interpolate function which always gives a value
+from a vector of data.
+
 */
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
@@ -370,6 +373,17 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 	return vec_new;
 	}
 	
+//getting the date and time
+const string currentDateTime()
+	{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%y%m%d%H%M%S", &tstruct);
+    return buf;
+	}
+	
 int main()
 {
 //defining the time to label output
@@ -383,8 +397,8 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 16.0;
-const unsigned int N = 1e3;
+double r0 = 1.0e-16, r1 = 5.0;
+const unsigned int N = 3e3;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
@@ -455,7 +469,7 @@ while (absolute(F-aim)>closeness)
 	}
 
 //printing solution
-string filename = "./data/" + timeNumber + "sphaleron.dat", picname = "./pics/sphaleron.png";
+string filename = "./data/" + timeNumber + "sphaleron2.dat", picname = "./pics/sphaleron2.png";
 simplePrintVector(filename,y0Vec);
 printf("\n%16s%20s%20s\n\n","Solution printed: ",filename.c_str(),picname.c_str());
 gpSimple(filename,picname);
@@ -521,15 +535,15 @@ if (false)
 	printSpmat("./data/D2.dat",D2);
 	printf("Matrices printed: ./data/D1.dat ./data/D2.dat\n\n");
 	}
-printf("From Matlab: D1 gives omega^2_- = -15.31,\n");
-printf("             D2 gives omega^2_- = -15.34\n\n");
+//printf("From Matlab: D1 gives omega^2_- = -15.31,\n");
+//printf("             D2 gives omega^2_- = -15.34\n\n");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //assembling material to calculate occupation of modes
 
 mat omega(N+1,N+1);
 mat Eomega(N+1,N+1);
-if (true)
+if (false)
 	{
 	//h_ij matrix
 	mat h(N+1,N+1);
@@ -584,15 +598,15 @@ if (true)
 				}
 			}
 		}
-	printMat("data/sphaleronOmega.dat",omega);
-	printMat("data/sphaleronEomega.dat",Eomega);
-	printf("omega printed: data/sphaleronOmega.dat\n");
-	printf("Eomega printed: data/sphaleronOmega.dat\n\n");
+	printMat("data/sphaleron2Omega.dat",omega);
+	printMat("data/sphaleron2Eomega.dat",Eomega);
+	printf("omega printed: data/sphaleron2Omega.dat\n");
+	printf("Eomega printed: data/sphaleron2Omega.dat\n\n");
 	}
-else
+else if (false)
 	{
-	omega = loadMat("data/sphaleronOmega.dat",N+1,N+1);
-	Eomega = loadMat("data/sphaleronEomega.dat",N+1,N+1);
+	omega = loadMat("data/sphaleron2Omega.dat",N+1,N+1);
+	Eomega = loadMat("data/sphaleron2Eomega.dat",N+1,N+1);
 	printf("Loaded omega and Eomega from file\n\n");
 	}
 	
@@ -601,26 +615,31 @@ else
 //in order to calculate E_lin and N_lin
 
 unsigned int Nt = N*3;
-double T = 0.8*(r1-r0), amp = -1.0e-2;
+double T = 0.6*(r1-r0), amp = 1.0e-2;
 if ((T-4.0)>1.1*(r1-r0)) { cout << "R is too small compared to T. R = " << r1-r0 << ", T = " << T << endl;}
-//cout << "amp of negative mode: ";
-//cin >> amp;
+cout << "amp of negative mode: ";
+cin >> amp;
+int sigma = 1;
+cout << "type 1 for minkowskian, -1 for euclidean: ";
+cin >> sigma;
+cout << endl;
+
 double dt = T/Nt; //equals Dt
 if (dt>0.5*dr)
 	{
 	cout << "dt too large. dt = "<< dt << ", dr = " << dr << endl;
 	return 0;
 	}
-vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec, linNum(Nt+1), linErg(Nt+1), linErgField(Nt+1);
-vec nonLinErg(Nt+1), erg(Nt+1);
+vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), eigVec;
+/*vec  erg(Nt+1),linNum(Nt+1), linErg(Nt+1), linErgField(Nt+1), nonLinErg(Nt+1);
+erg = Eigen::VectorXd::Zero(Nt+1);
 linErg = Eigen::VectorXd::Zero(Nt+1);
 linErgField = Eigen::VectorXd::Zero(Nt+1);
 linNum = Eigen::VectorXd::Zero(Nt+1);
-nonLinErg = Eigen::VectorXd::Zero(Nt+1);
-erg = Eigen::VectorXd::Zero(Nt+1);
+nonLinErg = Eigen::VectorXd::Zero(Nt+1);*/
 
 //getting eigVec from file
-eigVec = loadSimpleVector("data/sphaleronEigVec.dat"); //normalized to 1
+eigVec = loadSimpleVector("data/sphaleron2EigVec.dat"); //normalized to 1
 
 //initial condition 1)
 //defining phi on initial time slice
@@ -629,7 +648,8 @@ for (unsigned int j=0;j<(N+1);j++)
 	unsigned int l = j*(Nt+1);
 	phi(l) = y0Vec[j] + amp*eigVec(j);
 	}
-	
+
+/*	
 //initialising linErg and linNum	
 for (unsigned int x=0;x<(N+1);x++)
 	{
@@ -649,6 +669,7 @@ for (unsigned int x=0;x<(N+1);x++)
 		linNum(0) += omega(x,k)*phi(l)*phi(j);	
 		}
 	}
+*/
 
 //initial condition 2)
 //intitialize velocity, dphi/dt(x,0) = 0;
@@ -672,12 +693,14 @@ for (unsigned int j=0;j<(Nt+1);j++)
 are due to the boundary condition 2) which, to second order, is phi(t,-dr) = phi(t,dr)*/
 acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) - phi(0) + pow(phi(0),3.0);
 acc(0) *= 0.5; //as initial time slice, generated from taylor expansion and equation of motion
+acc(0) *= (double)sigma; //as up imaginary time
 for (unsigned int j=1; j<N; j++)
 	{
 	unsigned int l = j*(Nt+1);
 	double r = r0 + dr*j;
     acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
     acc(l) *= 0.5;
+    acc(l) *= (double)sigma;
 	}
 
 //A7. run loop
@@ -690,18 +713,20 @@ for (unsigned int u=1; u<(Nt+1); u++)
         phi(m) = phi(m-1) + dt*vel(m);
     	}
     acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
-    linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
+    acc(u) *= (double)sigma;
+    /*linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
     linErgField(u-1) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1))-phi(u+N*(Nt+1)-1),2.0)/pow(dt,2.0);
     linErgField(u) += 4.0*pi*( r0*(r0+dr)*0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr + dr*pow(r0,2.0)*0.5*pow(phi(u),2.0) );
     linErgField(u) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0);
     nonLinErg(u) += 4.0*pi*dr*pow(r0,2.0)*0.25*pow(phi(u),4.0);
-    nonLinErg(u) += 4.0*pi*dr*pow(r1,2.0)*0.25*pow(phi(u+N*(Nt+1)),4.0);
+    nonLinErg(u) += 4.0*pi*dr*pow(r1,2.0)*0.25*pow(phi(u+N*(Nt+1)),4.0);*/
     for (unsigned int x=1; x<N; x++)
     	{
         unsigned int m = u+x*(Nt+1);
         double r = r0 + x*dr;
         acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
-        linErgField(u-1) +=  4.0*pi*pow(r,2.0)*dr*0.5*pow(phi(m)-phi(m-1),2.0)/pow(dt,2.0);
+        acc(m) *= (double)sigma;
+        /*linErgField(u-1) +=  4.0*pi*pow(r,2.0)*dr*0.5*pow(phi(m)-phi(m-1),2.0)/pow(dt,2.0);
 		linErgField(u) += 4.0*pi*(r*(r+dr)*0.5*pow(phi(m+(Nt+1))-phi(m),2.0)/dr + pow(r,2.0)*0.5*dr*pow(phi(m),2.0));
 		nonLinErg(u) += 4.0*pi*pow(r,2.0)*0.25*pow(phi(m),4.0)*dr;
         for (unsigned int k=0;k<(N+1);k++)
@@ -710,10 +735,11 @@ for (unsigned int u=1; u<(Nt+1); u++)
 			linErg(u) += Eomega(x,k)*phi(m)*phi(j);
 			linNum(u) += omega(x,k)*phi(m)*phi(j);
 			}
+		*/
     	}
 	}
 	
-for (unsigned int k=0; k<(Nt+1); k++)
+/*for (unsigned int k=0; k<(Nt+1); k++)
 	{
 	erg(k) = linErgField(k) + nonLinErg(k);
 	}
@@ -735,6 +761,7 @@ for (unsigned int k=1; k<(N+1); k++)
 	linErgContm += 2.0*pi*Asqrd*freqSqrd;
 	linNumContm += 2.0*pi*Asqrd*pow(freqSqrd,0.5);
 	}
+*/
 	
 unsigned int N_print = 100, Nt_print = 100;
 vec tVec(Nt_print*N_print), rVec(Nt_print*N_print);
@@ -750,9 +777,20 @@ for (unsigned int t=0;t<Nt_print;t++)
 		}
 	}
 	
-vec phiToPrint;
+vec phiToPrint, chiToPrint(N_print*Nt_print);
 phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
-simplePrintVector("data/sphaleronLinNum.dat",linNum);
+
+for (unsigned int u=0; u<Nt_print; u++)
+	{
+	for (unsigned int x=0; x<N_print; x++)
+		{
+		double r = r0 + x*dr;
+		unsigned int m = u + Nt_print*x;
+		chiToPrint(m) = r*phiToPrint(m);
+		}
+	}
+
+/*simplePrintVector("data/sphaleronLinNum.dat",linNum);
 simplePrintVector("data/sphaleronLinErg.dat",linErg);
 simplePrintVector("data/sphaleronLinErgField.dat",linErgField);
 simplePrintVector("data/sphaleronNonLinErg.dat",nonLinErg);
@@ -761,12 +799,15 @@ gpSimple("data/sphaleronLinNum.dat","pics/sphaleronLinNum.png");
 gpSimple("data/sphaleronLinErg.dat","pics/sphaleronLinErg.png");
 gpSimple("data/sphaleronLinErgField.dat","pics/sphaleronLinErgField.png");
 gpSimple("data/sphaleronNonLinErg.dat","pics/sphaleronNonLinErg.png");
-gpSimple("data/sphaleronErg.dat","pics/sphaleronErg.png");
-string evoPrint = "data/" + timeNumber + "sphaleronEvo.dat";
-printThreeVectors(evoPrint,tVec,rVec,phiToPrint);
-gp(evoPrint,"sphaleron.gp");
-printf("Time evolution printed: %39s pics/sphaleronEvolution.png\n",evoPrint);
-printf("                        data/sphaleronLinNum.dat pics/sphaleronLinNum.png\n");
+gpSimple("data/sphaleronErg.dat","pics/sphaleronErg.png");*/
+string phiPrint = "data/" + timeNumber + "sphaleron2phi.dat";
+string chiPrint = "data/" + timeNumber + "sphaleron2chi.dat";
+printThreeVectors(phiPrint,tVec,rVec,phiToPrint);
+printThreeVectors(chiPrint,tVec,rVec,chiToPrint);
+gp(phiPrint,"sphaleron.gp");
+printf("Time evolution printed: %39s pics/sphaleron2Phi.png\n",phiPrint.c_str());
+printf("Time evolution printed: %39s\n\n",chiPrint.c_str());
+/*printf("                        data/sphaleronLinNum.dat pics/sphaleronLinNum.png\n");
 printf("                        data/sphaleronLinErg.dat pics/sphaleronLinErg.png\n");
 printf("                        data/sphaleronLinErgField.dat pics/sphaleronLinErgField.png\n");
 printf("                        data/sphaleronNonLinErg.dat pics/sphaleronNonLinErg.png\n");
@@ -778,6 +819,6 @@ printf("linNum(Nt-1) = %8.4f\n",linNum(Nt-1));
 printf("linErg(Nt-1) = %8.4f\n",linErg(Nt-1));
 printf("linNumContm(Nt-1) = %8.4f\n",linNumContm);
 printf("linErgContm(Nt-1) = %8.4f\n\n",linErgContm);
-
+*/
 return 0;
 }
