@@ -56,6 +56,12 @@ typedef Eigen::VectorXd vec;
 struct void_params {};
 struct void_params paramsVoid;
 
+struct force_params{double phiPlus; double phiMinus; double x; double dx;}; 
+struct force_params paramsForce;
+
+struct force_jac_params{double phiPlus; double phiMinus; double phiPlusDot; double phiMinusDot; double x; double dx;}; 
+struct force_jac_params paramsJacForce;
+
 #define pi 3.14159265359
 
 int func (double t, const double y[], double f[], void *params)
@@ -368,6 +374,95 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 			}
 		}
 	return vec_new;
+	}
+	
+//a function to make a vector defined in 2d equal to one defined in 1d on a given timeslice
+void equateSlice(vec vec2d, vec vec1d, const unsigned int & Ntime, const unsigned int & Nspace, const unsigned int & tSlice)
+	{
+	if (vec2d.size()!=Ntime*Nspace || vec1d.size()!=Nspace)
+		{
+		printf("equateSlice error: vec2d.length() = %i, vec1d.length() = %i\nNtime = %i, Nspace = %i",(int)(vec2d.size()),(int)(vec1d.size()),Ntime,Nspace);
+		}
+	for (unsigned int l=0;l<Nspace;l++)
+		{
+		unsigned int m = tSlice + Ntime*l;
+		vec2d(m) = vec1d(l);
+		}
+	}
+	
+//a function to give 'force' for time evolution, minkowskian
+int funcMink (double t, const double y[], double f[], void *params)
+	{
+	struct force_jac_params * parameters = (struct force_jac_params *)params;
+	double phiPlus = (parameters->phiPlus);
+	double phiMinus = (parameters->phiMinus);
+	double x = (parameters->x);
+	double dx = (parameters->dx);
+	f[0] = y[1];
+	f[1] = (phiPlus + phiMinus-2.0*y[0])/pow(dx,2.0) + (phiPlus - phiMinus)/x/dx - y[0] + pow(y[0],3.0);
+	return GSL_SUCCESS;
+	}
+
+//a function to give 'force' for time evolution, euclidean
+int funcEuc (double t, const double y[], double f[], void *params)
+	{
+	struct force_jac_params * parameters = (struct force_jac_params *)params;
+	double phiPlus = (parameters->phiPlus);
+	double phiMinus = (parameters->phiMinus);
+	double x = (parameters->x);
+	double dx = (parameters->dx);
+	f[0] = y[1];
+	f[1] = -(phiPlus + phiMinus-2.0*y[0])/pow(dx,2.0) - (phiPlus - phiMinus)/x/dx + y[0] - pow(y[0],3.0);
+	return GSL_SUCCESS;
+	}
+	
+int jacMink (double t, const double y[], double *dfdy, double dfdt[], void *params)
+	{
+	struct force_jac_params * parameters = (struct force_jac_params *)params;
+	double phiPlus = (parameters->phiPlus);
+	double phiMinus = (parameters->phiMinus);
+	double x = (parameters->x);
+	double dx = (parameters->dx);
+	gsl_matrix_view dfdy_mat = gsl_matrix_view_array (dfdy, 2, 2);
+	gsl_matrix * m = &dfdy_mat.matrix; 
+	gsl_matrix_set (m, 0, 0, 0.0);
+	gsl_matrix_set (m, 0, 1, 1.0);
+	gsl_matrix_set (m, 1, 0, 1.0 - 3.0*pow(y[0],2.0));
+	gsl_matrix_set (m, 1, 1, -2.0/t);
+	dfdt[0] = 0.0;
+	dfdt[1] = 2.0*y[1]/pow(t,2.0);
+	return GSL_SUCCESS;
+	}
+	
+int jacEuc (double t, const double y[], double *dfdy, double dfdt[], void *params)
+	{
+	struct force_jac_params * parameters = (struct force_jac_params *)params;
+	double phiPlus = (parameters->phiPlus);
+	double phiMinus = (parameters->phiMinus);
+	double x = (parameters->x);
+	double dx = (parameters->dx);
+	gsl_matrix_view dfdy_mat = gsl_matrix_view_array (dfdy, 2, 2);
+	gsl_matrix * m = &dfdy_mat.matrix; 
+	gsl_matrix_set (m, 0, 0, 0.0);
+	gsl_matrix_set (m, 0, 1, 1.0);
+	gsl_matrix_set (m, 1, 0, 1.0 - 3.0*pow(y[0],2.0));
+	gsl_matrix_set (m, 1, 1, -2.0/t);
+	dfdt[0] = 0.0;
+	dfdt[1] = 2.0*y[1]/pow(t,2.0);
+	return GSL_SUCCESS;
+	}
+	
+//getting the date and time
+const string currentDateTime()
+	{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%y%m%d%H%M%S", &tstruct);
+    return buf;
 	}
 	
 int main()
@@ -765,7 +860,7 @@ gpSimple("data/sphaleronErg.dat","pics/sphaleronErg.png");
 string evoPrint = "data/" + timeNumber + "sphaleronEvo.dat";
 printThreeVectors(evoPrint,tVec,rVec,phiToPrint);
 gp(evoPrint,"sphaleron.gp");
-printf("Time evolution printed: %39s pics/sphaleronEvolution.png\n",evoPrint);
+printf("Time evolution printed: %39s pics/sphaleronEvolution.png\n",evoPrint.c_str());
 printf("                        data/sphaleronLinNum.dat pics/sphaleronLinNum.png\n");
 printf("                        data/sphaleronLinErg.dat pics/sphaleronLinErg.png\n");
 printf("                        data/sphaleronLinErgField.dat pics/sphaleronLinErgField.png\n");
