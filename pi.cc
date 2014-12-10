@@ -131,7 +131,8 @@ string print_choice = aq.printChoice;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//finding epsilon and root
-
+	vector<double> minima0(2);
+	
 	if (pot[0]!='3')
 		{
 		//gsl function for dV(phi)
@@ -154,9 +155,11 @@ string print_choice = aq.printChoice;
 	
 		//evaluating some properties of V
 		mass2 = ddVd(minima[0],&paramsV);
+		cout << "mass2 = " << mass2 << endl;
+		double fn_mass2 = 1.0 + epsilon0*exp(-4.0/pow(A,2.0))*(1.0/A + 1.0/pow(A,3.0) + 1.0/pow(A,5.0));
+		cout << "fn_mass2 = " << fn_mass2 << endl;
 	
 		//finding root0 of dV0(phi)=0;
-		vector<double> minima0(3);
 		if (pot[0]=='1')
 			{
 			minima0[0] = -1.0; minima0[1] = 1.0;
@@ -194,14 +197,15 @@ string print_choice = aq.printChoice;
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//finding phi profile between minima
+	
+	unsigned int profileSize = Nb; //more than the minimum
+	vector<double> phiProfile(profileSize);
+	vector<double> rhoProfile(profileSize);
+	double alphaL, alphaR;
 
 	if (pot[0]!='3')
 		{
-		//finding phi profile between minima
-		unsigned int profileSize = Nb; //more than the minimum
-		vector<double> phiProfile(profileSize);
-		vector<double> rhoProfile(profileSize);
-		double alphaL, alphaR;
 		if (pot[0]=='2')
 			{
 			double phiL = minima0[1]-1.0e-2;
@@ -215,6 +219,7 @@ string print_choice = aq.printChoice;
 			gsl_function rho_integrand;
 			rho_integrand.function = &rhoIntegrand;
 			rho_integrand.params = &paramsV0;
+			gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
 			w = gsl_integration_workspace_alloc(1e4);
 			for (unsigned int j=0;j<profileSize;j++)
 				{
@@ -289,7 +294,7 @@ else if ((inP.compare("b") == 0) && pot[0]!='3')
 	}
 else
 	{
-	negVec = loadVector("data/sphaleron
+	//negVec = loadVector("data/sphaleron
 	}
 a = L/(N-1.0);
 b = Tb/(Nb-1.0);
@@ -399,7 +404,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				if (pot[0]=='3')
 					{
 					double rj = r0 + j*a, rk = r0 + k*a;
-					djdk = 4.0*pi*rj*rk*dr;			
+					djdk = 4.0*pi*rj*rk*a;			
 					}
 				else
 					{
@@ -918,16 +923,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	}
     	}
 		
-<<<<<<< HEAD
-	E = 0;
-	unsigned int linearInt = (unsigned int)(Na/6);
-	//#pragma omp parallel for
-	for (unsigned int j=0; j<linearInt; j++)
-		{
-		E += real(erg(j));
-		}
-	E /= linearInt;
-=======
 	//E = 0;
 	//unsigned int linearInt = (unsigned int)(Na/6);
 	//#pragma omp parallel for
@@ -936,8 +931,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//	E += real(erg(j));
 	//	}
 	//E /= linearInt;
-	E = linErg(0);
->>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
+	E = linErgA(0);
 	W = - E*2.0*Tb + 2.0*imag(action);
 
     //now propagating forwards along c

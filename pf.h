@@ -151,6 +151,27 @@ unsigned int smallestLoc(const vector <T> & inVector)
 		}
 	return loc;
 	}
+	
+//count non-empty lines of a file
+unsigned int countLines(const string & file_to_count)
+	{
+	ifstream fin;
+	fin.open(file_to_count.c_str());
+	string line;
+	unsigned int counter = 0;
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line.empty())
+			{
+			continue;
+			}
+		counter++;
+		}		
+	fin.close();
+    return counter;
+	}
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //generic gsl derived functions
@@ -929,14 +950,13 @@ void gp(const string & readFile, const string & gnuplotFile)
 	pclose(gnuplotPipe);
 	}
 	
-//print repi via gnuplot
+//print simple 1:2 using gnuplot
 void gpSimple(const string & readFile) 
 	{
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
-<<<<<<< HEAD
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -944,24 +964,6 @@ void gpSimple(const string & readFile)
 	fprintf(gnuplotPipe, "%s \n", command2);
 	pclose(gnuplotPipe);
 	}
-	
-//print repi via gnuplot
-void gpSimple2(const string & readFile) 
-	{
-	string commandOpenStr = "gnuplot -persistent";
-	const char * commandOpen = commandOpenStr.c_str();
-	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
-=======
->>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
-	string command2Str = "pause -1";
-	const char * command1 = command1Str.c_str();
-	const char * command2 = command2Str.c_str();
-	fprintf(gnuplotPipe, "%s \n", command1);
-	fprintf(gnuplotPipe, "%s \n", command2);
-	pclose(gnuplotPipe);
-	}
-
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -981,7 +983,7 @@ vec loadSimpleVector (const string& loadFile)
 		if (!line.empty())
 			{
 			istringstream ss(line);
-			ss >> outputVec(j));
+			ss >> outputVec(j);
 			j++;
 			}
 		}
@@ -1294,7 +1296,7 @@ mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 		{
 		if (l==0)
 			{
-			xh(l,l) = mass2 + 2.0/pow(dr,2.0);
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
 			xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);			
 			}
 		else if (l==(xN-1))
@@ -1304,11 +1306,11 @@ mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 			}
 		else
 			{
-			xh(l,l) = mass2 + 2.0/pow(dr,2.0);
-			if ((l+1)==N)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(dr,2.0);}
-			else			{	xh(l,l+1) = -1.0/pow(dr,2.0);}
-			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(dr,2.0);}
-			else			{	xh(l,l-1) = -1.0/pow(dr,2.0);}
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			if ((l+1)==N)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
+			else			{	xh(l,l+1) = -1.0/pow(xa,2.0);}
+			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);}
+			else			{	xh(l,l-1) = -1.0/pow(xa,2.0);}
 			}
 		}
 	return xh;

@@ -73,26 +73,6 @@ string getLastLine(ifstream& inStream)
     return xLine;
 	}
 	
-//count non-empty lines of a file
-unsigned int countLines(const string & file_to_count)
-	{
-	ifstream fin;
-	fin.open(file_to_count.c_str());
-	string line;
-	unsigned int counter = 0;
-	while(!fin.eof())
-		{
-		getline(fin,line);
-		if(line.empty())
-			{
-			continue;
-			}
-		counter++;
-		}		
-	fin.close();
-    return counter;
-	}
-	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //file string manipulation
 
