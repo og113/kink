@@ -1,5 +1,5 @@
 /*
-program to solve the scalar O(N) symmetric instanton equation:
+program to solve the scalar O(N) symmetric bounce equation:
 	f'' + (N-1)f'/r - f + f^3 = 0
 input argument argv[1]=N
 */
@@ -146,7 +146,7 @@ if (argc!=2)
 	return 0;
 	}
 double N = atof(argv[1]);
-printf("\nFinding the O(%g) instanton.\n\n",N);
+printf("\nFinding the O(%g) bounce.\n\n",N);
 parameters = {N};
 
 gsl_odeiv2_system sys = {func, jac, 4, &parameters};
@@ -228,7 +228,7 @@ while (absolute(F-aim)>closeness)
 	}
 
 //printing solution
-string filename = "./data/O" + to_string((int)N) + "instanton.dat", picname = "./pics/O" + to_string((int)N) + "instanton.png";
+string filename = "./data/O" + to_string((int)N) + "bounce.dat", picname = "./pics/O" + to_string((int)N) + "bounce.png";
 simplePrintVector(filename,y0Vec);
 printf("\nSolution printed: %20s  %20s\n\n",filename.c_str(),picname.c_str());
 gpSimple(filename,picname);
