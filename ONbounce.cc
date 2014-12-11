@@ -41,7 +41,7 @@ int func (double t, const double y[], double f[], void *params)
 	f[0] = y[1];
 	f[1] = -(N-1.0)*y[1]/t + y[0] - pow(y[0],3.0);
 	f[2] = y[3];
-	f[3] = -2.0*y[3]/t + y[2] - 3.0*y[2]*pow(y[0],2.0);
+	f[3] = -(N-1.0)*y[3]/t + y[2] - 3.0*y[2]*pow(y[0],2.0);
 	return GSL_SUCCESS;
 	}
 
@@ -153,17 +153,17 @@ gsl_odeiv2_system sys = {func, jac, 4, &parameters};
 
 double F = 1.0, dF;
 double aim = 0.0;
-double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 16.0;
-const unsigned int Nx = 1e3;
+double closeness = 1.0e-6;
+double r0 = 1.0e-12, r1 = 10.0;
+const unsigned int Nx = 1e4;
 double dr = r1-r0;
 dr /= (double)Nx;
 vector<double> y0Vec(Nx+1), y2Vec(Nx+1);
 unsigned int runsCount = 0;
 
-double Y0 = 4.337;//initial guess
+double Y0, Y1 = 0.0, Y2 = 1.0, Y3 = 0.0;
 if (absolute(N-3.0)<0.1) { Y0 = 4.337;}
-else if (absolute(N-2.0)<0.1) { Y0 = 2.2062008;} //less damping so need to be very accurate
+else if (absolute(N-2.0)<0.1) { Y0 = 2.206;}
 else if (absolute(N-4.0)<0.1) { cout << "initial y0: "; cin >> Y0;}
 else { cout << "initial y0: "; cin >> Y0;}
 
@@ -172,19 +172,49 @@ printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","Nx","y(r1)","yMin","F-aim","Y
 while (absolute(F-aim)>closeness)
 	{
 	runsCount++;
-	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sys,  gsl_odeiv2_step_rk8pd, 1.0e-6, 1.0e-6, 0.0);
+	
+	//if possible, calculating first step, from r=0 to r=dr, using analytic approximation for small r
+	bool firstStep = false;
+	/*
+	if (dr<0.1*pow(absolute(1.0-3*pow(Y0,2.0)),0.5))
+		{
+		firstStep = true;
+		y0Vec[0] = Y0;
+		y2Vec[0] = Y2;
+		Y1 += dr*(Y0-pow(Y0,3.0))/N;
+		Y0 += pow(dr,2.0)*(Y0-pow(Y0,3.0))/2.0/N;
+		double temp = Y2;
+		Y2 += dr*Y3; //using simple forward euler derivative
+		Y3 += dr*(-(N-1.0)*Y3/dr + temp - 3.0*Y3*temp);
+		r0 = dr;
+		}
+	*/
+	
+	gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sys,  gsl_odeiv2_step_rk8pd, 1.0e-8, 1.0e-6, 0.0);
 
-	double r = r0, ri;
-	double y0[4] = { Y0, 0.0, 1.0, 0.0};
+	double r, ri;
+	double y0[4] = { Y0, Y1, Y2, Y3};
 	double y[4];
 	memcpy(y, y0, sizeof(y0));
 	double yMin = absolute(y[0]-aim);
-	y0Vec[0] = y[0];
-	y2Vec[0] = y[2];
 	int status;
-	unsigned int i, iMin = 0;
-	
-	for (i = 1; i <= Nx; i++)
+	unsigned int i, iStart, iMin = 0;
+	if (firstStep)
+		{
+		iStart = 2;
+		r = dr;
+		y0Vec[1] = y[0];
+		y2Vec[1] = y[2];
+		}
+	else
+		{
+		iStart = 1;
+		r = r0;
+		y0Vec[0] = y[0];
+		y2Vec[0] = y[2];
+		}
+
+	for (i = iStart; i <= Nx; i++)
 		{
 		ri =(double)i;
 		ri *= dr;
@@ -217,7 +247,14 @@ while (absolute(F-aim)>closeness)
 	printf("%16i%16i%16g%16g%16g%16.12g",runsCount,i,y[0],yMin,F-aim,Y0);
 	if (absolute(dF)>2.0e-16)
 		{
-		Y0 += -F/dF;
+		if ((Y0-F/dF)>0.0)
+			{
+			Y0 += -F/dF;
+			}
+		else
+			{
+			Y0 /= 1.2; //arbitrary fudge
+			}
 		printf("%16.12g%16g\n",Y0,-F/dF);
 		}
 	gsl_odeiv2_driver_free (d);
