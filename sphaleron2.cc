@@ -284,7 +284,7 @@ eigVec = loadSimpleVector("data/sphaleronEigVec.dat"); //normalized to 1
 paramsForce = {r0, r1, N, sigma};
 
 //setting up ode solver for time evolution
-gsl_odeiv2_system sysTime = {funcTime, jacTime, 4, &paramsForce};
+gsl_odeiv2_system sysTime = {funcPDE, jacPDE, 4, &paramsForce};
 
 vector<double> yVec((N+1)*(Nt+1));
 
