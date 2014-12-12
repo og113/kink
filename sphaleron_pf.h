@@ -39,6 +39,9 @@ struct force_params paramsForce;
 
 #define pi 3.14159265359
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//main ode and pde functions
+
 int func (double t, const double y[], double f[], void *params)
 	{
 	f[0] = y[1];
@@ -51,8 +54,8 @@ int func (double t, const double y[], double f[], void *params)
 int jac (double t, const double y[], double *dfdy, double dfdt[], void *params)
 	{
 	gsl_matrix_view dfdy_mat = gsl_matrix_view_array (dfdy, 4, 4);
-	gsl_matrix * m = &dfdy_mat.matrix;
-	gsl_matrix_set_all (m, 0.0); 
+	gsl_matrix * m = &dfdy_mat.matrix; 
+	gsl_matrix_set_all (m, 0.0);
 	gsl_matrix_set (m, 0, 1, 1.0);
 	gsl_matrix_set (m, 1, 0, 1.0 - 3.0*pow(y[0],2.0));
 	gsl_matrix_set (m, 1, 1, -2.0/t);
@@ -67,8 +70,8 @@ int jac (double t, const double y[], double *dfdy, double dfdt[], void *params)
 	return GSL_SUCCESS;
 	}
 	
-//a function to give 'force' for time evolution, minkowskian
-int funcTime (double t, const double y[], double f[], void *params)
+//a function to give 'force' for time evolution
+int funcPDE (double t, const double y[], double f[], void *params)
 	{
 	struct force_params * parameters = (struct force_params *)params;
 	double x0 = (parameters->x0);
@@ -94,7 +97,8 @@ int funcTime (double t, const double y[], double f[], void *params)
 	return GSL_SUCCESS;
 	}
 	
-int jacTime (double t, const double y[], double *dfdy, double dfdt[], void *params)
+//a function to give 'force' for time evolution	
+int jacPDE (double t, const double y[], double *dfdy, double dfdt[], void *params)
 	{
 	struct force_params * parameters = (struct force_params *)params;
 	double x0 = (parameters->x0);
@@ -138,6 +142,8 @@ int jacTime (double t, const double y[], double *dfdy, double dfdt[], void *para
 		}
 	return GSL_SUCCESS;
 	}
+	
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 //gives absolute value of a number
 double absolute (const double& amplitude)
@@ -425,6 +431,49 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 		else
 			{
 			vec_new(l) = vec_old(pos);
+			}
+		}
+	return vec_new;
+	}
+	
+//same function but for vector<double>	
+vector<double> interpolate2(vector<double> vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
+	vector<double> vec_new (N_new*Nt_new);
+	
+	unsigned int x_new, t_new, x_old, t_old;
+	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
+	unsigned int pos;	
+	
+	for (unsigned int l=0;l<N_new*Nt_new;l++)
+		{
+		t_new = intCoord(l,0,Nt_new);
+		x_new = intCoord(l,1,Nt_new);
+		exact_t_old = t_new*(Nt_old-1.0)/(Nt_new-1.0);
+		exact_x_old = x_new*(N_old-1.0)/(N_new-1.0);
+		t_old = (unsigned int)exact_t_old;
+		x_old = (unsigned int)exact_x_old;
+		rem_t_old = exact_t_old;
+		rem_t_old -= (double)(t_old);
+		rem_x_old = exact_x_old;
+		rem_x_old -= (double)(x_old);
+		pos = t_old + Nt_old*x_old;
+		if  (t_old<(Nt_old-1) && x_old<(N_old-1))
+			{
+			vec_new[l] = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old[pos] \
+							+ (1.0-rem_t_old)*rem_x_old*vec_old[pos+Nt_old] \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old[pos+1] \
+							+ rem_t_old*rem_x_old*vec_old[pos+Nt_old+1];
+			}
+		else if (x_old<(N_old-1))
+			{
+			vec_new[l] = (1.0-rem_x_old)*vec_old[pos] + rem_x_old*vec_old[pos+Nt_old];
+			}
+		else
+			{
+			vec_new[l] = vec_old[pos];
 			}
 		}
 	return vec_new;
