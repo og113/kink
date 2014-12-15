@@ -40,7 +40,7 @@ double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
 double r0 = 1.0e-16, r1 = 16.0;
-const unsigned int N = 2e2;
+const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
@@ -111,9 +111,9 @@ while (absolute(F-aim)>closeness)
 	}
 
 //printing solution
-string filename = "./data/" + timeNumber + "sphaleron.dat", picname = "./pics/sphaleron.png";
+string filename = "./data/sphaleron.dat", picname = "./pics/sphaleron.png";
 simplePrintVector(filename,y0Vec);
-printf("\n%16s%20s%20s\n\n","Solution printed: ",filename.c_str(),picname.c_str());
+printf("\nSolution printed: %20s %20s\n\n",filename.c_str(),picname.c_str());
 gpSimple(filename,picname);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ printf("             D2 gives omega^2_- = -15.34\n\n");
 
 mat omega(N+1,N+1);
 mat Eomega(N+1,N+1);
-if (true)
+if (false)
 	{
 	//h_ij matrix
 	mat h(N+1,N+1);
@@ -270,13 +270,7 @@ if (dt>0.5*dr)
 	}
 vector<double> phi((Nt+1)*N);
 
-vec eigVec, linNum(Nt+1), linErg(Nt+1), linErgField(Nt+1);
-vec nonLinErg(Nt+1), erg(Nt+1);
-linErg = Eigen::VectorXd::Zero(Nt+1);
-linErgField = Eigen::VectorXd::Zero(Nt+1);
-linNum = Eigen::VectorXd::Zero(Nt+1);
-nonLinErg = Eigen::VectorXd::Zero(Nt+1);
-erg = Eigen::VectorXd::Zero(Nt+1);
+vec eigVec;
 
 //getting eigVec from file
 eigVec = loadSimpleVector("data/sphaleronEigVec.dat"); //normalized to 1
@@ -291,13 +285,14 @@ vector<double> yVec((N+1)*(Nt+1));
 gsl_odeiv2_driver * d = gsl_odeiv2_driver_alloc_yp_new (&sysTime,  gsl_odeiv2_step_rk8pd, 1.0e-6, 1.0e-6, 0.0);
 
 double t = 0.0, ti;
-double y0[N];
+double y0[2*N];
 for (unsigned int j=0; j<N; j++)
 	{
-	y0[j] = y0Vec[j] + amp*eigVec[j];
+	y0[2*j] = y0Vec[j] + amp*eigVec[j];
+	y0[2*j+1] = 0.0;
 	phi[j*Nt] = y0[j];
 	}
-double y[N];
+double y[2*N];
 memcpy(y, y0, sizeof(y0));
 int status;
 
@@ -314,7 +309,7 @@ for (unsigned int i = 1; i < Nt; i++)
 		}
 	for (unsigned int j=0; j<N; j++)
 		{
-		phi[i+j*Nt] = y0[j];
+		phi[i+j*Nt] = y0[2*j];
 		}
 	}
 for (unsigned int j=0; j<N; j++)

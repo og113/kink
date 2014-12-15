@@ -62,7 +62,7 @@ double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
 double r0 = 1.0e-16, r1 = 16.0;
-const unsigned int N = 2e2;
+const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
@@ -154,7 +154,7 @@ else { cout << "E = " << E << endl << endl;}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //computing and printing linear fluctuation operator as sparse matrix
 //in order to calulate negative eigenvalue and eigenvector
-if (false)
+if (true)
 	{
 	spMat D1(N+1,N+1), D2(N+1,N+1);
 	D1.setZero();
@@ -207,7 +207,7 @@ printf("             D2 gives omega^2_- = -15.34\n\n");
 
 mat omega(N+1,N+1);
 mat Eomega(N+1,N+1);
-if (false)
+if (true)
 	{
 	//h_ij matrix
 	mat h(N+1,N+1);

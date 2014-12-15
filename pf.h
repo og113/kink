@@ -673,8 +673,8 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 		}
 	return XcoordC;
 	}
-	
-long int neigh(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
+
+long int periodic(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
 	{
 	long int neighLocation = -1; //this is the result if there are no neighbours for the given values of the argument
 	unsigned int c = intCoord(locNum,direction,xNt);
@@ -704,6 +704,40 @@ long int neigh(const lint& locNum, const unsigned int& direction, const signed i
 	return neighLocation;
 	}
 	
+//spherical system, reflective at r=0, nothing at r=R
+long int spherical(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
+	{
+	long int neighLocation; 
+	unsigned int c = intCoord(locNum,direction,xNt);
+	if (direction==0)
+		{
+		if (sign==1 and c!=(xNt-1))
+			{
+			neighLocation = locNum+1;
+			}
+		else if (sign==-1 and c!=0)
+			{
+			neighLocation = locNum-1;
+			}
+		}
+	else if (c==0 and sign==-1)
+		{
+		neighLocation = locNum+xNt;
+		}
+	else if (c==(xNx-1) and sign==1)
+		{
+		neighLocation = -1;//this is the result if there are no neighbours for the given values of the argument
+		}
+	else
+		{
+		neighLocation = locNum+sign*(int)xNt;
+		}
+	return neighLocation;
+	}
+	
+long int (*neigh) (const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx);
+
+//dt type functions
 comp dtFn (const unsigned int& time)
 	{
 	comp xdt;
@@ -788,6 +822,48 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 	for (unsigned int l=0; l<zero_modes; l++)
 		{
 		vec_new(2*N_new*Nt_new+l) = vec_old(2*N_old*Nt_old+l);
+		}
+	return vec_new;
+	}
+	
+vec interpolate2(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
+	vec vec_new (N_new*Nt_new);
+	
+	unsigned int x_new, t_new, x_old, t_old;
+	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
+	unsigned int pos;	
+	
+	for (unsigned int l=0;l<N_new*Nt_new;l++)
+		{
+		t_new = intCoord(l,0,Nt_new);
+		x_new = intCoord(l,1,Nt_new);
+		exact_t_old = t_new*(Nt_old-1.0)/(Nt_new-1.0);
+		exact_x_old = x_new*(N_old-1.0)/(N_new-1.0);
+		t_old = (unsigned int)exact_t_old;
+		x_old = (unsigned int)exact_x_old;
+		rem_t_old = exact_t_old;
+		rem_t_old -= (double)(t_old);
+		rem_x_old = exact_x_old;
+		rem_x_old -= (double)(x_old);
+		pos = t_old + Nt_old*x_old;
+		if  (t_old<(Nt_old-1) && x_old<(N_old-1))
+			{
+			vec_new(l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(pos) \
+							+ (1.0-rem_t_old)*rem_x_old*vec_old(pos+Nt_old) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(pos+1) \
+							+ rem_t_old*rem_x_old*vec_old(pos+Nt_old+1);
+			}
+		else if (x_old<(N_old-1))
+			{
+			vec_new(l) = (1.0-rem_x_old)*vec_old(pos) + rem_x_old*vec_old(pos+Nt_old);
+			}
+		else
+			{
+			vec_new(l) = vec_old(pos);
+			}
 		}
 	return vec_new;
 	}
@@ -1030,6 +1106,32 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 		{
 		cout << "loadVector error in: " << loadFile << endl;
 		cout << "j+k = " << j+k << endl;
+		}
+	F.close();
+	return outputVec;
+	}
+	
+//load simple vector from file
+vec loadVectorColumn (const string& loadFile, const unsigned int column)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	vec outputVec(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line, temp;
+	unsigned int j=0;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			for (unsigned int l=0; l<column; l++)
+				{
+				ss >> temp;
+				}
+			ss >> outputVec[j];
+			j++;
+			}
 		}
 	F.close();
 	return outputVec;
