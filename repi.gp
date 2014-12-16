@@ -19,6 +19,6 @@ set ylabel "re(t)-im(t)"
 set zlabel "re(phi)"
 set grid
 set hidden3d
-splot f using 3:($1-$2):4 with lines
+splot f using 3:($2-$1):4 with lines
 
 pause -1

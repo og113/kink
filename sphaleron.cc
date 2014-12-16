@@ -61,7 +61,7 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 16.0;
+double r0 = 1.0e-16, r1 = 10.0;
 const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;

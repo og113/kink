@@ -658,6 +658,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp pot_0 = 0.0;
 		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+		
+		//testing that the potential term is working for pot3
+		if (pot[0]=='3' && false)
+			{
+			comp Vtrial = 0.0, Vcontrol = 0.0;
+			for (unsigned int j=0; j<N; j++)
+				{
+				double r = 1.0e-16 + j*a;
+				paramsV  = {r, 0.0};
+				Vcontrol += pow(p(2*j*Nb),2.0)/2.0 - pow(p(2*j*Nb),4.0)/4.0/pow(r,2.0);
+				Vtrial += V(p(2*j*Nb));
+				}
+			double potTest = pow(pow(real(Vcontrol-Vtrial),2.0) + pow(imag(Vcontrol-Vtrial),2.0),0.5);
+			cout << "potTest = " << potTest << endl;
+			}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -670,7 +685,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			long int neighPosX = neigh(j,1,1,Nb,N);
 			if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, A};
+				paramsV  = {1.0e-16+x*a, 0.0};
 				}
 
 			
@@ -691,7 +706,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (pot[0]=='3' && x==0)
 				{
-				DDS.insert(2*j,2*j) = -1.0/a; //dp/dx=0 at r=R
+				DDS.insert(2*j,2*j) = -1.0/a; //dp/dx=1 at r=0
 				DDS.insert(2*j,2*(j+1)) = 1.0/a;
 				DDS.insert(2*j+1,2*j+1) = -1.0/a;
 				DDS.insert(2*j+1,2*(j+1)+1) = 1.0/a;
