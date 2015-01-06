@@ -5,10 +5,10 @@
 100     100     100     32      0.050   1.0     1.61    0.0
 ##
 #inputChoice    fileNumberIn    loopIn    totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
-p               141112074703    20        1           n           100         150         e               0       
+f               150106132505    0         1           n           100         150         e               0       
 ##
-#alpha     open     amp     pot     A     reg
-0.4        1.0      0.4     3n      0.4   0.0
+#alpha     open     amp     pot     A         reg
+0.4        1.0      0.4     3n      0.4       0.0
 ##
 ##negEig inputs
 #P          c           done

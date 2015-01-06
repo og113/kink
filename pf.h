@@ -1314,8 +1314,10 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Ta = Ta*newParameter/Tb;
 		Tc = Tc*newParameter/Tb;
 		Tb = newParameter;
-		angle = asin(Tb/R);
-		if (2.0*(1.5*Tb*tan(angle))<L) { L=2.0*(1.5*Tb*tan(angle));}
+		if (Tb<R){
+			angle = asin(Tb/R);
+			if (2.0*(1.5*Tb*tan(angle))<L) L=2.0*(1.5*Tb*tan(angle));
+			}
 		a = L/(N-1.0);
 		}
 	else if ( parameterLabel.compare("R")==0) //this parameter changes the initial guess

@@ -30,7 +30,9 @@ int main()
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-string timeNumber = currentDateTime();
+bool printTimeNumber = false;
+string timeNumber;
+if (printTimeNumber) timeNumber = currentDateTime();
 
 ifstream fin;
 fin.open("inputs");
@@ -276,8 +278,18 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 		if (negEigDone==0)
 			{
 			cout << "need to run negEig and set negEigDone=1" << endl;
+			return 1;
 			}
-		negVec = loadVector("./data/eigVec.dat",Nb,N,1);
+		unsigned int fileLength = countLines("./data/eigVec.dat");
+		if (fileLength==(N*Nb+1))
+			{
+			negVec = loadVector("./data/eigVec.dat",Nb,N,1);
+			}
+		else
+			{
+			cout << "eigVec not the right length" << endl;
+			return 1;
+			}
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
@@ -699,7 +711,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//boundaries
-			if (pot[0]=='3' && x==(Nb-1))
+			if (pot[0]=='3' && x==(N-1))
 				{
 				DDS.insert(2*j,2*j) = 1.0; //p=0 at r=R
 				DDS.insert(2*j+1,2*j+1) = 1.0;
@@ -944,9 +956,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			paramsV  = {1.0e-16+j*a, A};
 			}
-    	unsigned int l = j*(Na+1);
-        accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
-            -Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+		unsigned int l = j*(Na+1);
+		if (pot[0]=='3' && j==(N-1))
+			{
+			accA(l) = 0.0;
+			}
+		else if (pot[0]=='3' && j==0)
+			{
+			accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
+            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+			}
+    	else
+    		{
+        	accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
+            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+            }
     	}
     	
     //A4.5 starting the energy and that off
@@ -971,10 +995,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				paramsV  = {1.0e-16+x*a, A};
 				}
             unsigned int m = t+x*(Na+1);
-            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
-            -dV(ap(m)) - dVr(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
-            + a*V(ap(m)) + a*Vr(ap(m));
+            if (pot[0]=='3' && x==(N-1))
+				{
+				accA(m) = 0.0;
+				}
+			else if (pot[0]=='3' && x==0)
+				{
+				accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
+            		-dV(ap(m)) - dVr(ap(m));
+            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+            		+ a*V(ap(m)) + a*Vr(ap(m));
+				}
+			else
+				{
+		    	accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
+            		-dV(ap(m)) - dVr(ap(m));
+            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+            		+ a*V(ap(m)) + a*Vr(ap(m));
+		        }
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
@@ -1031,13 +1069,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //#pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
+    	unsigned int l = j*(Nc+1);
     	if (pot[0]=='3')
 			{
 			paramsV  = {1.0e-16+j*a, A};
 			}
-    	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-            -Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+		if (pot[0]=='3' && j==(N-1))
+			{
+			accC(l) = 0.0;
+			}
+		else if (pot[0]=='3' && j==0)
+			{
+			accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+			}
+    	else
+    		{
+        	accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
+            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+            }
     	}
 
     //C7. run loop
@@ -1058,12 +1108,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				paramsV  = {1.0e-16+x*a, A};
 				}
 		    unsigned int l = t+x*(Nc+1);
-		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-		    -dV(ccp(l));
-		    if (t>1)
+		    if (pot[0]=='3' && x==(N-1))
+				{
+				accC(l) = 0.0;
+				}
+			else if (pot[0]=='3' && x==0)
+				{
+				accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+		    		-dV(ccp(l));
+				}
+			else
+				{
+		    	accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
+		    		-dV(ccp(l));
+		        }
+		    if ((t>1) && x!=(N-1))
 		    	{
-		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
-		    	+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
+				erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\
+				 	+ pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
+	    			+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
 			}
 		}
