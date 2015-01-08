@@ -431,7 +431,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp t = coordB(j,0);
 			comp x = coordB(j,1);
 			p(2*j+1) = 0.0; //imaginary parts set to zero
-			if (pot[3]!='3')
+			if (pot[0]!='3')
 				{
 				if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 					{
@@ -640,7 +640,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			unsigned int t = intCoord(j,0,Nb); //coordinates
 			unsigned int neighPosX = neigh(j,1,1,Nb,N);
 			
-			if (absolute(Chi0(j))>1.0e-16) //zero mode lagrange constraint
+			if (absolute(Chi0(j))>1.0e-16 && pot[0]!='3')  //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);

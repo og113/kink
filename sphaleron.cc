@@ -62,7 +62,7 @@ double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
 double r0 = 1.0e-16, r1 = 16.0;
-const unsigned int N = 2e2;
+const unsigned int N = 3e3;
 double dr = r1-r0;
 dr /= (double)N;
 vec y0Vec(N+1), y2Vec(N+1);
