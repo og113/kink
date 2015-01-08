@@ -30,7 +30,9 @@ int main()
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-string timeNumber = currentDateTime();
+bool printTimeNumber = false;
+string timeNumber;
+if (printTimeNumber) timeNumber = currentDateTime();
 
 ifstream fin;
 fin.open("inputs");
@@ -89,6 +91,7 @@ string print_choice = aq.printChoice;
 	//potential functions
 	if (pot[0]=='1')
 		{
+		neigh = &periodic;
 		V = &V1c;
 		dV = &dV1c;
 		ddV = &ddV1c;
@@ -100,6 +103,7 @@ string print_choice = aq.printChoice;
 		}
 	else if (pot[0]=='2')
 		{
+		neigh = &periodic;
 		V = &V2c;
 		dV = &dV2c;
 		ddV = &ddV2c;
@@ -111,6 +115,7 @@ string print_choice = aq.printChoice;
 		}
 	else if (pot[0]=='3')
 		{
+		neigh = &spherical;
 		V = &V3c;
 		dV = &dV3c;
 		ddV = &ddV3c;
@@ -273,8 +278,18 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 		if (negEigDone==0)
 			{
 			cout << "need to run negEig and set negEigDone=1" << endl;
+			return 1;
 			}
-		negVec = loadVector("./data/eigVec.dat",Nb,N,1);
+		unsigned int fileLength = countLines("./data/eigVec.dat");
+		if (fileLength==(N*Nb+1))
+			{
+			negVec = loadVector("./data/eigVec.dat",Nb,N,1);
+			}
+		else
+			{
+			cout << "eigVec not the right length" << endl;
+			return 1;
+			}
 		ifstream eigFile;
 		eigFile.open("./data/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
@@ -421,18 +436,32 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//assigning input phi
 	if (inP.compare("f")!=0 && loop==0)
 		{
-		if (R<alpha)
+		if (pot[0]=='3')
 			{
-			cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
-			}
-		//#pragma omp parallel for
-		for (unsigned int j=0; j<N*Nb; j++)
-			{
-			comp t = coordB(j,0);
-			comp x = coordB(j,1);
-			p(2*j+1) = 0.0; //imaginary parts set to zero
-			if (pot[0]!='3')
+			vec tempPhi = loadVectorColumn("data/instanton00.dat",2);
+			vec temp2Phi;
+			unsigned int length = tempPhi.size();
+			length = (unsigned int)(sqrt(length));
+			temp2Phi = interpolate2(tempPhi,length,length,Nb,N);
+			for (unsigned int j=0; j<N*Nb; j++)
 				{
+				p[2*j] = temp2Phi[j];
+				p[2*j+1] = 0.0;
+				}
+			p[2*Nb*N] = 0.5; //for the zero mode
+			}
+		else
+			{
+			if (R<alpha)
+				{
+				cout << "R is too small. Not possible to give thinwall input. It should be more that " << alpha;
+				}
+			//#pragma omp parallel for
+			for (unsigned int j=0; j<N*Nb; j++)
+				{
+				comp t = coordB(j,0);
+				comp x = coordB(j,1);
+				p(2*j+1) = 0.0; //imaginary parts set to zero
 				if (inP.compare("b")==0 || (inP.compare("p")==0 && Tb>R))
 					{
 					double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
@@ -469,7 +498,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 								rhoPos[k] -= rhoProfile[k];
 								}
 							unsigned int minLoc = smallestLoc(rhoPos);
-		                    p(2*j) = phiProfile[minLoc];
+			                p(2*j) = phiProfile[minLoc];
 							}
 						}
 					if (inP.compare("p")==0)
@@ -503,11 +532,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 						p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
 						}
 					}
-				}
-			else if (pot[0]=='3') //redundant, just for clarity
-				{
-				string loadfile= "data/" + aq.inputTimeNumber + "sphaleronEvo.dat";
-				
 				}
 			}
 		p(2*N*Nb) = 0.5; //initializing Lagrange parameter for removing dp/dx zero mode
@@ -563,7 +587,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
-    if (true)
+    if (pot[0]!='3')
     	{
     	//#pragma omp parallel for
 		for (unsigned int j=0;j<N;j++)
@@ -576,6 +600,14 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
 		    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
 		    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
+			}
+		}
+	else
+		{
+		for (unsigned int j=0;j<Nb;j++)
+			{
+			unsigned int m = j + (N-1)*Nb;
+		    p(2*m) = 0.0; //p=0 ar r=R
 			}
 		}
 		
@@ -604,8 +636,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
-            Chi0(pos) = p(2*neigh(pos,1,1,Nb,N))-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
-            //Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
+			long int neighPos = neigh(pos,1,1,Nb,N);
+			if(neighPos!=-1)
+            	{
+            	Chi0(pos) = p(2*neighPos)-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
+            	//Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
+            	}
+            else
+            	{
+            	Chi0(pos) = 0.0;
+            	}
             }
         if (runs_count==1) //printing Chi0
         	{
@@ -630,6 +670,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp pot_0 = 0.0;
 		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+		
+		//testing that the potential term is working for pot3
+		if (pot[0]=='3' && false)
+			{
+			comp Vtrial = 0.0, Vcontrol = 0.0;
+			for (unsigned int j=0; j<N; j++)
+				{
+				double r = 1.0e-16 + j*a;
+				paramsV  = {r, 0.0};
+				Vcontrol += pow(p(2*j*Nb),2.0)/2.0 - pow(p(2*j*Nb),4.0)/4.0/pow(r,2.0);
+				Vtrial += V(p(2*j*Nb));
+				}
+			double potTest = pow(pow(real(Vcontrol-Vtrial),2.0) + pow(imag(Vcontrol-Vtrial),2.0),0.5);
+			cout << "potTest = " << potTest << endl;
+			}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -638,7 +693,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned long int j = 0; j < N*Nb; j++)
 			{		
 			unsigned int t = intCoord(j,0,Nb); //coordinates
-			unsigned int neighPosX = neigh(j,1,1,Nb,N);
+			unsigned int x = intCoord(j,1,Nb);
+			long int neighPosX = neigh(j,1,1,Nb,N);
+			if (pot[0]=='3')
+				{
+				paramsV  = {1.0e-16+x*a, 0.0};
+				}
+
 			
 			if (absolute(Chi0(j))>1.0e-16 && pot[0]!='3')  //zero mode lagrange constraint
 				{
@@ -649,14 +710,27 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//boundaries			
-			if (t==(Nb-1))
+			//boundaries
+			if (pot[0]=='3' && x==(N-1))
+				{
+				DDS.insert(2*j,2*j) = 1.0; //p=0 at r=R
+				DDS.insert(2*j+1,2*j+1) = 1.0;
+				}
+			else if (pot[0]=='3' && x==0)
+				{
+				DDS.insert(2*j,2*j) = -1.0/a; //dp/dx=1 at r=0
+				DDS.insert(2*j,2*(j+1)) = 1.0/a;
+				DDS.insert(2*j+1,2*j+1) = -1.0/a;
+				DDS.insert(2*j+1,2*(j+1)+1) = 1.0/a;
+				}
+			else if (t==(Nb-1))
 				{
 				comp Dt = -b*i/2.0;
-				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary
+				erg(t+Na) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary	
 				pot_0 += Dt*a*V(Cp(j));
 				pot_r += Dt*a*Vr(Cp(j));
-				erg(t+Na) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
+				
 				
 				DDS.insert(2*j,2*j) = 1.0/b; //zero time derivative
 				DDS.insert(2*j,2*(j-1)) = -1.0/b;
@@ -700,6 +774,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                 	{
                     int sign = pow(-1,k);
                     int direc = (int)(k/2.0);
+                    long int neighb = neigh(j,direc,sign,Nb,N);
                     if (direc == 0)
                     	{
                         minusDS(2*j) += real(a*Cp(j+sign)/dt);
@@ -709,10 +784,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
                         DDS.insert(2*j+1,2*(j+sign)) = -imag(a/dt);
                         DDS.insert(2*j+1,2*(j+sign)+1) = -real(a/dt);
                         }
-                    else
+                    else if (neighb !=-1)
                     	{
-                        unsigned int neighb = neigh(j,direc,sign,Nb,N);
-                        
                         minusDS(2*j) += - real(Dt*Cp(neighb)/a);
                         minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
                         DDS.insert(2*j,2*neighb) = real(Dt/a);
@@ -879,9 +952,25 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //#pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
-    	unsigned int l = j*(Na+1);
-        accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
-            -Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+    	if (pot[0]=='3')
+			{
+			paramsV  = {1.0e-16+j*a, A};
+			}
+		unsigned int l = j*(Na+1);
+		if (pot[0]=='3' && j==(N-1))
+			{
+			accA(l) = 0.0;
+			}
+		else if (pot[0]=='3' && j==0)
+			{
+			accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
+            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+			}
+    	else
+    		{
+        	accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
+            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+            }
     	}
     	
     //A4.5 starting the energy and that off
@@ -901,11 +990,29 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         //#pragma omp parallel for	
         for (unsigned int x=0; x<N; x++)
         	{
+        	if (pot[0]=='3')
+				{
+				paramsV  = {1.0e-16+x*a, A};
+				}
             unsigned int m = t+x*(Na+1);
-            accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
-            -dV(ap(m)) - dVr(ap(m));
-            erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
-            + a*V(ap(m)) + a*Vr(ap(m));
+            if (pot[0]=='3' && x==(N-1))
+				{
+				accA(m) = 0.0;
+				}
+			else if (pot[0]=='3' && x==0)
+				{
+				accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
+            		-dV(ap(m)) - dVr(ap(m));
+            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+            		+ a*V(ap(m)) + a*Vr(ap(m));
+				}
+			else
+				{
+		    	accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
+            		-dV(ap(m)) - dVr(ap(m));
+            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+            		+ a*V(ap(m)) + a*Vr(ap(m));
+		        }
             for (unsigned int y=0; y<N; y++)
             	{
             	unsigned int n = t + y*(Na+1);
@@ -963,8 +1070,24 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-        accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-            -Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+    	if (pot[0]=='3')
+			{
+			paramsV  = {1.0e-16+j*a, A};
+			}
+		if (pot[0]=='3' && j==(N-1))
+			{
+			accC(l) = 0.0;
+			}
+		else if (pot[0]=='3' && j==0)
+			{
+			accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+			}
+    	else
+    		{
+        	accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
+            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+            }
     	}
 
     //C7. run loop
@@ -980,13 +1103,30 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//#pragma omp parallel for
 		for (unsigned int x=0; x<N; x++)
 			{
+			if (pot[0]=='3')
+				{
+				paramsV  = {1.0e-16+x*a, A};
+				}
 		    unsigned int l = t+x*(Nc+1);
-		    accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-		    -dV(ccp(l));
-		    if (t>1)
+		    if (pot[0]=='3' && x==(N-1))
+				{
+				accC(l) = 0.0;
+				}
+			else if (pot[0]=='3' && x==0)
+				{
+				accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+		    		-dV(ccp(l));
+				}
+			else
+				{
+		    	accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
+		    		-dV(ccp(l));
+		        }
+		    if ((t>1) && x!=(N-1))
 		    	{
-		    	erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0 + pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
-		    	+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
+				erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\
+				 	+ pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
+	    			+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
 			}
 		}

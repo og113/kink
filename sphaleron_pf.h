@@ -80,6 +80,8 @@ int funcPDE (double t, const double y[], double f[], void *params)
 	double sigma = (parameters->sigma);
 	double dx = (x1-x0), x;
 	dx /= (double)Nx;
+	unsigned int yLength = (unsigned int)(sizeof(y)/sizeof(*y));
+	if (yLength!=2*Nx){printf("funcPDE error: yLength = %i",yLength);}
 	f[0] = y[1];
 	f[1] = 2.0*(y[2]-y[0])/pow(dx,2.0) - y[0] + pow(y[0],3.0);
 	f[1] *= sigma;
@@ -160,6 +162,46 @@ double absolute (const double& amplitude)
 	return abs_amplitude;
 	}
 
+//some simple vector functions
+vector<double> vecEquate(const vector<double> & vecB)
+	{
+	unsigned int length = vecB.size();
+	vector<double> vecA(length);
+	for (unsigned int j=0; j<length; j++)
+		{
+		vecA[j] = vecB[j];
+		}
+	return vecA;
+	}
+
+vector<double> vecSum(const vector<double> & vecB, const vector<double> & vecA)
+	{
+	unsigned int lengthA = vecA.size();
+	unsigned int lengthB = vecB.size();
+	if (lengthA!=lengthB)
+		{
+		printf("vecSum error: vector sizes do not agree: lengthA = %i, lengthB = %i\n",lengthA,lengthB);
+		return vecA;
+		}
+	vector<double> vecC(lengthA);
+	for (unsigned int j=0; j<lengthA; j++)
+		{
+		vecC[j] = vecA[j] + vecB[j];
+		}
+	return vecC;
+	}
+	
+vector<double> vecMultiply(const vector<double> & vecA, const double alpha)
+	{
+	unsigned int lengthA = vecA.size();
+	vector<double> vecB(lengthA);
+	for (unsigned int j=0; j<lengthA; j++)
+		{
+		vecB[j] = alpha*vecA[j];
+		}
+	return vecB;
+	}
+
 //simple function to print a vector to file	
 void simplePrintVector(const string& printFile, vec vecToPrint)
 	{
@@ -219,7 +261,7 @@ double EIntegrand (double x, void * parameters)
 	{
 	if (x<0.0)
 		{
-		printf ("error in EIntegrand, R<0");
+		printf ("error in EIntegrand, R<0\n");
 		return 0.0;
 		}
 	else
@@ -332,7 +374,55 @@ vec loadSimpleVector (const string& loadFile)
 		if (!line.empty())
 			{
 			istringstream ss(line);
-			ss >> outputVec(j);
+			ss >> outputVec[j];
+			j++;
+			}
+		}
+	F.close();
+	return outputVec;
+	}
+	
+//load simple vector from file
+vec loadSimpleVectorColumn (const string& loadFile, const unsigned int column)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	vec outputVec(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line, temp;
+	unsigned int j=0;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			for (unsigned int l=0; l<column; l++)
+				{
+				ss >> temp;
+				}
+			ss >> outputVec[j];
+			j++;
+			}
+		}
+	F.close();
+	return outputVec;
+	}
+	
+//load simple vector from file
+vector<double> loadSimpleVector2 (const string& loadFile)
+	{
+	unsigned int fileLength = countLines(loadFile);
+	vector<double> outputVec(fileLength);
+	fstream F;
+	F.open((loadFile).c_str(), ios::in);
+	string line;
+	unsigned int j=0;
+	while (getline(F, line))
+		{
+		if (!line.empty())
+			{
+			istringstream ss(line);
+			ss >> outputVec[j];
 			j++;
 			}
 		}
@@ -369,8 +459,8 @@ void gp(const string & readFile, const string & gnuplotFile)
 	{
 	string prefix = "gnuplot -e \"f='";
 	string middle = "'\" ";
-	//string suffix = " -persistent";
-	string commandStr = prefix + readFile + middle + gnuplotFile;// + suffix;
+	string suffix = " -persistent";
+	string commandStr = prefix + readFile + middle + gnuplotFile + suffix;
 	const char * command = commandStr.c_str();
 	FILE * gnuplotPipe = popen (command,"w");
 	fprintf(gnuplotPipe, "%s \n", " ");
@@ -479,18 +569,59 @@ vector<double> interpolate2(vector<double> vec_old, const unsigned int & Nt_old,
 	return vec_new;
 	}
 	
+//same function but 1d	
+vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<N_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old = " << N_old << endl;}
+	vec vec_new (N_new);
+	
+	unsigned int x_old;
+	double exact_x_old, rem_x_old;
+	
+	for (unsigned int l=0;l<N_new;l++)
+		{
+		exact_x_old = l*(N_old-1.0)/(N_new-1.0);
+		x_old = (unsigned int)exact_x_old;
+		rem_x_old = exact_x_old - (double)(x_old);
+		if  (x_old<(N_old-1))
+			{
+			vec_new[l] = (1.0-rem_x_old)*vec_old[x_old] \
+							+ rem_x_old*vec_old[x_old+1];
+			}
+		else
+			{
+			vec_new[l] = vec_old[x_old];
+			}
+		}
+	return vec_new;
+	}
+	
 //a function to make a vector defined in 2d equal to one defined in 1d on a given timeslice
 void equateSlice(vec vec2d, vec vec1d, const unsigned int & Ntime, const unsigned int & Nspace, const unsigned int & tSlice)
 	{
 	if (vec2d.size()!=Ntime*Nspace || vec1d.size()!=Nspace)
 		{
-		printf("equateSlice error: vec2d.length() = %i, vec1d.length() = %i\nNtime = %i, Nspace = %i",(int)(vec2d.size()),(int)(vec1d.size()),Ntime,Nspace);
+		printf("equateSlice error: vec2d.length() = %i, vec1d.length() = %i\nNtime = %i, Nspace = %i\n",(int)(vec2d.size()),(int)(vec1d.size()),Ntime,Nspace);
 		}
 	for (unsigned int l=0;l<Nspace;l++)
 		{
 		unsigned int m = tSlice + Ntime*l;
 		vec2d(m) = vec1d(l);
 		}
+	}
+	
+//function to reverse time direction of a vector
+vec reverseTime(vec inVec, const unsigned int & Nt, const unsigned int & Nx)
+	{
+	vec outVec(Nx*Nt);
+	for (unsigned int j=0; j<Nx*Nt; j++)
+		{
+		unsigned int x = intCoord(j,1,Nt), t = intCoord(j,0,Nt);
+		unsigned int m = t + x*Nt, n = (Nt-1-t) + x*Nt;
+		outVec[n] = inVec[m];
+		}
+	return outVec;
 	}
 	
 //getting the date and time
