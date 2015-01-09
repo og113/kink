@@ -707,7 +707,7 @@ long int periodic(const lint& locNum, const unsigned int& direction, const signe
 //spherical system, reflective at r=0, nothing at r=R
 long int spherical(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
 	{
-	long int neighLocation; 
+	long int neighLocation = -1; 
 	unsigned int c = intCoord(locNum,direction,xNt);
 	if (direction==0)
 		{
@@ -804,19 +804,37 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 		pos = t_old + Nt_old*x_old;
 		if  (t_old<(Nt_old-1) )
 			{
-			vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
+			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+				{
+				vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
 							+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)) \
 							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)) \
 							+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1));
-			vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
+				vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
 			 				+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1) \
 							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)+1)\
 						 	+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1)+1);
+				}
+			else
+				{
+				vec_new(2*l) = (1.0-rem_t_old)*vec_old(2*pos) \
+							+ rem_t_old*vec_old(2*(pos+1));
+				vec_new(2*l+1) = (1.0-rem_t_old)*vec_old(2*pos+1)\
+							+ rem_t_old*vec_old(2*(pos+1)+1);
+				}
 			}
 		else
 			{
-			vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
-			vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+				{
+				vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
+				vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+				}
+			else
+				{
+				vec_new(2*l) = vec_old(2*pos);
+				vec_new(2*l+1) = vec_old(2*pos+1);
+				}
 			}
 		}
 	for (unsigned int l=0; l<zero_modes; l++)

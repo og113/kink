@@ -69,6 +69,7 @@ defining main vectors
 vec phi(N*Nt); phi = Eigen::VectorXd::Zero(N*Nt);
 vec sphaleron = interpolate1d(sphaleronFull,sphaleronFull.size(),N);
 vec negEig = interpolate1d(negEigFull,sphaleronFull.size(),N);
+if (negEig[0]<0) negEig *= -1.0;
 
 /* ---------------------------------------------------------------------------------------------
 constructing intial guess for phi

@@ -30,7 +30,7 @@ int main()
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-bool printTimeNumber = false;
+bool printTimeNumber = true;
 string timeNumber;
 if (printTimeNumber) timeNumber = currentDateTime();
 
@@ -207,7 +207,7 @@ string print_choice = aq.printChoice;
 	unsigned int profileSize = Nb; //more than the minimum
 	vector<double> phiProfile(profileSize);
 	vector<double> rhoProfile(profileSize);
-	double alphaL, alphaR;
+	double alphaL = 0, alphaR = 0;
 
 	if (pot[0]!='3')
 		{
@@ -677,7 +677,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp Vtrial = 0.0, Vcontrol = 0.0;
 			for (unsigned int j=0; j<N; j++)
 				{
-				double r = 1.0e-16 + j*a;
+				double r = r0 + j*a;
 				paramsV  = {r, 0.0};
 				Vcontrol += pow(p(2*j*Nb),2.0)/2.0 - pow(p(2*j*Nb),4.0)/4.0/pow(r,2.0);
 				Vtrial += V(p(2*j*Nb));
@@ -697,16 +697,16 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			long int neighPosX = neigh(j,1,1,Nb,N);
 			if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, 0.0};
+				paramsV  = {r0+x*a, 0.0};
 				}
 
 			
-			if (absolute(Chi0(j))>1.0e-16) //zero mode lagrange constraint
+			if ((absolute(Chi0(j))>1.0e-16) && pot[0]!='3') //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
-		    	minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
-		    	minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j);
+				minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
+				minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j);
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -806,6 +806,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
+        if (pot[0]=='3') DDS.insert(2*N*Nb,2*N*Nb) = 1.0;
         action = kineticT - kineticS - pot_0 - pot_r;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -954,7 +955,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
     	if (pot[0]=='3')
 			{
-			paramsV  = {1.0e-16+j*a, A};
+			paramsV  = {r0+j*a, A};
 			}
 		unsigned int l = j*(Na+1);
 		if (pot[0]=='3' && j==(N-1))
@@ -992,7 +993,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	{
         	if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, A};
+				paramsV  = {r0+x*a, A};
 				}
             unsigned int m = t+x*(Na+1);
             if (pot[0]=='3' && x==(N-1))
@@ -1072,7 +1073,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	unsigned int l = j*(Nc+1);
     	if (pot[0]=='3')
 			{
-			paramsV  = {1.0e-16+j*a, A};
+			paramsV  = {r0+j*a, A};
 			}
 		if (pot[0]=='3' && j==(N-1))
 			{
@@ -1105,7 +1106,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, A};
+				paramsV  = {r0+x*a, A};
 				}
 		    unsigned int l = t+x*(Nc+1);
 		    if (pot[0]=='3' && x==(N-1))
