@@ -24,15 +24,14 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-bool printTimeNumber = true;
 string timeNumber;
-if (printTimeNumber) timeNumber = currentDateTime();
+(argc==2) ? timeNumber = argv[1] : timeNumber = currentDateTime();
 
 ifstream fin;
 fin.open("inputs");
@@ -642,10 +641,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             	Chi0(pos) = p(2*neighPos)-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
             	//Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
             	}
-            else
-            	{
-            	Chi0(pos) = 0.0;
-            	}
             }
         if (runs_count==1) //printing Chi0
         	{
@@ -844,13 +839,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if(solver.info()!=Eigen::Success)
 			{
 			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
-			return 0;
+			return 1;
 			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
 			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
-			return 0;
+			return 1;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
@@ -858,7 +853,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
 			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
 			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
-			return 0;
+			return 1;
 			}
 		
 		//independent check on whether calculation worked
@@ -871,7 +866,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			cout << "Calculation failed" << endl;
 			cout << "calc_test = " << calc_test.back() << endl;
-			return 0;
+			return 1;
 			}
 
 		//assigning values to phi
