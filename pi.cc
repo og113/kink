@@ -91,6 +91,7 @@ string print_choice = aq.printChoice;
 	if (pot[0]=='1')
 		{
 		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V1c;
 		dV = &dV1c;
 		ddV = &ddV1c;
@@ -103,6 +104,7 @@ string print_choice = aq.printChoice;
 	else if (pot[0]=='2')
 		{
 		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V2c;
 		dV = &dV2c;
 		ddV = &ddV2c;
@@ -115,6 +117,7 @@ string print_choice = aq.printChoice;
 	else if (pot[0]=='3')
 		{
 		neigh = &spherical;
+		simpleSpace = &simpleSpaceSphere;
 		V = &V3c;
 		dV = &dV3c;
 		ddV = &ddV3c;
@@ -206,7 +209,7 @@ string print_choice = aq.printChoice;
 	unsigned int profileSize = Nb; //more than the minimum
 	vector<double> phiProfile(profileSize);
 	vector<double> rhoProfile(profileSize);
-	double alphaL = 0, alphaR = 0;
+	double alphaL = alpha, alphaR = alpha;
 
 	if (pot[0]!='3')
 		{
@@ -537,16 +540,18 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	else
 		{
-		string loadfile;
+		string loadfile, inputsFile;
 		if (inP.compare("f")==0)
 			{
 			loadfile = "./data/" + aq.inputTimeNumber + "pip_" + aq.inputLoop + ".dat";
 			cout << "input: " << loadfile << endl;
 			inP = "p";
+			inputsFile = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
 			}
 		else
 			{
 			loadfile = "./data/" + timeNumber + "pi"+inP+"_" + numberToString<int>(loop-1)+".dat";
+			inputsFile = "./data/" + timeNumber + "inputsPi_" + numberToString<int>(loop-1);
 			}
 		unsigned int fileLength = countLines(loadfile);
 		if (fileLength==(N*Nb+1))
@@ -557,9 +562,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			unsigned int Nin, Ntin;
 			//cout << "interpolating input, filelength = " << fileLength << " , Cp.size() = " << N*Nb+1 << endl;
-			string inputsF = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
 			ifstream fin;
-			fin.open(inputsF.c_str());
+			fin.open(inputsFile.c_str());
 			if (fin.is_open())
 				{
 				string line, temp;
@@ -574,7 +578,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					break;
 					}
 				}
-			else{cout << "unable to open " << inputsF << endl;}
+			else{cout << "unable to open " << inputsFile << endl;}
 			fin.close();
 			vec temp_p = loadVector(loadfile,Ntin,Nin,1);
 			p = interpolate(temp_p,Ntin,Nin,Nb,N);
@@ -602,8 +606,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
 		for (unsigned int j=0;j<Nb;j++)
 			{
+			unsigned int l0 = c(j,0,Nb);
 			unsigned int m = c(j,N-1,Nb);
+			p(2*l0) = 0.0; // p=0 ar r=0
+			p(2*l0+1) = 0.0;
 		    p(2*m) = 0.0; //p=0 ar r=R
+		    p(2*m+1) = 0.0;
 			}
 		}
 		
@@ -710,10 +718,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (pot[0]=='3' && x==0)
 				{
-				DDS.insert(2*j,2*j) = -1.0/a; // dp/dx=0 at r=0
-				DDS.insert(2*j,2*(j+1)) = 1.0/a;
-				DDS.insert(2*j+1,2*j+1) = -1.0/a;
-				DDS.insert(2*j+1,2*(j+1)+1) = 1.0/a;
+				DDS.insert(2*j,2*j) = 1.0; // p=0 at r=0
+				DDS.insert(2*j+1,2*j+1) = 1.0;
 				}
 			else if (t==(Nb-1))
 				{
@@ -835,21 +841,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
+			cerr << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
 			return 1;
 			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
-			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
+			cerr << "Factorization failed, solver.info() = "<< solver.info() << endl;
 			return 1;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
-			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
-			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
+			cerr << "Solving failed, solver.info() = "<< solver.info() << endl;
+			cerr << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+			cerr << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
 			return 1;
 			}
 		
@@ -1213,6 +1219,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string pifile = prefix + "pi"+inP+suffix;
 	printVectorB(pifile,p);
 	printf("%12s%30s\n"," ",pifile.c_str());
+	gp(pifile,"repi.gp");
 	
 	//printing output phi on whole time contour
 	string tpifile = prefix + "tpi"+inP+suffix;

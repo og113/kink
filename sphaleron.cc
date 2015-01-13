@@ -51,7 +51,8 @@ using namespace std;
 int main()
 {
 //defining the time to label output
-string timeNumber = currentDateTime();
+string timeNumber;
+if (false) timeNumber = currentDateTime();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //solving 1d boundary value problem via shooting method
 paramsVoid = {};
@@ -154,7 +155,7 @@ else { cout << "E = " << E << endl << endl;}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //computing and printing linear fluctuation operator as sparse matrix
 //in order to calulate negative eigenvalue and eigenvector
-if (true)
+if (false)
 	{
 	spMat D1(N+1,N+1), D2(N+1,N+1);
 	D1.setZero();
@@ -207,7 +208,7 @@ printf("             D2 gives omega^2_- = -15.34\n\n");
 
 mat omega(N+1,N+1);
 mat Eomega(N+1,N+1);
-if (true)
+if (false)
 	{
 	//h_ij matrix
 	mat h(N+1,N+1);
@@ -301,6 +302,7 @@ erg = Eigen::VectorXd::Zero(Nt+1);
 eigVec = loadSimpleVector("data/sphaleronEigVec.dat"); //normalized to 1
 
 if (eigVec.size()!=(N+1)){ printf("eigVec.size() = %i. Redo Matlab calculation of eigVec.\n\n",(int)(eigVec.size())); return 0;}
+if (eigVec[0]<0) eigVec *= -1.0;
 
 //initial condition 1)
 //defining phi on initial time slice

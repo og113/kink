@@ -598,10 +598,20 @@ comp simpleTime (const unsigned int& time)
 	return xTime;
 	}
 	
-//simple space
-double simpleSpace (const unsigned int& space)
+//simple space functions
+double (*simpleSpace) (const unsigned int& space);	
+
+//simple space for a box
+double simpleSpaceBox (const unsigned int& space)
 	{
 	double xSpace = -L/2.0 + space*a;
+	return xSpace;
+	}
+	
+//simple space for a sphere
+double simpleSpaceSphere (const unsigned int& space)
+	{
+	double xSpace = space*a;
 	return xSpace;
 	}
 	
