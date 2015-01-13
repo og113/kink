@@ -30,7 +30,7 @@ int main()
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-bool printTimeNumber = false;
+bool printTimeNumber = true;
 string timeNumber;
 if (printTimeNumber) timeNumber = currentDateTime();
 
@@ -207,7 +207,7 @@ string print_choice = aq.printChoice;
 	unsigned int profileSize = Nb; //more than the minimum
 	vector<double> phiProfile(profileSize);
 	vector<double> rhoProfile(profileSize);
-	double alphaL, alphaR;
+	double alphaL = alpha, alphaR = alpha;
 
 	if (pot[0]!='3')
 		{
@@ -701,7 +701,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 
 			
-			if (absolute(Chi0(j))>1.0e-16 && pot[0]!='3')  //zero mode lagrange constraint
+			if (absolute(Chi0(j))>1.0e-16)  //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
@@ -842,21 +842,21 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		solver.analyzePattern(DDS);
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
+			cerr << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
 			return 0;
 			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
-			cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
+			cerr << "Factorization failed, solver.info() = "<< solver.info() << endl;
 			return 0;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
 			{
-			cout << "Solving failed, solver.info() = "<< solver.info() << endl;
-			cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
-			cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
+			cerr << "Solving failed, solver.info() = "<< solver.info() << endl;
+			cerr << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+			cerr << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
 			return 0;
 			}
 		

@@ -707,7 +707,7 @@ long int periodic(const lint& locNum, const unsigned int& direction, const signe
 //spherical system, reflective at r=0, nothing at r=R
 long int spherical(const lint& locNum, const unsigned int& direction, const signed int& sign, const unsigned int& xNt, const unsigned int & xNx) //periodic in space but not time, degree refers to the number of neighbours, 1 is for just positive neighbours, 2 is for both
 	{
-	long int neighLocation; 
+	long int neighLocation = -1; 
 	unsigned int c = intCoord(locNum,direction,xNt);
 	if (direction==0)
 		{

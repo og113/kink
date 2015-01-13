@@ -49,6 +49,7 @@ if (sphaleron.size()!=negEig.size())
 	printf("error: sphaleron.size() = %i, negEig.size() = %i\n\n",(int)sphaleron.size(),(int)negEig.size());
 	return 0;
 	}
+if (negEig[0]<0) negEig *= -1.0;
 
 /* ---------------------------------------------------------------------------------------------
 main parameters
