@@ -424,7 +424,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					djdk=a;
 					}
-				if (j==0 || j==N || k==0 || k==N) {djdk/=2.0;}
+				if (j==0 || j==(N-1) || k==0 || k==(N-1)) {djdk/=2.0;}
 				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 				}
@@ -586,26 +586,23 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
+	//#pragma omp parallel for
+	for (unsigned int j=0;j<N;j++)
+		{
+	    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
+	    p(2*(j*Nb+1)) = p(2*j*Nb);
+	    p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
+	    p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
+	    p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
+	    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
+	    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
+	    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
+		}
     if (pot[0]!='3')
     	{
-    	//#pragma omp parallel for
-		for (unsigned int j=0;j<N;j++)
-			{
-		    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
-		    p(2*(j*Nb+1)) = p(2*j*Nb);
-		    p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
-		    p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
-		    p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
-		    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
-		    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
-		    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
-			}
-		}
-	else
-		{
 		for (unsigned int j=0;j<Nb;j++)
 			{
-			unsigned int m = j + (N-1)*Nb;
+			unsigned int m = c(j,N-1,Nb);
 		    p(2*m) = 0.0; //p=0 ar r=R
 			}
 		}
@@ -708,12 +705,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			//boundaries
 			if (pot[0]=='3' && x==(N-1))
 				{
-				DDS.insert(2*j,2*j) = 1.0; //p=0 at r=R
+				DDS.insert(2*j,2*j) = 1.0; // p=0 at r=R
 				DDS.insert(2*j+1,2*j+1) = 1.0;
 				}
 			else if (pot[0]=='3' && x==0)
 				{
-				DDS.insert(2*j,2*j) = -1.0/a; //dp/dx=1 at r=0
+				DDS.insert(2*j,2*j) = -1.0/a; // dp/dx=0 at r=0
 				DDS.insert(2*j,2*(j+1)) = 1.0/a;
 				DDS.insert(2*j+1,2*j+1) = -1.0/a;
 				DDS.insert(2*j+1,2*(j+1)+1) = 1.0/a;
@@ -1198,7 +1195,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//copying a version of inputs with timeNumber
 	string runInputs = prefix + "inputsPi" + "_" + numberToString<unsigned int>(loop);
-	if (loop_choice[0]=='N')
+	if (loop_choice[0] == 'N')
 		{
 		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(intLoopParameter));
 		}

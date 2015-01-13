@@ -551,6 +551,11 @@ void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xE
 
 //lattice functions
 
+//inverse of intCoord
+unsigned int c(const unsigned int& t, const unsigned int& x, const unsigned int& Nt) {
+	return t + x*Nt;
+}
+
 //function which find integer coordinates in 2d
 unsigned int intCoord(const unsigned int& locNum, const int& direction, const unsigned int& xNt)
 	{
@@ -1282,15 +1287,15 @@ void changeInt (const string & parameterLabel, const int & newParameter)
 	{
 	if ( parameterLabel.compare("N")==0)
 		{
-		Na = (int)newParameter*Na/N;
-		Nb = (int)newParameter*Nb/N;
-		Nc = (int)newParameter*Nc/N;
-		NT = Na + Nb + Nc;
+		//Na = (int)newParameter*Na/N;
+		//Nb = (int)newParameter*Nb/N;
+		//Nc = (int)newParameter*Nc/N;
+		//NT = Na + Nb + Nc;
 		N = newParameter;
 		a = L/(N-1);
-		b = Tb/(Nb-1);
-		Ta = b*(Na-1.0);
-		Tc = b*(Nc-1.0);
+		//b = Tb/(Nb-1);
+		//Ta = b*(Na-1.0);
+		//Tc = b*(Nc-1.0);
 		}
 	else if ( parameterLabel.compare("Na")==0)
 		{

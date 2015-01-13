@@ -212,14 +212,15 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 	}
 	
 //copy inputs with a change
-void changeInputs(const string & outputFile, const string & search, const string & replace)
-	{ 
+void changeInputs(const string & outputFile, string search, string replace)
+	{
+	search += " ";
 	ifstream fin;
 	ofstream fout;
 	fin.open("inputs");
 	fout.open(outputFile.c_str());
 	string line;
-	size_t pos;
+	size_t pos, posEnd, replaceLength = replace.length();
 	while(!fin.eof())
 		{
 		getline(fin,line);
@@ -235,6 +236,10 @@ void changeInputs(const string & outputFile, const string & search, const string
 			getline(fin,line);
 			if (pos != string::npos)
 				{
+				posEnd = line.find(" ",pos);
+				if ((posEnd-pos)>replaceLength) {
+					for (unsigned int j=0; j<(posEnd-pos-replaceLength); j++) replace += " ";
+				}	
 				line.replace(pos, replace.length(), replace);
 				}
 			}
