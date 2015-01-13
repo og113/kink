@@ -18,14 +18,23 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //putting together filename from questions
 
 string filename, id, method;
-cout << "filename/n: ";
-cin >> filename;
+if (argc==1) {
+	cout << "filename/n: ";
+	cin >> filename;
+}
+else if (argc==2) {
+	filename = argv[1];
+}
+else if (argc==3) {
+	filename = argv[1];
+	method = argv[2];
+}
 if (filename.compare("n")==0)
 	{
 	filename = "";
@@ -74,7 +83,7 @@ if (filename.compare("n")==0)
 	cout << "trimmed id: " << id << endl;
 	cout << endl;
 	}
-else
+else if (method.empty())
 	{
 	cout << "printing method: simple or vector (s/v): ";
 	cin >> method;

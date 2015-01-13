@@ -24,15 +24,14 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //getting variables and user inputs from inputs
 
 //defining the time to label output
-bool printTimeNumber = true;
 string timeNumber;
-if (printTimeNumber) timeNumber = currentDateTime();
+(argc==2) ? timeNumber = argv[1] : timeNumber = currentDateTime();
 
 ifstream fin;
 fin.open("inputs");
@@ -92,6 +91,7 @@ string print_choice = aq.printChoice;
 	if (pot[0]=='1')
 		{
 		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V1c;
 		dV = &dV1c;
 		ddV = &ddV1c;
@@ -104,6 +104,7 @@ string print_choice = aq.printChoice;
 	else if (pot[0]=='2')
 		{
 		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V2c;
 		dV = &dV2c;
 		ddV = &ddV2c;
@@ -116,6 +117,7 @@ string print_choice = aq.printChoice;
 	else if (pot[0]=='3')
 		{
 		neigh = &spherical;
+		simpleSpace = &simpleSpaceSphere;
 		V = &V3c;
 		dV = &dV3c;
 		ddV = &ddV3c;
@@ -425,7 +427,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					djdk=a;
 					}
-				if (j==0 || j==N || k==0 || k==N) {djdk/=2.0;}
+				if (j==0 || j==(N-1) || k==0 || k==(N-1)) {djdk/=2.0;}
 				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 				}
@@ -538,16 +540,18 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	else
 		{
-		string loadfile;
+		string loadfile, inputsFile;
 		if (inP.compare("f")==0)
 			{
 			loadfile = "./data/" + aq.inputTimeNumber + "pip_" + aq.inputLoop + ".dat";
 			cout << "input: " << loadfile << endl;
 			inP = "p";
+			inputsFile = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
 			}
 		else
 			{
 			loadfile = "./data/" + timeNumber + "pi"+inP+"_" + numberToString<int>(loop-1)+".dat";
+			inputsFile = "./data/" + timeNumber + "inputsPi_" + numberToString<int>(loop-1);
 			}
 		unsigned int fileLength = countLines(loadfile);
 		if (fileLength==(N*Nb+1))
@@ -558,9 +562,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			unsigned int Nin, Ntin;
 			//cout << "interpolating input, filelength = " << fileLength << " , Cp.size() = " << N*Nb+1 << endl;
-			string inputsF = "./data/" + aq.inputTimeNumber + "inputsPi_" + aq.inputLoop;
 			ifstream fin;
-			fin.open(inputsF.c_str());
+			fin.open(inputsFile.c_str());
 			if (fin.is_open())
 				{
 				string line, temp;
@@ -575,7 +578,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					break;
 					}
 				}
-			else{cout << "unable to open " << inputsF << endl;}
+			else{cout << "unable to open " << inputsFile << endl;}
 			fin.close();
 			vec temp_p = loadVector(loadfile,Ntin,Nin,1);
 			p = interpolate(temp_p,Ntin,Nin,Nb,N);
@@ -587,27 +590,28 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		}
 	
 	//fixing input periodic instanton to have zero time derivative at time boundaries
+	//#pragma omp parallel for
+	for (unsigned int j=0;j<N;j++)
+		{
+	    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
+	    p(2*(j*Nb+1)) = p(2*j*Nb);
+	    p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
+	    p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
+	    p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
+	    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
+	    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
+	    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
+		}
     if (pot[0]!='3')
     	{
-    	//#pragma omp parallel for
-		for (unsigned int j=0;j<N;j++)
-			{
-		    p(2*j*Nb) = (1.0-open)*p(2*j*Nb) + open*p(2*(j*Nb+1)); //initial time real
-		    p(2*(j*Nb+1)) = p(2*j*Nb);
-		    p(2*j*Nb+1) = (1.0-open)*p(2*j*Nb+1) + open*p(2*(j*Nb+1)+1); //initial time imag
-		    p(2*(j*Nb+1)+1) = p(2*j*Nb+1);
-		    p(2*((j+1)*Nb-1)) = open*p(2*((j+1)*Nb-2)) + (1.0-open)*p(2*((j+1)*Nb-1)); //final time real
-		    p(2*((j+1)*Nb-2)) = p(2*((j+1)*Nb-1));
-		    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
-		    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
-			}
-		}
-	else
-		{
 		for (unsigned int j=0;j<Nb;j++)
 			{
-			unsigned int m = j + (N-1)*Nb;
+			unsigned int l0 = c(j,0,Nb);
+			unsigned int m = c(j,N-1,Nb);
+			p(2*l0) = 0.0; // p=0 ar r=0
+			p(2*l0+1) = 0.0;
 		    p(2*m) = 0.0; //p=0 ar r=R
+		    p(2*m+1) = 0.0;
 			}
 		}
 		
@@ -642,10 +646,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
             	Chi0(pos) = p(2*neighPos)-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
             	//Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
             	}
-            else
-            	{
-            	Chi0(pos) = 0.0;
-            	}
             }
         if (runs_count==1) //printing Chi0
         	{
@@ -677,7 +677,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			comp Vtrial = 0.0, Vcontrol = 0.0;
 			for (unsigned int j=0; j<N; j++)
 				{
-				double r = 1.0e-16 + j*a;
+				double r = r0 + j*a;
 				paramsV  = {r, 0.0};
 				Vcontrol += pow(p(2*j*Nb),2.0)/2.0 - pow(p(2*j*Nb),4.0)/4.0/pow(r,2.0);
 				Vtrial += V(p(2*j*Nb));
@@ -697,31 +697,29 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			long int neighPosX = neigh(j,1,1,Nb,N);
 			if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, 0.0};
+				paramsV  = {r0+x*a, 0.0};
 				}
 
 			
-			if (absolute(Chi0(j))>1.0e-16)  //zero mode lagrange constraint
+			if ((absolute(Chi0(j))>1.0e-16) && pot[0]!='3') //zero mode lagrange constraint
 				{
 				DDS.insert(2*j,2*N*Nb) = a*Chi0(j); 
 				DDS.insert(2*N*Nb,2*j) = a*Chi0(j);
-		    	minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
-		    	minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j);
+				minusDS(2*j) += -a*Chi0(j)*p(2*N*Nb);
+				minusDS(2*N*Nb) += -a*Chi0(j)*p(2*j);
 		    	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//boundaries
 			if (pot[0]=='3' && x==(N-1))
 				{
-				DDS.insert(2*j,2*j) = 1.0; //p=0 at r=R
+				DDS.insert(2*j,2*j) = 1.0; // p=0 at r=R
 				DDS.insert(2*j+1,2*j+1) = 1.0;
 				}
 			else if (pot[0]=='3' && x==0)
 				{
-				DDS.insert(2*j,2*j) = -1.0/a; //dp/dx=1 at r=0
-				DDS.insert(2*j,2*(j+1)) = 1.0/a;
-				DDS.insert(2*j+1,2*j+1) = -1.0/a;
-				DDS.insert(2*j+1,2*(j+1)+1) = 1.0/a;
+				DDS.insert(2*j,2*j) = 1.0; // p=0 at r=0
+				DDS.insert(2*j+1,2*j+1) = 1.0;
 				}
 			else if (t==(Nb-1))
 				{
@@ -806,6 +804,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
+        if (pot[0]=='3') DDS.insert(2*N*Nb,2*N*Nb) = 1.0;
         action = kineticT - kineticS - pot_0 - pot_r;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -843,13 +842,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		if(solver.info()!=Eigen::Success)
 			{
 			cerr << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
-			return 0;
+			return 1;
 			}		
 		solver.factorize(DDS);
 		if(solver.info()!=Eigen::Success) 
 			{
 			cerr << "Factorization failed, solver.info() = "<< solver.info() << endl;
-			return 0;
+			return 1;
 			}
 		delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 		if(solver.info()!=Eigen::Success)
@@ -857,7 +856,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			cerr << "Solving failed, solver.info() = "<< solver.info() << endl;
 			cerr << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
 			cerr << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
-			return 0;
+			return 1;
 			}
 		
 		//independent check on whether calculation worked
@@ -870,7 +869,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			cout << "Calculation failed" << endl;
 			cout << "calc_test = " << calc_test.back() << endl;
-			return 0;
+			return 1;
 			}
 
 		//assigning values to phi
@@ -954,7 +953,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	{
     	if (pot[0]=='3')
 			{
-			paramsV  = {1.0e-16+j*a, A};
+			paramsV  = {r0+j*a, A};
 			}
 		unsigned int l = j*(Na+1);
 		if (pot[0]=='3' && j==(N-1))
@@ -992,7 +991,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         	{
         	if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, A};
+				paramsV  = {r0+x*a, A};
 				}
             unsigned int m = t+x*(Na+1);
             if (pot[0]=='3' && x==(N-1))
@@ -1072,7 +1071,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     	unsigned int l = j*(Nc+1);
     	if (pot[0]=='3')
 			{
-			paramsV  = {1.0e-16+j*a, A};
+			paramsV  = {r0+j*a, A};
 			}
 		if (pot[0]=='3' && j==(N-1))
 			{
@@ -1105,7 +1104,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			if (pot[0]=='3')
 				{
-				paramsV  = {1.0e-16+x*a, A};
+				paramsV  = {r0+x*a, A};
 				}
 		    unsigned int l = t+x*(Nc+1);
 		    if (pot[0]=='3' && x==(N-1))
@@ -1202,7 +1201,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//copying a version of inputs with timeNumber
 	string runInputs = prefix + "inputsPi" + "_" + numberToString<unsigned int>(loop);
-	if (loop_choice[0]=='N')
+	if (loop_choice[0] == 'N')
 		{
 		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(intLoopParameter));
 		}
@@ -1220,6 +1219,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string pifile = prefix + "pi"+inP+suffix;
 	printVectorB(pifile,p);
 	printf("%12s%30s\n"," ",pifile.c_str());
+	gp(pifile,"repi.gp");
 	
 	//printing output phi on whole time contour
 	string tpifile = prefix + "tpi"+inP+suffix;

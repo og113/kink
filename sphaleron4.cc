@@ -51,7 +51,7 @@ if (sphaleronFull.size()!=negEigFull.size())
 main parameters
 ---------------------------------------------------------------------------------------------*/
 unsigned int 	N= 500, Nt = 500;
-double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 1.61;
+double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 0.78;
 double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 double			amp;
 if (argc>1)
@@ -71,6 +71,15 @@ vec sphaleron = interpolate1d(sphaleronFull,sphaleronFull.size(),N);
 vec negEig = interpolate1d(negEigFull,sphaleronFull.size(),N);
 
 /* ---------------------------------------------------------------------------------------------
+normalising
+---------------------------------------------------------------------------------------------*/
+if (negEig[0]<0) negEig *= -1.0;
+double normSphaleron, normNegEig;
+normSphaleron = sphaleron.norm();
+normNegEig = negEig.norm();
+negEig *= normSphaleron/normNegEig;
+
+/* ---------------------------------------------------------------------------------------------
 constructing intial guess for phi
 ---------------------------------------------------------------------------------------------*/
 for (unsigned int k=0; k<Nt; k++)
@@ -87,7 +96,7 @@ for (unsigned int k=0; k<Nt; k++)
 printing initial guess
 ---------------------------------------------------------------------------------------------*/
 string filename = "data/instanton00.dat";
-unsigned int N_print = 300, Nt_print = 300; //these two should be equal for input to pi.cc
+unsigned int N_print = 300, Nt_print = 300;
 vec tVec(Nt_print*N_print), rVec(Nt_print*N_print), phiToPrint;
 double dtPrint = (t1-t0)/(Nt_print-1.0);
 double dxPrint = (r1-r0)/(N_print-1.0);

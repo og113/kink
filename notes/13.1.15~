@@ -1,0 +1,7 @@
+to do to get pot3 working:
+	- rewrite boundary conditions to be exactly those in dl7.
+	- add energy and action calculation at boundaries.
+	- sort out the h matrix used to calculate omega and Eomega
+	- add pot3 ifs to main, or write a new main which only deals with pot3
+	- sort out dp/dx=0 at x=0 boundary condition, may need to use ghost points - THIS IS CURRENTLY COMPLETELY CRAP
+	- check N and Nb dependence of calculations. compare with dl7.

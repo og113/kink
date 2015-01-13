@@ -551,6 +551,11 @@ void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xE
 
 //lattice functions
 
+//inverse of intCoord
+unsigned int c(const unsigned int& t, const unsigned int& x, const unsigned int& Nt) {
+	return t + x*Nt;
+}
+
 //function which find integer coordinates in 2d
 unsigned int intCoord(const unsigned int& locNum, const int& direction, const unsigned int& xNt)
 	{
@@ -593,10 +598,20 @@ comp simpleTime (const unsigned int& time)
 	return xTime;
 	}
 	
-//simple space
-double simpleSpace (const unsigned int& space)
+//simple space functions
+double (*simpleSpace) (const unsigned int& space);	
+
+//simple space for a box
+double simpleSpaceBox (const unsigned int& space)
 	{
 	double xSpace = -L/2.0 + space*a;
+	return xSpace;
+	}
+	
+//simple space for a sphere
+double simpleSpaceSphere (const unsigned int& space)
+	{
+	double xSpace = space*a;
 	return xSpace;
 	}
 	
@@ -804,19 +819,37 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 		pos = t_old + Nt_old*x_old;
 		if  (t_old<(Nt_old-1) )
 			{
-			vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
+			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+				{
+				vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
 							+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)) \
 							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)) \
 							+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1));
-			vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
+				vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
 			 				+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1) \
 							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)+1)\
 						 	+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1)+1);
+				}
+			else
+				{
+				vec_new(2*l) = (1.0-rem_t_old)*vec_old(2*pos) \
+							+ rem_t_old*vec_old(2*(pos+1));
+				vec_new(2*l+1) = (1.0-rem_t_old)*vec_old(2*pos+1)\
+							+ rem_t_old*vec_old(2*(pos+1)+1);
+				}
 			}
 		else
 			{
-			vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
-			vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+				{
+				vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
+				vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+				}
+			else
+				{
+				vec_new(2*l) = vec_old(2*pos);
+				vec_new(2*l+1) = vec_old(2*pos+1);
+				}
 			}
 		}
 	for (unsigned int l=0; l<zero_modes; l++)
@@ -1264,15 +1297,15 @@ void changeInt (const string & parameterLabel, const int & newParameter)
 	{
 	if ( parameterLabel.compare("N")==0)
 		{
-		Na = (int)newParameter*Na/N;
-		Nb = (int)newParameter*Nb/N;
-		Nc = (int)newParameter*Nc/N;
-		NT = Na + Nb + Nc;
+		//Na = (int)newParameter*Na/N;
+		//Nb = (int)newParameter*Nb/N;
+		//Nc = (int)newParameter*Nc/N;
+		//NT = Na + Nb + Nc;
 		N = newParameter;
 		a = L/(N-1);
-		b = Tb/(Nb-1);
-		Ta = b*(Na-1.0);
-		Tc = b*(Nc-1.0);
+		//b = Tb/(Nb-1);
+		//Ta = b*(Na-1.0);
+		//Tc = b*(Nc-1.0);
 		}
 	else if ( parameterLabel.compare("Na")==0)
 		{
