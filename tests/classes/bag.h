@@ -1,13 +1,42 @@
 //parameters and functions for pi.cc
 
-#ifndef __ERROR_H_INCLUDED__
-#define __ERROR_H_INCLUDED__
+#ifndef __BAG_H_INCLUDED__
+#define __BAG_H_INCLUDED__
 
 #include <iostream>
 #include <vector>
 #include "error.h"
 
 using namespace std;
+
+typedef unsigned int uint;
+
+/*-------------------------------------------------------------------------------------------------------------------------
+fallible
+	- useful return type for search functions
+-------------------------------------------------------------------------------------------------------------------------*/
+
+template <class T>
+class Fallible {
+public:
+	Fallible()			: isValid(false), instance() {}			// empty constructor - initialized to false
+	Fallible(const T& t): isValid(true), instance(t) {}			// constructor - initialized to true
+	bool failed() const { return !isValid;			  }			// true if invalid
+	bool valid()  const { return isValid;			  }			// true if valid
+	void invalidate()   { isValid = false;			  }			// make invalid
+	operator T() const;											// provides conversion to T
+	T elseDefaultTo(const T& defaultValue) const;				// value if valid, else defaultValue
+	
+	class UsedInInvalidState: public SimpleError {
+	public:
+		UsedInInvalidState();
+		virtual string message() const;
+	};
+	
+private:
+	bool	isValid;
+	T 		instance;
+};
 
 /*-------------------------------------------------------------------------------------------------------------------------
 parameter
@@ -17,10 +46,10 @@ class BagError {
 public:
 	class NotFound: public SimpleError{
 	public:
-		NotFound(const string& s);
-		virtual string		message() const;
+		NotFound(const string& s) : pName(s) {}		// constructor
+		virtual string		message() const;		// message to be passed for printing
 	private:
-		string	pName;
+		string	pName;								// name of parameter not found
 	};
 };
 
@@ -69,7 +98,6 @@ public:
 	ParameterBag();											// empty constructor
 	ParameterBag(const ParameterBag&);						// copy constructor
 	ParameterBag& operator=(const ParameterBag&);			// assign parameter bag
-	ParameterBag(const int argc&, const char** argv);		// assign parameters from inputs
 	~ParameterBag() {}										// destructor
 	T operator()(const string& pName) const;				// to get a named T parameter
 	void				set(const Parameter<T>& p);			// set parameter
@@ -104,3 +132,5 @@ public:
 
 private:
 };
+
+#endif // __BAG_H_INCLUDED__
