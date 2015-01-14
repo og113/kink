@@ -116,7 +116,8 @@ for (unsigned int j=0;j<(N+1);j++)
 	unsigned int l = j*(Nt+1);
 	unsigned int m;
 	(direction == 1) ? m = Nt + l : m = l;
-	phi(l) = initial(m);
+	double r = r0 + j*dr;
+	phi(l) = initial(m)/r;
 	}
 	
 //initialising linErg and linNum	
@@ -232,7 +233,8 @@ phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
 string evoPrint = "data/" + timeNumber + "pi3.dat";
 printThreeVectors(evoPrint,tVec,rVec,phiToPrint);
 gp(evoPrint,"pi3.gp");
-printf("Input: %39s\n",filename.c_str());
+printf("\ndirection = %i, sigma = %g\n",direction,sigma);
+printf("Input:                  %39s\n",filename.c_str());
 printf("Time evolution printed: %39s pics/pi3.png\n",evoPrint.c_str());
 printf("erg(Nt-1) = %8.4f\n",linErgField(Nt-1));
 printf("linErgField(Nt-1) = %8.4f\n",linErgField(Nt-1));

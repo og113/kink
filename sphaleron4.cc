@@ -51,17 +51,11 @@ if (sphaleronFull.size()!=negEigFull.size())
 main parameters
 ---------------------------------------------------------------------------------------------*/
 unsigned int 	N= 500, Nt = 500;
-double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 0.78;
+double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 0.80;
 double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 double			amp;
-if (argc>1)
-	{
-	amp = atof(argv[1]);
-	}
-else
-	{
-	amp = -1.0e-2;
-	}
+if (argc>1) amp = atof(argv[1]);
+else amp = -1.0e-2;
 
 /* ---------------------------------------------------------------------------------------------
 defining main vectors

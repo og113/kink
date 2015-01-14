@@ -5,3 +5,5 @@ to do to get pot3 working:
 	- add pot3 ifs to main, or write a new main which only deals with pot3
 	- sort out dp/dx=0 at x=0 boundary condition, may need to use ghost points - THIS IS CURRENTLY COMPLETELY CRAP
 	- check N and Nb dependence of calculations. compare with dl7.
+	- sort out the fact that Dx!=dx in the spherical case.
+	- okk so you seem to have something which blows up. how close is it to the sphaleron? does it actually change in time?
