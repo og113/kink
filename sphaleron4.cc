@@ -41,11 +41,10 @@ load vectors
 ---------------------------------------------------------------------------------------------*/
 vec sphaleronFull = loadSimpleVectorColumn("data/sphaleron.dat",1);
 vec negEigFull = loadSimpleVector("data/sphaleronEigVec.dat");
-if (sphaleronFull.size()!=negEigFull.size())
-	{
+if (sphaleronFull.size()!=negEigFull.size()) {
 	printf("error: sphaleron.size() = %i, negEig.size() = %i\n\n",(int)sphaleronFull.size(),(int)negEigFull.size());
-	return 0;
-	}
+	return 1;
+}
 
 /* ---------------------------------------------------------------------------------------------
 main parameters
@@ -54,14 +53,8 @@ unsigned int 	N= 500, Nt = 500;
 double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 0.78;
 double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 double			amp;
-if (argc>1)
-	{
-	amp = atof(argv[1]);
-	}
-else
-	{
-	amp = -1.0e-2;
-	}
+if (argc>1) amp = atof(argv[1]);
+else amp = -1.0e-2;
 
 /* ---------------------------------------------------------------------------------------------
 defining main vectors
@@ -82,15 +75,13 @@ negEig *= normSphaleron/normNegEig;
 /* ---------------------------------------------------------------------------------------------
 constructing intial guess for phi
 ---------------------------------------------------------------------------------------------*/
-for (unsigned int k=0; k<Nt; k++)
-	{
-	for (unsigned int j=0; j<N; j++)
-		{
+for (unsigned int k=0; k<Nt; k++) {
+	for (unsigned int j=0; j<N; j++) {
 		unsigned int 	m = k + j*Nt;
 		double 			r = r0 + dr*j, t = t0 + dt*k;
 		phi[m] = r*(sphaleron[j] + amp*cos(3.91*t)*negEig[j]);
-		}
 	}
+}
 	
 /* ---------------------------------------------------------------------------------------------
 printing initial guess
@@ -100,15 +91,13 @@ unsigned int N_print = 300, Nt_print = 300;
 vec tVec(Nt_print*N_print), rVec(Nt_print*N_print), phiToPrint;
 double dtPrint = (t1-t0)/(Nt_print-1.0);
 double dxPrint = (r1-r0)/(N_print-1.0);
-for (unsigned int k=0;k<Nt_print;k++)
-	{
-	for (unsigned int j=0; j<N_print; j++)
-		{
+for (unsigned int k=0;k<Nt_print;k++) {
+	for (unsigned int j=0; j<N_print; j++) {
 		unsigned int m = k + j*Nt_print;
 		tVec(m) = t0 + k*dtPrint;
 		rVec(m) = r0 + j*dxPrint;
-		}
 	}
+}
 phiToPrint = interpolate(phi,Nt,N,Nt_print,N_print);
 phiToPrint = reverseTime(phiToPrint,Nt_print,N_print);
 printThreeVectors(filename,tVec,rVec,phiToPrint);

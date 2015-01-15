@@ -269,10 +269,7 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 		{
 		angle = asin(Tb/R);
 		double Ltemp = 1.5*(1.5*Tb*tan(angle));
-		if (Ltemp<L) //making sure to use the smaller of the two possible Ls
-			{
-			L=Ltemp;
-			}
+		if (Ltemp<L) L=Ltemp;//making sure to use the smaller of the two possible Ls
 		}
 	else
 		{
@@ -469,29 +466,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					double rho = real(sqrt(-pow(t,2.0) + pow(x,2.0))); //should be real even without real()
 					if (pot[0]=='1')
 						{
-						if ((rho-R)<-alpha)
-							{
-							p(2*j) = minima[1];
-							}
-						else if ((rho-R)>alpha)
-							{
-							p(2*j) = minima[0];
-							}
-						else
-							{
-							p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
-							}
+						if ((rho-R)<-alpha) 		p(2*j) = minima[1];
+						else if ((rho-R)>alpha) 	p(2*j) = minima[0];
+						else						p(2*j) = (minima[1]+minima[0])/2.0\
+														 + (minima[0]-minima[1])*tanh((rho-R)/2.0)/2.0;
 						}
 					else if (pot[0]=='2')
 						{
-						if ((rho-R)<=alphaL)
-							{
-							p(2*j) = minima[1];
-							}
-						else if ((rho-R)>=alphaR)
-							{
-							p(2*j) = minima[0];
-							}
+						if ((rho-R)<=alphaL) 		p(2*j) = minima[1];
+						else if ((rho-R)>=alphaR) 	p(2*j) = minima[0];
 						else
 							{
 							vector<double> rhoPos (profileSize,rho-R);
@@ -513,26 +496,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 					{
 					double rho1 = real(sqrt(-pow(t,2.0) + pow(x+R*cos(angle),2.0)));
 					double rho2 = real(sqrt(-pow(t,2.0) + pow(x-R*cos(angle),2.0)));
-					if ((rho1-R)<-alpha && (rho2-R)<-alpha)
-						{
-						p(2*j) = minima[1];
-						}
-					else if ((rho1-R)>alpha || (rho2-R)>alpha)
-						{
-						p(2*j) = minima[0];
-						}
-					else if (real(x)>0) //note that the coord should be real
-						{
-						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho1-R)/2.0)/2.0;
-						}
-					else if (real(x)<0)
-						{
-						p(2*j) = (minima[1]+minima[0])/2.0 + (minima[0]-minima[1])*tanh((rho2-R)/2.0)/2.0;
-						}
-					else
-						{
-						p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
-						}
+					if ((rho1-R)<-alpha && (rho2-R)<-alpha)		p(2*j) = minima[1];
+					else if ((rho1-R)>alpha || (rho2-R)>alpha)	p(2*j) = minima[0];
+					else if (real(x)>0)							p(2*j) = (minima[1]+minima[0])/2.0\
+																 	+ (minima[0]-minima[1])*tanh((rho1-R)/2.0)/2.0;
+					else if (real(x)<0)							p(2*j) = (minima[1]+minima[0])/2.0 \
+																	+ (minima[0]-minima[1])*tanh((rho2-R)/2.0)/2.0;
+					else										p(2*j) = minima[1]; //i.e. if coordB(j,1) == 0
 					}
 				}
 			}

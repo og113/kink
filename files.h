@@ -212,7 +212,7 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 	}
 	
 //copy inputs with a change
-void changeInputs(const string & outputFile, string search, string replace)
+void changeInputs(string outputFile, string search, string replace)
 	{
 	search += " ";
 	ifstream fin;
