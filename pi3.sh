@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for i in `seq 0 18`;
+for i in `seq 0 20`;
     do
-		AMP=$(echo "scale=9; -0.05*$i+0.1" | bc)
+		AMP=$(echo "scale=9; -0.01*$i+0.1" | bc)
 		echo "amp = "$AMP
 		./sphaleron4 $AMP
 		./pi $i > data/pi_$i.out
