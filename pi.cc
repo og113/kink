@@ -325,6 +325,7 @@ closenessD = 1.0;
 closenessC = 1.0e-16*N*NT;
 closenessE = 1.0e-2;
 closenessR = 1.0e-2;
+double closenessDT = 1.0e-2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //begin loop over varying parameter
@@ -371,6 +372,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	vector<double> calc_test(1); 	calc_test[0] = 1.0;
 	vector<double> erg_test(1); 	erg_test[0] = 1.0;
 	vector<double> reg_test(1); 	reg_test[0] = 1.0;
+	vector<double> dt_test(1);		dt_test[0] = 1.0;
 
 	//initializing phi (=p)
 	vec p(2*N*Nb+1);
@@ -640,6 +642,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		comp pot_0 = 0.0;
 		comp pot_r = 0.0;
 		erg = Eigen::VectorXcd::Constant(NT,-ergZero);
+		double dtTest = 0.0;
 		
 		//testing that the potential term is working for pot3
 		if (pot[0]=='3' && false)
@@ -668,6 +671,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (pot[0]=='3')
 				{
 				paramsV  = {r0+x*a, 0.0};
+				if (t<(Nb-1)) dtTest += (p(2*(j+1))-p(2*j))/b;
 				}
 
 			
@@ -774,7 +778,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
-        if (pot[0]=='3') DDS.insert(2*N*Nb,2*N*Nb) = 1.0;
+        if (pot[0]=='3') {
+        	DDS.insert(2*N*Nb,2*N*Nb) = 1.0;
+        	dtTest /= (double)(Nb-1.0);
+        }
         action = kineticT - kineticS - pot_0 - pot_r;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -879,6 +886,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		sol_test.push_back(normDS/normP);
 		solM_test.push_back(maxDS);
 		delta_test.push_back(normDelta/normP);
+		dt_test.push_back(dtTest);
 			
 		//printing tests to see convergence
 		if (runs_count==1)
@@ -888,6 +896,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		printf("%16i%16i%16g%16g%16g%16g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back());
 		
 		} //closing "runs" while loop
+		
+		if (abs(dt_test.back())<closenessDT) {
+		cout << endl << "average dp/dt integrated over each timeslice:" << endl;
+		for (unsigned int j=0; j<dt_test.size();j++) cout << dt_test[j] << endl;
+		cout << endl;
+		}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//propagating solution along minkowskian time paths
@@ -1189,7 +1203,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string pifile = prefix + "pi"+inP+suffix;
 	printVectorB(pifile,p);
 	printf("%12s%30s\n"," ",pifile.c_str());
-	gp(pifile,"repi.gp");
+//	gp(pifile,"repi.gp");
 	
 	//printing output phi on whole time contour
 	string tpifile = prefix + "tpi"+inP+suffix;
