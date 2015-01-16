@@ -26,33 +26,27 @@ unsigned int loops;
 double minTb, maxTb, minTheta, maxTheta;
 ifstream fmainin;
 fmainin.open("mainInputs", ios::in);
-if (fmainin.is_open())
-	{
+if (fmainin.is_open()) {
 	string line;
 	unsigned int lineNumber = 0;
-	while(getline(fmainin,line))
-		{
-		if(line[0] == '#')
-			{
-			continue;
-			}
+	while(getline(fmainin,line)) {
+		if(line[0] == '#') continue;
+		else if(line.empty()) continue;
 		istringstream ss(line);
-		if (lineNumber==0)
-			{
+		if (lineNumber==0) {
 			ss >> inF >> minFile >> maxFile >> firstLoop >> lastLoop;
 			lineNumber++;
-			}
-		else if (lineNumber==1)
-			{
+		}
+		else if (lineNumber==1) {
 			ss >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx;
 			lineNumber++;
-			}
 		}
 	}
-else
-	{
-	cout << "unable to open mainInputs" << endl;
-	}
+}
+else {
+	cerr << "unable to open mainInputs" << endl;
+	return 1;
+}
 fmainin.close();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -60,10 +54,10 @@ fmainin.close();
 
 //getting list of relevant data files, with timeNumbers between minFile and maxFile
 int systemCall = system("dir ./data/* > dataFiles");
-if (systemCall==-1)
-	{
-	cout << "system call failure, finding dataFiles" << endl;
-	}
+if (systemCall==-1){
+	cerr << "system call failure, finding dataFiles" << endl;
+	return 1;
+}
 vector<string> filenames, piFiles, inputsFiles, eigenvectorFiles, eigenvalueFiles;
 filenames = readDataFiles(minFile,maxFile);
 
@@ -88,7 +82,8 @@ else if (inF.compare("m")==0)
 	}
 else
 	{
-	cout << "inF error" << endl;
+	cerr << "inF error" << endl;
+	return 1;
 	}
 
 //picking subset based on loopNumbers being above firstLoop
@@ -97,7 +92,8 @@ files.reserve(2);
 files.push_back(&piFiles); files.push_back(&inputsFiles);
 if (files.size()==0)
 	{
-	cout << "no files found" << endl;
+	cerr << "no files found" << endl;
+	return 1;
 	}
 for (unsigned int k=0;k<files.size();k++)
 	{
@@ -146,10 +142,7 @@ vector <unsigned long long int> fileNumbers = getInts(piFiles);
 
 //printing filenames
 cout << endl;
-for (unsigned int j=0; j<inputsFiles.size();j++)
-	{
-	cout << inputsFiles[j] << " " << piFiles[j] << endl;
-	}
+for (unsigned int j=0; j<inputsFiles.size();j++) cout << inputsFiles[j] << " " << piFiles[j] << endl;
 cout << endl;
 
 //defining the timeNumber
@@ -174,10 +167,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		unsigned int lineNumber = 0;
 		while(getline(fin,line))
 			{
-			if(line[0] == '#')
-				{
-				continue;
-				}
+			if(line[0] == '#') continue;
+			else if(line.empty()) continue;
 			istringstream ss(line);
 			if (lineNumber==0)
 				{
@@ -204,7 +195,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	else
 		{
-		cout << "unable to open " << inputsFiles[fileLoop] << endl;
+		cerr << "unable to open " << inputsFiles[fileLoop] << endl;
+		return 1;
 		}
 	fin.close();
 	inP = aq.inputChoice;
@@ -215,9 +207,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //potential function
 	
-	//potential functions
+//potential functions
 	if (pot[0]=='1')
 		{
+		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V1c;
 		dV = &dV1c;
 		ddV = &ddV1c;
@@ -229,6 +223,8 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		}
 	else if (pot[0]=='2')
 		{
+		neigh = &periodic;
+		simpleSpace = &simpleSpaceBox;
 		V = &V2c;
 		dV = &dV2c;
 		ddV = &ddV2c;
@@ -237,6 +233,20 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		ddVd = &ddV2;
 		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
+		}
+	else if (pot[0]=='3')
+		{
+		neigh = &spherical;
+		simpleSpace = &simpleSpaceSphere;
+		V = &V3c;
+		dV = &dV3c;
+		ddV = &ddV3c;
+		Vd = &V3;
+		dVd = &dV3;
+		ddVd = &ddV3;
+		epsilon0 = 0.0;
+		epsilon = 0.0;
+		r0 = 1.0e-16;
 		}
 	else
 		{
@@ -248,76 +258,95 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 
 		
 //finding epsilon and root
-
-	//gsl function for dV(phi)
-	gsl_function F;
-	F.function = Vd;
-	F.params = &paramsV;	
+vector<double> minima0(2);
 	
-	//finding preliminary roots of dV(phi)=0
-	minima[0] = brentMinimum(&F, -1.0, -3.0, 0.0);
-	minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
-	
-	//gsl function for V(root2)-V(root1)-dE
-	struct ec_params ec_params = { A, minima[0], minima[1], dE};
-	gsl_function EC;
-	EC.function = &ec;
-	EC.params = &ec_params;
-
-	//evaluating epsilon, new root and dE may change slightly
-	epsilonFn(&F,&EC,&dE,&epsilon,&minima);
-	
-	//evaluating mass about false vac
-	mass2 = ddVd(minima[0],&paramsV);
-	
-	//finding root0 of dV0(phi)=0;
-	vector<double> minima0(3);
-	if (pot[0]=='1')
+	if (pot[0]!='3')
 		{
-		minima0[0] = -1.0; minima0[1] = 1.0;
-		}
-	else if (pot[0]=='2')
-		{
-		gsl_function V0;
-		V0.function = Vd;
-		V0.params = &paramsV0;	
-		minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
-		minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
-		struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
-		gsl_function EC0;
-		EC0.function = &ec;
-		EC0.params = &ec0_params;
-		double dE0 = 0.0;
-		epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
-		}
+		//gsl function for dV(phi)
+		gsl_function F;
+		F.function = Vd;
+		F.params = &paramsV;	
 	
-	//finding S1
-	double S1error;
-	gsl_function S1_integrand;
-	S1_integrand.function = &s1Integrand;
-	S1_integrand.params = &paramsV0;
-	gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-	gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
-	gsl_integration_workspace_free(w);
-	if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
+		//finding preliminary roots of dV(phi)=0
+		minima[0] = brentMinimum(&F, -1.0, -3.0, 0.0);
+		minima[1] = brentMinimum(&F, 1.2, 0.5, 3.0);
+	
+		//gsl function for V(root2)-V(root1)-dE
+		struct ec_params ec_params = { A, minima[0], minima[1], dE};
+		gsl_function EC;
+		EC.function = &ec;
+		EC.params = &ec_params;
+
+		//evaluating epsilon, new root and dE may change slightly
+		epsilonFn(&F,&EC,&dE,&epsilon,&minima);
+	
+		//evaluating mass about false vac
+		mass2 = ddVd(minima[0],&paramsV);
+	
+		//finding root0 of dV0(phi)=0;
+		vector<double> minima0(3);
+		if (pot[0]=='1')
+			{
+			minima0[0] = -1.0; minima0[1] = 1.0;
+			}
+		else if (pot[0]=='2')
+			{
+			gsl_function V0;
+			V0.function = Vd;
+			V0.params = &paramsV0;	
+			minima0[0] = brentMinimum(&V0, -1.0, -3.0, 0.0);
+			minima0[0] = brentMinimum(&V0, 1.2, 0.5, 3.0);
+			struct ec_params ec0_params = { A, minima0[0], minima0[1], 0.0};
+			gsl_function EC0;
+			EC0.function = &ec;
+			EC0.params = &ec0_params;
+			double dE0 = 0.0;
+			epsilonFn(&V0,&EC0,&dE0,&epsilon0,&minima0);
+			}
+	
+		//finding S1
+		double S1error;
+		gsl_function S1_integrand;
+		S1_integrand.function = &s1Integrand;
+		S1_integrand.params = &paramsV0;
+		gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
+		gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+		gsl_integration_workspace_free(w);
+		if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
+		}
+	else
+		{
+		mass2 = 1.0;
+		minima[0] = 0.0; //only one minimum
+		R = 1.0; alpha = 0.0; //not used
+		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//other derived quantities
 	NT = Na + Nb + Nc;
-	R = S1/dE;
-	alpha *= R;
+	double twaction;
+	if (pot[0]!='3')
+		{
+		R = S1/dE;
+		twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
+		alpha *= R;
+		L = LoR*R;
+		}
+	else
+		{
+		twaction = 8.0*pow(pi,2.0)/3.0; //massless limit
+		L = LoR*10.0;
+		//no need for R or alpha
+		}
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
 	L = LoR*R;
-	if (Tb<R)
+	if (Tb<R && pot[0]!='3')
 		{
 		angle = asin(Tb/R);
 		double Ltemp = 1.5*(1.5*Tb*tan(angle));
-		if (Ltemp<L) //making sure to use the smaller of the two possible Ls
-			{
-			L=Ltemp;
-			}
+		if (Ltemp<L) L=Ltemp;//making sure to use the smaller of the two possible Ls
 		}
 	a = L/(N-1.0);
 	b = Tb/(Nb-1.0);
@@ -362,7 +391,7 @@ auto ddVr = [&] (const comp & phi)
 	Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
 	if (eigensolver.info() != Eigen::Success)
 		{
-		cout << "h eigensolver failed" << endl;
+		cerr << "h eigensolver failed" << endl;
 		}
 	else
 		{
@@ -394,9 +423,9 @@ auto ddVr = [&] (const comp & phi)
 			//cout << "negEig run" << endl;
 			cout << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
 			}
-		negVec = loadVector("data/eigVec.dat",Nb,N,1);
+		negVec = loadVector("data/stable/eigVec.dat",Nb,N,1);
 		ifstream eigFile;
-		eigFile.open("data/eigValue.dat");
+		eigFile.open("data/stable/eigValue.dat");
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		double temp;
@@ -436,6 +465,7 @@ auto ddVr = [&] (const comp & phi)
 			else
 				{
 				cout << "nothing to loop over, set loops to 1" << endl;
+				loop1 = 1;
 				}
 			}
 		
@@ -877,26 +907,14 @@ auto ddVr = [&] (const comp & phi)
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
-<<<<<<< HEAD
 			E = linErg(0);
 			Num =linNum(0);
 			E_exact = 0;
-=======
-			//E = 0;
-			E_exact = 0;
-			//Num = 0;
->>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
 			for (unsigned int j=0; j<linearInt; j++)
 				{
 				E_exact += real(erg(j));
 				}
-<<<<<<< HEAD
 			E_exact /= (double)linearInt;
-=======
-			E_exact /= linearInt;
-			E = linErg(0);
-			Num = linNum(0);
->>>>>>> e14eddf6d352e5753edd56b6669c6bc48c3fb11a
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking agreement between erg and linErg

@@ -39,8 +39,8 @@ int main(int argc, char ** argv)
 /* ---------------------------------------------------------------------------------------------
 load vectors
 ---------------------------------------------------------------------------------------------*/
-vec sphaleronFull = loadSimpleVectorColumn("data/sphaleron.dat",1);
-vec negEigFull = loadSimpleVector("data/sphaleronEigVec.dat");
+vec sphaleronFull = loadSimpleVectorColumn("data/stable/sphaleron.dat",1);
+vec negEigFull = loadSimpleVector("data/stable/sphaleronEigVec.dat");
 if (sphaleronFull.size()!=negEigFull.size()) {
 	printf("error: sphaleron.size() = %i, negEig.size() = %i\n\n",(int)sphaleronFull.size(),(int)negEigFull.size());
 	return 1;

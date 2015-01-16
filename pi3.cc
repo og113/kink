@@ -42,7 +42,21 @@ else if (argc % 2 && argc>1) {
 		if (id.compare("-tn")==0) timeNumberIn = argv[2*j+2];
 		else if (id.compare("-d")==0) direction = atoi(argv[2*j+2]);
 		else if (id.compare("-s")==0) sigma = atof(argv[2*j+2]);
+		else {
+			cerr << "input " << id << " unrecognized" << endl;
+			return 1;
+		}
 	}
+}
+else if (argc == 1) {
+	cerr << "must provide input to pi3.cc" << endl;
+	return 1;
+}
+else {
+	cerr << "input unrecognised:" << endl;
+	for (int j=1; j<argc; j++) cerr << argv[j] << " ";
+	cerr << endl;
+	return 1;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //main parameters
@@ -51,6 +65,8 @@ double r0 = 1.0e-16, r1 = 10.0;
 const unsigned int N = 1e3;
 double dr = r1-r0;
 dr /= (double)N;
+
+unsigned int Nin, Nain, Nbin;
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //propagating sphaleron plus a small amount of negative mode forward in time
@@ -86,7 +102,6 @@ if (fileLength==((N+1)*(Nt+1)))
 	}
 else if (fileLength % 2) //if its odd
 	{
-	unsigned int Nin, Ntin;
 	//cout << "interpolating input, filelength = " << fileLength << " , Cp.size() = " << N*Nb+1 << endl;
 	string inputsF = "./data/" + timeNumberIn + "inputsPi_0";
 	ifstream fin;
@@ -98,15 +113,15 @@ else if (fileLength % 2) //if its odd
 			{
 			if(line[0] == '#') continue;
 			istringstream ss(line);
-			ss >> Nin >> temp >> Ntin;
+			ss >> Nin >> Nain >> Nbin;
 			break;
 			}
 		}
 	else cout << "unable to open " << inputsF << endl;
 	fin.close();
 	vec temp_initial = loadSimpleVectorColumn(filename,3);
-	temp_initial.conservativeResize(Ntin*Nin);
-	initial = interpolate(temp_initial,Ntin,Nin,Nt+1,N+1);
+	temp_initial.conservativeResize(Nbin*Nin);
+	initial = interpolate(temp_initial,Nbin,Nin,Nt+1,N+1);
 	}
 
 //initial condition 1)
@@ -213,7 +228,14 @@ for (unsigned int k=1; k<(N+1); k++)
 	linNumContm += 2.0*pi*Asqrd*pow(freqSqrd,0.5);
 	}
 	
+printf("\ndirection = %i, sigma = %g\n",direction,sigma);
+printf("Input:                  %39s\n",filename.c_str());
+	
 unsigned int N_print = 100, Nt_print = 100;
+if (direction==-1 && sigma==1) {
+	N_print = Nin;
+	Nt_print = Nain+Nbin;
+}
 vec tVec(Nt_print*N_print), rVec(Nt_print*N_print);
 double dtPrint = T/(Nt_print-1.0);
 double dxPrint = (r1-r0)/(N_print-1.0);
@@ -229,12 +251,39 @@ for (unsigned int t=0;t<Nt_print;t++)
 	
 vec phiToPrint;
 phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
+	
+// constructing input to main
+vec mainIn((Nain+Nbin)*Nin);
+if (direction==-1 && sigma==1)
+	{
+	vec mink;
+	mink = interpolate(phi,Nt+1,N+1,Nain+1,Nin+1);
+	for (unsigned int j=0;j<(Nain+Nbin);j++)
+		{
+		for (unsigned int k=0; k<Nin; k++)
+			{
+			unsigned int l = j+k*(Nain+Nbin), m;
+			double r = r0 + k*dxPrint;
+			if (j<Nain)
+				{
+				m = (Nain-j)+k*(Nain+1);
+				mainIn(l) = mink(m)*r;
+				}
+			else
+				{
+				m = (j-Nain)+k*Nbin;
+				mainIn(l) = initial(m);
+				}
+			}
+		}
+	string mainInFile = "data/" + timeNumber + "mainIn.dat";
+	printThreeVectors(mainInFile,tVec,rVec,mainIn);
+	printf("MainIn printed        : %39s pics/pi3.png\n",mainInFile.c_str());
+	}
 
 string evoPrint = "data/" + timeNumber + "pi3.dat";
 printThreeVectors(evoPrint,tVec,rVec,phiToPrint);
 gp(evoPrint,"pi3.gp");
-printf("\ndirection = %i, sigma = %g\n",direction,sigma);
-printf("Input:                  %39s\n",filename.c_str());
 printf("Time evolution printed: %39s pics/pi3.png\n",evoPrint.c_str());
 printf("erg(Nt-1) = %8.4f\n",linErgField(Nt-1));
 printf("linErgField(Nt-1) = %8.4f\n",linErgField(Nt-1));

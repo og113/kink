@@ -279,10 +279,11 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			cout << "need to run negEig and set negEigDone=1" << endl;
 			return 1;
 			}
-		unsigned int fileLength = countLines("./data/eigVec.dat");
+		string eigVecFilename = "./data/stable/eigVec.dat"
+		unsigned int fileLength = countLines(eigVecFilename);
 		if (fileLength==(N*Nb+1))
 			{
-			negVec = loadVector("./data/eigVec.dat",Nb,N,1);
+			negVec = loadVector(eigVecFilename,Nb,N,1);
 			}
 		else
 			{
@@ -290,7 +291,7 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			return 1;
 			}
 		ifstream eigFile;
-		eigFile.open("./data/eigVal.dat", ios::in);
+		eigFile.open("./data/stable/eigValue.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		ss >> negP >> negc >> negcheck >> negerror >> negVal;
@@ -671,7 +672,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (pot[0]=='3')
 				{
 				paramsV  = {r0+x*a, 0.0};
-				if (t<(Nb-1)) dtTest += (p(2*(j+1))-p(2*j))/b;
+				if (t<(Nb-1)) dtTest += abs((p(2*(j+1))-p(2*j))/b);
 				}
 
 			
@@ -898,7 +899,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		} //closing "runs" while loop
 		
 		if (abs(dt_test.back())<closenessDT) {
-		cout << endl << "average dp/dt integrated over each timeslice:" << endl;
+		cout << endl << "average |dp/dt| integrated over each timeslice:" << endl;
 		for (unsigned int j=0; j<dt_test.size();j++) cout << dt_test[j] << endl;
 		cout << endl;
 		}
