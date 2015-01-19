@@ -385,6 +385,7 @@ vec loadSimpleVector (const string& loadFile)
 	vec outputVec(fileLength);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
+	if (!F.good()) cerr << "LoadSimpleVectorColumn error: " << loadFile << "not opened properly." << endl;
 	string line;
 	unsigned int j=0;
 	while (getline(F, line))
@@ -407,6 +408,7 @@ vec loadSimpleVectorColumn (const string& loadFile, const unsigned int column)
 	vec outputVec(fileLength);
 	fstream F;
 	F.open((loadFile).c_str(), ios::in);
+	if (!F.good()) cerr << "LoadSimpleVectorColumn error: " << loadFile << "not opened properly." << endl;
 	string line, temp;
 	unsigned int j=0;
 	while (getline(F, line))
@@ -505,7 +507,7 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
 	{
 	unsigned int old_size = vec_old.size();
-	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
+	if (old_size<N_old*Nt_old) {cerr << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
 	vec vec_new (N_new*Nt_new);
 	
 	unsigned int x_new, t_new, x_old, t_old;
@@ -548,7 +550,7 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 vector<double> interpolate2(vector<double> vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
 	{
 	unsigned int old_size = vec_old.size();
-	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
+	if (old_size<N_old*Nt_old) {cerr << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
 	vector<double> vec_new (N_new*Nt_new);
 	
 	unsigned int x_new, t_new, x_old, t_old;

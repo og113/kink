@@ -54,12 +54,14 @@ and labels for input and output
 
 string timeNumber = currentDateTime();
 string timeNumberIn = "150112114306";
+string loopIn = "0";
 if (argc == 2) timeNumberIn = argv[1];
 else if (argc % 2 && argc>1) {
 	for (unsigned int j=0; j<(int)(argc/2); j++) {
 		string id = argv[2*j+1];
 		if (id[0]=='-') id = id.substr(1);
 		if (id.compare("tn")==0) timeNumberIn = argv[2*j+2];
+		else if (id.compare("loop")==0 || id.compare("loop")==0) loopIn = argv[2*j+2];
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -83,7 +85,7 @@ getting parameters from specific inputs
 
 unsigned int Nin, Nain, Nbin, Ncin;
 double Tbin, dtin, drin;
-string inputsF = "./data/" + timeNumberIn + "inputsPi_0";
+string inputsF = "./data/" + timeNumberIn + "inputsPi_" + loopIn;
 ifstream fin;
 fin.open(inputsF.c_str());
 if (fin.is_open())
@@ -125,14 +127,14 @@ if (abs(dt)>0.5*dr) {
 /* ---------------------------------------------------------------------------------------------
 loading phi on BC
 ---------------------------------------------------------------------------------------------*/
-string filename = "data/" + timeNumberIn + "pip_0.dat";
+string filename = "data/" + timeNumberIn + "pip_" + loopIn + ".dat";
 unsigned int fileLength = countLines(filename);
 vec phiBC;
 	
 if (fileLength==Nin*Nbin) phiBC = loadSimpleVectorColumn(filename,3);
 else if (fileLength==(Nin*Nbin+1))
 	{
-	vec phiBC = loadSimpleVectorColumn(filename,3);
+	phiBC = loadSimpleVectorColumn(filename,3);
 	phiBC.conservativeResize(Nbin*Nin);
 	}
 else {
@@ -144,25 +146,27 @@ else {
 propagating euclidean solution forwards and then backwards in time
 ---------------------------------------------------------------------------------------------*/
 
-vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);
-vec nonLinErg(Nt+1), erg(Nt+1);
-linErgField = Eigen::VectorXd::Zero(Nt+1);
-nonLinErg = Eigen::VectorXd::Zero(Nt+1);
-erg = Eigen::VectorXd::Zero(Nt+1);
-double linErgContm = 0.0, linNumContm = 0.0;
+vec phiA, phiC;
+double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA;
 
 uint j=0;
 while(j<2) {
 
 	if (j==0) {
-		Nt = Na-1;
-		direction = -1;
-	}
-	else if (j==1) {
-		Nt = Nc-1;
+		Nt = Nc;
 		direction = 1;
 	}
-	j++;
+	else if (j==1) {
+		Nt = Na;
+		direction = -1;
+	}
+	
+	vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);
+	vec nonLinErg(Nt+1), erg(Nt+1);
+	linErgField = Eigen::VectorXd::Zero(Nt+1);
+	nonLinErg = Eigen::VectorXd::Zero(Nt+1);
+	erg = Eigen::VectorXd::Zero(Nt+1);
+	linErgContm = 0.0, linNumContm = 0.0;
 	
 	vec initial;
 	initial = interpolate(phiBC,Nbin,Nin,Nt+1,N+1);
@@ -269,11 +273,19 @@ while(j<2) {
 		linErgContm += 2.0*pi*Asqrd*freqSqrd;
 		linNumContm += 2.0*pi*Asqrd*pow(freqSqrd,0.5);
 		}
+	
+	if (j==0) {
+		phiC = phi;
+	}
+	else if (j==1) {
+		phiA = phi;
+		ergA = erg(Nt-1);
+		nonLinErgA = nonLinErg(Nt-1);
+		linErgFieldA = linErgField(Nt-1);
+	}
+	j++;
 		
 } // end of while j<2 loop
-	
-printf("\ndirection = %i, sigma = %g\n",direction,sigma);
-printf("Input:                  %39s\n",filename.c_str());
 	
 vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);
 for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
@@ -288,18 +300,19 @@ for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
 	
 // constructing input to main
 vec mainIn((Nain+Nbin+Ncin)*Nin);
-vec mink;
-mink = interpolate(phi,Nt+1,N+1,Nain+1,Nin+1);
+vec phiAOut, phiCOut;
+phiAOut = interpolate(phiA,Na+1,N+1,Nain+1,Nin);
+phiCOut = interpolate(phiC,Nc+1,N+1,Ncin+1,Nin);
 for (unsigned int j=0;j<(Nain+Nbin+Ncin);j++)
 	{
 	for (unsigned int k=0; k<Nin; k++)
 		{
-		unsigned int l = j+k*(Nain+Nbin), m;
+		unsigned int l = j+k*(Nain+Nbin+Ncin), m;
 		double r = r0 + k*drin;
 		if (j<Nain)
 			{
 			m = (Nain-j)+k*(Nain+1);
-			mainIn(l) = mink(m)*r;
+			mainIn(l) = phiAOut(m)*r;
 			}
 		else if (j<(Nain+Nbin))
 			{
@@ -308,21 +321,28 @@ for (unsigned int j=0;j<(Nain+Nbin+Ncin);j++)
 			}
 		else
 			{
-			
+            m = j - Nain - Nbin + 1 + k*(Ncin+1);
+			mainIn(l) = phiCOut(m)*r;
 			}
 		}
 	}
 string mainInFile = "data/" + timeNumber + "tpip_0.dat";
 printThreeVectors(mainInFile,tVec,rVec,mainIn);
-printf("tpip printed        : %39s pics/pi3.png\n",mainInFile.c_str());
 gp(mainInFile,"pi3.gp");
-printf("erg(Nt-1) = %8.4f\n",linErgField(Nt-1));
-printf("linErgField(Nt-1) = %8.4f\n",linErgField(Nt-1));
-printf("nonLinErg(Nt-1) = %8.4f\n",nonLinErg(Nt-1));
-printf("linNumContm(Nt-1) = %8.4f\n",linNumContm);
-printf("linErgContm(Nt-1) = %8.4f\n\n",linErgContm);
 
-double finalTest = linErgField(Nt-1);
+printf("%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb");
+printf("%8i%8i%8i%8i%8g%8g\n",Nin,Nain,Nbin,Ncin,r1-r0,Tbin);
+printf("\n");
+
+printf("Input:                  %39s\n",filename.c_str());
+printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
+printf("erg(0) = %8.4f\n",ergA);
+printf("linErgFieldA(0) = %8.4f\n",linErgFieldA);
+printf("nonLinErgA(0) = %8.4f\n",nonLinErgA);
+printf("linNumContmA(0) = %8.4f\n",linNumContm);
+printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
+
+double finalTest = linErgFieldA;
 if ( !isfinite(finalTest) ) return 0;
 else return 1;
 }

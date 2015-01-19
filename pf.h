@@ -930,8 +930,8 @@ vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & 
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%12s%8s%8s%8s%12s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8g%8g%12g%8g%8g%8g%12g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 

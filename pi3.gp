@@ -4,8 +4,8 @@
 #plots real part only
 
 #if you want to save directly to a file, use the following two lines of code
-set term png size 1600,800
-set output './pics/pi3.png';
+#set term png size 1600,800
+#set output './pics/pi3.png';
 
 unset log
 unset label
@@ -19,6 +19,6 @@ set ylabel "re(t)-im(t)"
 set zlabel "re(phi)"
 set grid
 set hidden3d
-splot f using 2:1:3 with lines
+splot f using 2:1:3 with points
 
 pause -1

@@ -57,25 +57,25 @@ double			amp = -1.0e-2;
 /* ---------------------------------------------------------------------------------------------
 getting inputs
 ---------------------------------------------------------------------------------------------*/
-if (argc>1) {
+if (argc>2) {
 	for (int j=0; j<(int)(argc/2); j++) {
 		string temp1 = argv[2*j+1];
 		string temp2 = argv[2*j+2];
-		if (temp1[0]=='-') {
-			temp1 = temp1.substr(1);
-			if (temp1.compare("amp")==0) amp = stringToNumber<double>(temp2);
-			else if (temp1.compare("t1")==0) t1 = stringToNumber<double>(temp2);
-			else if (temp1.compare("r1")==0) r1 = stringToNumber<double>(temp2);
-			else if (temp1.compare("r0")==0) r0 = stringToNumber<double>(temp2);
-			else if (temp1.compare("N")==0) N = stringToNumber<unsigned int>(temp2);
-			else if (temp1.compare("Nt")==0) Nt = stringToNumber<unsigned int>(temp2);
-			else {
-				cerr << "input " << temp1 << " not understood" << endl;
-				return 1;
-			}
+		if (temp1[0]=='-') temp1 = temp1.substr(1);
+		if (temp1.compare("amp")==0) amp = stringToNumber<double>(temp2);
+		else if (temp1.compare("t1")==0) t1 = stringToNumber<double>(temp2);
+		else if (temp1.compare("r1")==0) r1 = stringToNumber<double>(temp2);
+		else if (temp1.compare("r0")==0) r0 = stringToNumber<double>(temp2);
+		else if (temp1.compare("N")==0) N = stringToNumber<unsigned int>(temp2);
+		else if (temp1.compare("Nt")==0) Nt = stringToNumber<unsigned int>(temp2);
+		else {
+			cerr << "input " << temp1 << " not understood" << endl;
+			return 1;
 		}
 	}
 }
+else if (argc==2) amp = atof(argv[1]);
+else cerr << "inputs not understood" << endl;
 
 /* ---------------------------------------------------------------------------------------------
 defining main vectors
