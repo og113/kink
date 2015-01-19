@@ -1,0 +1,4 @@
+working through translating instances of pot[0]=='3' from pi.cc to main.cc. currently on:
+	34/34
+also, need to sort out 2 points on the final minkowskian evolution, i.e. Nc=2. need to get pi3.cc to add these points to its tpip output.
+sorting this out now in pi3.cc, on about line 125

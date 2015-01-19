@@ -42,7 +42,7 @@ for j in `seq 0 4`
 			if [ "$?" = "0" ]; then
 				echo "pi3 output:" >> $FILE
 				echo "" >> $FILE
-				./pi3 $TIMENUMBER >> $FILE
+				./pi3 -tn $TIMENUMBER >> $FILE
 				if [ "$?" = "0" ]; then
 					echo "success: solution tunnelled" >> $FILE
 					echo "" >> $FILE

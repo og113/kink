@@ -279,15 +279,38 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			cout << "need to run negEig and set negEigDone=1" << endl;
 			return 1;
 			}
-		string eigVecFilename = "./data/stable/eigVec.dat"
+		string eigVecFilename = "./data/stable/eigVec.dat";
 		unsigned int fileLength = countLines(eigVecFilename);
 		if (fileLength==(N*Nb+1))
 			{
 			negVec = loadVector(eigVecFilename,Nb,N,1);
 			}
+		else if (fileLength % 2) //if its odd
+			{
+			string eigVecInputs = "data/stable/eigVecInputs.dat";
+			unsigned int NEig, NtEig;
+			ifstream fin;
+			fin.open(eigVecInputs.c_str());
+			if (fin.is_open())
+				{
+				string line, tempStr;
+				while(getline(fin,line))
+					{
+					if(line[0] == '#') continue;
+					if(line.empty()) continue;
+					istringstream ss(line);
+					ss >> NEig >> tempStr >> NtEig;
+					break;
+					}
+				}
+			else{cerr << "unable to open " << eigVecInputs << endl;}
+			fin.close();
+			vec tempEig = loadVector(eigVecFilename,NtEig,NEig,1);
+			negVec = interpolate(tempEig,NtEig,NEig,Nb,N);
+			}
 		else
 			{
-			cout << "eigVec not the right length" << endl;
+			cout << "eigVec not the right length, cannot interpolate" << endl;
 			return 1;
 			}
 		ifstream eigFile;
@@ -542,10 +565,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				string line, temp;
 				while(getline(fin,line))
 					{
-					if(line[0] == '#')
-						{
-						continue;
-						}
+					if(line[0] == '#') continue;
 					istringstream ss(line);
 					ss >> Nin >> temp >> Ntin;
 					break;
@@ -912,10 +932,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     cVec ap(N*(Na+1)); //phi on section "a"
     ap = Eigen::VectorXcd::Zero(N*(Na+1));
     //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++)
-    	{
-        ap(j*(Na+1)) = Cp(j*Nb);
-    	}
+    for (unsigned int j=0; j<N; j++) ap(j*(Na+1)) = Cp(j*Nb);
 
     //A2. initialize vel - defined at half steps, first step being at t=-1/2,
     //vel(t+1/2) := (p(t+1)-p(t))/dt
@@ -936,25 +953,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     //#pragma omp parallel for
     for (unsigned int j=0; j<N; j++)
     	{
-    	if (pot[0]=='3')
-			{
-			paramsV  = {r0+j*a, A};
-			}
+    	if (pot[0]=='3') 			paramsV  = {r0+j*a, A};
 		unsigned int l = j*(Na+1);
-		if (pot[0]=='3' && j==(N-1))
-			{
-			accA(l) = 0.0;
-			}
-		else if (pot[0]=='3' && j==0)
-			{
-			accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
-            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
-			}
-    	else
-    		{
-        	accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l)) \
-            	-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
-            }
+		if (pot[0]=='3' && j==(N-1)) 	accA(l) = 0.0;
+		else if (pot[0]=='3' && j==0) 	accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
+            								-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+    	else 							accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))\
+    										+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l))-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
     	}
     	
     //A4.5 starting the energy and that off
@@ -974,15 +979,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
         //#pragma omp parallel for	
         for (unsigned int x=0; x<N; x++)
         	{
-        	if (pot[0]=='3')
-				{
-				paramsV  = {r0+x*a, A};
-				}
+        	if (pot[0]=='3') paramsV  = {r0+x*a, A};
             unsigned int m = t+x*(Na+1);
-            if (pot[0]=='3' && x==(N-1))
-				{
-				accA(m) = 0.0;
-				}
+            if (pot[0]=='3' && x==(N-1)) accA(m) = 0.0;
 			else if (pot[0]=='3' && x==0)
 				{
 				accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
@@ -1030,10 +1029,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     cVec ccp(N*(Nc+1)); //phi on section "c"
     ccp = Eigen::VectorXcd::Zero(N*(Nc+1));
     //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++)
-    	{
-        ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
-    	}
+    for (unsigned int j=0; j<N; j++) ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
 
     //C3. initialize vel - defined at half steps, first step being at t=-1/2,
     //vel(t+1/2) := (p(t+1)-p(t))/dt
@@ -1054,24 +1050,12 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
     for (unsigned int j=0; j<N; j++)
     	{
     	unsigned int l = j*(Nc+1);
-    	if (pot[0]=='3')
-			{
-			paramsV  = {r0+j*a, A};
-			}
-		if (pot[0]=='3' && j==(N-1))
-			{
-			accC(l) = 0.0;
-			}
-		else if (pot[0]=='3' && j==0)
-			{
-			accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
-            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
-			}
-    	else
-    		{
-        	accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-            		-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
-            }
+    	if (pot[0]=='3') paramsV  = {r0+j*a, A};
+		if (pot[0]=='3' && j==(N-1)) 	accC(l) = 0.0;
+		else if (pot[0]=='3' && j==0) 	accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+            							-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+    	else 							accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))\
+    										+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
     	}
 
     //C7. run loop
@@ -1087,25 +1071,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		//#pragma omp parallel for
 		for (unsigned int x=0; x<N; x++)
 			{
-			if (pot[0]=='3')
-				{
-				paramsV  = {r0+x*a, A};
-				}
+			if (pot[0]=='3') paramsV  = {r0+x*a, A};
 		    unsigned int l = t+x*(Nc+1);
-		    if (pot[0]=='3' && x==(N-1))
-				{
-				accC(l) = 0.0;
-				}
-			else if (pot[0]=='3' && x==0)
-				{
-				accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
-		    		-dV(ccp(l));
-				}
-			else
-				{
-		    	accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l)) \
-		    		-dV(ccp(l));
-		        }
+		    if (pot[0]=='3' && x==(N-1)) 	accC(l) = 0.0;
+			else if (pot[0]=='3' && x==0) 	accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+		    									-dV(ccp(l));
+			else 							accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N)) \
+												+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-dV(ccp(l));		    	
 		    if ((t>1) && x!=(N-1))
 		    	{
 				erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\

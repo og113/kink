@@ -900,6 +900,27 @@ vec interpolate2(vec vec_old, const unsigned int & Nt_old, const unsigned int & 
 		}
 	return vec_new;
 	}
+	
+//same function but 1d	
+vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & N_new)
+	{
+	unsigned int old_size = vec_old.size();
+	if (old_size<N_old) cerr << "interpolate error, vec_old.size() = " << old_size << " , N_old = " << N_old << endl;
+	vec vec_new (N_new);
+	
+	unsigned int x_old;
+	double exact_x_old, rem_x_old;
+	
+	for (unsigned int l=0;l<N_new;l++)
+		{
+		exact_x_old = l*(N_old-1.0)/(N_new-1.0);
+		x_old = (unsigned int)exact_x_old;
+		rem_x_old = exact_x_old - (double)(x_old);
+		if  (x_old<(N_old-1)) vec_new[l] = (1.0-rem_x_old)*vec_old[x_old] + rem_x_old*vec_old[x_old+1];
+		else vec_new[l] = vec_old[x_old];
+		}
+	return vec_new;
+	}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1158,10 +1179,7 @@ vec loadVectorColumn (const string& loadFile, const unsigned int column)
 		if (!line.empty())
 			{
 			istringstream ss(line);
-			for (unsigned int l=0; l<column; l++)
-				{
-				ss >> temp;
-				}
+			for (unsigned int l=0; l<column; l++) ss >> temp;
 			ss >> outputVec[j];
 			j++;
 			}

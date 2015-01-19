@@ -399,42 +399,90 @@ auto ddVr = [&] (const comp & phi)
 		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
 	
-	#pragma omp parallel for	
+	//#pragma omp parallel for	
 	for (unsigned int j=0; j<N; j++)
 		{
 		for (unsigned int k=0; k<N; k++)
 			{
 			for (unsigned int l=0; l<N; l++)
 				{
-				omega(j,k) += a*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				Eomega(j,k) += a*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				double djdk;
+				if (pot[0]=='3')
+					{
+					double rj = r0 + j*a, rk = r0 + k*a;
+					djdk = 4.0*pi*rj*rk*a;			
+					}
+				else djdk=a;
+				if (j==0 || j==(N-1) || k==0 || k==(N-1)) djdk/=2.0;
+				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 				}
 			}
 		}
 
 	if (zmt[0]=='n' || zmx[0]=='n')
 		{
-		//cout << "Tb>R so using negEig, need to have run pi with inP='b'" << endl;
-		if (negEigDone==0)
+		if (pot[0]=='3') {
+			vec negVecFull = loadVectorColumn("data/stable/sphaleron.dat",1); // nb may need to check that r1 is correct
+			negVec = interpolate1d(negVecFull,negVecFull.size(),N);
+		}
+		else
 			{
-			//system("./negEig"); //negEig now needs timeNumber
-			//char * fileNumber = (char *)(fileNumbers[fileLoop]);
-			//system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
-			//cout << "negEig run" << endl;
-			cout << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
+			if (negEigDone==0)
+				{
+				//system("./negEig"); //negEig now needs timeNumber
+				//char * fileNumber = (char *)(fileNumbers[fileLoop]);
+				//system(fileNumber); //won't work if inF=='m', as needs fileNumber of pi run
+				//cout << "negEig run" << endl;
+				cerr << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
+				return 1;
+				}
+		string eigVecFilename = "./data/stable/eigVec.dat";
+		unsigned int fileLength = countLines(eigVecFilename);
+		if (fileLength==(N*Nb+1)) negVec = loadVector(eigVecFilename,Nb,N,1);
+		else if (fileLength % 2) //if its odd
+			{
+			string eigVecInputs = "data/stable/eigVecInputs.dat";
+			unsigned int NEig, NtEig;
+			ifstream fin;
+			fin.open(eigVecInputs.c_str());
+			if (fin.is_open())
+				{
+				string line, tempStr;
+				while(getline(fin,line))
+					{
+					if(line[0] == '#') continue;
+					if(line.empty()) continue;
+					istringstream ss(line);
+					ss >> NEig >> tempStr >> NtEig;
+					break;
+					}
+				}
+			else {
+				cerr << "unable to open " << eigVecInputs << endl;
+				return 1;
 			}
-		negVec = loadVector("data/stable/eigVec.dat",Nb,N,1);
-		ifstream eigFile;
-		eigFile.open("data/stable/eigValue.dat");
-		string lastLine = getLastLine(eigFile);
-		istringstream ss(lastLine);
-		double temp;
-		double eigError; //should be <<1
-		ss >> temp >> temp >> temp >> eigError >> negVal;
-		if (eigError>1.0)
+			fin.close();
+			vec tempEig = loadVector(eigVecFilename,NtEig,NEig,1);
+			negVec = interpolate(tempEig,NtEig,NEig,Nb,N);
+			}
+		else
 			{
-			cout << "error in negEig = " << eigError << endl;
-			cout << "consider restarting with different values of P and c" << endl;
+			cerr << "eigVec not the right length, cannot interpolate" << endl;
+			return 1;
+			}
+			ifstream eigFile;
+			eigFile.open("data/stable/eigValue.dat");
+			string lastLine = getLastLine(eigFile);
+			istringstream ss(lastLine);
+			double temp;
+			double eigError; //should be <<1
+			ss >> temp >> temp >> temp >> eigError >> negVal;
+			if (eigError>1.0)
+				{
+				cout << "error in negEig = " << eigError << endl;
+				cout << "consider restarting with different values of P and c" << endl;
+				}
 			}
 		}
 
@@ -465,7 +513,7 @@ auto ddVr = [&] (const comp & phi)
 			else
 				{
 				cout << "nothing to loop over, set loops to 1" << endl;
-				loop1 = 1;
+				loops = 1;
 				}
 			}
 		
@@ -479,7 +527,6 @@ auto ddVr = [&] (const comp & phi)
 		vec linNum(NT);
 		
 		//defining the action and bound and W
-		double twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		comp action = i*twaction;
 		double bound;
 		double W;
@@ -567,18 +614,10 @@ auto ddVr = [&] (const comp & phi)
 						posT = posMap.at(zmt[1+l]);
 						for (unsigned int k=0;k<slicesT;k++)
 							{
-							if (zmt[0]=='n')
-								{
-								chiT(posT+k) = negVec(2*(posCe+k));
-								}
-							else if (zmt[0]=='d')
-								{
-								chiT(posT+k) = p(2*(posT+k+1))-p(2*(posT+k));
-								}
-							else
-								{
-								cout << "choice of zmt not allowed" << endl;
-								}
+							if (zmt[0]=='n' && pot[0]!='3') 	chiT(posT+k) = negVec(2*(posCe+k));
+							if (zmt[0]=='n' && pot[0]=='3') 	chiT(posT+k) = negVec(j);
+							else if (zmt[0]=='d')				chiT(posT+k) = p(2*(posT+k+1))-p(2*(posT+k));
+							else								cout << "choice of zmt not allowed" << endl;
 							}
 						}
 					}
@@ -595,18 +634,10 @@ auto ddVr = [&] (const comp & phi)
 						posX = posMap.at(zmx[1+l]);
 						for (unsigned int k=0;k<slicesX;k++)
 							{
-							if (zmx[0]=='n')
-								{
-								chiX(posX+k) = negVec(2*(posCe+k));
-								}
-							else if (zmx[0]=='d')
-								{
-								chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
-								}
-							else
-								{
-								cout << "choice of zmx not allowed" << endl;
-								}
+							if (zmx[0]=='n' && pot[0]!='3')		chiX(posX+k) = negVec(2*(posCe+k));
+							if (zmt[0]=='n' && pot[0]=='3') 	chiT(posT+k) = negVec(j);
+							else if (zmx[0]=='d')	chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
+							else					cout << "choice of zmx not allowed" << endl;
 							}
 						}
 					}
@@ -617,7 +648,7 @@ auto ddVr = [&] (const comp & phi)
 			normT = pow(normT,0.5);
 			if (absolute(normX)<DBL_MIN || absolute(normT)<DBL_MIN)
 				{
-				cout << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
+				cerr << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
 			chiX = chiX/normX;
 			chiT = chiT/normT;
@@ -646,17 +677,32 @@ auto ddVr = [&] (const comp & phi)
 			//initializing to zero
 			comp kineticS = 0.0;
 			comp kineticT = 0.0;
-			comp pot = 0.0;
+			comp potV = 0.0;
 			comp pot_r = 0.0;
 			bound = 0.0;
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 			linErg = Eigen::VectorXd::Zero(NT);
 			linNum = Eigen::VectorXd::Zero(NT);
+			
+			//testing that the potential term is working for pot3
+			if (pot[0]=='3' && true)
+				{
+				comp Vtrial = 0.0, Vcontrol = 0.0;
+				for (unsigned int j=0; j<N; j++)
+					{
+					double r = r0 + j*a;
+					paramsV  = {r, 0.0};
+					Vcontrol += pow(p(2*j*Nb),2.0)/2.0 - pow(p(2*j*Nb),4.0)/4.0/pow(r,2.0);
+					Vtrial += V(p(2*j*Nb));
+					}
+				double potTest = pow(pow(real(Vcontrol-Vtrial),2.0) + pow(imag(Vcontrol-Vtrial),2.0),0.5);
+				cout << "potTest = " << potTest << endl;
+				}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//assigning values to minusDS and DDS and evaluating action
-			#pragma omp parallel for
+			//#pragma omp parallel for
 			for (unsigned long int j = 0; j < N*NT; j++)
 				{		
 				unsigned int t = intCoord(j,0,NT); //coordinates
@@ -664,8 +710,9 @@ auto ddVr = [&] (const comp & phi)
 				unsigned int neighPosX = neigh(j,1,1,NT,N);
 				comp Dt = DtFn(t);
 				comp dt = dtFn(t);
+				if (pot[0]=='3') paramsV  = {r0+x*a, 0.0};
 			
-				if (absolute(chiX(j))>DBL_MIN) //spatial zero mode lagrange constraint
+				if (absolute(chiX(j))>DBL_MIN && pot[0]!='3') //spatial zero mode lagrange constraint
 					{
 					DDS.insert(2*j,2*N*NT) = a*chiX(j); 
 					DDS.insert(2*N*NT,2*j) = a*chiX(j);
@@ -704,11 +751,21 @@ auto ddVr = [&] (const comp & phi)
 					}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				//boundaries			
-				if (t==(NT-1))
+				//boundaries
+				if (pot[0]=='3' && x==(N-1))
+					{
+					DDS.insert(2*j,2*j) = 1.0; // p=0 at r=R
+					DDS.insert(2*j+1,2*j+1) = 1.0;
+					}
+				else if (pot[0]=='3' && x==0)
+					{
+					DDS.insert(2*j,2*j) = 1.0; // p=0 at r=0
+					DDS.insert(2*j+1,2*j+1) = 1.0;
+					}			
+				else if (t==(NT-1))
 					{
 					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
-					pot += Dt*a*V(Cp(j));
+					potV += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -719,7 +776,7 @@ auto ddVr = [&] (const comp & phi)
 					{
 					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-					pot += Dt*a*V(Cp(j));
+					potV += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 					
@@ -813,7 +870,7 @@ auto ddVr = [&] (const comp & phi)
 					{
 					kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 					kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-					pot += Dt*a*V(Cp(j));
+					potV += Dt*a*V(Cp(j));
 					pot_r += Dt*a*Vr(Cp(j));
 					erg(t) += a*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				
@@ -856,13 +913,14 @@ auto ddVr = [&] (const comp & phi)
 		            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 		            }
 		        }
-		    action = kineticT - kineticS - pot - pot_r;   
+		    if (pot[0]=='3') DDS.insert(2*N*NT,2*N*NT) = 1.0;
+		    action = kineticT - kineticS - potV - pot_r;   
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
 			
 			//checking pot_r is much smaller than the other potential terms
-			reg_test.push_back(abs(pot_r/pot));
+			reg_test.push_back(abs(pot_r/potV));
 			if (reg_test.back()>closenessR)
 				{
 				cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
@@ -875,30 +933,15 @@ auto ddVr = [&] (const comp & phi)
 			unsigned int linearInt = (int)(Na/3);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
-				if (absolute(linErg(j))>linEMax)
-					{
-					linEMax = absolute(linErg(j));
-					}
-				if (absolute(linErg(j))<linEMin)
-					{
-					linEMin = absolute(linErg(j));
-					}
-				if (absolute(linNum(j))>linNMax)
-					{
-					linNMax = absolute(linNum(j));
-					}
-				if (absolute(linNum(j))<linNMin)
-					{
-					linNMin = absolute(linNum(j));
-					}
+				if (absolute(linErg(j))>linEMax) linEMax = absolute(linErg(j));
+				if (absolute(linErg(j))<linEMin) linEMin = absolute(linErg(j));
+				if (absolute(linNum(j))>linNMax) linNMax = absolute(linNum(j));
+				if (absolute(linNum(j))<linNMin) linNMin = absolute(linNum(j));
 				}
 			linTestE = (linEMax-linEMin)*2.0/(linEMax+linEMin);
 			linTestN = (linNMax-linNMin)*2.0/(linNMax+linNMin);
 			lin_test.push_back(linTestE);
-			if (linTestN>linTestE)
-				{
-				lin_test.back() = linTestN;
-				}
+			if (linTestN>linTestE) lin_test.back() = linTestN;
 			
 			//checking conservation of E
 			double ergTest = real(erg(1)-erg(NT-2));
@@ -910,10 +953,7 @@ auto ddVr = [&] (const comp & phi)
 			E = linErg(0);
 			Num =linNum(0);
 			E_exact = 0;
-			for (unsigned int j=0; j<linearInt; j++)
-				{
-				E_exact += real(erg(j));
-				}
+			for (unsigned int j=0; j<linearInt; j++) E_exact += real(erg(j));
 			E_exact /= (double)linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
@@ -980,22 +1020,22 @@ auto ddVr = [&] (const comp & phi)
 			solver.analyzePattern(DDS);
 			if(solver.info()!=Eigen::Success)
 				{
-				cout << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
-				return 0;
+				cerr << "DDS pattern analysis failed, solver.info() = "<< solver.info() << endl;
+				return 1;
 				}		
 			solver.factorize(DDS);
 			if(solver.info()!=Eigen::Success) 
 				{
-				cout << "Factorization failed, solver.info() = "<< solver.info() << endl;
-				return 0;
+				cerr << "Factorization failed, solver.info() = "<< solver.info() << endl;
+				return 1;
 				}
 			delta = solver.solve(minusDS);// use the factorization to solve for the given right hand side
 			if(solver.info()!=Eigen::Success)
 				{
-				cout << "Solving failed, solver.info() = "<< solver.info() << endl;
-				cout << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
-				cout << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
-				return 0;
+				cerr << "Solving failed, solver.info() = "<< solver.info() << endl;
+				cerr << "log(abs(det(DDS))) = " << solver.logAbsDeterminant() << endl;
+				cerr << "sign(det(DDS)) = " << solver.signDeterminant() << endl;
+				return 1;
 				}
 		
 			//independent check on whether calculation worked
@@ -1006,9 +1046,9 @@ auto ddVr = [&] (const comp & phi)
 			calc_test.push_back(maxDiff);
 			if (calc_test.back()>closenessC)
 				{
-				cout << "Calculation failed" << endl;
-				cout << "calc_test = " << calc_test.back() << endl;
-				return 0;
+				cerr << "Calculation failed" << endl;
+				cerr << "calc_test = " << calc_test.back() << endl;
+				return 1;
 				}
 
 			//assigning values to phi
@@ -1024,10 +1064,7 @@ auto ddVr = [&] (const comp & phi)
 			normDS = pow(normDS,0.5);
 			double maxDS = minusDS.maxCoeff();
 			double minDS = minusDS.minCoeff();
-			if (-minDS>maxDS)
-				{
-				maxDS = -minDS;
-				}
+			if (-minDS>maxDS) maxDS = -minDS;
 			double normP = p.dot(p);
 			normP = pow(normP,0.5);
 			double normDelta = delta.dot(delta);
@@ -1052,17 +1089,10 @@ auto ddVr = [&] (const comp & phi)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
 
 		//checking energy conserved
-		if (erg_test.back()>closenessE)
-				{
-				cout << endl;
-				cout << "ergTest = " << erg_test.back() << endl;
-				}
+		if (erg_test.back()>closenessE) cout << endl << "ergTest = " << erg_test.back() << endl;
 		
 		//checking lattice small enough
-		if (mom_test.back()>closenessP)
-			{
-			cout << "momTest = "<< mom_test.back()  << endl;
-			}
+		if (mom_test.back()>closenessP) cout << endl << "momTest = "<< mom_test.back()  << endl;
 		
 		//stopping clock
 		time = clock() - time;
@@ -1087,18 +1117,9 @@ auto ddVr = [&] (const comp & phi)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (absolute(maxTheta-minTheta)>DBL_MIN)
-			{
-			changeInputs(runInputs, "theta", numberToString<double>(theta));
-			}
-		else if (absolute(maxTb-minTb)>DBL_MIN)
-			{
-			changeInputs(runInputs, "Tb", numberToString<double>(Tb));
-			}
-		else
-			{
-			copyFile(inputsFiles[fileLoop],runInputs);
-			}
+		if (absolute(maxTheta-minTheta)>DBL_MIN) 	changeInputs(runInputs, "theta", numberToString<double>(theta));
+		else if (absolute(maxTb-minTb)>DBL_MIN)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb));
+		else 										copyFile(inputsFiles[fileLoop],runInputs);
 		printf("%12s%30s\n","output: ",runInputs.c_str());
 	
 		//printing output phi
