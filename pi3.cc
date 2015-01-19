@@ -82,7 +82,7 @@ getting parameters from specific inputs
 ---------------------------------------------------------------------------------------------*/
 
 unsigned int Nin, Nain, Nbin, Ncin;
-double Tbin, dtin;
+double Tbin, dtin, drin;
 string inputsF = "./data/" + timeNumberIn + "inputsPi_0";
 ifstream fin;
 fin.open(inputsF.c_str());
@@ -102,6 +102,7 @@ else cout << "unable to open " << inputsF << endl;
 fin.close();
 
 dtin = Tbin/(Nbin-1.0);
+drin = (r1-r0)/(Nin-1.0);
 Ta = dtin*Nain;
 Tc = dtin*Ncin;
 dt = dr*0.2;
@@ -121,196 +122,200 @@ if (abs(dt)>0.5*dr) {
 	return 1;
 }
 
+/* ---------------------------------------------------------------------------------------------
+loading phi on BC
+---------------------------------------------------------------------------------------------*/
+string filename = "data/" + timeNumberIn + "pip_0.dat";
+unsigned int fileLength = countLines(filename);
+vec phiBC;
+	
+if (fileLength==Nin*Nbin) phiBC = loadSimpleVectorColumn(filename,3);
+else if (fileLength==(Nin*Nbin+1))
+	{
+	vec phiBC = loadSimpleVectorColumn(filename,3);
+	phiBC.conservativeResize(Nbin*Nin);
+	}
+else {
+	cerr << filename << " cannot be read." << endl;
+	cerr << "File length not correct: " << fileLength << " != " << Nbin*Nin+1 << endl;
+}
 
 /* ---------------------------------------------------------------------------------------------
 propagating euclidean solution forwards and then backwards in time
 ---------------------------------------------------------------------------------------------*/
-
-bool notFinished = true;
-while(notFinished) {
-Nt = Na-1; //etc -------------------
 
 vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);
 vec nonLinErg(Nt+1), erg(Nt+1);
 linErgField = Eigen::VectorXd::Zero(Nt+1);
 nonLinErg = Eigen::VectorXd::Zero(Nt+1);
 erg = Eigen::VectorXd::Zero(Nt+1);
-
-//getting initial from file
-string filename = "data/" + timeNumberIn + "pip_0.dat";
-unsigned int fileLength = countLines(filename);
-vec initial;
-		
-if (fileLength==((N+1)*(Nt+1))) initial = loadSimpleVectorColumn(filename,3);
-else if (fileLength % 2) //if its odd
-	{
-	//cout << "interpolating input, filelength = " << fileLength << " , Cp.size() = " << N*Nb+1 << endl;
-	vec temp_initial = loadSimpleVectorColumn(filename,3);
-	temp_initial.conservativeResize(Nbin*Nin);
-	initial = interpolate(temp_initial,Nbin,Nin,Nt+1,N+1);
-	}
-
-//initial condition 1)
-//defining phi on initial time slice
-for (unsigned int j=0;j<(N+1);j++)
-	{
-	unsigned int l = j*(Nt+1);
-	unsigned int m;
-	(direction == 1) ? m = Nt + l : m = l;
-	double r = r0 + j*dr;
-	phi(l) = initial(m)/r;
-	}
-	
-//initialising linErg and linNum	
-for (unsigned int x=0;x<(N+1);x++)
-	{
-	unsigned int j = x*(Nt+1);
-	double r = r0 + x*dr, eta;
-	(x==0 || x==N) ? eta = 0.5 : eta = 1.0;
-	nonLinErg(0) += 4.0*pi*pow(r,2.0)*eta*0.25*pow(phi(j),4.0)*dr;
-	linErgField(0) += 4.0*pi*pow(r,2.0)*eta*0.5*pow(phi(j),2.0)*dr;
-	if (x<N) linErgField(0) += 4.0*pi*r*(r+dr)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
-	}
-
-//initial condition 2)
-//intitialize velocity, dphi/dt(x,0) = 0;
-for (unsigned int j=0; j<(N+1); j++)
-	{
-	unsigned int l = j*(Nt+1);
-    vel(l) = 0.0;
-	}
-
-//boundary condition 1)
-//phi=0.0 at r=L
-for (unsigned int j=0;j<(Nt+1);j++)
-	{
-	unsigned int l = N*(Nt+1) + j;
-	phi(l) = 0.0;
-	}
-
-//boundary condition 2)
-//initialize acc using phi and expression from equation of motion
-/*the unusual d^2phi/dr^2 term and the absence of the first derivative term
-are due to the boundary condition 2) which, to second order, is phi(t,-dr) = phi(t,dr)*/
-acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) - phi(0) + pow(phi(0),3.0);
-acc(0) *= sigma*0.5; //as initial time slice, generated from taylor expansion and equation of motion
-for (unsigned int j=1; j<N; j++)
-	{
-	unsigned int l = j*(Nt+1);
-	double r = r0 + dr*j;
-    acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
-    acc(l) *= sigma*0.5;
-	}
-
-//A7. run loop
-for (unsigned int u=1; u<(Nt+1); u++)
-	{
-    for (unsigned int x=0; x<N; x++) //don't loop over last x position as fixed by boundary condition 1)
-    	{
-        unsigned int m = u+x*(Nt+1);
-        vel(m) = vel(m-1) + dt*acc(m-1);
-        phi(m) = phi(m-1) + dt*vel(m);
-    	}
-    acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
-    acc(u) *= sigma;
-    linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
-    linErgField(u-1) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1))-phi(u+N*(Nt+1)-1),2.0)/pow(dt,2.0);
-    linErgField(u) += 4.0*pi*( r0*(r0+dr)*0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr + dr*pow(r0,2.0)*0.5*pow(phi(u),2.0) );
-    linErgField(u) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0);
-    nonLinErg(u) += 4.0*pi*dr*pow(r0,2.0)*0.25*pow(phi(u),4.0);
-    nonLinErg(u) += 4.0*pi*dr*pow(r1,2.0)*0.25*pow(phi(u+N*(Nt+1)),4.0);
-    for (unsigned int x=1; x<N; x++)
-    	{
-        unsigned int m = u+x*(Nt+1);
-        double r = r0 + x*dr;
-        acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
-        acc(m) *= sigma;
-        linErgField(u-1) +=  4.0*pi*pow(r,2.0)*dr*0.5*pow(phi(m)-phi(m-1),2.0)/pow(dt,2.0);
-		linErgField(u) += 4.0*pi*(r*(r+dr)*0.5*pow(phi(m+(Nt+1))-phi(m),2.0)/dr + pow(r,2.0)*0.5*dr*pow(phi(m),2.0));
-		nonLinErg(u) += 4.0*pi*pow(r,2.0)*0.25*pow(phi(m),4.0)*dr;
-    	}
-	}
-	
-for (unsigned int k=0; k<(Nt+1); k++)
-	{
-	erg(k) = linErgField(k) + nonLinErg(k);
-	}
-	
 double linErgContm = 0.0, linNumContm = 0.0;
-for (unsigned int k=1; k<(N+1); k++)
-	{
-	double momtm = k*pi/(r1-r0);
-	double freqSqrd = 1.0+pow(momtm,2.0);
-	double Asqrd, integral1 = 0.0, integral2 = 0.0;
-	for (unsigned int l=0; l<(N+1); l++)
-		{
-		double r = r0 + l*dr;
-		unsigned int m = (Nt-1) + l*(Nt+1);
-		integral1 += dr*r*phi(m)*pow(2.0/(r1-r0),0.5)*sin(momtm*r);
-		integral2 += dr*r*(phi(m+1)-phi(m))*pow(2.0/(r1-r0),0.5)*sin(momtm*r)/dt;
-		}
-	Asqrd = pow(integral1,2.0) + pow(integral2,2.0)/freqSqrd;
-	linErgContm += 2.0*pi*Asqrd*freqSqrd;
-	linNumContm += 2.0*pi*Asqrd*pow(freqSqrd,0.5);
+
+uint j=0;
+while(j<2) {
+
+	if (j==0) {
+		Nt = Na-1;
+		direction = -1;
 	}
+	else if (j==1) {
+		Nt = Nc-1;
+		direction = 1;
+	}
+	j++;
+	
+	vec initial;
+	initial = interpolate(phiBC,Nbin,Nin,Nt+1,N+1);
+
+	//initial condition 1)
+	//defining phi on initial time slice
+	for (unsigned int j=0;j<(N+1);j++)
+		{
+		unsigned int l = j*(Nt+1);
+		unsigned int m;
+		(direction == 1) ? m = Nt + l : m = l;
+		double r = r0 + j*dr;
+		phi(l) = initial(m)/r;
+		}
+	
+	//initialising linErg and linNum	
+	for (unsigned int x=0;x<(N+1);x++)
+		{
+		unsigned int j = x*(Nt+1);
+		double r = r0 + x*dr, eta;
+		(x==0 || x==N) ? eta = 0.5 : eta = 1.0;
+		nonLinErg(0) += 4.0*pi*pow(r,2.0)*eta*0.25*pow(phi(j),4.0)*dr;
+		linErgField(0) += 4.0*pi*pow(r,2.0)*eta*0.5*pow(phi(j),2.0)*dr;
+		if (x<N) linErgField(0) += 4.0*pi*r*(r+dr)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
+		}
+
+	//initial condition 2)
+	//intitialize velocity, dphi/dt(x,0) = 0;
+	for (unsigned int j=0; j<(N+1); j++)
+		{
+		unsigned int l = j*(Nt+1);
+		vel(l) = 0.0;
+		}
+
+	//boundary condition 1)
+	//phi=0.0 at r=L
+	for (unsigned int j=0;j<(Nt+1);j++)
+		{
+		unsigned int l = N*(Nt+1) + j;
+		phi(l) = 0.0;
+		}
+
+	//boundary condition 2)
+	//initialize acc using phi and expression from equation of motion
+	/*the unusual d^2phi/dr^2 term and the absence of the first derivative term
+	are due to the boundary condition 2) which, to second order, is phi(t,-dr) = phi(t,dr)*/
+	acc(0) = 2.0*(phi(Nt+1) - phi(0))/pow(dr,2.0) - phi(0) + pow(phi(0),3.0);
+	acc(0) *= sigma*0.5; //as initial time slice, generated from taylor expansion and equation of motion
+	for (unsigned int j=1; j<N; j++)
+		{
+		unsigned int l = j*(Nt+1);
+		double r = r0 + dr*j;
+		acc(l) = (phi(l+(Nt+1)) + phi(l-(Nt+1)) - 2.0*phi(l))/pow(dr,2.0) + (phi(l+(Nt+1))-phi(l-(Nt+1)))/r/dr - phi(l) + pow(phi(l),3.0);
+		acc(l) *= sigma*0.5;
+		}
+
+	//A7. run loop
+	for (unsigned int u=1; u<(Nt+1); u++)
+		{
+		for (unsigned int x=0; x<N; x++) //don't loop over last x position as fixed by boundary condition 1)
+			{
+		    unsigned int m = u+x*(Nt+1);
+		    vel(m) = vel(m-1) + dt*acc(m-1);
+		    phi(m) = phi(m-1) + dt*vel(m);
+			}
+		acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
+		acc(u) *= sigma;
+		linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
+		linErgField(u-1) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1))-phi(u+N*(Nt+1)-1),2.0)/pow(dt,2.0);
+		linErgField(u) += 4.0*pi*( r0*(r0+dr)*0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr + dr*pow(r0,2.0)*0.5*pow(phi(u),2.0) );
+		linErgField(u) += 4.0*pi*dr*pow(r1,2.0)*0.5*pow(phi(u+N*(Nt+1)),2.0);
+		nonLinErg(u) += 4.0*pi*dr*pow(r0,2.0)*0.25*pow(phi(u),4.0);
+		nonLinErg(u) += 4.0*pi*dr*pow(r1,2.0)*0.25*pow(phi(u+N*(Nt+1)),4.0);
+		for (unsigned int x=1; x<N; x++)
+			{
+		    unsigned int m = u+x*(Nt+1);
+		    double r = r0 + x*dr;
+		    acc(m) = (phi(m+(Nt+1)) + phi(m-(Nt+1)) - 2.0*phi(m))/pow(dr,2.0) + (phi(m+(Nt+1))-phi(m-(Nt+1)))/r/dr - phi(m) + pow(phi(m),3.0);
+		    acc(m) *= sigma;
+		    linErgField(u-1) +=  4.0*pi*pow(r,2.0)*dr*0.5*pow(phi(m)-phi(m-1),2.0)/pow(dt,2.0);
+			linErgField(u) += 4.0*pi*(r*(r+dr)*0.5*pow(phi(m+(Nt+1))-phi(m),2.0)/dr + pow(r,2.0)*0.5*dr*pow(phi(m),2.0));
+			nonLinErg(u) += 4.0*pi*pow(r,2.0)*0.25*pow(phi(m),4.0)*dr;
+			}
+		}
+	
+	for (unsigned int k=0; k<(Nt+1); k++)
+		{
+		erg(k) = linErgField(k) + nonLinErg(k);
+		}
+	
+	for (unsigned int k=1; k<(N+1); k++)
+		{
+		double momtm = k*pi/(r1-r0);
+		double freqSqrd = 1.0+pow(momtm,2.0);
+		double Asqrd, integral1 = 0.0, integral2 = 0.0;
+		for (unsigned int l=0; l<(N+1); l++)
+			{
+			double r = r0 + l*dr;
+			unsigned int m = (Nt-1) + l*(Nt+1);
+			integral1 += dr*r*phi(m)*pow(2.0/(r1-r0),0.5)*sin(momtm*r);
+			integral2 += dr*r*(phi(m+1)-phi(m))*pow(2.0/(r1-r0),0.5)*sin(momtm*r)/dt;
+			}
+		Asqrd = pow(integral1,2.0) + pow(integral2,2.0)/freqSqrd;
+		linErgContm += 2.0*pi*Asqrd*freqSqrd;
+		linNumContm += 2.0*pi*Asqrd*pow(freqSqrd,0.5);
+		}
+		
+} // end of while j<2 loop
 	
 printf("\ndirection = %i, sigma = %g\n",direction,sigma);
 printf("Input:                  %39s\n",filename.c_str());
 	
-unsigned int N_print = 100, Nt_print = 100;
-if (direction==-1 && sigma==1) {
-	N_print = Nin;
-	Nt_print = Nain+Nbin;
-}
-vec tVec(Nt_print*N_print), rVec(Nt_print*N_print);
-double dtPrint = T/(Nt_print-1.0);
-double dxPrint = (r1-r0)/(N_print-1.0);
-for (unsigned int t=0;t<Nt_print;t++)
+vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);
+for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
 	{
-	for (unsigned int r=0; r<N_print; r++)
+	for (unsigned int r=0; r<Nin; r++)
 		{
-		unsigned int j= t + r*Nt_print;
-		tVec(j) = t*dtPrint;
-		rVec(j) = r0 + r*dxPrint;
+		unsigned int j= t + r*(Nain+Nbin+Ncin);
+		tVec(j) = t*dtin;
+		rVec(j) = r0 + r*drin;
 		}
 	}
-	
-vec phiToPrint;
-phiToPrint = interpolate(phi,Nt+1,N+1,Nt_print,N_print);
 	
 // constructing input to main
-vec mainIn((Nain+Nbin)*Nin);
-if (direction==-1 && sigma==1)
+vec mainIn((Nain+Nbin+Ncin)*Nin);
+vec mink;
+mink = interpolate(phi,Nt+1,N+1,Nain+1,Nin+1);
+for (unsigned int j=0;j<(Nain+Nbin+Ncin);j++)
 	{
-	vec mink;
-	mink = interpolate(phi,Nt+1,N+1,Nain+1,Nin+1);
-	for (unsigned int j=0;j<(Nain+Nbin);j++)
+	for (unsigned int k=0; k<Nin; k++)
 		{
-		for (unsigned int k=0; k<Nin; k++)
+		unsigned int l = j+k*(Nain+Nbin), m;
+		double r = r0 + k*drin;
+		if (j<Nain)
 			{
-			unsigned int l = j+k*(Nain+Nbin), m;
-			double r = r0 + k*dxPrint;
-			if (j<Nain)
-				{
-				m = (Nain-j)+k*(Nain+1);
-				mainIn(l) = mink(m)*r;
-				}
-			else
-				{
-				m = (j-Nain)+k*Nbin;
-				mainIn(l) = initial(m);
-				}
+			m = (Nain-j)+k*(Nain+1);
+			mainIn(l) = mink(m)*r;
+			}
+		else if (j<(Nain+Nbin))
+			{
+			m = (j-Nain)+k*Nbin;
+			mainIn(l) = phiBC(m);
+			}
+		else
+			{
+			
 			}
 		}
-	string mainInFile = "data/" + timeNumber + "tpip_0.dat";
-	printThreeVectors(mainInFile,tVec,rVec,mainIn);
-	printf("tpip printed        : %39s pics/pi3.png\n",mainInFile.c_str());
 	}
-
-string evoPrint = "data/" + timeNumber + "pi3.dat";
-printThreeVectors(evoPrint,tVec,rVec,phiToPrint);
-gp(evoPrint,"pi3.gp");
-printf("Time evolution printed: %39s pics/pi3.png\n",evoPrint.c_str());
+string mainInFile = "data/" + timeNumber + "tpip_0.dat";
+printThreeVectors(mainInFile,tVec,rVec,mainIn);
+printf("tpip printed        : %39s pics/pi3.png\n",mainInFile.c_str());
+gp(mainInFile,"pi3.gp");
 printf("erg(Nt-1) = %8.4f\n",linErgField(Nt-1));
 printf("linErgField(Nt-1) = %8.4f\n",linErgField(Nt-1));
 printf("nonLinErg(Nt-1) = %8.4f\n",nonLinErg(Nt-1));
