@@ -30,10 +30,6 @@ return instance;
 bag errors
 -------------------------------------------------------------------------------------------------------------------------*/
 
-BagError::NotFound::NotFound(const string& s) {
-	pName = s;
-}
-
 string BagError::NotFound::message() const{
 	return "Parameter " + pName + " not found.";
 }

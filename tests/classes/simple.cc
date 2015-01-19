@@ -28,3 +28,4 @@ T stringToNumber ( const string& Text )
 	return ss >> result ? result : 0;
 	}
 
+

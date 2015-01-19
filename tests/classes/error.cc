@@ -14,3 +14,4 @@ SimpleError::~SimpleError(){}
 ostream& operator<<(ostream&s, const SimpleError& e) {
 	return s << e.message() << endl;
 }
+
