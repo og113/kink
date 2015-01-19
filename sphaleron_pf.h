@@ -161,6 +161,24 @@ double absolute (const double& amplitude)
 		}
 	return abs_amplitude;
 	}
+	
+//to convert number to string, usage is string str = NumberToString<number type>(x);
+template <typename T>
+string numberToString ( T Number ){
+	stringstream ss;
+	ss << Number;
+	return ss.str();
+}
+
+//to convert string to number, usage is (number type) x = StringToNumber<number type>(str);
+template <typename T>
+T stringToNumber ( const string &Text ){
+	stringstream ss(Text);
+	T result;
+	return ss >> result ? result : 0;
+}
+	
+//string to number
 
 //some simple vector functions
 vector<double> vecEquate(const vector<double> & vecB)

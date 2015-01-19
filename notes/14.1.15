@@ -1,0 +1,28 @@
+to do as regards coding:
+	- parameter bag
+		- use a proto bag with non-template functions
+		- use virtual functions and a general class type
+		- combine double and uint parameter bags into a new big one
+		- add primary and secondary parameter functions
+		- write a program to print or change a parameter bag to inputs, basically to change the file so can be run from .sh files
+	- argc and argv input
+		- write a base class to take argc and argv inputs, check for "-" and do something, use virtual functions
+		- write a class to take in parameters using "-name value"
+		- write a class to take in -print options and -plot options
+	- error class
+		- base with just a message and printing
+		- next with message and two doubles to compare
+		- implement this
+	- point class
+	- lattice class
+	- 2d eigen field class
+		- use complex fields, its obviously better
+		- use eigen functions in class
+		- denote positions using points
+		- get neighs facility
+		- N and Nt as member data
+	print function
+		- first use << for as much stuff as possible
+		- then overload a print function to get other more complex options
+		- perhaps have one linked to the lattice so that you can print using simpleTime or simpleSpace
+		- also want to print over ABC, ABCD, BC etc.

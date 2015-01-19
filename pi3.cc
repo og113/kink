@@ -242,5 +242,7 @@ printf("nonLinErg(Nt-1) = %8.4f\n",nonLinErg(Nt-1));
 printf("linNumContm(Nt-1) = %8.4f\n",linNumContm);
 printf("linErgContm(Nt-1) = %8.4f\n\n",linErgContm);
 
-return 0;
+double finalTest = linErgField(Nt-1);
+if ( !isfinite(finalTest) ) return 0;
+else return 1;
 }

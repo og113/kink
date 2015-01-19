@@ -24,21 +24,19 @@ using namespace std;
 
 //to convert number to string, usage is string str = NumberToString<number type>(x);
 template <typename T>
-string numberToString ( T Number )
-	{
+string numberToString ( T Number ){
 	stringstream ss;
 	ss << Number;
 	return ss.str();
-	}
+}
 
 //to convert string to number, usage is (number type) x = StringToNumber<number type>(str);
 template <typename T>
-T stringToNumber ( const string &Text )//Text not by const reference so that the function can be used with a 
-	{                               //character array as argument
+T stringToNumber ( const string &Text ){
 	stringstream ss(Text);
 	T result;
 	return ss >> result ? result : 0;
-	}
+}
 
 //getting the date and time
 const string currentDateTime()
