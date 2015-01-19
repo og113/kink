@@ -212,6 +212,7 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 //copy inputs with a change
 void changeInputs(string outputFile, string search, string replace)
 	{
+	bool found = false;
 	search += " ";
 	ifstream fin;
 	ofstream fout;
@@ -234,6 +235,7 @@ void changeInputs(string outputFile, string search, string replace)
 			getline(fin,line);
 			if (pos != string::npos)
 				{
+				found = true;
 				posEnd = line.find(" ",pos);
 				if ((posEnd-pos)>replaceLength) {
 					for (unsigned int j=0; j<(posEnd-pos-replaceLength); j++) replace += " ";
@@ -245,6 +247,7 @@ void changeInputs(string outputFile, string search, string replace)
 		}
 	fin.close();
 	fout.close();
+	if (!found) cerr << "changeInputs error: parameter " << search << " not found in " << outputFile << endl;
 	}
 	
 
