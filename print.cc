@@ -33,7 +33,9 @@ else if (argc==2) {
 }
 else if (argc==3) {
 	filename = argv[1];
-	method = argv[2];
+	string temp = argv[2];
+	if (temp[0]=='-') temp = temp.substr(1);
+	method = temp;
 }
 if (filename.compare("n")==0)
 	{

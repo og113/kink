@@ -463,7 +463,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		{
 		if (pot[0]=='3')
 			{
-			vec tempPhi = loadVectorColumn("data/instanton00.dat",2);
+			vec tempPhi = loadVectorColumn("data/instanton00.dat",3);
 			vec temp2Phi;
 			unsigned int length = tempPhi.size();
 			length = (unsigned int)(sqrt(length));
@@ -1179,10 +1179,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 //	gp(pifile,"repi.gp");
 	
 	//printing output phi on whole time contour
-	string tpifile = prefix + "tpi"+inP+suffix;
-	printVector(tpifile,tp);
-	printf("%12s%30s\n"," ",tpifile.c_str());
-	//gp(tpifile,"repi.gp");
+	if (pot[0]!='3')
+		{
+		string tpifile = prefix + "tpi"+inP+suffix;
+		printVector(tpifile,tp);
+		printf("%12s%30s\n"," ",tpifile.c_str());
+		//gp(tpifile,"repi.gp");
+		}
 	
 	//printing output minusDS				
 	string minusDSfile = "./data/" + timeNumber + "minusDS"+suffix;
