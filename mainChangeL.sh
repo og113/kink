@@ -4,10 +4,10 @@ FILE="results/20.01.15_L_5.0_10.0_Tb_0.8.txt"
 echo "output to" $FILE
 echo "output from mainChangeL.sh" > $FILE
 
-for j in `seq 0 10`
+for j in `seq 0 16`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	L=$(echo "scale=1; 0.5*$j+5.0" | bc)
+	L=$(echo "scale=1; -0.5*$j+10.0" | bc)
 	LoR=$(echo "scale=1; $L/10.0" | bc)
 	echo "L =" $L >> $FILE
 	echo "" >> $FILE

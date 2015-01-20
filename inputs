@@ -2,7 +2,7 @@
 ##the following are input to pi.cc:
 ##
 #N      Na      Nb      Nc      dE        LoR        Tb      theta
- 160    200     160     2       0.050     .5         0.8     0.0
+ 160    200     160     2       0.050     .9         0.8     0.0
 ##
 #inputChoice    fileNumberIn    loopIn    totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
  p              150120093931    0         1           n           80          160         n               0       
@@ -13,6 +13,8 @@
 ##negEig inputs
 #P          c           done
  100000     1.0e-6      1
+
+
 
 
 
