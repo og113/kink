@@ -241,6 +241,8 @@ void changeInputs(string outputFile, string search, string replace, string input
 	ofstream fout;
 	fin.open(inputFile);
 	fout.open(outputFile.c_str());
+	if (!fin.good()) cerr << "changeInputs error: " << inputFile << " not opened properly." << endl;
+	if (!fout.good()) cerr << "changeInputs error: " << outputFile << " not opened properly." << endl;
 	string line;
 	size_t pos, posEnd, replaceLength = replace.length();
 	while(!fin.eof())
@@ -270,7 +272,7 @@ void changeInputs(string outputFile, string search, string replace, string input
 		}
 	fin.close();
 	fout.close();
-	if (!found) cerr << "changeInputs error: parameter " << search << " not found in " << outputFile << endl;
+	if (!found) cerr << "changeInputs error: parameter " << search << "not found in " << inputFile << endl;
 	}	
 	
 

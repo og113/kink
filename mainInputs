@@ -3,8 +3,20 @@
 ##range of times and dates to loop over
 ##in the format yymmdd-hhmmss
 ##
-#inF		minfileNo			maxfileNo		firstLoop     lastLoop		
- p          150120104755        150121000000    0             20
+#inF        minFileNo           maxFileNo         firstLoop     lastLoop		
+ p          150121000000        150122000000      0             20
 ##
 #minTb		maxTb      minTheta	  maxTheta	 loops	zmt     zmx
  17.00      17.00      0.00       0.00       1      nA10    nC9
+
+
+
+
+
+
+
+
+
+
+
+

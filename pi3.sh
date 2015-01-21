@@ -45,7 +45,7 @@ for j in `seq 0 4`
 	for i in `seq 3 7`;
 		do
 			echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-			AMP=$(echo "scale=9; -0.01*$i+0.1" | bc)
+			AMP=$(echo "scale=9; 0.1*$i-1.0" | bc)
 			echo "Tb =" $Tb >> $FILE
 			echo "amp = "$AMP >> $FILE
 			echo "" >> $FILE

@@ -20,12 +20,9 @@ else if (argc>3) {
 		string temp1 = argv[2*j+1];
 		string temp2 = argv[2*j+2];
 		if (temp1[0]=='-') temp1 = temp1.substr(1);
-		if (temp1.compare("f")==0) filename = temp2;
-		else if (temp1.compare("file")==0) filename = temp2;
-		else if (temp1.compare("v")==0) pValue = stringToNumber<double>(temp2);
-		else if (temp1.compare("value")==0) pValue = stringToNumber<double>(temp2);
-		else if (temp1.compare("n")==0) pName = temp2;
-		else if (temp1.compare("name")==0) pName = temp2;
+		if (temp1.compare("f")==0 || temp1.compare("file")==0) filename = temp2;
+		else if (temp1.compare("v")==0 || temp1.compare("value")==0) pValue = temp2;
+		else if (temp1.compare("n")==0 || temp1.compare("name")==0) pName = temp2;
 		else {
 			cerr << "input " << temp1 << " not understood" << endl;
 			return 1;

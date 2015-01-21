@@ -33,7 +33,7 @@ for j in `seq 0 16`
 	./mx "D"
 	./mx "V0 = V(:,1);"
 	./mx "printVector(V0,'../kink/data/stable/sphaleronEigVec.dat');"
-	AMP=0.5
+	AMP=-0.5
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
 	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
@@ -48,7 +48,7 @@ for j in `seq 0 16`
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./changeInputs -f mainInputs -n minfileNo -v "$TIMENUMBER"
+			./changeInputs -f mainInputs -n minFileNo -v "$TIMENUMBER"
 			echo "#################################################################################################" >> $FILE
 			./main >> $FILE
 			echo "#################################################################################################" >> $FILE
