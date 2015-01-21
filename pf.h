@@ -157,15 +157,13 @@ unsigned int countLines(const string & file_to_count)
 	{
 	ifstream fin;
 	fin.open(file_to_count.c_str());
+	if (!fin.good()) cerr << "countLines error: " << file_to_count << " not opened properly." << endl;
 	string line;
 	unsigned int counter = 0;
 	while(!fin.eof())
 		{
 		getline(fin,line);
-		if(line.empty())
-			{
-			continue;
-			}
+		if(line.empty()) continue;
 		counter++;
 		}		
 	fin.close();

@@ -41,20 +41,13 @@ if (fin.is_open())
 	unsigned int lineNumber = 0;
 	while(getline(fin,line))
 		{
-		if(line[0] == '#')
-			{
-			continue;
-			}
+		if(line[0] == '#') continue;
 		istringstream ss(line);
 		if (lineNumber==0)
 			{
 			ss >> N >> Na >> Nb >> Nc >> dE >> LoR >> Tb >> theta;
 			lineNumber++;
-			if (absolute(theta)>1.0e-16)
-				{
-				cout << "theta != 0" << endl;
-				cout << "theta = " << theta << endl;
-				}
+			if (absolute(theta)>1.0e-16) cout << "theta != 0" << endl << "theta = " << theta << endl;
 			}
 		else if (lineNumber==1)
 			{
@@ -595,7 +588,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
 	    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
 		}
-    if (pot[0]=='3' && false)
+    if (pot[0]=='3')
     	{
 		for (unsigned int j=0;j<Nb;j++)
 			{

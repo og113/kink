@@ -51,7 +51,7 @@ main parameters
 ---------------------------------------------------------------------------------------------*/
 unsigned int 	N= 1e3, Nt = 1e3;
 double 			r0 = 1.0e-16, r1 = 5.0, t0 = 0.0, t1 = 0.80;
-double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
+double			dr, dt;
 double			amp = -1.0e-2;
 
 /* ---------------------------------------------------------------------------------------------
@@ -76,6 +76,8 @@ if (argc>2) {
 }
 else if (argc==2) amp = atof(argv[1]);
 else cerr << "inputs not understood" << endl;
+
+dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 
 printf("%8s%8s%8s%8s%8s%8s%8s\n","N","Nt","r1","r0","t1","t0","amp");
 printf("%8i%8i%8g%8g%8g%8g%8g\n",N,Nt,r1,r0,t1,t0,amp);

@@ -60,7 +60,8 @@ else if (argc % 2 && argc>1) {
 		string id = argv[2*j+1];
 		if (id[0]=='-') id = id.substr(1);
 		if (id.compare("tn")==0) timeNumberIn = argv[2*j+2];
-		else if (id.compare("loop")==0 || id.compare("loop")==0) loopIn = argv[2*j+2];
+		else if (id.compare("r1")==0) timeNumberIn = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("loop")==0 || id.compare("l")==0) loopIn = argv[2*j+2];
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -97,7 +98,7 @@ if (fin.is_open())
 		if(line.empty()) continue;
 		istringstream ss(line);
 		ss >> Nin >> Nain >> Nbin >> Ncin >> temp >> LoR >> Tbin;
-		r1 *= LoR;
+		r1 = 10.0*LoR;
 		break;
 		}
 	}

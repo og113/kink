@@ -62,7 +62,7 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 7.0;
+double r0 = 1.0e-16, r1 = 10.0;
 unsigned int N = 1e3;
 unsigned int runsCount = 0;
 
