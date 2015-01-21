@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
 /* ---------------------------------------------------------------------------------------------
 load vectors
 ---------------------------------------------------------------------------------------------*/
-vec sphaleronFull = loadSimpleVectorColumn("data/stable/sphaleron.dat",1);
+vec sphaleronFull = loadSimpleVectorColumn("data/stable/sphaleron.dat",0);
 vec negEigFull = loadSimpleVector("data/stable/sphaleronEigVec.dat");
 if (sphaleronFull.size()!=negEigFull.size()) {
 	printf("error: sphaleron.size() = %i, negEig.size() = %i\n\n",(int)sphaleronFull.size(),(int)negEigFull.size());
@@ -50,7 +50,7 @@ if (sphaleronFull.size()!=negEigFull.size()) {
 main parameters
 ---------------------------------------------------------------------------------------------*/
 unsigned int 	N= 500, Nt = 500;
-double 			r0 = 1.0e-16, r1 = 10.0, t0 = 0.0, t1 = 0.80;
+double 			r0 = 1.0e-16, r1 = 5.0, t0 = 0.0, t1 = 0.80;
 double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 double			amp = -1.0e-2;
 
@@ -122,7 +122,7 @@ for (unsigned int k=0;k<Nt_print;k++) {
 phiToPrint = interpolate(phi,Nt,N,Nt_print,N_print);
 phiToPrint = reverseTime(phiToPrint,Nt_print,N_print);
 printThreeVectors(filename,tVec,rVec,phiToPrint);
-gp(filename,"vector.gp");
+gp(filename,"repi.gp");
 
 return 0;
 }

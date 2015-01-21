@@ -48,9 +48,9 @@ then,
 
 using namespace std;
 
-int main()
+int main(int argc, char** argv)
 {
-//defining the time to label output
+
 string timeNumber;
 if (false) timeNumber = currentDateTime();
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,17 +62,40 @@ gsl_odeiv2_system sys = {func, jac, 4, &paramsVoid};
 double F = 1.0, dF;
 double aim = 0.0;
 double closeness = 1.0e-8;
-double r0 = 1.0e-16, r1 = 10.0;
-const unsigned int N = 1e3;
+double r0 = 1.0e-16, r1 = 7.0;
+unsigned int N = 1e3;
+unsigned int runsCount = 0;
+
+/* ---------------------------------------------------------------------------------------------
+getting inputs
+---------------------------------------------------------------------------------------------*/
+if (argc>2) {
+	for (int j=0; j<(int)(argc/2); j++) {
+		string temp1 = argv[2*j+1];
+		string temp2 = argv[2*j+2];
+		if (temp1[0]=='-') temp1 = temp1.substr(1);
+		if (temp1.compare("r1")==0) r1 = stringToNumber<double>(temp2);
+		else if (temp1.compare("r0")==0) r0 = stringToNumber<double>(temp2);
+		else if (temp1.compare("N")==0) N = stringToNumber<unsigned int>(temp2);
+		else {
+			cerr << "input " << temp1 << " not understood" << endl;
+			return 1;
+		}
+	}
+}
+else cerr << "inputs not understood" << endl;
+
+vec y0Vec(N+1), y2Vec(N+1);
 double dr = r1-r0;
 dr /= (double)N;
-vec y0Vec(N+1), y2Vec(N+1);
-unsigned int runsCount = 0;
+
+/* ---------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------*/
 
 double Y0 = 4.337;//initial guess
 //cout << "initial y0: ";
 //cin >> Y0;
-
+cout << "r1 = " << r1 << endl << endl;
 printf("%16s%16s%16s%16s%16s%16s%16s%16s\n","run","N","y(r1)","yMin","F-aim","Y0Old","Y0New","-F/dF");
 
 while (absolute(F-aim)>closeness)
@@ -136,7 +159,7 @@ while (absolute(F-aim)>closeness)
 //printing solution
 string filename = "./data/" + timeNumber + "sphaleron.dat", picname = "./pics/sphaleron.png";
 simplePrintVector(filename,y0Vec);
-printf("\n%16s%20s%20s\n\n","Solution printed: ",filename.c_str(),picname.c_str());
+printf("\n%16s%20s %20s\n\n","Solution printed: ",filename.c_str(),picname.c_str());
 gpSimple(filename,picname);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +178,8 @@ else { cout << "E = " << E << endl << endl;}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //computing and printing linear fluctuation operator as sparse matrix
 //in order to calulate negative eigenvalue and eigenvector
-if (false)
+bool printD1AndD2 = true;
+if (printD1AndD2)
 	{
 	spMat D1(N+1,N+1), D2(N+1,N+1);
 	D1.setZero();
@@ -203,12 +227,16 @@ if (false)
 printf("From Matlab: D1 gives omega^2_- = -15.31,\n");
 printf("             D2 gives omega^2_- = -15.34\n\n");
 
+bool allIWantIsD1AndD2 = true;
+if (allIWantIsD1AndD2 && printD1AndD2) return 0;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //assembling material to calculate occupation of modes
 
 mat omega(N+1,N+1);
 mat Eomega(N+1,N+1);
-if (false)
+bool constructOmega = true;
+if (constructOmega)
 	{
 	//h_ij matrix
 	mat h(N+1,N+1);

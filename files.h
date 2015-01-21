@@ -108,6 +108,29 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 	return intVector;
 	}
 	
+//function to return the last integer of a string
+int getLastInt(const string& str) {
+	size_t first_index;
+	size_t last_index;
+	if (str.find_last_not_of("0123456789")!=string::npos) first_index = str.find_last_not_of("0123456789");
+	else {
+		cerr << "getLastInt error, no non-numeric characters found in " << str << endl;
+		return -1;
+	}
+	string temp = str.substr(first_index+1);
+	if (isdigit(temp[0])==0) { // zero for false
+		cerr << "getLastInt error, first character of " << temp << " in " << str << " not numeric" << endl;
+		return -1;
+	}
+	if (temp.find_last_of("0123456789")!=string::npos) last_index = temp.find_last_of("0123456789");
+	else {
+		cerr << "getLastInt error, last numeric character not found in " << temp << " in " << str << endl;
+		return -1;
+	}
+	temp = temp.substr(0,last_index+1);
+	return stringToNumber<unsigned long long>(temp);
+}
+	
 //function to return final numbers in strings, after last "_", note it will also change argument
 vector<int> getLastInts(vector <string> * strVector) //this function could be improved by splitting into two functions, one that finds the integers at the end of a string and the other that loops over the vector, ideally we wouldn't have to look for "_" but could just look for not digit, something along these lines would surely work
 	{
@@ -210,13 +233,13 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 	}
 	
 //copy inputs with a change
-void changeInputs(string outputFile, string search, string replace)
+void changeInputs(string outputFile, string search, string replace, string inputFile = "inputs")
 	{
 	bool found = false;
 	search += " ";
 	ifstream fin;
 	ofstream fout;
-	fin.open("inputs");
+	fin.open(inputFile);
 	fout.open(outputFile.c_str());
 	string line;
 	size_t pos, posEnd, replaceLength = replace.length();
@@ -248,6 +271,6 @@ void changeInputs(string outputFile, string search, string replace)
 	fin.close();
 	fout.close();
 	if (!found) cerr << "changeInputs error: parameter " << search << " not found in " << outputFile << endl;
-	}
+	}	
 	
 

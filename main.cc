@@ -332,6 +332,12 @@ vector<double> minima0(2);
 		twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		alpha *= R;
 		L = LoR*R;
+		if (Tb<R)
+			{
+			angle = asin(Tb/R);
+			double Ltemp = 1.5*(1.5*Tb*tan(angle));
+			if (Ltemp<L) L=Ltemp;//making sure to use the smaller of the two possible Ls
+			}
 		}
 	else
 		{
@@ -341,16 +347,9 @@ vector<double> minima0(2);
 		}
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
-	L = LoR*R;
-	if (Tb<R && pot[0]!='3')
-		{
-		angle = asin(Tb/R);
-		double Ltemp = 1.5*(1.5*Tb*tan(angle));
-		if (Ltemp<L) L=Ltemp;//making sure to use the smaller of the two possible Ls
-		}
 	a = L/(N-1.0);
 	b = Tb/(Nb-1.0);
-	if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b = " << b << endl << endl;}
+	if (a>0.5*pow(mass2,0.5) || b>0.5*pow(mass2,0.5)) {cerr << endl << "a = " << a << " , b = " << b << endl << endl;}
 	Ta = b*Na;
 	Tc = b*Nc;
 	double ergZero = N*a*Vd(minima[0],&paramsV);
@@ -423,7 +422,7 @@ auto ddVr = [&] (const comp & phi)
 	if (zmt[0]=='n' || zmx[0]=='n')
 		{
 		if (pot[0]=='3') {
-			vec negVecFull = loadVectorColumn("data/stable/sphaleron.dat",1); // nb may need to check that r1 is correct
+			vec negVecFull = loadVectorColumn("data/stable/sphaleronEigVec.dat",1); // nb may need to check that r1 is correct
 			negVec = interpolate1d(negVecFull,negVecFull.size(),N);
 		}
 		else
@@ -446,6 +445,10 @@ auto ddVr = [&] (const comp & phi)
 			unsigned int NEig, NtEig;
 			ifstream fin;
 			fin.open(eigVecInputs.c_str());
+			if (!fin.good()) {
+				cerr << eigVecInputs << " didn't open successfully" << endl;
+				return 1;
+			}
 			if (fin.is_open())
 				{
 				string line, tempStr;
@@ -492,7 +495,7 @@ auto ddVr = [&] (const comp & phi)
 		{
 		if (loops>1)
 			{
-			if ((absolute(theta-minTheta)>DBL_MIN || absolute(Tb-minTb)>DBL_MIN) && loop==0)
+			if ((abs(theta-minTheta)>DBL_MIN || abs(Tb-minTb)>DBL_MIN) && loop==0)
 				{
 				cout << "input Tb: " << Tb << endl;
 				cout << "program Tb: " << minTb << endl;
@@ -500,12 +503,12 @@ auto ddVr = [&] (const comp & phi)
 				cout << "program theta: " << minTheta << endl;
 				cout << endl;
 				}
-			if (absolute(maxTheta-minTheta)>DBL_MIN)
+			if (abs(maxTheta-minTheta)>DBL_MIN)
 				{
 				theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
 				Gamma = exp(-theta);
 				}
-			else if (absolute(maxTb-minTb)>DBL_MIN)
+			else if (abs(maxTb-minTb)>DBL_MIN)
 				{
 				Tb = minTb + (maxTb - minTb)*loop/(loops-1.0);
 				changeDouble ("Tb",Tb);
@@ -575,7 +578,7 @@ auto ddVr = [&] (const comp & phi)
 		
 		//defining complexified vector Cp
 		cVec Cp(NT*N);
-		Cp = vecComplex(p,N*NT);
+		Cp = vecComplex(p,NT*N);
 	
 		//defining DDS and minusDS
 		spMat DDS(2*N*NT+2,2*N*NT+2);
@@ -593,13 +596,17 @@ auto ddVr = [&] (const comp & phi)
 			for (unsigned int j=0; j<N; j++)
 				{
 				unsigned int posX, posT, posCe;
-				char* tempChar = &zmx[zmx.size()-1];
-				stringstream ssX(tempChar);
 				unsigned int slicesX, slicesT;
-				ssX >> slicesX;
-				tempChar = &zmt[zmt.size()-1];
-				stringstream ssT(tempChar);
-				ssT >> slicesT; //all seems v long winded but other ways seemed to fail
+				if (getLastInt(zmx)<0) {
+					cerr << "getLastInt error with zmx = " << zmx << endl;
+					return 1;
+				}
+				if (getLastInt(zmt)<0) {
+					cerr << "getLastInt error with zmt = " << zmt << endl;
+					return 1;
+				}
+				slicesX = getLastInt(zmx);
+				slicesT = getLastInt(zmt);
 				posCe = j*Nb+Nb-slicesT; //position C for Euclidean vector, i.e. for negVec
 				map<char,unsigned int> posMap;
 				posMap['A'] = j*NT;
@@ -615,9 +622,17 @@ auto ddVr = [&] (const comp & phi)
 						for (unsigned int k=0;k<slicesT;k++)
 							{
 							if (zmt[0]=='n' && pot[0]!='3') 	chiT(posT+k) = negVec(2*(posCe+k));
-							if (zmt[0]=='n' && pot[0]=='3') 	chiT(posT+k) = negVec(j);
+							if (zmt[0]=='n' && pot[0]=='3')
+								{
+								double r = r0 + j*a;
+								chiT(posT+k) = negVec(j)*r;
+								}
 							else if (zmt[0]=='d')				chiT(posT+k) = p(2*(posT+k+1))-p(2*(posT+k));
-							else								cout << "choice of zmt not allowed" << endl;
+							else
+								{
+								cerr << "choice of zmt not allowed" << endl;
+								return 1;
+								}
 							}
 						}
 					}
@@ -635,9 +650,17 @@ auto ddVr = [&] (const comp & phi)
 						for (unsigned int k=0;k<slicesX;k++)
 							{
 							if (zmx[0]=='n' && pot[0]!='3')		chiX(posX+k) = negVec(2*(posCe+k));
-							if (zmt[0]=='n' && pot[0]=='3') 	chiT(posT+k) = negVec(j);
-							else if (zmx[0]=='d')	chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
-							else					cout << "choice of zmx not allowed" << endl;
+							if (zmx[0]=='n' && pot[0]=='3')
+								{
+								double r = r0 + j*a;
+								chiX(posX+k) = negVec(j)*r;
+								}
+							else if (zmx[0]=='d' && pot[0]!='3')chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
+							else
+								{
+								cerr << "choice of zmx not allowed" << endl;
+								return 1;
+								}
 							}
 						}
 					}
@@ -646,7 +669,7 @@ auto ddVr = [&] (const comp & phi)
 			normX = pow(normX,0.5);
 			double normT = chiT.dot(chiT);
 			normT = pow(normT,0.5);
-			if (absolute(normX)<DBL_MIN || absolute(normT)<DBL_MIN)
+			if (abs(normX)<DBL_MIN || abs(normT)<DBL_MIN)
 				{
 				cerr << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
@@ -658,7 +681,7 @@ auto ddVr = [&] (const comp & phi)
 			DDS.setZero(); //just making sure
 			Eigen::VectorXi DDS_to_reserve(2*N*NT+2);//number of non-zero elements per column
 			DDS_to_reserve = Eigen::VectorXi::Constant(2*N*NT+2,13);
-			if (absolute(theta)<2.0e-16)
+			if (abs(theta)<2.0e-16)
 				{
 				DDS_to_reserve(0) = N+3;
 				DDS_to_reserve(1) = 11;
@@ -685,7 +708,7 @@ auto ddVr = [&] (const comp & phi)
 			linNum = Eigen::VectorXd::Zero(NT);
 			
 			//testing that the potential term is working for pot3
-			if (pot[0]=='3' && true)
+			if (pot[0]=='3' && false)
 				{
 				comp Vtrial = 0.0, Vcontrol = 0.0;
 				for (unsigned int j=0; j<N; j++)
@@ -712,7 +735,7 @@ auto ddVr = [&] (const comp & phi)
 				comp dt = dtFn(t);
 				if (pot[0]=='3') paramsV  = {r0+x*a, 0.0};
 			
-				if (absolute(chiX(j))>DBL_MIN && pot[0]!='3') //spatial zero mode lagrange constraint
+				if (abs(chiX(j))>DBL_MIN && pot[0]!='3') //spatial zero mode lagrange constraint
 					{
 					DDS.insert(2*j,2*N*NT) = a*chiX(j); 
 					DDS.insert(2*N*NT,2*j) = a*chiX(j);
@@ -720,7 +743,7 @@ auto ddVr = [&] (const comp & phi)
 					minusDS(2*N*NT) += -a*chiX(j)*p(2*j);
 					}
 					
-				if (absolute(chiT(j))>DBL_MIN)
+				if (abs(chiT(j))>DBL_MIN)
 					{
 					DDS.coeffRef(2*(j+1),2*N*NT+1) += a*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) += a*chiT(j);
@@ -731,7 +754,7 @@ auto ddVr = [&] (const comp & phi)
 		            minusDS(2*N*NT+1) += - a*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
-				if (absolute(theta)<DBL_MIN)
+				if (abs(theta)<DBL_MIN)
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
@@ -785,15 +808,15 @@ auto ddVr = [&] (const comp & phi)
 			        	{
 			            int sign = pow(-1,k+1);
 			            int direc = (int)(k/2.0);
+			            unsigned int neighb = neigh(j,direc,sign,NT,N);
 			            if (direc == 0)
 			            	{
 			                minusDS(2*j+1) += a*imag(Cp(j+sign)/dt);
 			                DDS.coeffRef(2*j+1,2*(j+sign)) += -imag(a/dt);
 			                DDS.coeffRef(2*j+1,2*(j+sign)+1) += -real(a/dt);
 			                }
-			            else
+			            else if (neighb!=-1)
 			            	{
-			                unsigned int neighb = neigh(j,direc,sign,NT,N);
 			                minusDS(2*j+1) += - imag(Dt*Cp(neighb)/a);
 			                DDS.coeffRef(2*j+1,2*neighb) += imag(Dt)/a;
 			                DDS.coeffRef(2*j+1,2*neighb+1) += real(Dt)/a;
@@ -806,7 +829,7 @@ auto ddVr = [&] (const comp & phi)
 			        DDS.coeffRef(2*j+1,2*j) += imag(temp0 - temp1 );
 			        DDS.coeffRef(2*j+1,2*j+1) += real(temp0 - temp1 );
 				    /////////////////////////////////////////////////////////////////////////////////////////
-					if (absolute(theta)<DBL_MIN)
+					if (abs(theta)<DBL_MIN)
 						{
 						//simplest boundary conditions replaced by ones continuously connected to theta!=0 ones
 						//DDS.insert(2*j+1,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
@@ -815,7 +838,7 @@ auto ddVr = [&] (const comp & phi)
 						/////////////////////////////////////equation R - theta=0//////////////////////////////////////
 						for (unsigned int k=0;k<N;k++)
 							{
-							if (absolute(omega(x,k))>DBL_MIN)
+							if (abs(omega(x,k))>DBL_MIN)
 								{
 								unsigned int m=k*NT;
 								DDS.coeffRef(2*j,2*m+1) += -2.0*omega(x,k);
@@ -828,7 +851,7 @@ auto ddVr = [&] (const comp & phi)
 						{
 						for (unsigned int k=0;k<N;k++)
 							{
-							if (absolute(omega(x,k))>2.0e-16)
+							if (abs(omega(x,k))>DBL_MIN)
 								{
 								/////////////////////equation I - theta!=0//////////////
 								unsigned int m=k*NT;
@@ -933,10 +956,10 @@ auto ddVr = [&] (const comp & phi)
 			unsigned int linearInt = (int)(Na/3);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
-				if (absolute(linErg(j))>linEMax) linEMax = absolute(linErg(j));
-				if (absolute(linErg(j))<linEMin) linEMin = absolute(linErg(j));
-				if (absolute(linNum(j))>linNMax) linNMax = absolute(linNum(j));
-				if (absolute(linNum(j))<linNMin) linNMin = absolute(linNum(j));
+				if (abs(linErg(j))>linEMax) linEMax = abs(linErg(j));
+				if (abs(linErg(j))<linEMin) linEMin = abs(linErg(j));
+				if (abs(linNum(j))>linNMax) linNMax = abs(linNum(j));
+				if (abs(linNum(j))<linNMin) linNMin = abs(linNum(j));
 				}
 			linTestE = (linEMax-linEMin)*2.0/(linEMax+linEMin);
 			linTestN = (linNMax-linNMin)*2.0/(linNMax+linNMin);
@@ -946,7 +969,7 @@ auto ddVr = [&] (const comp & phi)
 			//checking conservation of E
 			double ergTest = real(erg(1)-erg(NT-2));
 			ergTest = ergTest*2.0/(real(erg(1)+erg(NT-2)));
-			ergTest = absolute(ergTest);
+			ergTest = abs(ergTest);
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
@@ -960,7 +983,7 @@ auto ddVr = [&] (const comp & phi)
 			//checking agreement between erg and linErg
 			double trueTest = E - E_exact; //not using zero as boundaries are funny
 			trueTest = trueTest*2.0/(E + E_exact);
-			trueTest = absolute(trueTest);
+			trueTest = abs(trueTest);
 			true_test.push_back(trueTest);
 			
 			//checking lattice small enough for E, should have parameter for this
@@ -1042,7 +1065,7 @@ auto ddVr = [&] (const comp & phi)
 			vec diff(2*N*NT+2);
 			diff = DDS*delta-minusDS;
 			double maxDiff = diff.maxCoeff();
-			maxDiff = absolute(maxDiff);
+			maxDiff = abs(maxDiff);
 			calc_test.push_back(maxDiff);
 			if (calc_test.back()>closenessC)
 				{
@@ -1117,8 +1140,8 @@ auto ddVr = [&] (const comp & phi)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (absolute(maxTheta-minTheta)>DBL_MIN) 	changeInputs(runInputs, "theta", numberToString<double>(theta));
-		else if (absolute(maxTb-minTb)>DBL_MIN)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb));
+		if (abs(maxTheta-minTheta)>DBL_MIN) 	changeInputs(runInputs, "theta", numberToString<double>(theta));
+		else if (abs(maxTb-minTb)>DBL_MIN)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb));
 		else 										copyFile(inputsFiles[fileLoop],runInputs);
 		printf("%12s%30s\n","output: ",runInputs.c_str());
 	

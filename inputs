@@ -1,11 +1,11 @@
 ##two hashes means comments, one means titles, use spaces not tabs
 ##the following are input to pi.cc:
 ##
-#N      Na      Nb      Nc      dE      LoR     Tb      theta
- 160    200     160     1       0.050   1.0     0.8     0.0
+#N      Na      Nb      Nc      dE        LoR        Tb      theta
+ 160    200     160     2       0.050     .9         0.8     0.0
 ##
 #inputChoice    fileNumberIn    loopIn    totalLoops  loopChoice  minValue    maxValue    printChoice     printRun
- p              150106132505    0         1           n           80          160         n               0       
+ p              150120093931    0         1           n           80          160         n               0       
 ##
 #alpha     open     amp     pot     A         reg
  0.4       1.0      0.4     3n      0.4       0.0
@@ -13,6 +13,42 @@
 ##negEig inputs
 #P          c           done
  100000     1.0e-6      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -230,7 +230,7 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << j << setw(25) << vecToPrint[j] << endl;
+		F << setw(25) << vecToPrint[j] << endl;
 		}
 	F.close();
 	}
@@ -258,7 +258,7 @@ void gpSimple(const string & readFile, const string & outFile)
 	FILE * gnuplotPipe = popen (commandOpen,"w");
 	string commandStrPic1 = "set term png size 1600,800";
     string commandStrPic2 = "set output '" + outFile + "'";
-	string commandStr1 = "plot \"" + readFile + "\" using 1:2 with linespoints";
+	string commandStr1 = "plot \"" + readFile + "\" using 1 with linespoints";
 	string commandStr2 = "pause -1";
 	const char * commandPic1 = commandStrPic1.c_str();
 	const char * commandPic2 = commandStrPic2.c_str();
@@ -464,7 +464,7 @@ void printThreeVectors(const string& printFile, vec vec1, vec vec2, vec vec3)
 		{
 		for (unsigned int j=0; j<length1; j++)
 			{
-			F << setw(25) << vec1(j) << setw(25) << vec2(j) << setw(25) << vec3(j) << endl;
+			F << setw(25) << vec1(j) << setw(25) << 0.0 << setw(25) << vec2(j) << setw(25) << vec3(j) << setw(25) << 0.0 << endl;
 			}
 		}
 	else

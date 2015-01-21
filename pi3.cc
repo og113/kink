@@ -37,8 +37,7 @@ main parameters
 
 double r0 = 1.0e-16, r1 = 10.0;
 unsigned int N = 1e3;
-double dr = r1-r0;
-dr /= (double)N;
+double dr;
 
 double Ta, Tc;
 unsigned int Na, Nc, Nt;
@@ -91,18 +90,22 @@ fin.open(inputsF.c_str());
 if (fin.is_open())
 	{
 	string line, temp;
+	double LoR;
 	while(getline(fin,line))
 		{
 		if(line[0] == '#') continue;
 		if(line.empty()) continue;
 		istringstream ss(line);
-		ss >> Nin >> Nain >> Nbin >> Ncin >> temp >> temp >> Tbin;
+		ss >> Nin >> Nain >> Nbin >> Ncin >> temp >> LoR >> Tbin;
+		r1 *= LoR;
 		break;
 		}
 	}
 else cout << "unable to open " << inputsF << endl;
 fin.close();
 
+dr = r1-r0;
+dr /= (double)N;
 dtin = Tbin/(Nbin-1.0);
 drin = (r1-r0)/(Nin-1.0);
 Ta = dtin*Nain;

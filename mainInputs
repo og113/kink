@@ -1,10 +1,10 @@
-#the following are input to main.cc:
-#
-#range of times and dates to loop over
-#in the format yymmdd-hhmmss
-#
-#inF		min fileNo			max fileNo		firstLoop     lastLoop		
- p          150119144833        150119144833    0             20
-#
+##the following are input to main.cc:
+##
+##range of times and dates to loop over
+##in the format yymmdd-hhmmss
+##
+#inF		minfileNo			maxfileNo		firstLoop     lastLoop		
+ p          150120104755        150121000000    0             20
+##
 #minTb		maxTb      minTheta	  maxTheta	 loops	zmt     zmx
- 17.00      17.00      0.00       0.00       1      nAD1    dC9
+ 17.00      17.00      0.00       0.00       1      nA10    nC9

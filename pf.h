@@ -737,11 +737,11 @@ long int spherical(const lint& locNum, const unsigned int& direction, const sign
 		}
 	else if (c==0 and sign==-1)
 		{
-		neighLocation = locNum+xNt;
+		neighLocation = -1;//this is the result if there are no neighbours for the given values of the argument
 		}
 	else if (c==(xNx-1) and sign==1)
 		{
-		neighLocation = -1;//this is the result if there are no neighbours for the given values of the argument
+		neighLocation = -1;
 		}
 	else
 		{
@@ -1151,10 +1151,13 @@ vec loadVector (const string& loadFile, const unsigned int& Nt, const unsigned i
 				}
 			}
 		}
-	if (j==Nt*Nx && k==(zeroModes-1))
+	if (j==Nt*Nx && k<zeroModes)
 		{
-		outputVec(2*j+k) = 0.5; //obviously a random guess
-		k++;
+		while(k<zeroModes)
+			{
+			outputVec(2*j+k) = 0.5; //obviously a random guess
+			k++;
+			}
 		}
 	if ((j+k)!=(Nt*Nx+zeroModes))
 		{
