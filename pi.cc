@@ -595,7 +595,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
 	    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
 		}
-    if (pot[0]!='3')
+    if (pot[0]=='3')
     	{
 		for (unsigned int j=0;j<Nb;j++)
 			{

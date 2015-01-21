@@ -31,7 +31,7 @@ for j in `seq 0 0`
 	./mx "D"
 	./mx "V0 = V(:,1);"
 	./mx "printVector(V0,'../kink/data/stable/sphaleronEigVec.dat');"
-	AMP="0.3"
+	AMP="0.4"
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
 	./sphaleron4 -r1 $L -amp $AMP >> $FILE
