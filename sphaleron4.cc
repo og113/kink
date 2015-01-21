@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
 /* ---------------------------------------------------------------------------------------------
 load vectors
 ---------------------------------------------------------------------------------------------*/
-vec sphaleronFull = loadSimpleVectorColumn("data/stable/sphaleron.dat",0);
+vec sphaleronFull = loadSimpleVector("data/stable/sphaleron.dat");
 vec negEigFull = loadSimpleVector("data/stable/sphaleronEigVec.dat");
 if (sphaleronFull.size()!=negEigFull.size()) {
 	printf("error: sphaleron.size() = %i, negEig.size() = %i\n\n",(int)sphaleronFull.size(),(int)negEigFull.size());
@@ -49,7 +49,7 @@ if (sphaleronFull.size()!=negEigFull.size()) {
 /* ---------------------------------------------------------------------------------------------
 main parameters
 ---------------------------------------------------------------------------------------------*/
-unsigned int 	N= 500, Nt = 500;
+unsigned int 	N= 1e3, Nt = 1e3;
 double 			r0 = 1.0e-16, r1 = 5.0, t0 = 0.0, t1 = 0.80;
 double			dr = (r1-r0)/(double)(N-1.0), dt = (t1-t0)/(double)(Nt-1.0);
 double			amp = -1.0e-2;
@@ -76,6 +76,10 @@ if (argc>2) {
 }
 else if (argc==2) amp = atof(argv[1]);
 else cerr << "inputs not understood" << endl;
+
+printf("%8s%8s%8s%8s%8s%8s%8s\n","N","Nt","r1","r0","t1","t0","amp");
+printf("%8i%8i%8g%8g%8g%8g%8g\n",N,Nt,r1,r0,t1,t0,amp);
+printf("\n");
 
 /* ---------------------------------------------------------------------------------------------
 defining main vectors

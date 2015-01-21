@@ -1223,9 +1223,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%30s\n"," ",eigenvaluefile.c_str());
 
 	//printing eigenvector to file
-	string eigenvectorFile = prefix + "eigVec.dat";
+	/*string eigenvectorFile = prefix + "eigVec.dat";
 	copyFile("data/eigVec.dat",eigenvectorFile);
-	printf("%12s%30s\n"," ",eigenvectorFile.c_str());
+	printf("%12s%30s\n"," ",eigenvectorFile.c_str());*/
 
 } //closing parameter loop
 

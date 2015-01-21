@@ -1,11 +1,18 @@
 #!/bin/bash
 
-#open another terminal, type         tmux new -s matlab "matlab -nodesktop -nojvm"        and then run this in the other terminal
+#tmux new -s matlab "matlab -nodesktop -nojvm"
 
 FILE="results/20.01.15_L_5.0_10.0_Tb_0.8.txt"
+SUMMARY="results/20.01.15_summary.txt"
 echo "output to" $FILE
+echo "summary to" $SUMMARY
 echo "output from mainChangeL.sh" > $FILE
+echo "" >> $FILE
+echo "output from mainChangeL.sh" > $SUMMARY
+echo "" >> $SUMMARY
+printf '%-10s %-10s \n' "L" "S/F" >> $SUMMARY
 
+<<<<<<< HEAD
 Tb=0.8
 
 for j in `seq 0 16`
@@ -27,11 +34,10 @@ for j in `seq 0 16`
 	./mx "D"
 	./mx "V0 = V(:,1);"
 	./mx "printVector(V0,'../kink/data/stable/sphaleronEigVec.dat');"
-	AMP="0.3"
-	echo "amp = "$AMP >> $FILE
+	AMP="0.4"
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
-	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP
+	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
 	echo "./pi" >> $FILE
 	echo "" >> $FILE
 	TIMENUMBER=$j
@@ -47,13 +53,20 @@ for j in `seq 0 16`
 			echo "#################################################################################################" >> $FILE
 			./main >> $FILE
 			echo "#################################################################################################" >> $FILE
+			if [ "$?" = "0" ]; then
+				printf '%-10s %-10s \n' $L "S" >> $SUMMARY
+			else
+				printf '%-10s %-10s \n' $L "FM" >> $SUMMARY
+			fi
 		else
 			echo "solution didn't tunnel" >> $FILE
 			echo "" >> $FILE
+			printf '%-10s %-10s ' $L "FT" >> $SUMMARY
 		fi
 	else
 		echo pi failed, value returned is $? >> $FILE
 		echo "" >> $FILE
+		printf '%-10s %-10s \n' $L "FP" >> $SUMMARY
 	fi
 	echo "" >> $FILE
 	done
