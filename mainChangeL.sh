@@ -1,8 +1,12 @@
 #!/bin/bash
 
+#open another terminal, type         tmux new -s matlab "matlab -nodesktop -nojvm"        and then run this in the other terminal
+
 FILE="results/20.01.15_L_5.0_10.0_Tb_0.8.txt"
 echo "output to" $FILE
 echo "output from mainChangeL.sh" > $FILE
+
+Tb=0.8
 
 for j in `seq 0 16`
 	do
@@ -19,7 +23,6 @@ for j in `seq 0 16`
 	cp data/D1.dat ../mpi/data/D1.dat
 	cp data/D2.dat ../mpi/data/D2.dat
 	./mx "[D1,D2,diff,maximum] = compareDDS;"
-	./mx "[D1,D2,diff,maximum] = compareDDS;"
 	./mx "[V,D] = eigs(D2,2,-20);"
 	./mx "D"
 	./mx "V0 = V(:,1);"
@@ -28,7 +31,7 @@ for j in `seq 0 16`
 	echo "amp = "$AMP >> $FILE
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
-	./sphaleron4 -r1 $L -amp $AMP
+	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP
 	echo "./pi" >> $FILE
 	echo "" >> $FILE
 	TIMENUMBER=$j

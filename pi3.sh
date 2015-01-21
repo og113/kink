@@ -1,7 +1,7 @@
 #!/bin/bash
 
-FILE="results/16.01.15_Tb_0.74_0.7_AMP_1.0_0.0.txt"
-SUMMARY="results/16.01.15_summary.txt"
+FILE="results/21.01.15_Tb_0.74_0.7_AMP_1.0_0.0.txt"
+SUMMARY="results/21.01.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
 

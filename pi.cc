@@ -595,7 +595,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	    p(2*((j+1)*Nb-2)+1) = open*p(2*((j+1)*Nb-1)+1) + (1.0-open)*p(2*((j+1)*Nb-2)+1); //final time imag
 	    p(2*((j+1)*Nb-1)+1) = p(2*((j+1)*Nb-2)+1);
 		}
-    if (pot[0]!='3')
+    if (pot[0]=='3' && false)
     	{
 		for (unsigned int j=0;j<Nb;j++)
 			{
@@ -633,10 +633,10 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
-			long int neighPos = neigh(pos,1,1,Nb,N);
-			if(neighPos!=-1)
+			long int neighPos = neigh(pos,1,1,Nb,N), neighMin = neigh(pos,1,-1,Nb,N);
+			if(neighPos!=-1 && neighMin!=-1)
             	{
-            	Chi0(pos) = p(2*neighPos)-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
+            	Chi0(pos) = p(2*neighPos)-p(2*neighMin); //final time slice
             	//Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
             	}
             }
