@@ -13,8 +13,10 @@ echo "" >> $SUMMARY
 printf '%-10s %-10s \n' "L" "S/F" >> $SUMMARY
 
 Tb=0.8
+loops=16
+./changeInputs -f mainInputs -n maxFileNo -v $loops
 
-for j in `seq 0 16`
+for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
 	L=$(echo "scale=1; -0.5*$j+10.0" | bc)

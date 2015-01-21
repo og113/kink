@@ -1,3 +1,6 @@
 output from mainChangeL.sh
 
 L          S/F        
+10.0       S          
+9.5        S          
+9.0        S          
