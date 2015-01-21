@@ -633,10 +633,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		for (unsigned int j=0; j<N; j++)
 			{
 			unsigned int pos = (j+1)*Nb-1;
-			long int neighPos = neigh(pos,1,1,Nb,N);
-			if(neighPos!=-1)
+			long int neighPos = neigh(pos,1,1,Nb,N), neighMin = neigh(pos,1,-1,Nb,N);
+			
+			if(neighPos!=-1 && neighMin!=-1)
             	{
-            	Chi0(pos) = p(2*neighPos)-p(2*neigh(pos,1,-1,Nb,N)); //final time slice
+            	Chi0(pos) = p(2*neighPos)-p(2*neighMin); //final time slice
             	//Chi0(pos-1) = p(2*neigh(pos-1,1,1,Nb,N))-p(2*neigh(pos-1,1,-1,Nb,N)); //penultimate time slice
             	}
             }
@@ -1223,9 +1224,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%30s\n"," ",eigenvaluefile.c_str());
 
 	//printing eigenvector to file
-	string eigenvectorFile = prefix + "eigVec.dat";
+	/*string eigenvectorFile = prefix + "eigVec.dat";
 	copyFile("data/eigVec.dat",eigenvectorFile);
-	printf("%12s%30s\n"," ",eigenvectorFile.c_str());
+	printf("%12s%30s\n"," ",eigenvectorFile.c_str());*/
 
 } //closing parameter loop
 

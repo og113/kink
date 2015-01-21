@@ -422,7 +422,7 @@ auto ddVr = [&] (const comp & phi)
 	if (zmt[0]=='n' || zmx[0]=='n')
 		{
 		if (pot[0]=='3') {
-			vec negVecFull = loadVectorColumn("data/stable/sphaleronEigVec.dat",1); // nb may need to check that r1 is correct
+			vec negVecFull = loadVectorColumn("data/stable/sphaleronEigVec.dat",0); // nb may need to check that r1 is correct
 			negVec = interpolate1d(negVecFull,negVecFull.size(),N);
 		}
 		else
@@ -808,7 +808,7 @@ auto ddVr = [&] (const comp & phi)
 			        	{
 			            int sign = pow(-1,k+1);
 			            int direc = (int)(k/2.0);
-			            unsigned int neighb = neigh(j,direc,sign,NT,N);
+			            int neighb = neigh(j,direc,sign,NT,N);
 			            if (direc == 0)
 			            	{
 			                minusDS(2*j+1) += a*imag(Cp(j+sign)/dt);

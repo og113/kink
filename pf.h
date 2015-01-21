@@ -737,11 +737,11 @@ long int spherical(const lint& locNum, const unsigned int& direction, const sign
 		}
 	else if (c==0 and sign==-1)
 		{
-		neighLocation = -1;//this is the result if there are no neighbours for the given values of the argument
+		neighLocation = -1;
 		}
 	else if (c==(xNx-1) and sign==1)
 		{
-		neighLocation = -1;
+		neighLocation = -1; //this is the result if there are no neighbours for the given values of the argument
 		}
 	else
 		{
