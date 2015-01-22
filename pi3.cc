@@ -45,13 +45,14 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
+bool testTunnel = false;
 
 /* ---------------------------------------------------------------------------------------------
 user inputs
 and labels for input and output
 ---------------------------------------------------------------------------------------------*/
 
-string timeNumber = currentDateTime();
+string timeNumber;
 string timeNumberIn = "150112114306";
 string loopIn = "0";
 if (argc == 2) timeNumberIn = argv[1];
@@ -62,6 +63,7 @@ else if (argc % 2 && argc>1) {
 		if (id.compare("tn")==0) timeNumberIn = argv[2*j+2];
 		else if (id.compare("r1")==0) timeNumberIn = stringToNumber<double>(argv[2*j+2]);
 		else if (id.compare("loop")==0 || id.compare("l")==0) loopIn = argv[2*j+2];
+		else if (id.compare("test")==0 || id.compare("tunnel")==0 || id.compare("tt")==0) testTunnel = (bool)atoi(argv[2*j+2]);
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -78,6 +80,9 @@ else {
 	cerr << endl;
 	return 1;
 }
+
+timeNumber = timeNumberIn;
+if (testTunnel) cout << "pi3 testing if tunnelled" << endl;
 
 /* ---------------------------------------------------------------------------------------------
 getting parameters from specific inputs
@@ -147,7 +152,7 @@ else {
 }
 
 /* ---------------------------------------------------------------------------------------------
-propagating euclidean solution forwards and then backwards in time
+propagating euclidean solution forwards and/or backwards in time
 ---------------------------------------------------------------------------------------------*/
 
 vec phiA, phiC;
@@ -163,6 +168,11 @@ while(j<2) {
 	else if (j==1) {
 		Nt = Na;
 		direction = -1;
+	}
+	if (testTunnel) {
+		Nt = 10*N;
+		direction = 1;
+		j=1;
 	}
 	
 	vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);
@@ -290,56 +300,60 @@ while(j<2) {
 	j++;
 		
 } // end of while j<2 loop
-	
-vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);
-for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
-	{
-	for (unsigned int r=0; r<Nin; r++)
+
+if (!testTunnel) {	
+	vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);
+	for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
 		{
-		unsigned int j= t + r*(Nain+Nbin+Ncin);
-		tVec(j) = t*dtin;
-		rVec(j) = r0 + r*drin;
-		}
-	}
-	
-// constructing input to main
-vec mainIn((Nain+Nbin+Ncin)*Nin);
-vec phiAOut, phiCOut;
-phiAOut = interpolate(phiA,Na+1,N+1,Nain+1,Nin);
-phiCOut = interpolate(phiC,Nc+1,N+1,Ncin+1,Nin);
-for (unsigned int j=0;j<(Nain+Nbin+Ncin);j++)
-	{
-	for (unsigned int k=0; k<Nin; k++)
-		{
-		unsigned int l = j+k*(Nain+Nbin+Ncin), m;
-		double r = r0 + k*drin;
-		if (j<Nain)
+		for (unsigned int r=0; r<Nin; r++)
 			{
-			m = (Nain-j)+k*(Nain+1);
-			mainIn(l) = phiAOut(m)*r;
-			}
-		else if (j<(Nain+Nbin))
-			{
-			m = (j-Nain)+k*Nbin;
-			mainIn(l) = phiBC(m);
-			}
-		else
-			{
-            m = j - Nain - Nbin + 1 + k*(Ncin+1);
-			mainIn(l) = phiCOut(m)*r;
+			unsigned int j= t + r*(Nain+Nbin+Ncin);
+			tVec(j) = t*dtin;
+			rVec(j) = r0 + r*drin;
 			}
 		}
-	}
-string mainInFile = "data/" + timeNumber + "tpip_0.dat";
-printThreeVectors(mainInFile,tVec,rVec,mainIn);
-gp(mainInFile,"pi3.gp");
+	
+	// constructing input to main
+	vec mainIn((Nain+Nbin+Ncin)*Nin);
+	vec phiAOut, phiCOut;
+	phiAOut = interpolate(phiA,Na+1,N+1,Nain+1,Nin);
+	phiCOut = interpolate(phiC,Nc+1,N+1,Ncin+1,Nin);
+	for (unsigned int j=0;j<(Nain+Nbin+Ncin);j++)
+		{
+		for (unsigned int k=0; k<Nin; k++)
+			{
+			unsigned int l = j+k*(Nain+Nbin+Ncin), m;
+			double r = r0 + k*drin;
+			if (j<Nain)
+				{
+				m = (Nain-j)+k*(Nain+1);
+				mainIn(l) = phiAOut(m)*r;
+				}
+			else if (j<(Nain+Nbin))
+				{
+				m = (j-Nain)+k*Nbin;
+				mainIn(l) = phiBC(m);
+				}
+			else
+				{
+		        m = j - Nain - Nbin + 1 + k*(Ncin+1);
+				mainIn(l) = phiCOut(m)*r;
+				}
+			}
+		}
+	string mainInFile = "data/" + timeNumber + "tpip_0.dat";
+	printThreeVectors(mainInFile,tVec,rVec,mainIn);
+	gp(mainInFile,"pi3.gp");
 
-printf("%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb");
-printf("%8i%8i%8i%8i%8g%8g\n",Nin,Nain,Nbin,Ncin,r1-r0,Tbin);
-printf("\n");
+	printf("%8s%8s%8s%8s%8s%8s\n","N","Na","Nb","Nc","L","Tb");
+	printf("%8i%8i%8i%8i%8g%8g\n",Nin,Nain,Nbin,Ncin,r1-r0,Tbin);
+	printf("\n");
+	
+	printf("Input:                  %39s\n",filename.c_str());
+	printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
+}
+else printf("Input:                  %39s\n",filename.c_str());
 
-printf("Input:                  %39s\n",filename.c_str());
-printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
 printf("erg(0) = %8.4f\n",ergA);
 printf("linErgFieldA(0) = %8.4f\n",linErgFieldA);
 printf("nonLinErgA(0) = %8.4f\n",nonLinErgA);
@@ -347,6 +361,9 @@ printf("linNumContmA(0) = %8.4f\n",linNumContm);
 printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
 
 double finalTest = linErgFieldA;
-if ( !isfinite(finalTest) ) return 0;
-else return 1;
+if (testTunnel) {
+	if ( !isfinite(finalTest) ) return 0;
+	else return 1;
+}
+else return 0;
 }

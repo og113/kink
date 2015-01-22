@@ -88,6 +88,18 @@ vector<string> findStrings(const vector <string> & fullVector, const string & se
 	return subVector;
 	}
 	
+long long int getTimenumber(const string& str) {
+	size_t first_index = 0, last_index = str.size();
+	string temp = str;
+	if (temp.find_first_of("0123456789")!=string::npos) first_index = temp.find_first_of("0123456789");
+	else return -1;
+	temp = temp.substr(first_index);
+	if (temp.find_first_not_of("0123456789")!=string::npos) last_index = temp.find_first_not_of("0123456789");
+	else return -1;
+	temp = temp.substr(0,last_index);
+	return stringToNumber<unsigned long long int>(temp);
+}
+	
 //get vector of unsigned long long int from vector of strings
 vector<unsigned long long int> getInts(const vector <string> & strVector)
 	{
@@ -95,15 +107,11 @@ vector<unsigned long long int> getInts(const vector <string> & strVector)
 	for (unsigned int l=0; l<strVector.size(); l++)
 		{
 		string temp = strVector[l];
-		if (temp[7]=='1')
-			{
-			temp = temp.substr(7,12);
-			intVector.push_back(stringToNumber<unsigned long long>(temp));
-			}
-		else
-			{
-			cout << "getInts error, filename not as expected: " << temp << endl;
-			}
+		//temp = temp.substr(7,12);
+		long long tempNum = getTimenumber(temp);
+		unsigned long long timenumber = 0;
+		if (tempNum>0) timenumber = tempNum;
+		intVector.push_back(timenumber);
 		}
 	return intVector;
 	}
@@ -214,15 +222,17 @@ vector<string> readDataFiles(const unsigned long long int & minFileNo, const uns
 		while ( !file.eof() )
 			{
 			file >> fileName;
-			if (fileName.size()>19)
+			if (fileName.size()>7)
 				{
-				if (fileName[7]=='1' && fileName[fileName.size()-1]!='~')
+				if (fileName[fileName.size()-1]!='~')
 					{
-					strNumber = fileName.substr(7,12);
-					fileNumber = stringToNumber<unsigned long long>(strNumber);
-					if (fileNumber>=minFileNo && fileNumber<=maxFileNo)
+					fileNumber = getTimenumber(fileName);
+					if (fileNumber>=0)
 						{
-						fileNames.push_back(fileName);
+						if (fileNumber>=minFileNo && fileNumber<=maxFileNo)
+							{
+							fileNames.push_back(fileName);
+							}
 						}
 					}
 				fileName.clear();

@@ -336,8 +336,8 @@ double ergZero = N*a*Vd(minima[0],&paramsV);
 
 //determining number of runs
 closenessA = 1.0;
-closenessS = 1.0e-5;
-closenessSM = 1.0e-4;
+closenessS = 1.0e-6;
+closenessSM = 1.0e-5;
 closenessD = 1.0;
 closenessC = 1.0e-16*N*NT;
 closenessE = 1.0e-2;
@@ -1203,17 +1203,20 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 //	gpSimple(ergFile);
 	
 	//printing error, and eigenvalue to file
-	ifstream eigenvalueIn;
-	string eigenvaluefile = "data/eigValue.dat";
-	eigenvalueIn.open(eigenvaluefile.c_str(),ios::in);
-	string lastEigLine = getLastLine(eigenvalueIn);
-	eigenvalueIn.close();
-	ofstream eigenvalueOut;
-	string eigValueFile = prefix + "eigValue.dat";
-	eigenvalueOut.open(eigValueFile.c_str(),ios::out);
-	eigenvalueOut << lastEigLine;
-	eigenvalueOut.close();
-	printf("%12s%30s\n"," ",eigenvaluefile.c_str());
+	if (pot[0]!='3')
+		{
+		ifstream eigenvalueIn;
+		string eigenvaluefile = "data/eigValue.dat";
+		eigenvalueIn.open(eigenvaluefile.c_str(),ios::in);
+		string lastEigLine = getLastLine(eigenvalueIn);
+		eigenvalueIn.close();
+		ofstream eigenvalueOut;
+		string eigValueFile = prefix + "eigValue.dat";
+		eigenvalueOut.open(eigValueFile.c_str(),ios::out);
+		eigenvalueOut << lastEigLine;
+		eigenvalueOut.close();
+		printf("%12s%30s\n"," ",eigenvaluefile.c_str());
+		}
 
 	//printing eigenvector to file
 	/*string eigenvectorFile = prefix + "eigVec.dat";

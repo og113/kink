@@ -107,10 +107,7 @@ for (unsigned int k=0;k<files.size();k++)
 			(*tempVecStr).erase((*tempVecStr).begin()+l);
 			loopNumbers.erase(loopNumbers.begin()+l);
 			}
-		else
-			{
-			l++;
-			}
+		else l++;
 		}
 	}
 
@@ -119,17 +116,14 @@ if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 	{
 	for (unsigned int j=0;j<files.size();j++)
 		{
-		for (unsigned int k=0;k<files.size();k++)
-			{
-			*files[j] = reduceTo(*files[j],*files[k]);
-			}
+		for (unsigned int k=0;k<files.size();k++) *files[j] = reduceTo(*files[j],*files[k]);
 		}
 	if (piFiles.size()!=inputsFiles.size() || piFiles.size()==0)
 		{
 		cout << "required files not available" << endl;
 		cout << "piFiles.size() = " << piFiles.size() << endl;
 		cout << "inputsFiles.size() = " << inputsFiles.size() << endl;
-		return 0;
+		return 1;
 		}
 	}
 

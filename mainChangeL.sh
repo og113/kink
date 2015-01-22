@@ -2,8 +2,8 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/21.01.15_L_5.0_10.0_Tb_0.8.txt"
-SUMMARY="results/21.01.15_summary.txt"
+FILE="results/22.01.15_L_5.0_10.0_Tb_0.8.txt"
+SUMMARY="results/22.01.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
 echo "output from mainChangeL.sh" > $FILE
@@ -13,8 +13,9 @@ echo "" >> $SUMMARY
 printf '%-10s %-10s \n' "L" "S/F" >> $SUMMARY
 
 Tb=0.8
-loops=16
+loops=14
 ./changeInputs -f mainInputs -n maxFileNo -v $loops
+./changeInputs -f mainInputs -n minFileNo -v 0
 
 for j in `seq 0 $loops`
 	do
@@ -35,7 +36,7 @@ for j in `seq 0 $loops`
 	./mx "D"
 	./mx "V0 = V(:,1);"
 	./mx "printVector(V0,'../kink/data/stable/sphaleronEigVec.dat');"
-	AMP=-0.5
+	AMP=0.5
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
 	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
@@ -46,19 +47,22 @@ for j in `seq 0 $loops`
 	if [ "$?" = "0" ]; then
 		echo "pi3 output:" >> $FILE
 		echo "" >> $FILE
-		./pi3 -tn $TIMENUMBER >> $FILE
+		./pi3 -tn $TIMENUMBER -test 1 >> $FILE
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./changeInputs -f mainInputs -n minFileNo -v "$TIMENUMBER"
+			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
+			echo "" >> $FILE
+			./changeInputs -f mainInputs -n minFileNo -v $TIMENUMBER
+			./changeInputs -f mainInputs -n maxFileNo -v $TIMENUMBER
 			echo "#################################################################################################" >> $FILE
 			./main >> $FILE
-			echo "#################################################################################################" >> $FILE
 			if [ "$?" = "0" ]; then
 				printf '%-10s %-10s \n' $L "S" >> $SUMMARY
 			else
 				printf '%-10s %-10s \n' $L "FM" >> $SUMMARY
 			fi
+			echo "#################################################################################################" >> $FILE
 		else
 			echo "solution didn't tunnel" >> $FILE
 			echo "" >> $FILE
