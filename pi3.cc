@@ -120,16 +120,20 @@ dt = dr*0.2;
 Na = (unsigned int)(Ta/dt);
 Nc = (unsigned int)(Tc/dt);
 
-if ((abs(Ta)-4.0)>1.1*(r1-r0)) {
+if (abs(Ta)>1.1*(r1-r0)) {
 	cerr << "R is too small compared to Ta. R = " << r1-r0 << ", Ta = " << Ta << endl;
 	return 1;
 }
-if ((abs(Tc)-4.0)>1.1*(r1-r0)) {
-	cerr << "R is too small compared to Ta. R = " << r1-r0 << ", Tc = " << Tc << endl;
+if (abs(Tc)>1.1*(r1-r0)) {
+	cerr << "R is too small compared to Tc. R = " << r1-r0 << ", Tc = " << Tc << endl;
 	return 1;
 }
 if (abs(dt)>0.5*dr) {
-	cerr << "dt too large. dt = "<< dt << ", dr = " << dr << endl;
+	cerr << "dt too large. dt = " << dt << ", dr = " << dr << endl;
+	return 1;
+}
+if (abs(Ta)<2.5) {
+	cerr << "Ta too small. Ta = " << Ta << endl;
 	return 1;
 }
 
@@ -161,18 +165,17 @@ double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA;
 uint j=0;
 while(j<2) {
 
-	if (j==0) {
+	if (testTunnel) {
+		Nt = 10*N;
+		j=1;
+	}
+	else if (j==0) {
 		Nt = Nc;
 		direction = 1;
 	}
 	else if (j==1) {
 		Nt = Na;
 		direction = -1;
-	}
-	if (testTunnel) {
-		Nt = 10*N;
-		direction = 1;
-		j=1;
 	}
 	
 	vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);

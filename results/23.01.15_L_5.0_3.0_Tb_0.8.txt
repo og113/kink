@@ -1,0 +1,450 @@
+output from mainChangeL.sh
+
+-------------------------------------------------------------------------------------------------------
+L = 5.0
+
+./sphaleron
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2       5     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00052      0.00104148      0.00552002        0.154436
+               0               2       0.0239081     0.000354606      0.00171309       0.0731972
+               0               3       0.0365376     2.47458e-05     9.33517e-05      0.00407517
+               0               4      0.00779442     4.04644e-07     1.84606e-06     0.000412459
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 6.33411     120     422       5     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                     ./data/0linErgp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/0pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     120     320     100       2       5     0.8
+
+Input:                                          data/0pip_0.dat
+tpip printed:                                       data/0tpip_0.dat pics/pi3.png
+erg(0) =  18.6852
+linErgFieldA(0) =  18.2989
+nonLinErgA(0) =   0.3863
+linNumContmA(0) =  10.2235
+linErgContmA(0) =  18.3003
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/0inputsPi_0 ./data/0tpip_0.dat
+
+     input:             ./data/0tpip_0.dat
+timeNumber: 150123150758
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2       5     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.10834    0.00325481     0.0204292      0.794942       1.08758           nan
+         0         2      0.392159    0.00118542     0.0060334      0.514868      0.960569           nan
+         0         3     0.0486453   0.000472916      0.120665      0.977043      0.763893           nan
+         0         4       4090.42      0.218001       23.6312      0.901276      0.897577           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+L = 4.5
+
+./sphaleron
+
+r1 = 4.5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00731157      0.00731157      0.00731157           4.337   4.34161259925       0.0046126
+               2            1001    -7.66673e-06     5.26336e-05    -7.66673e-06   4.34161259925   4.34160777266    -4.82659e-06
+               3            1001    -8.22775e-12     6.02736e-05    -8.22775e-12   4.34160777266   4.34160777265    -5.17979e-12
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9087
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     4.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00051     0.000842077      0.00507247       0.0935273
+               0               2       0.0290774     0.000130995     0.000557642       0.0208791
+               0               3       0.0218539     1.69128e-05     0.000109079       0.0233261
+               0               4       0.0115063     8.17935e-06     5.59339e-05      0.00641716
+               0               5      0.00276406     7.41231e-07     4.41798e-06     0.000747783
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 7.09539     120     422     4.5     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                     ./data/1linErgp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/1pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     120     320     100       2     4.5     0.8
+
+Input:                                          data/1pip_0.dat
+tpip printed:                                       data/1tpip_0.dat pics/pi3.png
+erg(0) =  18.6636
+linErgFieldA(0) =  18.2768
+nonLinErgA(0) =   0.3868
+linNumContmA(0) =  10.2047
+linErgContmA(0) =  18.2780
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/1inputsPi_0 ./data/1tpip_0.dat
+
+     input:             ./data/1tpip_0.dat
+timeNumber: 150123151020
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.08893    0.00270849     0.0160027      0.886109       1.10071           nan
+         0         2      0.425303   0.000596795    0.00230729      0.633462      0.865958           nan
+         0         3       0.22044    0.00124863      0.231302      0.931871      0.864475           nan
+         0         4       881.341      0.114351       10.5157      0.850633      0.848166           nan
+         0         5      0.168357      0.111973       71.8987      0.907977       1.87498           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+L = 4.0
+
+./sphaleron
+
+r1 = 4
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001       0.0128416       0.0128416       0.0128416           4.337   4.34885208715       0.0118521
+               2            1001    -3.24999e-05     6.68151e-05    -3.24999e-05   4.34885208715   4.34882224173    -2.98454e-05
+               3            1001    -2.01017e-10      9.9218e-05    -2.01017e-10   4.34882224173   4.34882224154    -1.84601e-10
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9282
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       4   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2       4     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00056     0.000752995      0.00457526       0.0924964
+               0               2       0.0271785     0.000114269     0.000490877       0.0225274
+               0               3         0.01901     1.64947e-05     0.000108889       0.0245881
+               0               4        0.010341     8.14121e-06     5.55555e-05      0.00721247
+               0               5      0.00262088     8.45875e-07     4.96662e-06      0.00100304
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5  6.9594     120     422       4     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                     ./data/2linErgp_0.dat
+                        ./data/2ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/2pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     120     320     100       2       4     0.8
+
+Input:                                          data/2pip_0.dat
+tpip printed:                                       data/2tpip_0.dat pics/pi3.png
+erg(0) =  18.7971
+linErgFieldA(0) =  18.3925
+nonLinErgA(0) =   0.4045
+linNumContmA(0) =  10.2507
+linErgContmA(0) =  18.3934
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/2inputsPi_0 ./data/2tpip_0.dat
+
+     input:             ./data/2tpip_0.dat
+timeNumber: 150123151256
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2       4     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.07182    0.00202607     0.0123612      0.984494       1.12942           nan
+         0         2      0.605923   0.000721648     0.0024082      0.613347        1.3784           nan
+         0         3       1.69873     0.0471491       4.42691       0.81593       1.04296           nan
+         0         4       1.74267     0.0281564       2.95881      0.645885       1.16525           nan
+         0         5       1.74627      0.010241      0.769613      0.790034       1.05044           nan
+         0         6       24.2556     0.0408728       50.9299      0.963551       1.00289           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+L = 3.5
+
+./sphaleron
+
+r1 = 3.5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001        0.023697        0.023697        0.023697           4.337   4.36841040129       0.0314104
+               2            1001    -0.000144842     1.84627e-05    -0.000144842   4.36841040129   4.36822071219    -0.000189689
+               3            1001    -5.10566e-09     0.000162944    -5.10566e-09   4.36822071219    4.3682207055    -6.68697e-09
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.981
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     3.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     3.5     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00061      0.00066789      0.00414135       0.0902318
+               0               2       0.0272265      0.00010003     0.000447205       0.0282582
+               0               3       0.0176116     1.91603e-05     0.000129412       0.0292007
+               0               4      0.00993381     1.04578e-05     6.88946e-05       0.0112069
+               0               5       0.0030826     1.90017e-06     1.07022e-05      0.00316974
+               0               6     0.000821278     1.60196e-07     9.00574e-07     0.000278233
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 8.34412     120     422     3.5     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                     ./data/3linErgp_0.dat
+                        ./data/3ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/3pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     120     320     100       2     3.5     0.8
+
+Input:                                          data/3pip_0.dat
+tpip printed:                                       data/3tpip_0.dat pics/pi3.png
+erg(0) =  19.3697
+linErgFieldA(0) =  18.8919
+nonLinErgA(0) =   0.4778
+linNumContmA(0) =  10.4769
+linErgContmA(0) =  18.8926
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/3inputsPi_0 ./data/3tpip_0.dat
+
+     input:             ./data/3tpip_0.dat
+timeNumber: 150123151555
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     3.5     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.05871    0.00126317    0.00826984       1.06767       1.18673           nan
+         0         2      0.954199    0.00106993     0.0145676      0.608118       1.63899           nan
+         0         3       3.85142    0.00149883     0.0597275      0.521699       1.88731           nan
+         0         4       1.37332    0.00935237       3.87879      0.962897       1.35859           nan
+         0         5       11264.1      0.876486       1280.76      0.952941       1.24349           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+L = 3.0
+
+./sphaleron
+
+r1 = 3
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001       0.0452226       0.0452226       0.0452226           4.337   4.42075274805       0.0837527
+               2            1001    -0.000634663     0.000169338    -0.000634663   4.42075274805   4.41960908274     -0.00114367
+               3            1001    -1.12917e-07     0.000266135    -1.12917e-07   4.41960908274   4.41960887919    -2.03549e-07
+               4            1001     4.98755e-15     4.98755e-15     4.98755e-15   4.41960887919   4.41960887919     8.99078e-15
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 19.1227
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       3   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            4
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2       3     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00066     0.000590243      0.00360643       0.0850641
+               0               2       0.0318031     9.09064e-05     0.000446638       0.0454138
+               0               3       0.0186909     3.11953e-05     0.000215209       0.0398979
+               0               4      0.00926147     1.92219e-05     0.000112488       0.0228785
+               0               5      0.00242168     7.97956e-06     3.74248e-05       0.0126476
+               0               6     5.53022e-05     2.52091e-06     1.03458e-05      0.00180618
+               0               7     0.000249511     2.93594e-08     1.63903e-07     2.43061e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+23.3449
+15.808
+10.504
+5.62447
+2.14404
+0.193516
+0.00325701
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       7 9.43436     120     422       3     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/4inputsPi_0
+                         ./data/4pip_0.dat
+                     ./data/4minusDS_0.dat
+                        ./data/4DDSp_0.dat
+                     ./data/4linErgp_0.dat
+                        ./data/4ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/4pip_0.dat
+erg(0) =  20.3035
+linErgFieldA(0) =  19.7193
+nonLinErgA(0) =   0.5842
+linNumContmA(0) =  10.8323
+linErgContmA(0) =  19.7200
+
+solution didn't tunnel
+
+
