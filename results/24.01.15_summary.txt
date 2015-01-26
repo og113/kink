@@ -1,0 +1,8 @@
+output from mainChangeN.sh
+
+N          Na         Nb         Nc         S/F       
+120        320        100        2          S          
+120        340        100        2          S          
+120        360        100        2          FM         
+120        380        100        2          FM         
+120        400        100        2          S          

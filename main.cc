@@ -975,7 +975,7 @@ auto ddVr = [&] (const comp & phi)
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
 			//checking agreement between erg and linErg
-			double trueTest = E - E_exact; //not using zero as boundaries are funny
+			double trueTest = E - E_exact;
 			trueTest = trueTest*2.0/(E + E_exact);
 			trueTest = abs(trueTest);
 			true_test.push_back(trueTest);

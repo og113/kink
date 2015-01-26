@@ -2,26 +2,26 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/22.01.15_L_5.0_10.0_Tb_0.8.txt"
-SUMMARY="results/22.01.15_summary.txt"
+FILE="results/23.01.15_L_5.0_3.0_Tb_0.8.txt"
+SUMMARY="results/23.01.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
 echo "output from mainChangeL.sh" > $FILE
 echo "" >> $FILE
-echo "output from mainChangeL.sh" > $SUMMARY
+echo "output from mainChangeL.sh" >> $SUMMARY
 echo "" >> $SUMMARY
 printf '%-10s %-10s \n' "L" "S/F" >> $SUMMARY
 
 Tb=0.8
-loops=14
+loops=4
 ./changeInputs -f mainInputs -n maxFileNo -v $loops
 ./changeInputs -f mainInputs -n minFileNo -v 0
 
 for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	L=$(echo "scale=1; -0.5*$j+10.0" | bc)
-	LoR=$(echo "scale=1; $L/10.0" | bc)
+	L=$(echo "scale=2; -0.5*$j+5.0" | bc)
+	LoR=$(echo "scale=3; $L/10.0" | bc)
 	echo "L =" $L >> $FILE
 	echo "" >> $FILE
 	./changeInputs LoR $LoR

@@ -1,0 +1,320 @@
+output from mainChangeL.sh
+
+Tb = 0.8
+L = 4.0
+-------------------------------------------------------------------------------------------------------
+N = 140
+Na = 200
+Nb = 160
+Nc = 2
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     4.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     140     200     160       2       4     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00044     0.000548557      0.00269838       0.0885454
+               0               2        0.165319     8.53549e-05     0.000337544       0.0240367
+               0               3       0.0385611     2.33135e-05      0.00022083       0.0615546
+               0               4       0.0222381     2.07636e-05     0.000152127       0.0182038
+               0               5       0.0051352     2.92415e-06     1.58383e-05      0.00808295
+               0               6      0.00232771     6.02064e-07     3.60102e-06      0.00169025
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 20.0145     140     362       4     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                     ./data/0linErgp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/0pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     140     200     160       2       4     0.8
+
+Input:                                          data/0pip_0.dat
+tpip printed:                                       data/0tpip_0.dat pics/pi3.png
+erg(0) =  18.7364
+linErgFieldA(0) =  18.5190
+nonLinErgA(0) =   0.2174
+linNumContmA(0) =   9.9198
+linErgContmA(0) =  18.5198
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/0inputsPi_0 ./data/0tpip_0.dat
+
+     input:             ./data/0tpip_0.dat
+timeNumber: 150123104319
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     140     200     160       2       4     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.08272    0.00106375    0.00826168      0.439723      0.246748           nan
+         0         2      0.335497   0.000315754    0.00266571      0.814669      0.901063           nan
+         0         3       28.1678     0.0357753      0.310538      0.331393      0.720781           nan
+         0         4      0.891311    0.00642289     0.0911389      0.998568      0.700597           nan
+         0         5       262.363      0.419308       21.7366       1.01161       1.55451           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+N = 120
+Na = 200
+Nb = 160
+Nc = 2
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     4.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     200     160       2       4     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00038     0.000642425       0.0033107       0.0886558
+               0               2        0.188722     0.000100032      0.00039467       0.0244536
+               0               3        0.046829     2.78089e-05     0.000263091        0.062043
+               0               4       0.0267873     2.47875e-05     0.000182628       0.0188015
+               0               5      0.00626079     3.67438e-06      1.9753e-05      0.00881217
+               0               6      0.00297348     8.48269e-07     4.98961e-06      0.00214304
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 14.6165     120     362       4     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                     ./data/1linErgp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/1pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     120     200     160       2       4     0.8
+
+Input:                                          data/1pip_0.dat
+tpip printed:                                       data/1tpip_0.dat pics/pi3.png
+erg(0) =  18.8742
+linErgFieldA(0) =  18.6265
+nonLinErgA(0) =   0.2477
+linNumContmA(0) =   9.9780
+linErgContmA(0) =  18.6273
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/1inputsPi_0 ./data/1tpip_0.dat
+
+     input:             ./data/1tpip_0.dat
+timeNumber: 150123104605
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     200     160       2       4     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.10878    0.00142387     0.0111063      0.450258      0.239743           nan
+         0         2      0.332953   0.000598621    0.00383675      0.724677      0.969746           nan
+         0         3       3.70374     0.0695832       14.2101      0.816407      0.523206           nan
+         0         4       18.3618     0.0572125       14.5666      0.836757      0.442539           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+N = 100
+Na = 200
+Nb = 160
+Nc = 2
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     4.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     100     200     160       2       4     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     0.000773192      0.00383393       0.0888644
+               0               2        0.229245     0.000121047      0.00047546       0.0251238
+               0               3       0.0603849     3.45995e-05     0.000324494       0.0628502
+               0               4       0.0338575     3.08768e-05     0.000224859       0.0197844
+               0               5      0.00803453     4.95984e-06     2.63778e-05       0.0100979
+               0               6      0.00408305     1.37216e-06     8.00452e-06      0.00314619
+               0               7      0.00105394       1.385e-07     7.62159e-07      0.00031424
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       7 12.4376     100     362       4     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                     ./data/2linErgp_0.dat
+                        ./data/2ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/2pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     100     200     160       2       4     0.8
+
+Input:                                          data/2pip_0.dat
+tpip printed:                                       data/2tpip_0.dat pics/pi3.png
+erg(0) =  19.1558
+linErgFieldA(0) =  18.8334
+nonLinErgA(0) =   0.3225
+linNumContmA(0) =  10.0904
+linErgContmA(0) =  18.8347
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/2inputsPi_0 ./data/2tpip_0.dat
+
+     input:             ./data/2tpip_0.dat
+timeNumber: 150123104749
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     100     200     160       2       4     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.14918    0.00196354     0.0152028      0.494532      0.230598           nan
+         0         2      0.360459   0.000877773     0.0071054      0.880205       1.13582           nan
+         0         3       21.1522     0.0443484      0.457593      0.484291       1.31538           nan
+         0         4      0.742258     0.0164041      0.125362      0.532661       1.47663           nan
+         0         5       0.92929    0.00358026      0.282917       1.06044       1.21885           nan
+         0         6       55543.7       2.58151       224.672      0.920822       1.96903           nan
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+N = 80
+Na = 200
+Nb = 160
+Nc = 2
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000     4.5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p      80     200     160       2       4     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00021     0.000971776      0.00483736       0.0892628
+               0               2        0.306417     0.000153162     0.000600796       0.0262278
+               0               3       0.0865296     4.58944e-05     0.000435327       0.0640973
+               0               4        0.046028     4.10026e-05     0.000292814       0.0214884
+               0               5       0.0110935     7.53039e-06     3.95018e-05        0.012581
+               0               6      0.00617266     2.79406e-06     1.58267e-05      0.00600335
+               0               7      0.00221806      6.6722e-07     3.49362e-06      0.00167898
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       7 8.62229      80     362       4     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                     ./data/3linErgp_0.dat
+                        ./data/3ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/3pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0) =     -nan
+nonLinErgA(0) =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+      80     200     160       2       4     0.8
+
+Input:                                          data/3pip_0.dat
+tpip printed:                                       data/3tpip_0.dat pics/pi3.png
+erg(0) =  20.0634
+linErgFieldA(0) =  19.4075
+nonLinErgA(0) =   0.6559
+linNumContmA(0) =  10.3954
+linErgContmA(0) =  19.4091
+
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/3inputsPi_0 ./data/3tpip_0.dat
+
+     input:             ./data/3tpip_0.dat
+timeNumber: 150123104921
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p      80     200     160       2       4     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.21805    0.00244553     0.0212901      0.795068       0.20676           nan
+         0         2        2.1995     0.0199206      0.186472      0.664191       1.71699           nan
+         0         3      0.121722     0.0119281      0.159805      0.641978       1.39459           nan
+#################################################################################################
+

@@ -1,0 +1,2664 @@
+N = 160
+Nb = 160
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = 1.0
+
+pi output:
+
+timeNumber:          0_0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00005      0.00292629       0.0167797        0.255766
+               0               2        0.641354      0.00131971      0.00902638         0.16566
+               0               3         5.56012     0.000867448      0.00493103        0.121352
+               0               4        0.239143     0.000107467     0.000508442       0.0412123
+               0               5       0.0103626     7.64062e-06     2.29896e-05       0.0173342
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.6805     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_0inputsPi_0
+                       ./data/0_0pip_0.dat
+                      ./data/0_0tpip_0.dat
+                   ./data/0_0minusDS_0.dat
+                      ./data/0_0DDSp_0.dat
+                   ./data/0_0linErgp_0.dat
+                      ./data/0_0ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_0pip_0.dat
+Time evolution printed:                data/150116114917pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .9
+
+pi output:
+
+timeNumber:          0_1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00011      0.00245992       0.0131631        0.217951
+               0               2        0.254488     0.000906829      0.00519642         0.15585
+               0               3        0.892872     0.000206245      0.00105456       0.0761668
+               0               4       0.0987215     2.73572e-05     0.000160889       0.0295159
+               0               5        0.046393     8.52882e-06       7.487e-05     0.000800024
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.7766     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_1inputsPi_0
+                       ./data/0_1pip_0.dat
+                      ./data/0_1tpip_0.dat
+                   ./data/0_1minusDS_0.dat
+                      ./data/0_1DDSp_0.dat
+                   ./data/0_1linErgp_0.dat
+                      ./data/0_1ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_1pip_0.dat
+Time evolution printed:                data/150116114945pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.87236e-05
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .8
+
+pi output:
+
+timeNumber:          0_2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00017      0.00199068       0.0104353        0.189215
+               0               2        0.160225     0.000631557      0.00318994        0.133433
+               0               3        0.341076     7.71897e-05     0.000331903       0.0790437
+               0               4       0.0948207     4.94207e-05     0.000339768       0.0177226
+               0               5       0.0293932     3.12793e-06     3.22457e-05     0.000400124
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.4559     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_2inputsPi_0
+                       ./data/0_2pip_0.dat
+                      ./data/0_2tpip_0.dat
+                   ./data/0_2minusDS_0.dat
+                      ./data/0_2DDSp_0.dat
+                   ./data/0_2linErgp_0.dat
+                      ./data/0_2ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_2pip_0.dat
+Time evolution printed:                data/150116115013pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 8.84188e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .7
+
+pi output:
+
+timeNumber:          0_3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00021      0.00155453      0.00875967        0.164924
+               0               2        0.131192     0.000436186      0.00198417        0.116469
+               0               3        0.135794     3.64347e-05     0.000110727       0.0853882
+               0               4         0.11131     6.97162e-05     0.000509303      0.00804571
+               0               5      0.00807833     9.01189e-07     6.33979e-06     0.000331821
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.2747     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_3inputsPi_0
+                       ./data/0_3pip_0.dat
+                      ./data/0_3tpip_0.dat
+                   ./data/0_3minusDS_0.dat
+                      ./data/0_3DDSp_0.dat
+                   ./data/0_3linErgp_0.dat
+                      ./data/0_3ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_3pip_0.dat
+Time evolution printed:                data/150116115041pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.01625e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .6
+
+pi output:
+
+timeNumber:          0_4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00025      0.00116613      0.00714706        0.144091
+               0               2        0.122565     0.000288616        0.001184        0.107701
+               0               3       0.0255343     2.70628e-05     7.19349e-05       0.0820906
+               0               4        0.114943     6.82041e-05      0.00051286      0.00563879
+               0               5      0.00371354     8.00397e-07     4.02428e-06     5.61427e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5  20.175     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_4inputsPi_0
+                       ./data/0_4pip_0.dat
+                      ./data/0_4tpip_0.dat
+                   ./data/0_4minusDS_0.dat
+                      ./data/0_4DDSp_0.dat
+                   ./data/0_4linErgp_0.dat
+                      ./data/0_4ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_4pip_0.dat
+Time evolution printed:                data/150116115109pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.6371e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .5
+
+pi output:
+
+timeNumber:          0_5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00028      0.00083285      0.00562037        0.128405
+               0               2        0.124788     0.000174518     0.000610446        0.110026
+               0               3       0.0530475     5.37787e-05     0.000342836        0.060151
+               0               4       0.0874251     3.54432e-05     0.000286123      0.00261942
+               0               5     0.000459054     1.92336e-07     9.03675e-07     1.45482e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.2027     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_5inputsPi_0
+                       ./data/0_5pip_0.dat
+                      ./data/0_5tpip_0.dat
+                   ./data/0_5minusDS_0.dat
+                      ./data/0_5DDSp_0.dat
+                   ./data/0_5linErgp_0.dat
+                      ./data/0_5ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_5pip_0.dat
+Time evolution printed:                data/150116115137pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 5.5754e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .4
+
+pi output:
+
+timeNumber:          0_6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     0.000560198      0.00420257        0.128623
+               0               2         0.14618     8.75205e-05     0.000296008        0.111496
+               0               3         0.10547     0.000107699     0.000740441       0.0305925
+               0               4       0.0424868     7.82698e-06     7.83931e-05      0.00231901
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 16.1926     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_6inputsPi_0
+                       ./data/0_6pip_0.dat
+                      ./data/0_6tpip_0.dat
+                   ./data/0_6minusDS_0.dat
+                      ./data/0_6DDSp_0.dat
+                   ./data/0_6linErgp_0.dat
+                      ./data/0_6ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_6pip_0.dat
+Time evolution printed:                data/150116115201pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.20047e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .3
+
+pi output:
+
+timeNumber:          0_7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00032     0.000372461      0.00291657        0.283822
+               0               2        0.353656     0.000388747      0.00266926       0.0462874
+               0               3       0.0944068     2.69117e-05      0.00010048       0.0062964
+               0               4      0.00850634     1.32161e-07       8.966e-07     0.000188041
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 16.1993     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_7inputsPi_0
+                       ./data/0_7pip_0.dat
+                      ./data/0_7tpip_0.dat
+                   ./data/0_7minusDS_0.dat
+                      ./data/0_7DDSp_0.dat
+                   ./data/0_7linErgp_0.dat
+                      ./data/0_7ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_7eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_7pip_0.dat
+Time evolution printed:                data/150116115224pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.19288e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .2
+
+pi output:
+
+timeNumber:          0_8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00033     0.000144085      0.00178533        0.122271
+               0               2       0.0664817      0.00029096      0.00167134        0.106065
+               0               3       0.0904727     3.16724e-05     0.000203839       0.0244562
+               0               4       0.0301436      1.3612e-05     7.59693e-05      0.00705795
+               0               5      0.00349837     9.79037e-07     5.07207e-06     0.000360792
+
+average |dp/dt| integrated over each timeslice:
+1
+5.06765
+1.84859
+0.861373
+0.394093
+0.00395442
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.1777     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_8inputsPi_0
+                       ./data/0_8pip_0.dat
+                      ./data/0_8tpip_0.dat
+                   ./data/0_8minusDS_0.dat
+                      ./data/0_8DDSp_0.dat
+                   ./data/0_8linErgp_0.dat
+                      ./data/0_8ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_8pip_0.dat
+Time evolution printed:                data/150116115251pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0310378
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = .1
+
+pi output:
+
+timeNumber:          0_9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00033     6.12922e-05     0.000831783       0.0351865
+               0               2      0.00465367     2.86178e-05     0.000123474       0.0114846
+               0               3         0.00787     2.59251e-07     1.19619e-06     0.000147137
+
+average |dp/dt| integrated over each timeslice:
+1
+2.53382
+0.118496
+0.00070918
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       3 12.4104     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/0_9inputsPi_0
+                       ./data/0_9pip_0.dat
+                      ./data/0_9tpip_0.dat
+                   ./data/0_9minusDS_0.dat
+                      ./data/0_9DDSp_0.dat
+                   ./data/0_9linErgp_0.dat
+                      ./data/0_9ergp_0.dat
+                         data/eigValue.dat
+                      ./data/0_9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/0_9pip_0.dat
+Time evolution printed:                data/150116115312pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.80911e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .74
+amp = 0
+
+pi output:
+
+timeNumber:         0_10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.74           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00034     2.41986e-05     7.88645e-05      0.00906859
+               0               2       0.0149741     3.06364e-07     9.24077e-07     5.05402e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+5.98125e-13
+1.61317e-12
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.72046     160     362      10    0.74    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:          ./data/0_10inputsPi_0
+                      ./data/0_10pip_0.dat
+                     ./data/0_10tpip_0.dat
+                  ./data/0_10minusDS_0.dat
+                     ./data/0_10DDSp_0.dat
+                  ./data/0_10linErgp_0.dat
+                     ./data/0_10ergp_0.dat
+                         data/eigValue.dat
+                     ./data/0_10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                       data/0_10pip_0.dat
+Time evolution printed:                data/150116115331pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.18986e-08
+
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = 1.0
+
+pi output:
+
+timeNumber:          1_0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00007      0.00287569       0.0164353        0.256482
+               0               2        0.678898      0.00131527      0.00872573        0.182836
+               0               3         5.10211     0.000707717      0.00388131        0.119714
+               0               4         0.22403     7.82187e-05     0.000376277       0.0504485
+               0               5       0.0442453     1.57448e-05     0.000106565        0.015748
+               0               6       0.0311729     2.50636e-06     2.47158e-05     0.000164312
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6  22.832     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_0inputsPi_0
+                       ./data/1_0pip_0.dat
+                      ./data/1_0tpip_0.dat
+                   ./data/1_0minusDS_0.dat
+                      ./data/1_0DDSp_0.dat
+                   ./data/1_0linErgp_0.dat
+                      ./data/1_0ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_0pip_0.dat
+Time evolution printed:                data/150116115403pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .9
+
+pi output:
+
+timeNumber:          1_1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00012      0.00241884       0.0128793        0.219723
+               0               2        0.319226     0.000906433      0.00510143        0.168092
+               0               3        0.877953     0.000189977     0.000929758       0.0953794
+               0               4        0.125701     5.46496e-05      0.00035754       0.0361185
+               0               5       0.0650103     1.34421e-05     0.000129424      0.00105911
+               0               6      0.00117058     2.82074e-08     2.77141e-07     2.36136e-06
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 22.7884     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_1inputsPi_0
+                       ./data/1_1pip_0.dat
+                      ./data/1_1tpip_0.dat
+                   ./data/1_1minusDS_0.dat
+                      ./data/1_1DDSp_0.dat
+                   ./data/1_1linErgp_0.dat
+                      ./data/1_1ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_1pip_0.dat
+Time evolution printed:                data/150116115433pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.65031e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .8
+
+pi output:
+
+timeNumber:          1_2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00018      0.00196093       0.0105293        0.191412
+               0               2        0.212904     0.000634589      0.00313808         0.14561
+               0               3        0.330067     7.51133e-05     0.000293535        0.103242
+               0               4        0.135808       9.254e-05     0.000642204       0.0191767
+               0               5       0.0338728     4.17619e-06     4.55379e-05     0.000983465
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 19.3157     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_2inputsPi_0
+                       ./data/1_2pip_0.dat
+                      ./data/1_2tpip_0.dat
+                   ./data/1_2minusDS_0.dat
+                      ./data/1_2DDSp_0.dat
+                   ./data/1_2linErgp_0.dat
+                      ./data/1_2ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_2pip_0.dat
+Time evolution printed:                data/150116115500pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 6.16094e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .7
+
+pi output:
+
+timeNumber:          1_3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00022      0.00153533      0.00884694        0.167658
+               0               2        0.172557     0.000439849       0.0019762        0.130144
+               0               3        0.120424     4.03963e-05     0.000104502        0.108791
+               0               4        0.155199     0.000115675     0.000836247      0.00979596
+               0               5      0.00499913     2.11277e-06     9.03474e-06     0.000627835
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.1605     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_3inputsPi_0
+                       ./data/1_3pip_0.dat
+                      ./data/1_3tpip_0.dat
+                   ./data/1_3minusDS_0.dat
+                      ./data/1_3DDSp_0.dat
+                   ./data/1_3linErgp_0.dat
+                      ./data/1_3ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_3pip_0.dat
+Time evolution printed:                data/150116115528pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.1446e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .6
+
+pi output:
+
+timeNumber:          1_4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00026      0.00115616      0.00722674        0.148018
+               0               2        0.156373     0.000291916      0.00117012         0.12445
+               0               3      0.00299904      3.9019e-05     0.000161738       0.0980709
+               0               4        0.149125     9.68336e-05     0.000720508      0.00747314
+               0               5       0.0050697     1.47202e-06     7.50742e-06     0.000132994
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 19.9011     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_4inputsPi_0
+                       ./data/1_4pip_0.dat
+                      ./data/1_4tpip_0.dat
+                   ./data/1_4minusDS_0.dat
+                      ./data/1_4DDSp_0.dat
+                   ./data/1_4linErgp_0.dat
+                      ./data/1_4ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_4pip_0.dat
+Time evolution printed:                data/150116115555pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 4.06159e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .5
+
+pi output:
+
+timeNumber:          1_5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00028      0.00083086      0.00569131        0.135564
+               0               2        0.155607     0.000177042     0.000602556        0.130524
+               0               3        0.085118     8.96499e-05      0.00058541       0.0656388
+               0               4         0.10404     4.21787e-05     0.000371288      0.00339707
+               0               5      0.00250836     2.79282e-07     2.37681e-06     3.98802e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 19.3718     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_5inputsPi_0
+                       ./data/1_5pip_0.dat
+                      ./data/1_5tpip_0.dat
+                   ./data/1_5minusDS_0.dat
+                      ./data/1_5DDSp_0.dat
+                   ./data/1_5linErgp_0.dat
+                      ./data/1_5ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_5pip_0.dat
+Time evolution printed:                data/150116115622pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.04414e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .4
+
+pi output:
+
+timeNumber:          1_6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     0.000566428      0.00426329        0.148126
+               0               2        0.185304     9.09251e-05     0.000278414        0.121715
+               0               3        0.126738     0.000137239     0.000941329       0.0347309
+               0               4       0.0564995     1.11405e-05     0.000115841      0.00303259
+               0               5      0.00243503     7.47525e-08        8.82e-07     5.03742e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 19.7846     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_6inputsPi_0
+                       ./data/1_6pip_0.dat
+                      ./data/1_6tpip_0.dat
+                   ./data/1_6minusDS_0.dat
+                      ./data/1_6DDSp_0.dat
+                   ./data/1_6linErgp_0.dat
+                      ./data/1_6ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_6pip_0.dat
+Time evolution printed:                data/150116115649pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.53992e-10
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .3
+
+pi output:
+
+timeNumber:          1_7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     0.000424794       0.0029653        0.549136
+               0               2        0.774809      0.00162942       0.0108185        0.196531
+               0               3         1.22772     0.000299256      0.00156202       0.0199166
+               0               4        0.262869     3.37297e-05     0.000362089       0.0169149
+               0               5       0.0355538     3.10764e-06     2.44617e-05     0.000536632
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 19.4351     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_7inputsPi_0
+                       ./data/1_7pip_0.dat
+                      ./data/1_7tpip_0.dat
+                   ./data/1_7minusDS_0.dat
+                      ./data/1_7DDSp_0.dat
+                   ./data/1_7linErgp_0.dat
+                      ./data/1_7ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_7eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_7pip_0.dat
+Time evolution printed:                data/150116115716pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.09677e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .2
+
+pi output:
+
+timeNumber:          1_8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00032     0.000147846      0.00181996        0.110592
+               0               2       0.0559683     0.000238471      0.00135601       0.0896456
+               0               3       0.0754201      2.3242e-05     0.000152133       0.0120261
+               0               4        0.018498     3.32269e-06     1.81567e-05      0.00188482
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 16.3522     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_8inputsPi_0
+                       ./data/1_8pip_0.dat
+                      ./data/1_8tpip_0.dat
+                   ./data/1_8minusDS_0.dat
+                      ./data/1_8DDSp_0.dat
+                   ./data/1_8linErgp_0.dat
+                      ./data/1_8ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_8pip_0.dat
+Time evolution printed:                data/150116115739pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0118
+linNumContm(Nt-1) =  10.7860
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0343794
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = .1
+
+pi output:
+
+timeNumber:          1_9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00032     6.34587e-05     0.000849921       0.0353177
+               0               2      0.00512022     2.84398e-05     0.000122562       0.0115642
+               0               3       0.0079361     2.51346e-07     1.09329e-06     0.000151621
+
+average |dp/dt| integrated over each timeslice:
+1
+2.56853
+0.113523
+0.00054564
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       3 13.0432     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/1_9inputsPi_0
+                       ./data/1_9pip_0.dat
+                      ./data/1_9tpip_0.dat
+                   ./data/1_9minusDS_0.dat
+                      ./data/1_9DDSp_0.dat
+                   ./data/1_9linErgp_0.dat
+                      ./data/1_9ergp_0.dat
+                         data/eigValue.dat
+                      ./data/1_9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/1_9pip_0.dat
+Time evolution printed:                data/150116115802pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.28476e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .73
+amp = 0
+
+pi output:
+
+timeNumber:         1_10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.73           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00033     2.38716e-05     7.77988e-05      0.00906859
+               0               2       0.0149741     3.02224e-07     9.11589e-07     5.05402e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+6.06319e-13
+1.66357e-12
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.16308     160     362      10    0.73    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:          ./data/1_10inputsPi_0
+                      ./data/1_10pip_0.dat
+                     ./data/1_10tpip_0.dat
+                  ./data/1_10minusDS_0.dat
+                     ./data/1_10DDSp_0.dat
+                  ./data/1_10linErgp_0.dat
+                     ./data/1_10ergp_0.dat
+                         data/eigValue.dat
+                     ./data/1_10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                       data/1_10pip_0.dat
+Time evolution printed:                data/150116115820pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.03508e-08
+
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = 1.0
+
+pi output:
+
+timeNumber:          2_0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00008      0.00282619       0.0160892        0.257385
+               0               2        0.713714      0.00130956       0.0084542        0.201001
+               0               3         4.79498     0.000590247      0.00311827        0.123741
+               0               4        0.219387     6.82832e-05     0.000321738       0.0605114
+               0               5       0.0829991     2.95409e-05     0.000246121       0.0121611
+               0               6       0.0280707     1.74395e-06     1.96812e-05     9.64812e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 24.7494     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_0inputsPi_0
+                       ./data/2_0pip_0.dat
+                      ./data/2_0tpip_0.dat
+                   ./data/2_0minusDS_0.dat
+                      ./data/2_0DDSp_0.dat
+                   ./data/2_0linErgp_0.dat
+                      ./data/2_0ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_0pip_0.dat
+Time evolution printed:                data/150116115853pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .9
+
+pi output:
+
+timeNumber:          2_1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00014      0.00237905        0.012594         0.22151
+               0               2        0.377843     0.000906285      0.00500728        0.180669
+               0               3        0.863474     0.000175596     0.000816839         0.11616
+               0               4        0.158854     9.68452e-05       0.0006517        0.040045
+               0               5       0.0817453     1.78623e-05     0.000185836      0.00158288
+               0               6      0.00174168     5.37223e-08      6.2185e-07     8.25411e-06
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 25.0544     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_1inputsPi_0
+                       ./data/2_1pip_0.dat
+                      ./data/2_1tpip_0.dat
+                   ./data/2_1minusDS_0.dat
+                      ./data/2_1DDSp_0.dat
+                   ./data/2_1linErgp_0.dat
+                      ./data/2_1ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_1pip_0.dat
+Time evolution printed:                data/150116115926pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.63585e-09
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .8
+
+pi output:
+
+timeNumber:          2_2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00019      0.00193238       0.0106266        0.193607
+               0               2        0.262566      0.00063786      0.00311925         0.15821
+               0               3        0.317483     7.45551e-05     0.000258149        0.127974
+               0               4        0.182747     0.000150484      0.00103695       0.0197644
+               0               5       0.0355298     5.83266e-06      5.7964e-05      0.00191716
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.9524     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_2inputsPi_0
+                       ./data/2_2pip_0.dat
+                      ./data/2_2tpip_0.dat
+                   ./data/2_2minusDS_0.dat
+                      ./data/2_2DDSp_0.dat
+                   ./data/2_2linErgp_0.dat
+                      ./data/2_2ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_2pip_0.dat
+Time evolution printed:                data/150116115954pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.28017e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .7
+
+pi output:
+
+timeNumber:          2_3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00023       0.0015173      0.00893709        0.170444
+               0               2        0.212699     0.000444005      0.00196649        0.144452
+               0               3        0.102729     4.61046e-05     0.000104549        0.130971
+               0               4        0.202458     0.000169685      0.00120923       0.0127027
+               0               5     0.000665066     4.25922e-06     2.06065e-05      0.00112158
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.9149     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_3inputsPi_0
+                       ./data/2_3pip_0.dat
+                      ./data/2_3tpip_0.dat
+                   ./data/2_3minusDS_0.dat
+                      ./data/2_3DDSp_0.dat
+                   ./data/2_3linErgp_0.dat
+                      ./data/2_3ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_3pip_0.dat
+Time evolution printed:                data/150116120024pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.51522e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .6
+
+pi output:
+
+timeNumber:          2_4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00026       0.0011474       0.0073089        0.152206
+               0               2        0.190002     0.000296014      0.00115514        0.142079
+               0               3       0.0229957     5.73493e-05     0.000292081        0.111017
+               0               4        0.183024     0.000124428     0.000974027      0.00889277
+               0               5      0.00463508     2.23536e-06     1.13075e-05     0.000295802
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.9105     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_4inputsPi_0
+                       ./data/2_4pip_0.dat
+                      ./data/2_4tpip_0.dat
+                   ./data/2_4minusDS_0.dat
+                      ./data/2_4DDSp_0.dat
+                   ./data/2_4linErgp_0.dat
+                      ./data/2_4ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_4pip_0.dat
+Time evolution printed:                data/150116120052pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 8.51568e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .5
+
+pi output:
+
+timeNumber:          2_5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00028     0.000830359      0.00576431        0.143762
+               0               2        0.187371     0.000180649     0.000603994        0.150986
+               0               3        0.120669     0.000135413     0.000886827        0.068919
+               0               4         0.12036     4.82023e-05     0.000456705      0.00500284
+               0               5      0.00614314     4.78759e-07      5.5488e-06     9.99274e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.9387     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_5inputsPi_0
+                       ./data/2_5pip_0.dat
+                      ./data/2_5tpip_0.dat
+                   ./data/2_5minusDS_0.dat
+                      ./data/2_5DDSp_0.dat
+                   ./data/2_5linErgp_0.dat
+                      ./data/2_5ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_5pip_0.dat
+Time evolution printed:                data/150116120120pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 9.3952e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .4
+
+pi output:
+
+timeNumber:          2_6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003      0.00057551      0.00432565        0.173227
+               0               2        0.230414     0.000101464     0.000291129        0.124486
+               0               3        0.138564     0.000153511      0.00104159       0.0402002
+               0               4        0.078928     1.64464e-05     0.000176701      0.00313815
+               0               5       0.0023833     9.62961e-08     1.20043e-06     5.39801e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 21.2226     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_6inputsPi_0
+                       ./data/2_6pip_0.dat
+                      ./data/2_6tpip_0.dat
+                   ./data/2_6minusDS_0.dat
+                      ./data/2_6DDSp_0.dat
+                   ./data/2_6linErgp_0.dat
+                      ./data/2_6ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_6pip_0.dat
+Time evolution printed:                data/150116120148pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 5.80712e-09
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .3
+
+pi output:
+
+timeNumber:          2_7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     0.000495876      0.00301525         1.41214
+               0               2         4.27235       0.0217271       0.0773429         1.17006
+               0               3         4.47414       0.0289938        0.320197        0.965739
+               0               4         48.5153        0.188259         30.3907         1.05954
+               0               5         13.0484        0.694075         43.6301        0.587312
+               0               6          0.1987        0.126141         91.6269         1.02394
+Calculation failed
+calc_test = 1.16415e-10
+pi failed, value returned is 1
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .2
+
+pi output:
+
+timeNumber:          2_8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     0.000151656      0.00185542        0.103566
+               0               2       0.0484217     0.000208692      0.00117458       0.0809765
+               0               3       0.0677873     1.81003e-05     0.000118392      0.00829001
+               0               4       0.0146021      1.4421e-06     7.69943e-06     0.000802176
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 17.2849     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_8inputsPi_0
+                       ./data/2_8pip_0.dat
+                      ./data/2_8tpip_0.dat
+                   ./data/2_8minusDS_0.dat
+                      ./data/2_8DDSp_0.dat
+                   ./data/2_8linErgp_0.dat
+                      ./data/2_8ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_8pip_0.dat
+Time evolution printed:                data/150116120244pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0190326
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = .1
+
+pi output:
+
+timeNumber:          2_9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00032     6.59556e-05      0.00086847       0.0354175
+               0               2       0.0056235     2.82058e-05     0.000121387       0.0116249
+               0               3      0.00798521     2.44925e-07     1.01059e-06     0.000155115
+
+average |dp/dt| integrated over each timeslice:
+1
+2.60421
+0.109459
+0.000452355
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       3 12.8581     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/2_9inputsPi_0
+                       ./data/2_9pip_0.dat
+                      ./data/2_9tpip_0.dat
+                   ./data/2_9minusDS_0.dat
+                      ./data/2_9DDSp_0.dat
+                   ./data/2_9linErgp_0.dat
+                      ./data/2_9ergp_0.dat
+                         data/eigValue.dat
+                      ./data/2_9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/2_9pip_0.dat
+Time evolution printed:                data/150116120306pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 5.75345e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .72
+amp = 0
+
+pi output:
+
+timeNumber:         2_10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.72           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00032     2.35446e-05      7.6733e-05      0.00906859
+               0               2       0.0149741     2.98084e-07     8.99102e-07     5.05402e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+6.1474e-13
+3.93672e-12
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.14158     160     362      10    0.72    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:          ./data/2_10inputsPi_0
+                      ./data/2_10pip_0.dat
+                     ./data/2_10tpip_0.dat
+                  ./data/2_10minusDS_0.dat
+                     ./data/2_10DDSp_0.dat
+                  ./data/2_10linErgp_0.dat
+                     ./data/2_10ergp_0.dat
+                         data/eigValue.dat
+                     ./data/2_10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                       data/2_10pip_0.dat
+Time evolution printed:                data/150116120324pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 9.79544e-09
+
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = 1.0
+
+pi output:
+
+timeNumber:          3_0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0001      0.00277788       0.0157414        0.258433
+               0               2        0.745672      0.00130334      0.00820556        0.219337
+               0               3         4.59109     0.000501086      0.00254145        0.132289
+               0               4        0.224107     8.18906e-05     0.000406981       0.0695162
+               0               5        0.124417     4.59043e-05     0.000423928      0.00840487
+               0               6       0.0224825     1.17084e-06     1.44446e-05     8.95959e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 24.1166     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_0inputsPi_0
+                       ./data/3_0pip_0.dat
+                      ./data/3_0tpip_0.dat
+                   ./data/3_0minusDS_0.dat
+                      ./data/3_0DDSp_0.dat
+                   ./data/3_0linErgp_0.dat
+                      ./data/3_0ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_0pip_0.dat
+Time evolution printed:                data/150116120357pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .9
+
+pi output:
+
+timeNumber:          3_1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00015      0.00234062       0.0124628         0.22331
+               0               2        0.431132     0.000906378      0.00491376        0.193571
+               0               3        0.849298     0.000163178     0.000714437        0.138279
+               0               4        0.198956     0.000155787      0.00105734       0.0414171
+               0               5       0.0961284     2.17279e-05     0.000238027      0.00272619
+               0               6      0.00237804     9.53124e-08     1.19529e-06     3.36854e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 24.4237     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_1inputsPi_0
+                       ./data/3_1pip_0.dat
+                      ./data/3_1tpip_0.dat
+                   ./data/3_1minusDS_0.dat
+                      ./data/3_1DDSp_0.dat
+                   ./data/3_1linErgp_0.dat
+                      ./data/3_1ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_1pip_0.dat
+Time evolution printed:                data/150116120428pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.68511e-09
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .8
+
+pi output:
+
+timeNumber:          3_2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0002      0.00190513       0.0107273        0.195805
+               0               2         0.30945     0.000641385      0.00310132        0.171244
+               0               3        0.303203     7.55945e-05     0.000225673        0.152868
+               0               4        0.235833     0.000222897      0.00154629       0.0206149
+               0               5       0.0339793      9.0137e-06     6.92355e-05      0.00329547
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.4046     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_2inputsPi_0
+                       ./data/3_2pip_0.dat
+                      ./data/3_2tpip_0.dat
+                   ./data/3_2minusDS_0.dat
+                      ./data/3_2DDSp_0.dat
+                   ./data/3_2linErgp_0.dat
+                      ./data/3_2ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_2pip_0.dat
+Time evolution printed:                data/150116120456pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 6.22266e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .7
+
+pi output:
+
+timeNumber:          3_3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00024      0.00150052      0.00903024        0.173297
+               0               2        0.251677     0.000448656      0.00195514        0.159402
+               0               3       0.0824613     5.38471e-05     0.000109903        0.151378
+               0               4        0.252562     0.000228847      0.00167668       0.0164216
+               0               5      0.00455668     7.34065e-06     3.65407e-05      0.00186333
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.6061     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_3inputsPi_0
+                       ./data/3_3pip_0.dat
+                      ./data/3_3tpip_0.dat
+                   ./data/3_3minusDS_0.dat
+                      ./data/3_3DDSp_0.dat
+                   ./data/3_3linErgp_0.dat
+                      ./data/3_3ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_3pip_0.dat
+Time evolution printed:                data/150116120524pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 4.37236e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .6
+
+pi output:
+
+timeNumber:          3_4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00027      0.00113997      0.00739362        0.156697
+               0               2        0.223484     0.000300895      0.00113904         0.16052
+               0               3       0.0527746      8.3178e-05     0.000465717         0.12083
+               0               4        0.216761     0.000149692      0.00123124      0.00987191
+               0               5      0.00219842     3.04803e-06     1.49647e-05     0.000490561
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.2206     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_4inputsPi_0
+                       ./data/3_4pip_0.dat
+                      ./data/3_4tpip_0.dat
+                   ./data/3_4minusDS_0.dat
+                      ./data/3_4DDSp_0.dat
+                   ./data/3_4linErgp_0.dat
+                      ./data/3_4ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_4pip_0.dat
+Time evolution printed:                data/150116120551pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.86224e-06
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .5
+
+pi output:
+
+timeNumber:          3_5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00028     0.000831512      0.00583944         0.15317
+               0               2        0.220221     0.000185295     0.000605162        0.170777
+               0               3        0.159051     0.000189367      0.00123297       0.0705567
+               0               4        0.137836     5.44969e-05     0.000546078      0.00711545
+               0               5      0.00971056     7.79965e-07     9.71834e-06     0.000198119
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.1203     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_5inputsPi_0
+                       ./data/3_5pip_0.dat
+                      ./data/3_5tpip_0.dat
+                   ./data/3_5minusDS_0.dat
+                      ./data/3_5DDSp_0.dat
+                   ./data/3_5linErgp_0.dat
+                      ./data/3_5ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_5pip_0.dat
+Time evolution printed:                data/150116120619pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.17653e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .4
+
+pi output:
+
+timeNumber:          3_6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003      0.00058819      0.00438973        0.205813
+               0               2        0.283745     0.000130257     0.000530276        0.118975
+               0               3        0.138091     0.000154224      0.00107081       0.0470965
+               0               4        0.109806     2.39381e-05     0.000262429      0.00249336
+               0               5      0.00129868     1.06311e-07     1.29062e-06      3.4033e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 20.0004     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_6inputsPi_0
+                       ./data/3_6pip_0.dat
+                      ./data/3_6tpip_0.dat
+                   ./data/3_6minusDS_0.dat
+                      ./data/3_6DDSp_0.dat
+                   ./data/3_6linErgp_0.dat
+                      ./data/3_6ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_6pip_0.dat
+Time evolution printed:                data/150116120646pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.51948e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .3
+
+pi output:
+
+timeNumber:          3_7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     1.50658e-05      0.00306649         1.03714
+               0               2          510352         4.01075         486.797        0.496829
+               0               3         0.80317         1.77224         145.441        0.508996
+               0               4        0.808772        0.471294         45.1638        0.708452
+               0               5        0.910112       0.0166554         13.9064         1.00902
+Calculation failed
+calc_test = 1.45519e-11
+pi failed, value returned is 1
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .2
+
+pi output:
+
+timeNumber:          3_8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     0.000155789      0.00189172       0.0988899
+               0               2       0.0424155     0.000189204      0.00105519       0.0754508
+               0               3       0.0629763     1.47755e-05     9.57884e-05      0.00663324
+               0               4       0.0126756     8.05528e-07     4.18435e-06     0.000425461
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 16.1371     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_8inputsPi_0
+                       ./data/3_8pip_0.dat
+                      ./data/3_8tpip_0.dat
+                   ./data/3_8minusDS_0.dat
+                      ./data/3_8DDSp_0.dat
+                   ./data/3_8linErgp_0.dat
+                      ./data/3_8ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_8pip_0.dat
+Time evolution printed:                data/150116120736pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0227384
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = .1
+
+pi output:
+
+timeNumber:          3_9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031      6.8764e-05     0.000887447       0.0354963
+               0               2       0.0061595     2.79346e-05     0.000120041       0.0116728
+               0               3      0.00802312     2.39355e-07     9.41398e-07     0.000157931
+
+average |dp/dt| integrated over each timeslice:
+1
+2.64089
+0.105964
+0.000394589
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       3 12.5737     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/3_9inputsPi_0
+                       ./data/3_9pip_0.dat
+                      ./data/3_9tpip_0.dat
+                   ./data/3_9minusDS_0.dat
+                      ./data/3_9DDSp_0.dat
+                   ./data/3_9linErgp_0.dat
+                      ./data/3_9ergp_0.dat
+                         data/eigValue.dat
+                      ./data/3_9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/3_9pip_0.dat
+Time evolution printed:                data/150116120757pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.46289e-07
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .71
+amp = 0
+
+pi output:
+
+timeNumber:         3_10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10    0.71           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00031     2.32176e-05     7.56673e-05      0.00906859
+               0               2       0.0149741     2.93943e-07     8.86614e-07     5.05402e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+6.23398e-13
+2.01827e-12
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.83436     160     362      10    0.71    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:          ./data/3_10inputsPi_0
+                      ./data/3_10pip_0.dat
+                     ./data/3_10tpip_0.dat
+                  ./data/3_10minusDS_0.dat
+                     ./data/3_10DDSp_0.dat
+                  ./data/3_10linErgp_0.dat
+                     ./data/3_10ergp_0.dat
+                         data/eigValue.dat
+                     ./data/3_10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                       data/3_10pip_0.dat
+Time evolution printed:                data/150116120814pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 9.62187e-09
+
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = 1.0
+
+pi output:
+
+timeNumber:          4_0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00012      0.00273088       0.0153918        0.259593
+               0               2        0.774864      0.00129701       0.0079752        0.237564
+               0               3         4.46408      0.00043194      0.00209951        0.144325
+               0               4         0.23777      0.00012332     0.000778471       0.0760968
+               0               5        0.166747     6.20039e-05     0.000615017      0.00586961
+               0               6       0.0159476     9.13141e-07     1.09815e-05     8.04452e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 23.2464     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_0inputsPi_0
+                       ./data/4_0pip_0.dat
+                      ./data/4_0tpip_0.dat
+                   ./data/4_0minusDS_0.dat
+                      ./data/4_0DDSp_0.dat
+                   ./data/4_0linErgp_0.dat
+                      ./data/4_0ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_0pip_0.dat
+Time evolution printed:                data/150116120845pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .9
+
+pi output:
+
+timeNumber:          4_1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00017      0.00230361       0.0125746        0.225119
+               0               2        0.479756      0.00090671      0.00482071        0.206798
+               0               3        0.835295     0.000152853     0.000621737        0.161554
+               0               4        0.246902     0.000233074      0.00158753       0.0406383
+               0               5        0.107498     2.55436e-05     0.000280889      0.00478649
+               0               6      0.00255663     1.60106e-07     1.96381e-06     0.000109317
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 22.9759     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_1inputsPi_0
+                       ./data/4_1pip_0.dat
+                      ./data/4_1tpip_0.dat
+                   ./data/4_1minusDS_0.dat
+                      ./data/4_1DDSp_0.dat
+                   ./data/4_1linErgp_0.dat
+                      ./data/4_1ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_1pip_0.dat
+Time evolution printed:                data/150116120916pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 4.9363e-10
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .8
+
+pi output:
+
+timeNumber:          4_2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00022      0.00187924       0.0108316        0.198012
+               0               2        0.353771     0.000645179      0.00308142        0.184727
+               0               3        0.287074     7.82445e-05     0.000200448        0.177545
+               0               4        0.295261     0.000308651      0.00217065       0.0230897
+               0               5        0.028399     1.44612e-05     7.88462e-05      0.00521699
+               0               6      0.00326568     6.34409e-08     1.79485e-07     0.000145524
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6  22.948     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_2inputsPi_0
+                       ./data/4_2pip_0.dat
+                      ./data/4_2tpip_0.dat
+                   ./data/4_2minusDS_0.dat
+                      ./data/4_2DDSp_0.dat
+                   ./data/4_2linErgp_0.dat
+                      ./data/4_2ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_2pip_0.dat
+Time evolution printed:                data/150116120947pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.6134e-09
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .7
+
+pi output:
+
+timeNumber:          4_3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00025       0.0014851      0.00912651        0.176231
+               0               2        0.289546     0.000453809       0.0019422        0.175011
+               0               3       0.0593358     6.42324e-05     0.000165568        0.169569
+               0               4        0.305227     0.000290321       0.0021873        0.020529
+               0               5       0.0104775     1.12354e-05      5.5208e-05       0.0028292
+               0               6      0.00655086     1.95232e-08     5.19858e-08     4.04373e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       6 22.6016     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_3inputsPi_0
+                       ./data/4_3pip_0.dat
+                      ./data/4_3tpip_0.dat
+                   ./data/4_3minusDS_0.dat
+                      ./data/4_3DDSp_0.dat
+                   ./data/4_3linErgp_0.dat
+                      ./data/4_3ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_3pip_0.dat
+Time evolution printed:                data/150116121017pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 1.28382e-09
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .6
+
+pi output:
+
+timeNumber:          4_4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00027      0.00113399      0.00748102        0.161536
+               0               2        0.256849     0.000306547      0.00112184          0.1797
+               0               3       0.0866805     0.000117269     0.000684512        0.127529
+               0               4        0.250873     0.000172173      0.00148515       0.0105001
+               0               5      0.00208344     3.91577e-06     1.91749e-05     0.000658172
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 18.8636     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_4inputsPi_0
+                       ./data/4_4pip_0.dat
+                      ./data/4_4tpip_0.dat
+                   ./data/4_4minusDS_0.dat
+                      ./data/4_4DDSp_0.dat
+                   ./data/4_4linErgp_0.dat
+                      ./data/4_4ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_4pip_0.dat
+Time evolution printed:                data/150116121043pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 6.51253e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .5
+
+pi output:
+
+timeNumber:          4_5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00029     0.000834508      0.00591681        0.163995
+               0               2        0.254329     0.000191019     0.000606072        0.189192
+               0               3         0.19937     0.000248798      0.00160291       0.0711029
+               0               4        0.158236     6.19187e-05     0.000643626      0.00939756
+               0               5       0.0125119     1.12017e-06     1.41434e-05     0.000340199
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 18.9667     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_5inputsPi_0
+                       ./data/4_5pip_0.dat
+                      ./data/4_5tpip_0.dat
+                   ./data/4_5minusDS_0.dat
+                      ./data/4_5DDSp_0.dat
+                   ./data/4_5linErgp_0.dat
+                      ./data/4_5ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_5pip_0.dat
+Time evolution printed:                data/150116121109pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 3.82317e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .4
+
+pi output:
+
+timeNumber:          4_6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00029     0.000605558       0.0044556         0.24881
+               0               2        0.348893      0.00019642      0.00103171        0.105033
+               0               3        0.121844     0.000141653       0.0010721       0.0547091
+               0               4        0.144719     3.19986e-05     0.000353524      0.00188944
+               0               5     0.000118333     1.34356e-07     1.36606e-06     1.33827e-05
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 18.7962     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_6inputsPi_0
+                       ./data/4_6pip_0.dat
+                      ./data/4_6tpip_0.dat
+                   ./data/4_6minusDS_0.dat
+                      ./data/4_6DDSp_0.dat
+                   ./data/4_6linErgp_0.dat
+                      ./data/4_6ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_6pip_0.dat
+Time evolution printed:                data/150116121135pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 2.78201e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .3
+
+pi output:
+
+timeNumber:          4_7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     0.000151307      0.00311907        0.582223
+               0               2         2.04032     0.000294771       0.0299581        0.960351
+               0               3     1.36914e+06         15.6422         3907.12        0.505434
+               0               4         0.80407         2.41961         1157.42        0.984984
+               0               5        0.169513         0.35881         342.953        0.975672
+Calculation failed
+calc_test = 8.73115e-11
+pi failed, value returned is 1
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .2
+
+pi output:
+
+timeNumber:          4_8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     0.000160359      0.00192893       0.0955635
+               0               2        0.037286     0.000175243     0.000969403       0.0715836
+               0               3       0.0596065     1.24903e-05     7.98328e-05      0.00575376
+               0               4       0.0115236     5.21151e-07     2.62761e-06     0.000259099
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4  15.563     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_8inputsPi_0
+                       ./data/4_8pip_0.dat
+                      ./data/4_8tpip_0.dat
+                   ./data/4_8minusDS_0.dat
+                      ./data/4_8DDSp_0.dat
+                   ./data/4_8linErgp_0.dat
+                      ./data/4_8ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_8pip_0.dat
+Time evolution printed:                data/150116121222pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0263726
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = .1
+
+pi output:
+
+timeNumber:          4_9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     7.18655e-05     0.000906871       0.0355604
+               0               2      0.00672639     2.76372e-05     0.000118577       0.0117117
+               0               3      0.00805324     2.34315e-07     8.81814e-07     0.000160268
+
+average |dp/dt| integrated over each timeslice:
+1
+2.67861
+0.102847
+0.000354283
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       3 12.0174     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:           ./data/4_9inputsPi_0
+                       ./data/4_9pip_0.dat
+                      ./data/4_9tpip_0.dat
+                   ./data/4_9minusDS_0.dat
+                      ./data/4_9DDSp_0.dat
+                   ./data/4_9linErgp_0.dat
+                      ./data/4_9ergp_0.dat
+                         data/eigValue.dat
+                      ./data/4_9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                        data/4_9pip_0.dat
+Time evolution printed:                data/150116121243pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 4.26341e-08
+
+
+-------------------------------------------------------------------------------------------------------
+Tb = .70
+amp = 0
+
+pi output:
+
+timeNumber:         4_10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.7           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.0003     2.28906e-05     7.46016e-05      0.00906859
+               0               2       0.0149741     2.89803e-07     8.74127e-07     5.05402e-05
+
+average |dp/dt| integrated over each timeslice:
+1
+6.32304e-13
+1.81743e-12
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.51632     160     362      10     0.7    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:          ./data/4_10inputsPi_0
+                      ./data/4_10pip_0.dat
+                     ./data/4_10tpip_0.dat
+                  ./data/4_10minusDS_0.dat
+                     ./data/4_10DDSp_0.dat
+                  ./data/4_10linErgp_0.dat
+                     ./data/4_10ergp_0.dat
+                         data/eigValue.dat
+                     ./data/4_10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                       data/4_10pip_0.dat
+Time evolution printed:                data/150116121300pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 9.59674e-09
+
+

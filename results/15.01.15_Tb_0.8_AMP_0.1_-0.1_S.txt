@@ -1,0 +1,1055 @@
+N = 160
+Nb = 160
+-------------------------------------------------------------------------------------------------------
+amp = .10
+
+pi output:
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039      5.4018e-05      0.00073072       0.0946849
+               0               2       0.0124637     0.000210618      0.00103877        0.054674
+               0               3       0.0181165     4.37858e-05     0.000220111       0.0134376
+               0               4      0.00569029     4.60928e-07     2.52945e-06        0.022504
+
+average dp/dt integrated over each timeslice:
+1
+2.34379
+-3.43115
+-0.828124
+-0.785358
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 15.5823     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                        ./data/0tpip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                     ./data/0linErgp_0.dat
+                        ./data/0ergp_0.dat
+                         data/eigValue.dat
+                        ./data/0eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/0pip_0.dat
+Time evolution printed:                data/150115181731pi3.dat pics/pi3.png
+erg(Nt-1) =  18.5891
+linErgField(Nt-1) =  18.5891
+nonLinErg(Nt-1) =   0.0092
+linNumContm(Nt-1) =  10.5295
+linErgContm(Nt-1) =  18.5939
+
+solution didn't tunnel
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00485297
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .09
+
+pi output:
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039      5.2578e-05     0.000656004       0.0985151
+               0               2       0.0992116     0.000165226     0.000966392       0.0422479
+               0               3       0.0496545     3.80886e-05     0.000222809       0.0276476
+               0               4       0.0253176     1.51774e-05     9.25923e-05       0.0157884
+               0               5        0.010061     5.39113e-06     2.92115e-05      0.00827451
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5 18.8131     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                        ./data/1tpip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                     ./data/1linErgp_0.dat
+                        ./data/1ergp_0.dat
+                         data/eigValue.dat
+                        ./data/1eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/1pip_0.dat
+Time evolution printed:                data/150115181759pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00767543
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00374438
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .08
+
+pi output:
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     4.56159e-05     0.000583482        0.027777
+               0               2        0.029907      7.7276e-06     4.98255e-05       0.0134471
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.48307     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                        ./data/2tpip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                     ./data/2linErgp_0.dat
+                        ./data/2ergp_0.dat
+                         data/eigValue.dat
+                        ./data/2eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/2pip_0.dat
+Time evolution printed:                data/150115181816pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000813447
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00455118
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .07
+
+pi output:
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     4.06588e-05     0.000513179       0.0172244
+               0               2        0.021289     1.45905e-06     9.47556e-06      0.00583706
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.47761     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                        ./data/3tpip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                     ./data/3linErgp_0.dat
+                        ./data/3ergp_0.dat
+                         data/eigValue.dat
+                        ./data/3eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/3pip_0.dat
+Time evolution printed:                data/150115181833pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00100806
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00355603
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .06
+
+pi output:
+
+timeNumber:            4
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.65825e-05     0.000445119       0.0136341
+               0               2       0.0181586     5.40259e-07     2.70956e-06     0.000819224
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2  8.4931     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/4inputsPi_0
+                         ./data/4pip_0.dat
+                        ./data/4tpip_0.dat
+                     ./data/4minusDS_0.dat
+                        ./data/4DDSp_0.dat
+                     ./data/4linErgp_0.dat
+                        ./data/4ergp_0.dat
+                         data/eigValue.dat
+                        ./data/4eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/4pip_0.dat
+Time evolution printed:                data/150115181851pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000347454
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00321863
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .05
+
+pi output:
+
+timeNumber:            5
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.32535e-05     0.000379327       0.0118715
+               0               2       0.0166384     4.46617e-07       2.005e-06      0.00546872
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2  8.5194     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/5inputsPi_0
+                         ./data/5pip_0.dat
+                        ./data/5tpip_0.dat
+                     ./data/5minusDS_0.dat
+                        ./data/5DDSp_0.dat
+                     ./data/5linErgp_0.dat
+                        ./data/5ergp_0.dat
+                         data/eigValue.dat
+                        ./data/5eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/5pip_0.dat
+Time evolution printed:                data/150115181908pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000136209
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00334468
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .04
+
+pi output:
+
+timeNumber:            6
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.06181e-05     0.000315828       0.0107755
+               0               2       0.0158047     4.44962e-07     2.16017e-06       0.0291199
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.47472     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/6inputsPi_0
+                         ./data/6pip_0.dat
+                        ./data/6tpip_0.dat
+                     ./data/6minusDS_0.dat
+                        ./data/6DDSp_0.dat
+                     ./data/6linErgp_0.dat
+                        ./data/6ergp_0.dat
+                         data/eigValue.dat
+                        ./data/6eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/6pip_0.dat
+Time evolution printed:                data/150115181925pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00250523
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00576946
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .03
+
+pi output:
+
+timeNumber:            7
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.86333e-05     0.000254647       0.0100154
+               0               2       0.0153299     4.13993e-07     1.99002e-06        0.027585
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.53111     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/7inputsPi_0
+                         ./data/7pip_0.dat
+                        ./data/7tpip_0.dat
+                     ./data/7minusDS_0.dat
+                        ./data/7DDSp_0.dat
+                     ./data/7linErgp_0.dat
+                        ./data/7ergp_0.dat
+                         data/eigValue.dat
+                        ./data/7eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/7pip_0.dat
+Time evolution printed:                data/150115181943pi3.dat pics/pi3.png
+erg(Nt-1) =  18.8557
+linErgField(Nt-1) =  18.8557
+nonLinErg(Nt-1) =   0.0096
+linNumContm(Nt-1) =  10.7228
+linErgContm(Nt-1) =  18.8610
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00778666
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00240499
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .02
+
+pi output:
+
+timeNumber:            8
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.72556e-05     0.000195809       0.0094911
+               0               2       0.0150719     3.75447e-07     1.67208e-06      0.00889376
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.50885     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/8inputsPi_0
+                         ./data/8pip_0.dat
+                        ./data/8tpip_0.dat
+                     ./data/8minusDS_0.dat
+                        ./data/8DDSp_0.dat
+                     ./data/8linErgp_0.dat
+                        ./data/8ergp_0.dat
+                         data/eigValue.dat
+                        ./data/8eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/8pip_0.dat
+Time evolution printed:                data/150115182000pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9602
+linErgField(Nt-1) =  18.9602
+nonLinErg(Nt-1) =   0.0106
+linNumContm(Nt-1) =  10.7698
+linErgContm(Nt-1) =  18.9663
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00200853
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00114487
+
+
+-------------------------------------------------------------------------------------------------------
+amp = .01
+
+pi output:
+
+timeNumber:            9
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.64428e-05     0.000139338      0.00917664
+               0               2       0.0149636     3.42315e-07     1.31932e-06      0.00355674
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.76933     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/9inputsPi_0
+                         ./data/9pip_0.dat
+                        ./data/9tpip_0.dat
+                     ./data/9minusDS_0.dat
+                        ./data/9DDSp_0.dat
+                     ./data/9linErgp_0.dat
+                        ./data/9ergp_0.dat
+                         data/eigValue.dat
+                        ./data/9eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                          data/9pip_0.dat
+Time evolution printed:                data/150115182020pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9673
+linErgField(Nt-1) =  18.9673
+nonLinErg(Nt-1) =   0.0114
+linNumContm(Nt-1) =  10.7820
+linErgContm(Nt-1) =  18.9735
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000288889
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00116282
+
+
+-------------------------------------------------------------------------------------------------------
+amp = 0
+
+pi output:
+
+timeNumber:           10
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.61607e-05     8.52589e-05      0.00906859
+               0               2       0.0149741     3.31204e-07     9.99002e-07     5.05402e-05
+
+average dp/dt integrated over each timeslice:
+1
+1.04204e-15
+-2.57177e-11
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.88384     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/10inputsPi_0
+                        ./data/10pip_0.dat
+                       ./data/10tpip_0.dat
+                    ./data/10minusDS_0.dat
+                       ./data/10DDSp_0.dat
+                    ./data/10linErgp_0.dat
+                       ./data/10ergp_0.dat
+                         data/eigValue.dat
+                       ./data/10eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/10pip_0.dat
+Time evolution printed:                data/150115182038pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9687
+linErgField(Nt-1) =  18.9687
+nonLinErg(Nt-1) =   0.0117
+linNumContm(Nt-1) =  10.7859
+linErgContm(Nt-1) =  18.9750
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 6.42171e-05
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00117564
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.01
+
+pi output:
+
+timeNumber:           11
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.63902e-05     0.000122454      0.00916734
+               0               2       0.0150952     3.47857e-07     1.31627e-06      0.00355814
+
+average dp/dt integrated over each timeslice:
+1
+-0.234379
+-0.195588
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.62105     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/11inputsPi_0
+                        ./data/11pip_0.dat
+                       ./data/11tpip_0.dat
+                    ./data/11minusDS_0.dat
+                       ./data/11DDSp_0.dat
+                    ./data/11linErgp_0.dat
+                       ./data/11ergp_0.dat
+                         data/eigValue.dat
+                       ./data/11eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/11pip_0.dat
+Time evolution printed:                data/150115182102pi3.dat pics/pi3.png
+erg(Nt-1) =  18.9701
+linErgField(Nt-1) =  18.9701
+nonLinErg(Nt-1) =   0.0122
+linNumContm(Nt-1) =  10.7912
+linErgContm(Nt-1) =  18.9764
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 6.379e-05
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00116277
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.02
+
+pi output:
+
+timeNumber:           12
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.71317e-05     0.000164713      0.00947212
+               0               2       0.0153373     3.85095e-07      1.6585e-06      0.00890458
+
+average dp/dt integrated over each timeslice:
+1
+-0.468757
+-0.395347
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.85645     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/12inputsPi_0
+                        ./data/12pip_0.dat
+                       ./data/12tpip_0.dat
+                    ./data/12minusDS_0.dat
+                       ./data/12DDSp_0.dat
+                    ./data/12linErgp_0.dat
+                       ./data/12ergp_0.dat
+                         data/eigValue.dat
+                       ./data/12eigVec.dat
+pi output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/12pip_0.dat
+Time evolution printed:                data/150115182120pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000288395
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00114428
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.03
+
+pi output:
+
+timeNumber:           13
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     2.84044e-05     0.000206481      0.00998656
+               0               2       0.0157321     4.26269e-07     1.96026e-06       0.0277548
+
+average dp/dt integrated over each timeslice:
+1
+-0.703136
+-0.603979
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.78858     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/13inputsPi_0
+                        ./data/13pip_0.dat
+                       ./data/13tpip_0.dat
+                    ./data/13minusDS_0.dat
+                       ./data/13DDSp_0.dat
+                    ./data/13linErgp_0.dat
+                       ./data/13ergp_0.dat
+                         data/eigValue.dat
+                       ./data/13eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/13pip_0.dat
+Time evolution printed:                data/150115182138pi3.dat pics/pi3.png
+erg(Nt-1) =     -nan
+linErgField(Nt-1) =     -nan
+nonLinErg(Nt-1) =     -nan
+linNumContm(Nt-1) =     -nan
+linErgContm(Nt-1) =     -nan
+
+success: solution tunnelled
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00202686
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00241943
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.04
+
+pi output:
+
+timeNumber:           14
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.02411e-05     0.000247753       0.0107371
+               0               2       0.0163454     4.60431e-07     2.11801e-06       0.0287191
+
+average dp/dt integrated over each timeslice:
+1
+-0.937515
+-0.82834
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.77947     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/14inputsPi_0
+                        ./data/14pip_0.dat
+                       ./data/14tpip_0.dat
+                    ./data/14minusDS_0.dat
+                       ./data/14DDSp_0.dat
+                    ./data/14linErgp_0.dat
+                       ./data/14ergp_0.dat
+                         data/eigValue.dat
+                       ./data/14eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/14pip_0.dat
+Time evolution printed:                data/150115182155pi3.dat pics/pi3.png
+erg(Nt-1) =  18.4527
+linErgField(Nt-1) =  18.4527
+nonLinErg(Nt-1) =   0.0090
+linNumContm(Nt-1) =  10.4571
+linErgContm(Nt-1) =  18.4573
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00775915
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00572591
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.05
+
+pi output:
+
+timeNumber:           15
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.26826e-05     0.000288528       0.0118177
+               0               2       0.0173073     4.68943e-07     1.97908e-06      0.00544282
+
+average dp/dt integrated over each timeslice:
+1
+-1.17189
+-1.08004
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.13037     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/15inputsPi_0
+                        ./data/15pip_0.dat
+                       ./data/15tpip_0.dat
+                    ./data/15minusDS_0.dat
+                       ./data/15DDSp_0.dat
+                    ./data/15linErgp_0.dat
+                       ./data/15ergp_0.dat
+                         data/eigValue.dat
+                       ./data/15eigVec.dat
+pi output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/15pip_0.dat
+Time evolution printed:                data/150115182214pi3.dat pics/pi3.png
+erg(Nt-1) =  18.7871
+linErgField(Nt-1) =  18.7871
+nonLinErg(Nt-1) =   0.0093
+linNumContm(Nt-1) =  10.6336
+linErgContm(Nt-1) =  18.7924
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.0024596
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00334564
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.06
+
+pi output:
+
+timeNumber:           16
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.57734e-05     0.000328803       0.0135103
+               0               2       0.0188964     5.57743e-07     2.61661e-06     0.000724038
+
+average dp/dt integrated over each timeslice:
+1
+-1.40627
+-1.38172
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 8.88534     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/16inputsPi_0
+                        ./data/16pip_0.dat
+                       ./data/16tpip_0.dat
+                    ./data/16minusDS_0.dat
+                       ./data/16DDSp_0.dat
+                    ./data/16linErgp_0.dat
+                       ./data/16ergp_0.dat
+                         data/eigValue.dat
+                       ./data/16eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/16pip_0.dat
+Time evolution printed:                data/150115182232pi3.dat pics/pi3.png
+erg(Nt-1) =  18.8014
+linErgField(Nt-1) =  18.8014
+nonLinErg(Nt-1) =   0.0094
+linNumContm(Nt-1) =  10.6418
+linErgContm(Nt-1) =  18.8068
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000139855
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00321584
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.07
+
+pi output:
+
+timeNumber:           17
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     3.95664e-05     0.000368574       0.0166732
+               0               2       0.0218069     1.27753e-06     8.00302e-06      0.00541422
+
+average dp/dt integrated over each timeslice:
+1
+-1.64065
+-1.78581
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.04583     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/17inputsPi_0
+                        ./data/17pip_0.dat
+                       ./data/17tpip_0.dat
+                    ./data/17minusDS_0.dat
+                       ./data/17DDSp_0.dat
+                    ./data/17linErgp_0.dat
+                       ./data/17ergp_0.dat
+                         data/eigValue.dat
+                       ./data/17eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/17pip_0.dat
+Time evolution printed:                data/150115182253pi3.dat pics/pi3.png
+erg(Nt-1) =  18.7698
+linErgField(Nt-1) =  18.7698
+nonLinErg(Nt-1) =   0.0093
+linNumContm(Nt-1) =  10.6217
+linErgContm(Nt-1) =  18.7750
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00030504
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.0035118
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.08
+
+pi output:
+
+timeNumber:           18
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     4.41575e-05     0.000407839       0.0243134
+               0               2       0.0283338     5.02181e-06      3.2504e-05         0.01157
+
+average dp/dt integrated over each timeslice:
+1
+-1.87503
+-2.44965
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       2 9.06203     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/18inputsPi_0
+                        ./data/18pip_0.dat
+                       ./data/18tpip_0.dat
+                    ./data/18minusDS_0.dat
+                       ./data/18DDSp_0.dat
+                    ./data/18linErgp_0.dat
+                       ./data/18ergp_0.dat
+                         data/eigValue.dat
+                       ./data/18eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/18pip_0.dat
+Time evolution printed:                data/150115182311pi3.dat pics/pi3.png
+erg(Nt-1) =  18.6799
+linErgField(Nt-1) =  18.6799
+nonLinErg(Nt-1) =   0.0092
+linNumContm(Nt-1) =  10.5655
+linErgContm(Nt-1) =  18.6849
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.000768574
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00426838
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.09
+
+pi output:
+
+timeNumber:           19
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039      4.9936e-05     0.000446595       0.0524693
+               0               2       0.0526157     3.89324e-05     0.000238276       0.0257136
+               0               3       0.0226694     1.28232e-05     7.49395e-05       0.0150003
+               0               4       0.0097629     4.87454e-06     2.65091e-05      0.00791844
+
+average dp/dt integrated over each timeslice:
+1
+-2.10941
+-4.16694
+-2.87154
+-2.04403
+
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       4 16.4891     160     362      10     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/19inputsPi_0
+                        ./data/19pip_0.dat
+                       ./data/19tpip_0.dat
+                    ./data/19minusDS_0.dat
+                       ./data/19DDSp_0.dat
+                    ./data/19linErgp_0.dat
+                       ./data/19ergp_0.dat
+                         data/eigValue.dat
+                       ./data/19eigVec.dat
+pi3 output:
+
+
+direction = 1, sigma = 1
+Input:                                         data/19pip_0.dat
+Time evolution printed:                data/150115182339pi3.dat pics/pi3.png
+erg(Nt-1) =  18.7480
+linErgField(Nt-1) =  18.7480
+nonLinErg(Nt-1) =   0.0093
+linNumContm(Nt-1) =  10.6089
+linErgContm(Nt-1) =  18.7532
+
+solution didn't tunnel
+compare vector with previous loop output:
+
+2*norm(A-B)/norm(A+B) = 0.00057445
+
+compare vector with static sphaleron:
+
+2*norm(A-B)/norm(A+B) = 0.00369936
+
+
+-------------------------------------------------------------------------------------------------------
+amp = -.10
+
+pi3 output:
+
+timeNumber:           20
+     inP       N      Na      Nb      Nc       L      Tb           R      dE   theta     reg     epsilon
+       p     160     200     160       2      10     0.8           1    0.05       0       0           0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.00039     9.90976e-06     0.000484839        0.901056
+               0               2         6859.69        0.453179         10.5172        0.465554
+               0               3        0.825537       0.0642407            5.14        0.976974
+               0               4         7.29594        0.261679         25.8934        0.791306
+               0               5           15.29         4.79181         894.032        0.796691
+               0               6        0.424578        0.292319         325.375         1.00263
+Calculation failed
+calc_test = 9.31323e-10
+pi failed, value returned is 1
+
