@@ -614,7 +614,7 @@ double simpleSpaceSphere (const unsigned int& space)
 	}
 	
 //gives values of coordinates in whole spacetime
-comp coord(const unsigned int& locNum,const int& direction)
+comp coord(const unsigned int& locNum,const int& direction, const unsigned int& Nt=NT)
 	{
 	comp xCoord;
 	if (direction==0)
@@ -1366,7 +1366,7 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		Ta = Ta*newParameter/Tb;
 		Tc = Tc*newParameter/Tb;
 		Tb = newParameter;
-		if (Tb<R){
+		if (Tb<R && pot[0]!='3'){
 			angle = asin(Tb/R);
 			if (2.0*(1.5*Tb*tan(angle))<L) L=2.0*(1.5*Tb*tan(angle));
 			}

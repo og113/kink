@@ -1,0 +1,914 @@
+
+./data/150124112655inputsM_0_0 ./data/150124112655mainpi_0_0.dat
+
+     input: ./data/150124112655mainpi_0_0.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.04073   0.000183645    0.00394757     0.0048564      0.948604           nan
+         0         2   1.04456e-07   8.04788e-13   5.54633e-11   3.15488e-10      0.948603           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 36.0971     120     422     4.5     0.8    0.05       0       81.0849        262.74      -420.383
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_0
+            ./data/150124163716mainpi_0_0.dat
+            ./data/150124163716mainminusDS_0_0.dat
+            ./data/150124163716mainDDS_0_0.dat
+            ./data/150124163716mainlinNum_0_0.dat
+            ./data/150124163716mainlinErg_0_0.dat
+            ./data/150124163716mainerg_0_0.dat
+
+     input: ./data/150124163716mainpi_0_0.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.79       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         1         1       1.04073   0.000183647    0.00394757    0.00485641      0.948603           nan
+         1         2   1.69527e-06   3.53549e-12   2.43736e-10    1.3605e-09      0.948608           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 36.5113     120     422     4.5    0.79    0.05       0        81.086       262.742      -415.133
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_1
+            ./data/150124163716mainpi_0_1.dat
+            ./data/150124163716mainminusDS_0_1.dat
+            ./data/150124163716mainDDS_0_1.dat
+            ./data/150124163716mainlinNum_0_1.dat
+            ./data/150124163716mainlinErg_0_1.dat
+            ./data/150124163716mainerg_0_1.dat
+
+     input: ./data/150124163716mainpi_0_1.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.78       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         2         1       1.04073   0.000183646    0.00394757    0.00485642      0.948608           nan
+         2         2   1.74941e-06   4.37657e-12   3.01385e-10   1.67765e-09      0.948613           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.9578     120     422     4.5    0.78    0.05       0       81.0871       262.745      -409.882
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_2
+            ./data/150124163716mainpi_0_2.dat
+            ./data/150124163716mainminusDS_0_2.dat
+            ./data/150124163716mainDDS_0_2.dat
+            ./data/150124163716mainlinNum_0_2.dat
+            ./data/150124163716mainlinErg_0_2.dat
+            ./data/150124163716mainerg_0_2.dat
+
+     input: ./data/150124163716mainpi_0_2.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.77       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         3         1       1.04073   0.000183646    0.00394758    0.00485642      0.948613           nan
+         3         2   1.69563e-06   5.65289e-12   3.87775e-10   2.13736e-09      0.948618           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.8862     120     422     4.5    0.77    0.05       0       81.0884       262.748      -404.632
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_3
+            ./data/150124163716mainpi_0_3.dat
+            ./data/150124163716mainminusDS_0_3.dat
+            ./data/150124163716mainDDS_0_3.dat
+            ./data/150124163716mainlinNum_0_3.dat
+            ./data/150124163716mainlinErg_0_3.dat
+            ./data/150124163716mainerg_0_3.dat
+
+     input: ./data/150124163716mainpi_0_3.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.76       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         4         1       1.04073   0.000183646    0.00394759    0.00485644      0.948618           nan
+         4         2   1.34883e-06    7.8312e-12   5.29687e-10   2.84982e-09      0.948624           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.0648     120     422     4.5    0.76    0.05       0       81.0898       262.751      -399.382
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_4
+            ./data/150124163716mainpi_0_4.dat
+            ./data/150124163716mainminusDS_0_4.dat
+            ./data/150124163716mainDDS_0_4.dat
+            ./data/150124163716mainlinNum_0_4.dat
+            ./data/150124163716mainlinErg_0_4.dat
+            ./data/150124163716mainerg_0_4.dat
+
+     input: ./data/150124163716mainpi_0_4.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.75       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         5         1       1.04073   0.000183646    0.00394761    0.00485646      0.948624           nan
+         5         2   1.03507e-06   1.23089e-11   7.99319e-10   4.04305e-09      0.948631           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.3799     120     422     4.5    0.75    0.05       0       81.0912       262.754      -394.132
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_5
+            ./data/150124163716mainpi_0_5.dat
+            ./data/150124163716mainminusDS_0_5.dat
+            ./data/150124163716mainDDS_0_5.dat
+            ./data/150124163716mainlinNum_0_5.dat
+            ./data/150124163716mainlinErg_0_5.dat
+            ./data/150124163716mainerg_0_5.dat
+
+     input: ./data/150124163716mainpi_0_5.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.74       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         6         1       1.04073   0.000183647    0.00394763     0.0048565      0.948631           nan
+         6         2   4.70859e-06   3.20087e-11   1.43279e-09   5.32156e-09      0.948635           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 37.5376     120     422     4.5    0.74    0.05       0       81.0922       262.757       -388.88
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_6
+            ./data/150124163716mainpi_0_6.dat
+            ./data/150124163716mainminusDS_0_6.dat
+            ./data/150124163716mainDDS_0_6.dat
+            ./data/150124163716mainlinNum_0_6.dat
+            ./data/150124163716mainlinErg_0_6.dat
+            ./data/150124163716mainerg_0_6.dat
+
+     input: ./data/150124163716mainpi_0_6.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.73       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         7         1       1.04073   0.000183648    0.00394768     0.0048567      0.948635           nan
+         7         2   1.98997e-05   2.05632e-10   4.05055e-09   8.14899e-08      0.948629           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 36.2821     120     422     4.5    0.73    0.05       0       81.0907       262.753      -383.619
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_7
+            ./data/150124163716mainpi_0_7.dat
+            ./data/150124163716mainminusDS_0_7.dat
+            ./data/150124163716mainDDS_0_7.dat
+            ./data/150124163716mainlinNum_0_7.dat
+            ./data/150124163716mainlinErg_0_7.dat
+            ./data/150124163716mainerg_0_7.dat
+
+     input: ./data/150124163716mainpi_0_7.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.72       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         8         1       1.04073   0.000183666     0.0039478    0.00496612      0.948629           nan
+         8         2   0.000683043    1.1507e-07   1.91924e-06     0.0607527      0.949192           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 32.9098     120     422     4.5    0.72    0.05       0       81.2216       263.083      -378.839
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_8
+            ./data/150124163716mainpi_0_8.dat
+            ./data/150124163716mainminusDS_0_8.dat
+            ./data/150124163716mainDDS_0_8.dat
+            ./data/150124163716mainlinNum_0_8.dat
+            ./data/150124163716mainlinErg_0_8.dat
+            ./data/150124163716mainerg_0_8.dat
+
+     input: ./data/150124163716mainpi_0_8.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.71       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         9         1       1.04207   0.000726643     0.0148232      0.105919      0.982487           nan
+         9         2     0.0233086   9.16225e-05   0.000650803     0.0548033      0.916499           nan
+         9         3     0.0137324   2.10222e-05   0.000206573    0.00682729      0.943469           nan
+         9         4     0.0018032   3.90338e-07    2.4695e-06   0.000116077      0.934911           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       4 65.6465     120     422     4.5    0.71    0.05       0       77.6774       252.784      -358.972
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_9
+            ./data/150124163716mainpi_0_9.dat
+            ./data/150124163716mainminusDS_0_9.dat
+            ./data/150124163716mainDDS_0_9.dat
+            ./data/150124163716mainlinNum_0_9.dat
+            ./data/150124163716mainlinErg_0_9.dat
+            ./data/150124163716mainerg_0_9.dat
+
+     input: ./data/150124163716mainpi_0_9.dat
+timeNumber: 150124163716
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.7       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        10         1       1.04143   0.000308808    0.00522348     0.0961405      0.934863           nan
+        10         2     0.0499493    7.8434e-05    0.00105969      0.165352       1.02446           nan
+        10         3     0.0800267   0.000524234    0.00962877     0.0976134      0.917742           nan
+        10         4     0.0453552   0.000139174    0.00256087     0.0580402      0.969781           nan
+        10         5     0.0376342   4.36694e-05    0.00089605     0.0490323       1.00834           nan
+        10         6      0.039883   2.00258e-05   0.000282829     0.0071629       1.04355           nan
+        10         7    0.00516204   7.50653e-07   1.23358e-05   0.000701314       1.03552           nan
+        10         8   0.000600227   3.81741e-09   5.30928e-08   1.23988e-06       1.03596           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       8 124.144     120     422     4.5     0.7    0.05       0       95.2266       285.542      -399.757
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124163716inputsM_0_10
+            ./data/150124163716mainpi_0_10.dat
+            ./data/150124163716mainminusDS_0_10.dat
+            ./data/150124163716mainDDS_0_10.dat
+            ./data/150124163716mainlinNum_0_10.dat
+            ./data/150124163716mainlinErg_0_10.dat
+            ./data/150124163716mainerg_0_10.dat
+
+
+./data/150124112655inputsM_0_0 ./data/150124112655mainpi_0_0.dat
+
+     input: ./data/150124112655mainpi_0_0.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.8       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.04073   0.000183645    0.00394757     0.0048564      0.948604           nan
+         0         2   1.04456e-07   8.04788e-13   5.54633e-11   3.15488e-10      0.948603           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 35.4532     120     422     4.5     0.8    0.05       0       81.0849        262.74      -420.383
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_0
+            ./data/150124171956mainpi_0_0.dat
+            ./data/150124171956mainminusDS_0_0.dat
+            ./data/150124171956mainDDS_0_0.dat
+            ./data/150124171956mainlinNum_0_0.dat
+            ./data/150124171956mainlinErg_0_0.dat
+            ./data/150124171956mainerg_0_0.dat
+
+     input: ./data/150124171956mainpi_0_0.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.81       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         1         1       1.04073   0.000183647    0.00394757     0.0048564      0.948603           nan
+         1         2   1.60228e-06   2.94032e-12   2.02735e-10   1.11816e-09      0.948599           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.0218     120     422     4.5    0.81    0.05       0        81.084       262.737      -425.635
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_1
+            ./data/150124171956mainpi_0_1.dat
+            ./data/150124171956mainminusDS_0_1.dat
+            ./data/150124171956mainDDS_0_1.dat
+            ./data/150124171956mainlinNum_0_1.dat
+            ./data/150124171956mainlinErg_0_1.dat
+            ./data/150124171956mainerg_0_1.dat
+
+     input: ./data/150124171956mainpi_0_1.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.82       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         2         1       1.04073   0.000183646    0.00394756     0.0048564      0.948599           nan
+         2         2   1.49687e-06    2.4984e-12    1.7221e-10   9.46686e-10      0.948596           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.1704     120     422     4.5    0.82    0.05       0       81.0831       262.735      -430.886
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_2
+            ./data/150124171956mainpi_0_2.dat
+            ./data/150124171956mainminusDS_0_2.dat
+            ./data/150124171956mainDDS_0_2.dat
+            ./data/150124171956mainlinNum_0_2.dat
+            ./data/150124171956mainlinErg_0_2.dat
+            ./data/150124171956mainerg_0_2.dat
+
+     input: ./data/150124171956mainpi_0_2.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.83       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         3         1       1.04073   0.000183646    0.00394755     0.0048564      0.948596           nan
+         3         2   1.39105e-06   2.15824e-12   1.48672e-10   8.15956e-10      0.948593           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.0223     120     422     4.5    0.83    0.05       0       81.0824       262.733      -436.138
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_3
+            ./data/150124171956mainpi_0_3.dat
+            ./data/150124171956mainminusDS_0_3.dat
+            ./data/150124171956mainDDS_0_3.dat
+            ./data/150124171956mainlinNum_0_3.dat
+            ./data/150124171956mainlinErg_0_3.dat
+            ./data/150124171956mainerg_0_3.dat
+
+     input: ./data/150124171956mainpi_0_3.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.84       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         4         1       1.04073   0.000183645    0.00394755    0.00485639      0.948593           nan
+         4         2    1.2901e-06   1.88916e-12   1.30021e-10    7.1256e-10       0.94859           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.2903     120     422     4.5    0.84    0.05       0       81.0817       262.732      -441.389
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_4
+            ./data/150124171956mainpi_0_4.dat
+            ./data/150124171956mainminusDS_0_4.dat
+            ./data/150124171956mainDDS_0_4.dat
+            ./data/150124171956mainlinNum_0_4.dat
+            ./data/150124171956mainlinErg_0_4.dat
+            ./data/150124171956mainerg_0_4.dat
+
+     input: ./data/150124171956mainpi_0_4.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.85       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         5         1       1.04073   0.000183645    0.00394755    0.00485639       0.94859           nan
+         5         2   1.19616e-06   1.67164e-12   1.14918e-10   6.29301e-10      0.948587           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2   32.68     120     422     4.5    0.85    0.05       0        81.081        262.73      -446.642
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_5
+            ./data/150124171956mainpi_0_5.dat
+            ./data/150124171956mainminusDS_0_5.dat
+            ./data/150124171956mainDDS_0_5.dat
+            ./data/150124171956mainlinNum_0_5.dat
+            ./data/150124171956mainlinErg_0_5.dat
+            ./data/150124171956mainerg_0_5.dat
+
+     input: ./data/150124171956mainpi_0_5.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.86       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         6         1       1.04073   0.000183645    0.00394754    0.00485639      0.948587           nan
+         6         2   1.10984e-06   1.49268e-12   1.02469e-10   5.61228e-10      0.948584           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 36.6242     120     422     4.5    0.86    0.05       0       81.0804       262.729      -451.894
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_6
+            ./data/150124171956mainpi_0_6.dat
+            ./data/150124171956mainminusDS_0_6.dat
+            ./data/150124171956mainDDS_0_6.dat
+            ./data/150124171956mainlinNum_0_6.dat
+            ./data/150124171956mainlinErg_0_6.dat
+            ./data/150124171956mainerg_0_6.dat
+
+     input: ./data/150124171956mainpi_0_6.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.87       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         7         1       1.04073   0.000183645    0.00394754    0.00485639      0.948584           nan
+         7         2   1.03106e-06   1.34331e-12   9.20568e-11   5.04083e-10      0.948582           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.2838     120     422     4.5    0.87    0.05       0       81.0799       262.728      -457.146
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_7
+            ./data/150124171956mainpi_0_7.dat
+            ./data/150124171956mainminusDS_0_7.dat
+            ./data/150124171956mainDDS_0_7.dat
+            ./data/150124171956mainlinNum_0_7.dat
+            ./data/150124171956mainlinErg_0_7.dat
+            ./data/150124171956mainerg_0_7.dat
+
+     input: ./data/150124171956mainpi_0_7.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.88       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         8         1       1.04073   0.000183645    0.00394754    0.00485639      0.948582           nan
+         8         2   9.59388e-07    1.2171e-12   8.32382e-11   4.55786e-10       0.94858           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 35.8216     120     422     4.5    0.88    0.05       0       81.0794       262.726      -462.398
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_8
+            ./data/150124171956mainpi_0_8.dat
+            ./data/150124171956mainminusDS_0_8.dat
+            ./data/150124171956mainDDS_0_8.dat
+            ./data/150124171956mainlinNum_0_8.dat
+            ./data/150124171956mainlinErg_0_8.dat
+            ./data/150124171956mainerg_0_8.dat
+
+     input: ./data/150124171956mainpi_0_8.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.89       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         9         1       1.04073   0.000183645    0.00394753    0.00485639       0.94858           nan
+         9         2   8.94248e-07   1.10934e-12   7.56897e-11    4.1446e-10      0.948578           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 35.3397     120     422     4.5    0.89    0.05       0       81.0789       262.725      -467.651
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124171956inputsM_0_9
+            ./data/150124171956mainpi_0_9.dat
+            ./data/150124171956mainminusDS_0_9.dat
+            ./data/150124171956mainDDS_0_9.dat
+            ./data/150124171956mainlinNum_0_9.dat
+            ./data/150124171956mainlinErg_0_9.dat
+            ./data/150124171956mainerg_0_9.dat
+
+     input: ./data/150124171956mainpi_0_9.dat
+timeNumber: 150124171956
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.9       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        10         1       1.04073   0.000183645    0.00394753    0.00485639      0.948578           nan
+        10         2   8.35038e-07   1.01652e-12   6.91683e-11   3.78758e-10      0.948576           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.4017     120     422     4.5     0.9    0.05       0       81.0785       262.724      -472.904
+
+
+
+./data/150124171956inputsM_0_10 ./data/150124171956mainpi_0_10.dat
+
+     input: ./data/150124171956mainpi_0_10.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     0.9       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         0         1       1.04933   0.000372177    0.00400475      0.116559      0.948576           nan
+         0         2     0.0283678   0.000265054    0.00187226     0.0533504       1.05438           nan
+         0         3    0.00388333    9.1876e-06   7.12757e-05    0.00275305        1.0107           nan
+         0         4   0.000294239   9.17602e-08    6.7119e-07   2.64139e-05       1.00793           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       4  69.161     120     422     4.5     0.9    0.05       0       78.4406       255.782      -460.407
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_0
+            ./data/150124173230mainpi_0_0.dat
+            ./data/150124173230mainminusDS_0_0.dat
+            ./data/150124173230mainDDS_0_0.dat
+            ./data/150124173230mainlinNum_0_0.dat
+            ./data/150124173230mainlinErg_0_0.dat
+            ./data/150124173230mainerg_0_0.dat
+
+     input: ./data/150124173230mainpi_0_0.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.91       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         1         1       1.04696   0.000183177    0.00400049    0.00484402       1.00793           nan
+         1         2   1.15093e-07   6.56413e-14   4.53275e-12   3.39809e-11       1.00793           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.9579     120     422     4.5    0.91    0.05       0       78.4349       255.754      -465.472
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_1
+            ./data/150124173230mainpi_0_1.dat
+            ./data/150124173230mainminusDS_0_1.dat
+            ./data/150124173230mainDDS_0_1.dat
+            ./data/150124173230mainlinNum_0_1.dat
+            ./data/150124173230mainlinErg_0_1.dat
+            ./data/150124173230mainerg_0_1.dat
+
+     input: ./data/150124173230mainpi_0_1.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.92       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         2         1       1.04696   0.000183177    0.00400049    0.00484402       1.00793           nan
+         2         2   1.09058e-07   6.93388e-14   4.81772e-12   3.59478e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.8347     120     422     4.5    0.92    0.05       0       78.4348       255.754      -470.586
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_2
+            ./data/150124173230mainpi_0_2.dat
+            ./data/150124173230mainminusDS_0_2.dat
+            ./data/150124173230mainDDS_0_2.dat
+            ./data/150124173230mainlinNum_0_2.dat
+            ./data/150124173230mainlinErg_0_2.dat
+            ./data/150124173230mainerg_0_2.dat
+
+     input: ./data/150124173230mainpi_0_2.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.93       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         3         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         3         2   1.05928e-07   5.86882e-14   4.03915e-12   3.00049e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.1755     120     422     4.5    0.93    0.05       0       78.4348       255.753      -475.701
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_3
+            ./data/150124173230mainpi_0_3.dat
+            ./data/150124173230mainminusDS_0_3.dat
+            ./data/150124173230mainDDS_0_3.dat
+            ./data/150124173230mainlinNum_0_3.dat
+            ./data/150124173230mainlinErg_0_3.dat
+            ./data/150124173230mainerg_0_3.dat
+
+     input: ./data/150124173230mainpi_0_3.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.94       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         4         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         4         2   1.01705e-07   5.06119e-14   3.44136e-12   2.55911e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 35.8774     120     422     4.5    0.94    0.05       0       78.4347       255.753      -480.816
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_4
+            ./data/150124173230mainpi_0_4.dat
+            ./data/150124173230mainminusDS_0_4.dat
+            ./data/150124173230mainDDS_0_4.dat
+            ./data/150124173230mainlinNum_0_4.dat
+            ./data/150124173230mainlinErg_0_4.dat
+            ./data/150124173230mainerg_0_4.dat
+
+     input: ./data/150124173230mainpi_0_4.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.95       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         5         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         5         2   9.69928e-08   4.43509e-14    2.9715e-12   2.18256e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.2852     120     422     4.5    0.95    0.05       0       78.4346       255.753       -485.93
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_5
+            ./data/150124173230mainpi_0_5.dat
+            ./data/150124173230mainminusDS_0_5.dat
+            ./data/150124173230mainDDS_0_5.dat
+            ./data/150124173230mainlinNum_0_5.dat
+            ./data/150124173230mainlinErg_0_5.dat
+            ./data/150124173230mainerg_0_5.dat
+
+     input: ./data/150124173230mainpi_0_5.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.96       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         6         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         6         2   9.21356e-08   3.94168e-14   2.59486e-12   1.92633e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.1943     120     422     4.5    0.96    0.05       0       78.4345       255.753      -491.045
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_6
+            ./data/150124173230mainpi_0_6.dat
+            ./data/150124173230mainminusDS_0_6.dat
+            ./data/150124173230mainDDS_0_6.dat
+            ./data/150124173230mainlinNum_0_6.dat
+            ./data/150124173230mainlinErg_0_6.dat
+            ./data/150124173230mainerg_0_6.dat
+
+     input: ./data/150124173230mainpi_0_6.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.97       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         7         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         7         2   8.73284e-08   3.54733e-14   2.28787e-12   1.67783e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.2981     120     422     4.5    0.97    0.05       0       78.4345       255.752       -496.16
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_7
+            ./data/150124173230mainpi_0_7.dat
+            ./data/150124173230mainminusDS_0_7.dat
+            ./data/150124173230mainDDS_0_7.dat
+            ./data/150124173230mainlinNum_0_7.dat
+            ./data/150124173230mainlinErg_0_7.dat
+            ./data/150124173230mainerg_0_7.dat
+
+     input: ./data/150124173230mainpi_0_7.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.98       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         8         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         8         2     8.268e-08   3.22837e-14   2.03404e-12   1.50938e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.9847     120     422     4.5    0.98    0.05       0       78.4344       255.752      -501.275
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_8
+            ./data/150124173230mainpi_0_8.dat
+            ./data/150124173230mainminusDS_0_8.dat
+            ./data/150124173230mainDDS_0_8.dat
+            ./data/150124173230mainlinNum_0_8.dat
+            ./data/150124173230mainlinErg_0_8.dat
+            ./data/150124173230mainerg_0_8.dat
+
+     input: ./data/150124173230mainpi_0_8.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    0.99       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+         9         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+         9         2   7.82482e-08   2.96788e-14   1.82153e-12   1.34522e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.6003     120     422     4.5    0.99    0.05       0       78.4344       255.752      -506.389
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_9
+            ./data/150124173230mainpi_0_9.dat
+            ./data/150124173230mainminusDS_0_9.dat
+            ./data/150124173230mainDDS_0_9.dat
+            ./data/150124173230mainlinNum_0_9.dat
+            ./data/150124173230mainlinErg_0_9.dat
+            ./data/150124173230mainerg_0_9.dat
+
+     input: ./data/150124173230mainpi_0_9.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5       1       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        10         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        10         2   7.40599e-08   2.75344e-14   1.64167e-12   1.20098e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2  33.304     120     422     4.5       1    0.05       0       78.4343       255.752      -511.504
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_10
+            ./data/150124173230mainpi_0_10.dat
+            ./data/150124173230mainminusDS_0_10.dat
+            ./data/150124173230mainDDS_0_10.dat
+            ./data/150124173230mainlinNum_0_10.dat
+            ./data/150124173230mainlinErg_0_10.dat
+            ./data/150124173230mainerg_0_10.dat
+
+     input: ./data/150124173230mainpi_0_10.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.01       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        11         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        11         2   7.01237e-08   2.57572e-14   1.48797e-12   1.09041e-11       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.1417     120     422     4.5    1.01    0.05       0       78.4343       255.752      -516.619
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_11
+            ./data/150124173230mainpi_0_11.dat
+            ./data/150124173230mainminusDS_0_11.dat
+            ./data/150124173230mainDDS_0_11.dat
+            ./data/150124173230mainlinNum_0_11.dat
+            ./data/150124173230mainlinErg_0_11.dat
+            ./data/150124173230mainerg_0_11.dat
+
+     input: ./data/150124173230mainpi_0_11.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.02       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        12         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        12         2   6.64372e-08   2.42739e-14   1.35548e-12   9.99981e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.1893     120     422     4.5    1.02    0.05       0       78.4342       255.752      -521.734
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_12
+            ./data/150124173230mainpi_0_12.dat
+            ./data/150124173230mainminusDS_0_12.dat
+            ./data/150124173230mainDDS_0_12.dat
+            ./data/150124173230mainlinNum_0_12.dat
+            ./data/150124173230mainlinErg_0_12.dat
+            ./data/150124173230mainerg_0_12.dat
+
+     input: ./data/150124173230mainpi_0_12.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.03       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        13         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        13         2   6.29918e-08   2.30318e-14   1.24042e-12   9.22401e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.5249     120     422     4.5    1.03    0.05       0       78.4342       255.752      -526.848
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_13
+            ./data/150124173230mainpi_0_13.dat
+            ./data/150124173230mainminusDS_0_13.dat
+            ./data/150124173230mainDDS_0_13.dat
+            ./data/150124173230mainlinNum_0_13.dat
+            ./data/150124173230mainlinErg_0_13.dat
+            ./data/150124173230mainerg_0_13.dat
+
+     input: ./data/150124173230mainpi_0_13.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.04       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        14         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        14         2   5.97756e-08   2.19831e-14   1.13979e-12   8.30727e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.2516     120     422     4.5    1.04    0.05       0       78.4341       255.752      -531.963
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_14
+            ./data/150124173230mainpi_0_14.dat
+            ./data/150124173230mainminusDS_0_14.dat
+            ./data/150124173230mainDDS_0_14.dat
+            ./data/150124173230mainlinNum_0_14.dat
+            ./data/150124173230mainlinErg_0_14.dat
+            ./data/150124173230mainerg_0_14.dat
+
+     input: ./data/150124173230mainpi_0_14.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.05       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        15         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        15         2   5.67747e-08   2.10967e-14    1.0944e-12   7.71422e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.8214     120     422     4.5    1.05    0.05       0       78.4341       255.751      -537.078
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_15
+            ./data/150124173230mainpi_0_15.dat
+            ./data/150124173230mainminusDS_0_15.dat
+            ./data/150124173230mainDDS_0_15.dat
+            ./data/150124173230mainlinNum_0_15.dat
+            ./data/150124173230mainlinErg_0_15.dat
+            ./data/150124173230mainerg_0_15.dat
+
+     input: ./data/150124173230mainpi_0_15.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.06       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        16         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        16         2   5.39749e-08   2.03427e-14    1.0944e-12   7.31293e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2  33.254     120     422     4.5    1.06    0.05       0       78.4341       255.751      -542.193
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_16
+            ./data/150124173230mainpi_0_16.dat
+            ./data/150124173230mainminusDS_0_16.dat
+            ./data/150124173230mainDDS_0_16.dat
+            ./data/150124173230mainlinNum_0_16.dat
+            ./data/150124173230mainlinErg_0_16.dat
+            ./data/150124173230mainerg_0_16.dat
+
+     input: ./data/150124173230mainpi_0_16.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.07       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        17         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        17         2   5.13618e-08   1.97001e-14   1.09441e-12   6.62665e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.6577     120     422     4.5    1.07    0.05       0        78.434       255.751      -547.308
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_17
+            ./data/150124173230mainpi_0_17.dat
+            ./data/150124173230mainminusDS_0_17.dat
+            ./data/150124173230mainDDS_0_17.dat
+            ./data/150124173230mainlinNum_0_17.dat
+            ./data/150124173230mainlinErg_0_17.dat
+            ./data/150124173230mainerg_0_17.dat
+
+     input: ./data/150124173230mainpi_0_17.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.08       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        18         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        18         2   4.89219e-08   1.91491e-14   1.09441e-12   6.27566e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 33.8066     120     422     4.5    1.08    0.05       0        78.434       255.751      -552.423
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_18
+            ./data/150124173230mainpi_0_18.dat
+            ./data/150124173230mainminusDS_0_18.dat
+            ./data/150124173230mainDDS_0_18.dat
+            ./data/150124173230mainlinNum_0_18.dat
+            ./data/150124173230mainlinErg_0_18.dat
+            ./data/150124173230mainerg_0_18.dat
+
+     input: ./data/150124173230mainpi_0_18.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5    1.09       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        19         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        19         2    4.6642e-08   1.86764e-14   1.09442e-12   5.79089e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.8454     120     422     4.5    1.09    0.05       0        78.434       255.751      -557.537
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_19
+            ./data/150124173230mainpi_0_19.dat
+            ./data/150124173230mainminusDS_0_19.dat
+            ./data/150124173230mainDDS_0_19.dat
+            ./data/150124173230mainlinNum_0_19.dat
+            ./data/150124173230mainlinErg_0_19.dat
+            ./data/150124173230mainerg_0_19.dat
+
+     input: ./data/150124173230mainpi_0_19.dat
+timeNumber: 150124173230
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     120     320     100       2     4.5     1.1       1    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest
+        20         1       1.04696   0.000183177    0.00400049    0.00484402       1.00792           nan
+        20         2   4.45097e-08   1.82689e-14   1.09442e-12   5.30012e-12       1.00792           nan
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E             W
+       2 34.6248     120     422     4.5     1.1    0.05       0       78.4339       255.751      -562.652
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150124173230inputsM_0_20
+            ./data/150124173230mainpi_0_20.dat
+            ./data/150124173230mainminusDS_0_20.dat
+            ./data/150124173230mainDDS_0_20.dat
+            ./data/150124173230mainlinNum_0_20.dat
+            ./data/150124173230mainlinErg_0_20.dat
+            ./data/150124173230mainerg_0_20.dat
+
