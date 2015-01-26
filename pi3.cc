@@ -159,7 +159,7 @@ else {
 propagating euclidean solution forwards and/or backwards in time
 ---------------------------------------------------------------------------------------------*/
 
-vec phiA, phiC;
+vec phiA, phiC, linearizationA;
 double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA;
 
 uint j=0;
@@ -299,6 +299,10 @@ while(j<2) {
 		ergA = erg(Nt-1);
 		nonLinErgA = nonLinErg(Nt-1);
 		linErgFieldA = linErgField(Nt-1);
+		if (testTunnel) {
+			linearizationA(Nt+1);
+			for (unsigned int k=0; k<(Nt+1); k++) linearizationA(k) = absDiff(erg(k),linErgField(k));
+		}
 	}
 	j++;
 		
@@ -355,13 +359,21 @@ if (!testTunnel) {
 	printf("Input:                  %39s\n",filename.c_str());
 	printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
 }
-else printf("Input:                  %39s\n",filename.c_str());
+else {
+	string linearizationFile = "data/" + timeNumber + "linearization.dat";
+	simplePrintVector(linearizationFile,linearizationA);
+	printf("Input:                  %39s\n",filename.c_str());
+	printf("linearization printed:  %39s\n",linearizationFile.c_str());
+	}
 
 printf("erg(0) = %8.4f\n",ergA);
 printf("linErgFieldA(0) = %8.4f\n",linErgFieldA);
 printf("nonLinErgA(0) = %8.4f\n",nonLinErgA);
 printf("linNumContmA(0) = %8.4f\n",linNumContm);
 printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
+
+
+
 
 double finalTest = linErgFieldA;
 if (testTunnel) {
