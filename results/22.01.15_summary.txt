@@ -1,0 +1,6 @@
+output from mainChangeL.sh
+
+L          S/F        
+10.0       FM         
+9.5        FM         
+9.0        FM         
