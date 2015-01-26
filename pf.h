@@ -137,6 +137,11 @@ double absolute (const double& amplitude)
 	return abs_amplitude;
 	}
 	
+//gives absolute measure of difference between two numbers
+double absDiff (const double& numA, const double& numB) {
+	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+}
+	
 //function giving location of smallest element of a vector of type T
 template <typename T>
 unsigned int smallestLoc(const vector <T> & inVector)
@@ -1084,7 +1089,7 @@ void gpSimple(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
+	string command1Str = "plot \"" + readFile + "\" using 1 with linespoints";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();

@@ -359,6 +359,7 @@ vector<double> minima0(2);
 	closenessT = 1.0e-5;
 	closenessP = 0.5;
 	closenessR = 1.0e-2;
+	closenessIE = 1.0e-6;
 	
 	//lambda functions for pot_r
 auto Vr = [&] (const comp & phi)
@@ -545,6 +546,7 @@ auto ddVr = [&] (const comp & phi)
 		vector<double> true_test(1); true_test[0] = 1.0;
 		vector<double> mom_test(1); mom_test[0] = 1.0;
 		vector<double> reg_test(1); reg_test[0] = 1.0;
+		vector<double> imErg_test(1); imErg_test[0] = 1.0;
 
 		//initializing phi (=p)
 		vec p(2*N*NT+2);
@@ -955,15 +957,13 @@ auto ddVr = [&] (const comp & phi)
 				if (abs(linNum(j))>linNMax) linNMax = abs(linNum(j));
 				if (abs(linNum(j))<linNMin) linNMin = abs(linNum(j));
 				}
-			linTestE = (linEMax-linEMin)*2.0/(linEMax+linEMin);
-			linTestN = (linNMax-linNMin)*2.0/(linNMax+linNMin);
+			linTestE = absDiff(linEMax,linEMin);
+			linTestN = absDiff(linNMax,linNMin);
 			lin_test.push_back(linTestE);
 			if (linTestN>linTestE) lin_test.back() = linTestN;
 			
 			//checking conservation of E
-			double ergTest = real(erg(1)-erg(NT-2));
-			ergTest = ergTest*2.0/(real(erg(1)+erg(NT-2)));
-			ergTest = abs(ergTest);
+			double ergTest = absDiff(abs(erg(1)),abs(erg(NT-2)));
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
@@ -974,10 +974,14 @@ auto ddVr = [&] (const comp & phi)
 			E_exact /= (double)linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
+			//testing imaginary part of energy
+			double imErgTest = 0.0;
+			for (unsigned int j=0; j<NT; j++) if (abs(erg(j))>DBL_MIN) imErgTest += imag(erg(j))/abs(erg(j));
+			imErgTest /= (double)NT;
+			imErg_test.push_back(imErgTest);
+			
 			//checking agreement between erg and linErg
-			double trueTest = E - E_exact;
-			trueTest = trueTest*2.0/(E + E_exact);
-			trueTest = abs(trueTest);
+			double trueTest = absDiff(E,E_exact);
 			true_test.push_back(trueTest);
 			
 			//checking lattice small enough for E, should have parameter for this
@@ -1107,6 +1111,9 @@ auto ddVr = [&] (const comp & phi)
 
 		//checking energy conserved
 		if (erg_test.back()>closenessE) cout << endl << "ergTest = " << erg_test.back() << endl;
+		
+		//checking energy real
+		if (imErg_test.back()>closenessIE) cout << endl << "imErg = "<< imErg_test.back()  << endl;
 		
 		//checking lattice small enough
 		if (mom_test.back()>closenessP) cout << endl << "momTest = "<< mom_test.back()  << endl;

@@ -1,0 +1,4 @@
+it is worth writing overloaded print and plot functions for vectors with a struct or something for options as there is too much faff at the moment about printing and plotting.
+this can be written in a header and .cc file and compiled separately.
+they should reduce the number of points for large vectors.
+may want to pass simpleTime and simpleSpace functions

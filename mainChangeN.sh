@@ -39,8 +39,9 @@ for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
 	let N=120
-	let Na=320+j*20
-	let Nb=100
+	let Nb=80+j*10
+	temp=$(echo "scale=0; $Nb*4.5" | bc)
+	let Na=${temp%.*}
 	let Nc=2
 	./changeInputs N $N
 	./changeInputs Na $Na
@@ -62,11 +63,13 @@ for j in `seq 0 $loops`
 	if [ "$?" = "0" ]; then
 		echo "pi3 output:" >> $FILE
 		echo "" >> $FILE
-		./pi3 -tn $TIMENUMBER -test 1 >> $FILE
+		./pi3 -tn $TIMENUMBER -tunnel 1 >> $FILE
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
+			./pi3 -tn $TIMENUMBER -tunnel 0 >> $FILE
+			echo "" >> $FILE
+			./pi3 -tn $TIMENUMBER -linearization 1 >> $FILE
 			echo "" >> $FILE
 			./changeInputs -f mainInputs -n minFileNo -v $TIMENUMBER
 			./changeInputs -f mainInputs -n maxFileNo -v $TIMENUMBER

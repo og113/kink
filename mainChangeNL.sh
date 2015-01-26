@@ -2,32 +2,20 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/23.01.15_L_5.0_3.0_Tb_0.8.txt"
-SUMMARY="results/23.01.15_summary.txt"
+FILE="results/26.01.15_NL_output.txt"
+SUMMARY="results/26.01.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-echo "output from mainChangeL.sh" > $FILE
-echo "" >> $FILE
-echo "output from mainChangeL.sh" >> $SUMMARY
-echo "" >> $SUMMARY
-printf '%-10s %-10s \n' "L" "S/F" >> $SUMMARY
+#echo "output from mainChangeNL.sh" > $FILE
+#echo "" >> $FILE
+#echo "output from mainChangeNL.sh" >> $SUMMARY
+#echo "" >> $SUMMARY
+#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
 
-Tb=0.8
-loops=0
-./changeInputs -f mainInputs -n maxFileNo -v $loops
-./changeInputs -f mainInputs -n minFileNo -v 0
-
-for j in `seq 0 $loops`
-	do
-	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	L=$(echo "scale=2; -0.5*$j+5.0" | bc)
-	LoR=$(echo "scale=3; $L/10.0" | bc)
-	echo "L =" $L >> $FILE
-	echo "" >> $FILE
-	./changeInputs LoR $LoR
+function getEigenvectors {
 	echo "./sphaleron" >> $FILE
 	echo "" >> $FILE
-	./sphaleron -r1 $L >> $FILE
+	./sphaleron -r1 $1 >> $FILE #1st argument is L
 	cp data/sphaleron.dat data/stable/sphaleron.dat
 	cp data/D1.dat ../mpi/data/D1.dat
 	cp data/D2.dat ../mpi/data/D2.dat
@@ -36,6 +24,36 @@ for j in `seq 0 $loops`
 	./mx "D"
 	./mx "V0 = V(:,1);"
 	./mx "printVector(V0,'../kink/data/stable/sphaleronEigVec.dat');"
+}
+
+function changeParameter {
+	./changeInputs $1 $2
+	echo $1 " = " $2 >> $FILE
+}
+
+Tb=0.8
+changeParameter Tb $Tb
+loops=3
+
+for j in `seq 0 $loops`
+	do
+	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
+	let N=130+j*10
+	let Nb=80
+	temp=$(echo "scale=0; $Nb*4.5" | bc)
+	let Na=${temp%.*}
+	let Nc=2
+	Ta=$(echo "scale=3; $Na*$Tb/($Nb-1.0)" | bc)
+	L=$(echo "scale=3; $Ta*1.1+2.0" | bc)
+	LoR=$(echo "scale=3; $L/10.0" | bc)
+	changeParameter "N" $N
+	changeParameter "Na" $Na
+	changeParameter "Nb" $Nb
+	changeParameter "Nc" $Nc
+	./changeInputs LoR $LoR
+	echo "L =" $L >> $FILE
+	echo "" >> $FILE
+	getEigenvectors $L
 	AMP=0.5
 	echo "./sphaleron4" >> $FILE
 	echo "" >> $FILE
@@ -51,6 +69,8 @@ for j in `seq 0 $loops`
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
+			./pi3 -tn $TIMENUMBER -linearization 1 >> $FILE
+			echo "" >> $FILE
 			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
 			echo "" >> $FILE
 			./changeInputs -f mainInputs -n minFileNo -v $TIMENUMBER
@@ -58,20 +78,20 @@ for j in `seq 0 $loops`
 			echo "#################################################################################################" >> $FILE
 			./main >> $FILE
 			if [ "$?" = "0" ]; then
-				printf '%-10s %-10s \n' $L "S" >> $SUMMARY
+				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta "S" >> $SUMMARY
 			else
-				printf '%-10s %-10s \n' $L "FM" >> $SUMMARY
+				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta "FM" >> $SUMMARY
 			fi
 			echo "#################################################################################################" >> $FILE
 		else
 			echo "solution didn't tunnel" >> $FILE
 			echo "" >> $FILE
-			printf '%-10s %-10s \n' $L "FT" >> $SUMMARY
+			printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta "FT" >> $SUMMARY
 		fi
 	else
 		echo pi failed, value returned is $? >> $FILE
 		echo "" >> $FILE
-		printf '%-10s %-10s \n' $L "FP" >> $SUMMARY
+		printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta "FP" >> $SUMMARY
 	fi
 	echo "" >> $FILE
 	done

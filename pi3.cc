@@ -45,7 +45,7 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
-bool testTunnel = false;
+bool testTunnel = false, testLinear = false;
 
 /* ---------------------------------------------------------------------------------------------
 user inputs
@@ -64,6 +64,7 @@ else if (argc % 2 && argc>1) {
 		else if (id.compare("r1")==0) timeNumberIn = stringToNumber<double>(argv[2*j+2]);
 		else if (id.compare("loop")==0 || id.compare("l")==0) loopIn = argv[2*j+2];
 		else if (id.compare("test")==0 || id.compare("tunnel")==0 || id.compare("tt")==0) testTunnel = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("linearization")==0 || id.compare("lin")==0) testLinear = (bool)atoi(argv[2*j+2]);
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -82,7 +83,13 @@ else {
 }
 
 timeNumber = timeNumberIn;
-if (testTunnel) cout << "pi3 testing if tunnelled" << endl;
+if (testTunnel) {
+	cout << "pi3 testing if tunnelled" << endl;
+}
+if (testLinear) {
+	testTunnel = false;
+	cout << "pi3 testing linearization" << endl;
+}
 
 /* ---------------------------------------------------------------------------------------------
 getting parameters from specific inputs
@@ -165,9 +172,15 @@ double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA;
 uint j=0;
 while(j<2) {
 
-	if (testTunnel) {
+	if (testLinear) {
 		Nt = 10*N;
 		j=1;
+		direction = -1;
+	}
+	else if (testTunnel) {
+		Nt = 10*N;
+		j=1;
+		direction = 1;
 	}
 	else if (j==0) {
 		Nt = Nc;
@@ -178,8 +191,8 @@ while(j<2) {
 		direction = -1;
 	}
 	
-	vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1)), linErgField(Nt+1);
-	vec nonLinErg(Nt+1), erg(Nt+1);
+	vec phi((Nt+1)*(N+1)), vel((Nt+1)*(N+1)), acc((Nt+1)*(N+1));
+	vec nonLinErg(Nt+1), linErgField(Nt+1), erg(Nt+1);
 	linErgField = Eigen::VectorXd::Zero(Nt+1);
 	nonLinErg = Eigen::VectorXd::Zero(Nt+1);
 	erg = Eigen::VectorXd::Zero(Nt+1);
@@ -299,8 +312,8 @@ while(j<2) {
 		ergA = erg(Nt-1);
 		nonLinErgA = nonLinErg(Nt-1);
 		linErgFieldA = linErgField(Nt-1);
-		if (testTunnel) {
-			linearizationA(Nt+1);
+		if (testLinear) {
+			linearizationA = Eigen::VectorXd::Zero(Nt+1);
 			for (unsigned int k=0; k<(Nt+1); k++) linearizationA(k) = absDiff(erg(k),linErgField(k));
 		}
 	}
@@ -308,7 +321,13 @@ while(j<2) {
 		
 } // end of while j<2 loop
 
-if (!testTunnel) {	
+
+if (testLinear) {
+	string linearizationFile = "data/" + timeNumber + "linearization.dat";
+	simplePrintVector(linearizationFile,linearizationA);
+	printf("linearization printed:  %39s\n",linearizationFile.c_str());
+}
+else if (!testTunnel) {	
 	vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);
 	for (unsigned int t=0;t<(Nain+Nbin+Ncin);t++)
 		{
@@ -360,10 +379,7 @@ if (!testTunnel) {
 	printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
 }
 else {
-	string linearizationFile = "data/" + timeNumber + "linearization.dat";
-	simplePrintVector(linearizationFile,linearizationA);
 	printf("Input:                  %39s\n",filename.c_str());
-	printf("linearization printed:  %39s\n",linearizationFile.c_str());
 	}
 
 printf("erg(0) = %8.4f\n",ergA);

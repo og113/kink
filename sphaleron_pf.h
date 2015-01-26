@@ -162,11 +162,6 @@ double absolute (const double& amplitude)
 	return abs_amplitude;
 	}
 	
-//gives absolute measure of difference between two numbers
-double absDiff (const double& numA, const double& numB) {
-	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
-}
-	
 //to convert number to string, usage is string str = NumberToString<number type>(x);
 template <typename T>
 string numberToString ( T Number ){
