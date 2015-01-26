@@ -23,7 +23,9 @@ typedef Eigen::VectorXd vec;
 struct holding print options
 -------------------------------------------------------------------------------------------------------------------------*/
 struct PrintOptions {
-	
+	bool complex;
+	uint Nt;
+	uint Nx;
 };
 /*-------------------------------------------------------------------------------------------------------------------------
 error handling for print functions

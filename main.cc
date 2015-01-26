@@ -949,7 +949,7 @@ auto ddVr = [&] (const comp & phi)
 			double linTestE;	double linTestN;
 			double linEMax = 0.0;	double linEMin = 5.0e15; //surely it's going to be less than this
 			double linNMax = 0.0;	double linNMin = 5.0e15;
-			unsigned int linearInt = (int)(Na/3);
+			unsigned int linearInt = (unsigned int)(Na/10);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
 				if (abs(linErg(j))>linEMax) linEMax = abs(linErg(j));
@@ -970,7 +970,7 @@ auto ddVr = [&] (const comp & phi)
 			E = linErg(0);
 			Num =linNum(0);
 			E_exact = 0;
-			for (unsigned int j=0; j<linearInt; j++) E_exact += real(erg(j));
+			for (unsigned int j=1; j<(linearInt+1); j++) E_exact += real(erg(j));
 			E_exact /= (double)linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);
 			
@@ -983,6 +983,7 @@ auto ddVr = [&] (const comp & phi)
 			//checking agreement between erg and linErg
 			double trueTest = absDiff(E,E_exact);
 			true_test.push_back(trueTest);
+			if (!isfinite(trueTest)) cout << "E = " << E << ", E_exact = " << E_exact << ", linearInt = " << linearInt << endl;
 			
 			//checking lattice small enough for E, should have parameter for this
 			double momTest = E*b/Num*pi; //perhaps should have a not b here

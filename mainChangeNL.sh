@@ -33,7 +33,7 @@ function changeParameter {
 
 Tb=0.8
 changeParameter Tb $Tb
-loops=3
+loops=0
 
 for j in `seq 0 $loops`
 	do

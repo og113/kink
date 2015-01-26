@@ -2,3 +2,5 @@ some thoughts about programs:
 	- one reason main.cc isn't working (and also maybe why pi.cc has stopped working) may be that the eigVecs etc are being loaded and printed wrongly, i.e. the wrong column is being loaded. that would explain why minusDS<<1 while delta~1.
 	- a longer term solution would be to write massively overloaded print and load functions which are sufficiently general to work in all the circumstances. perhaps a struct containing options could be used.
 	- it may be a good idea to write a map class with a map between strings and numbers (or void* or something). perhaps use std::map or perhaps invent a new one. this could be used to load argv and to construct the parameter bag.
+
+	probably worth having some kind of checks class with closeness and a check function with a message to print.

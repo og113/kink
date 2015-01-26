@@ -73,6 +73,7 @@ double closenessL; //linearisation of energy
 double closenessT; //true energy versus linear energy
 double closenessP; //checking lattice small enough for momenta
 double closenessR; //regularization
+double closenessIE; //imaginary part of the energy
 
 //parameters determining input phi
 //struct to hold answers to questions
