@@ -2,15 +2,15 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/26.01.15_NL_output.txt"
-SUMMARY="results/26.01.15_summary.txt"
+FILE="results/27.01.15_NL_output.txt"
+SUMMARY="results/27.01.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-#echo "output from mainChangeNL.sh" > $FILE
-#echo "" >> $FILE
-#echo "output from mainChangeNL.sh" >> $SUMMARY
-#echo "" >> $SUMMARY
-#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
+echo "output from mainChangeNL.sh" > $FILE
+echo "" >> $FILE
+echo "output from mainChangeNL.sh" >> $SUMMARY
+echo "" >> $SUMMARY
+printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
 
 function getEigenvectors {
 	echo "./sphaleron" >> $FILE
@@ -44,7 +44,7 @@ for j in `seq 0 $loops`
 	let Na=${temp%.*}
 	let Nc=2
 	Ta=$(echo "scale=3; $Na*$Tb/($Nb-1.0)" | bc)
-	L=$(echo "scale=3; $Ta*1.1+2.0" | bc)
+	L=$(echo "scale=3; $Ta*1.1+3.0" | bc)
 	LoR=$(echo "scale=3; $L/10.0" | bc)
 	changeParameter "N" $N
 	changeParameter "Na" $Na

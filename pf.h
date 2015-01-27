@@ -24,6 +24,7 @@
 
 using namespace std;
 
+typedef unsigned int uint;
 typedef unsigned long int lint;
 typedef complex<double> comp;
 typedef vector<unsigned int> intVec;
@@ -577,27 +578,27 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 	}
 	
 //simple time
-comp simpleTime (const unsigned int& time)
+comp simpleTime (const unsigned int& time, const unsigned int& the_Na=Na, const unsigned int& the_Nb=Nb, const unsigned int& the_Nc=Nc, const double& the_Tb = Tb, const double& the_b=b)
 	{
 	comp xTime;
-	if ( time < Na)
+	if ( time < the_Na)
 		{
 		double temp = (double)time;
-		temp -= (double)Na;
-		xTime = b*temp + i*Tb;
+		temp -= (double)the_Na;
+		xTime = the_b*temp + i*the_Tb;
 		}
-	else if (time < (Na+Nb))
+	else if (time < (the_Na+the_Nb))
 		{
 		double temp = (double)time;
-		temp -= Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
-		xTime = i*Tb - i*b*temp;
+		temp -= the_Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
+		xTime = i*the_Tb - i*the_b*temp;
 		}
 	else
 		{
 		double temp = (double)time;
-		temp -= (double)Na;
-		temp -= (double)Nb;
-		xTime = b*(temp+1.0); //the 1.0 is because the corner is part of the vertical contour
+		temp -= (double)the_Na;
+		temp -= (double)the_Nb;
+		xTime = the_b*(temp+1.0); //the 1.0 is because the corner is part of the vertical contour
 		}
 	return xTime;
 	}
@@ -606,16 +607,16 @@ comp simpleTime (const unsigned int& time)
 double (*simpleSpace) (const unsigned int& space);	
 
 //simple space for a box
-double simpleSpaceBox (const unsigned int& space)
+double simpleSpaceBox (const unsigned int& space, const double& the-L, const double& the_a=a)
 	{
-	double xSpace = -L/2.0 + space*a;
+	double xSpace = -L/2.0 + space*the_a;
 	return xSpace;
 	}
 	
 //simple space for a sphere
 double simpleSpaceSphere (const unsigned int& space)
 	{
-	double xSpace = space*a;
+	double xSpace = space*the_a;
 	return xSpace;
 	}
 	
@@ -806,7 +807,7 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 	unsigned int x_new, t_new, x_old, t_old;
 	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
 	unsigned int pos;
-	
+	int neigh_t, neigh_x, neigh_tx;	
 	
 	for (unsigned int l=0;l<N_new*Nt_new;l++)
 		{
@@ -821,38 +822,40 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 		rem_x_old = exact_x_old;
 		rem_x_old -= (double)(x_old);
 		pos = t_old + Nt_old*x_old;
+		neigh_t = neigh(pos,0,1,Nt_old,N_old);
+		neigh_x = neigh(pos,1,1,Nt_old,N_old);
+		neigh_tx = neigh(neigh_t,1,1,Nt_old,N_old);
 		if  (t_old<(Nt_old-1) )
 			{
-			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+			if (neigh_t!=-1 && neigh_x)
 				{
 				vec_new(2*l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos) \
-							+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)) \
-							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)) \
-							+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1));
+							+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh_x) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*neigh_t) \
+							+ rem_t_old*rem_x_old*vec_old(2*neigh_tx);
 				vec_new(2*l+1) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(2*pos+1)\
-			 				+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1) \
-							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*(pos+1)+1)\
-						 	+ rem_t_old*rem_x_old*vec_old(2*(neigh(pos,1,1,Nt_old,N_old)+1)+1);
+			 				+ (1.0-rem_t_old)*rem_x_old*vec_old(2*neigh_x+1) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(2*neigh_t+1)\
+						 	+ rem_t_old*rem_x_old*vec_old(2*neigh_tx+1);
 				}
-			else
+			else if (neigh_t!=-1)
 				{
 				vec_new(2*l) = (1.0-rem_t_old)*vec_old(2*pos) \
-							+ rem_t_old*vec_old(2*(pos+1));
+							+ rem_t_old*vec_old(2*neigh_t);
 				vec_new(2*l+1) = (1.0-rem_t_old)*vec_old(2*pos+1)\
-							+ rem_t_old*vec_old(2*(pos+1)+1);
+							+ rem_t_old*vec_old(2*neigh_t+1);
 				}
-			}
-		else
-			{
-			if (neigh(pos,1,1,Nt_old,N_old)!=-1)
+			else if(neigh_x!=-1)
 				{
-				vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old));
-				vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1) + rem_x_old*vec_old(2*neigh(pos,1,1,Nt_old,N_old)+1);
+				vec_new(2*l) = (1.0-rem_x_old)*vec_old(2*pos) \
+							+ rem_x_old*vec_old(2*neigh_x);
+				vec_new(2*l+1) = (1.0-rem_x_old)*vec_old(2*pos+1)\
+							+ rem_x_old*vec_old(2*neigh_x+1);
 				}
 			else
 				{
 				vec_new(2*l) = vec_old(2*pos);
-				vec_new(2*l+1) = vec_old(2*pos+1);
+				vec_new(2*l+1) = vec_old(2*pos+1);				
 				}
 			}
 		}
@@ -863,15 +866,16 @@ vec interpolate(vec vec_old, const unsigned int & Nt_old, const unsigned int & N
 	return vec_new;
 	}
 	
-vec interpolate2(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
+//interpolate real vector function
+vec interpolateReal(vec vec_old, const unsigned int & Nt_old, const unsigned int & N_old, const unsigned int & Nt_new, const unsigned int & N_new)
 	{
 	unsigned int old_size = vec_old.size();
 	if (old_size<N_old*Nt_old) {cout << "interpolate error, vec_old.size() = " << old_size << " , N_old*Nt_old = " << N_old*Nt_old << endl;}
-	vec vec_new (N_new*Nt_new);
-	
+	vec vec_new(N_old*Nt_old);
 	unsigned int x_new, t_new, x_old, t_old;
 	double exact_x_old, exact_t_old, rem_x_old, rem_t_old;
-	unsigned int pos;	
+	unsigned int pos;
+	int neigh_t, neigh_x, neigh_tx;	
 	
 	for (unsigned int l=0;l<N_new*Nt_new;l++)
 		{
@@ -886,20 +890,32 @@ vec interpolate2(vec vec_old, const unsigned int & Nt_old, const unsigned int & 
 		rem_x_old = exact_x_old;
 		rem_x_old -= (double)(x_old);
 		pos = t_old + Nt_old*x_old;
-		if  (t_old<(Nt_old-1) && x_old<(N_old-1))
+		neigh_t = neigh(pos,0,1,Nt_old,N_old);
+		neigh_x = neigh(pos,1,1,Nt_old,N_old);
+		neigh_tx = neigh(neigh_t,1,1,Nt_old,N_old);
+		if  (t_old<(Nt_old-1) )
 			{
-			vec_new(l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(pos) \
-							+ (1.0-rem_t_old)*rem_x_old*vec_old(pos+Nt_old) \
-							+ rem_t_old*(1.0-rem_x_old)*vec_old(pos+1) \
-							+ rem_t_old*rem_x_old*vec_old(pos+Nt_old+1);
-			}
-		else if (x_old<(N_old-1))
-			{
-			vec_new(l) = (1.0-rem_x_old)*vec_old(pos) + rem_x_old*vec_old(pos+Nt_old);
-			}
-		else
-			{
-			vec_new(l) = vec_old(pos);
+			if (neigh_x!=-1 && neigh_t!=-1)
+				{
+				vec_new(l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(pos) \
+							+ (1.0-rem_t_old)*rem_x_old*vec_old(neigh_x) \
+							+ rem_t_old*(1.0-rem_x_old)*vec_old(neigh_t) \
+							+ rem_t_old*rem_x_old*vec_old(neigh(neigh_tx);
+				}
+			else if (neigh_t!=-1)
+				{
+				vec_new(l) = (1.0-rem_t_old)*vec_old(pos) \
+							+ rem_t_old*vec_old(neigh_t);
+				}
+			else if (neigh_x!=-1)
+				{
+				vec_new(l) = (1.0-rem_x_old)*vec_old(pos) \
+							+ rem_x_old*vec_old(neigh_x);
+				}
+			else
+				{
+				vec_new(l) = vec_old(pos);
+				}
 			}
 		}
 	return vec_new;
@@ -1049,6 +1065,46 @@ void printVector (const string& printFile, vec vecToPrint)
 		for (unsigned int j=0; j<(vecToPrint.size()-2*N*NT);j++)
 			{
 			F << setw(25) << vecToPrint(2*N*NT+j) << endl;
+			}
+		}
+	F.close();
+	}
+	
+//print vector to file with maximum size 300 by 300
+void printReducedVector (const string& printFile, vec vecToPrint)
+	{
+	uint Nx = 100, Nt = 100;
+	vec reducedVec = interpolate(vecToPrint,NT,N,Nt,Nx);
+	ofstream F;
+	F.open((printFile).c_str());
+	uint x0 = intCoord(0,1,Nt);
+	F.precision(16);
+	for (unsigned long int j=0; j<Nx*Nt; j++)
+		{
+		unsigned int x = intCoord(j,1,Nt);
+		if (x!=x0) //this is put in for gnuplot
+			{
+			F << endl;
+			x0 = x;
+			}
+		F << left;
+		F << setw(25) << real(coord(j,0)) << setw(25) << imag(coord(j,0)); //note using coord for full time contour
+		F << setw(25) << real(coord(j,1));
+		if (vecToPrint.size()>Nx*Nt)
+			{
+			F << setw(25) << vecToPrint(2*j) << setw(25) << vecToPrint(2*j+1)  << endl;
+			}
+		else
+			{
+			F << setw(25) << vecToPrint(j) << endl;
+			}
+		}
+	if (vecToPrint.size()>2*Nx*Nt)
+		{
+		F << endl;
+		for (unsigned int j=0; j<(vecToPrint.size()-2*Nx*Nt);j++)
+			{
+			F << setw(25) << vecToPrint(2*Nx*NTt+j) << endl;
 			}
 		}
 	F.close();
