@@ -2,15 +2,15 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/27.01.15_NL_output.txt"
-SUMMARY="results/27.01.15_summary.txt"
+FILE="results/6.02.15_NL_output.txt"
+SUMMARY="results/6.02.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-echo "output from mainChangeNL.sh" > $FILE
+echo "output from mainChangeNL.sh" >> $FILE
 echo "" >> $FILE
-echo "output from mainChangeNL.sh" >> $SUMMARY
-echo "" >> $SUMMARY
-printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
+#echo "output from mainChangeNL.sh" > $SUMMARY
+#echo "" >> $SUMMARY
+#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
 
 function getEigenvectors {
 	echo "./sphaleron" >> $FILE
@@ -31,20 +31,19 @@ function changeParameter {
 	echo $1 " = " $2 >> $FILE
 }
 
-Tb=0.8
+Tb=0.80
 changeParameter Tb $Tb
 loops=0
 
 for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	let N=130+j*10
+	let N=150
 	let Nb=80
-	temp=$(echo "scale=0; $Nb*4.5" | bc)
-	let Na=${temp%.*}
-	let Nc=2
+	let Na=300
+	let Nc=4
 	Ta=$(echo "scale=3; $Na*$Tb/($Nb-1.0)" | bc)
-	L=$(echo "scale=3; $Ta*1.1+3.0" | bc)
+	L=$(echo "scale=3; 4" | bc)
 	LoR=$(echo "scale=3; $L/10.0" | bc)
 	changeParameter "N" $N
 	changeParameter "Na" $Na

@@ -332,7 +332,8 @@ b = Tb/(Nb-1.0);
 if (a>pow(mass2,0.5) || b>pow(mass2,0.5)) {cout << endl << "a = " << a << " , b = " << b << endl << endl;}
 Ta = b*Na;
 Tc = b*Nc;
-double ergZero = N*a*Vd(minima[0],&paramsV);
+double ergZero = 0.0;
+if (pot[0]!='3') ergZero = N*a*Vd(minima[0],&paramsV);
 
 //determining number of runs
 closenessA = 1.0;
@@ -433,16 +434,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			{
 			for (unsigned int l=0; l<N; l++)
 				{
-				double djdk;
-				if (pot[0]=='3')
-					{
-					double rj = r0 + j*a, rk = r0 + k*a;
-					djdk = 4.0*pi*rj*rk*a;			
-					}
-				else
-					{
-					djdk=a;
-					}
+				double djdk = a;
 				if (j==0 || j==(N-1) || k==0 || k==(N-1)) {djdk/=2.0;}
 				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
@@ -460,7 +452,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			vec temp2Phi;
 			unsigned int length = tempPhi.size();
 			length = (unsigned int)(sqrt(length));
-			temp2Phi = interpolate2(tempPhi,length,length,Nb,N);
+			temp2Phi = interpolateReal(tempPhi,length,length,Nb,N);
 			for (unsigned int j=0; j<N*Nb; j++)
 				{
 				p[2*j] = temp2Phi[j];
@@ -672,7 +664,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			double potTest = pow(pow(real(Vcontrol-Vtrial),2.0) + pow(imag(Vcontrol-Vtrial),2.0),0.5);
 			cout << "potTest = " << potTest << endl;
 			}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//assigning values to minusDS and DDS and evaluating action
@@ -792,11 +783,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	            DDS.insert(2*j+1,2*j+1) = real(-temp2 + temp0);
 	            }
             }
+        action = kineticT - kineticS - pot_0 - pot_r;
         if (pot[0]=='3') {
         	DDS.insert(2*N*Nb,2*N*Nb) = 1.0;
         	dtTest /= (double)(Nb-1.0);
+        	action *= 4.0*pi;
         }
-        action = kineticT - kineticS - pot_0 - pot_r;
+        
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//printing early if desired
@@ -979,14 +972,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
             		-dV(ap(m)) - dVr(ap(m));
-            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
-            		+ a*V(ap(m)) + a*Vr(ap(m));
+            	erg(Na-t) += a*pow(ap(m-1),2.0)/pow((-dtau),2.0)/2.0;
 				}
 			else
 				{
 		    	accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
             		-dV(ap(m)) - dVr(ap(m));
-            	erg (Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow((-dtau),2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+            	erg(Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow(-dtau,2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
             		+ a*V(ap(m)) + a*Vr(ap(m));
 		        }
             for (unsigned int y=0; y<N; y++)
@@ -1014,6 +1006,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//	E += real(erg(j));
 	//	}
 	//E /= linearInt;
+	if (pot[0]=='3') {
+		linErgA *= 4.0*pi;
+		linNumA *= 4.0*pi;
+		erg *= 4.0*pi;
+	}
 	E = linErgA(0);
 	W = - E*2.0*Tb + 2.0*imag(action);
 
@@ -1071,12 +1068,13 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		    									-dV(ccp(l));
 			else 							accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N)) \
 												+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-dV(ccp(l));		    	
-		    if ((t>1) && x!=(N-1))
+		    if (pot[0]=='3' && t>1 && x!=(N-1) && x!=0)
 		    	{
 				erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\
 				 	+ pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
 	    			+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
+		    else if (pot[0]=='3' && t>1 && x==0) erg (Na+Nb-2+t) += pow(ccp(neigh(l-1,1,1,Nc+1,N)),2.0)/a/2.0;
 			}
 		}
 		

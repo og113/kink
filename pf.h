@@ -607,16 +607,16 @@ comp simpleTime (const unsigned int& time, const unsigned int& the_Na=Na, const 
 double (*simpleSpace) (const unsigned int& space);	
 
 //simple space for a box
-double simpleSpaceBox (const unsigned int& space, const double& the-L, const double& the_a=a)
+double simpleSpaceBox (const unsigned int& space)
 	{
-	double xSpace = -L/2.0 + space*the_a;
+	double xSpace = -L/2.0 + space*a;
 	return xSpace;
 	}
 	
 //simple space for a sphere
 double simpleSpaceSphere (const unsigned int& space)
 	{
-	double xSpace = space*the_a;
+	double xSpace = space*a;
 	return xSpace;
 	}
 	
@@ -900,7 +900,7 @@ vec interpolateReal(vec vec_old, const unsigned int & Nt_old, const unsigned int
 				vec_new(l) = (1.0-rem_t_old)*(1.0-rem_x_old)*vec_old(pos) \
 							+ (1.0-rem_t_old)*rem_x_old*vec_old(neigh_x) \
 							+ rem_t_old*(1.0-rem_x_old)*vec_old(neigh_t) \
-							+ rem_t_old*rem_x_old*vec_old(neigh(neigh_tx);
+							+ rem_t_old*rem_x_old*vec_old(neigh_tx);
 				}
 			else if (neigh_t!=-1)
 				{
@@ -974,7 +974,7 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << j << setw(25) << vecToPrint(j) << endl;
+		F << setw(25) << vecToPrint(j) << endl;
 		}
 	F.close();
 	}
@@ -989,7 +989,7 @@ void simplePrintCVector(const string& printFile, cVec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << j << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
+		F << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
 		}
 	F.close();
 	}
@@ -1104,7 +1104,7 @@ void printReducedVector (const string& printFile, vec vecToPrint)
 		F << endl;
 		for (unsigned int j=0; j<(vecToPrint.size()-2*Nx*Nt);j++)
 			{
-			F << setw(25) << vecToPrint(2*Nx*NTt+j) << endl;
+			F << setw(25) << vecToPrint(2*Nx*NT+j) << endl;
 			}
 		}
 	F.close();
