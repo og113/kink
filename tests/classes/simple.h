@@ -13,4 +13,6 @@ string numberToString ( T Number );
 template <class T>
 T stringToNumber ( const string& Text );
 
+double absDiff (const double& numA, const double& numB);
+
 #endif // __SIMPLE_H_INCLUDED__

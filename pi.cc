@@ -193,7 +193,7 @@ string print_choice = aq.printChoice;
 		{
 		mass2 = 1.0;
 		minima[0] = 0.0; //only one minimum
-		R = 1.0; alpha = 0.0; //not used
+		R = 10.0; alpha = 0.0; //not used
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -460,7 +460,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			vec temp2Phi;
 			unsigned int length = tempPhi.size();
 			length = (unsigned int)(sqrt(length));
-			temp2Phi = interpolate2(tempPhi,length,length,Nb,N);
+			temp2Phi = interpolateReal(tempPhi,length,length,Nb,N);
 			for (unsigned int j=0; j<N*Nb; j++)
 				{
 				p[2*j] = temp2Phi[j];
