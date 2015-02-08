@@ -346,7 +346,8 @@ vector<double> minima0(2);
 	if (a>0.5*pow(mass2,0.5) || b>0.5*pow(mass2,0.5)) {cerr << endl << "a = " << a << " , b = " << b << endl << endl;}
 	Ta = b*Na;
 	Tc = b*Nc;
-	double ergZero = N*a*Vd(minima[0],&paramsV);
+	double ergZero = 0.0;
+	if (pot[0]!='3') ergZero = N*a*Vd(minima[0],&paramsV);
 	
 	//determining number of runs
 	closenessA = 1.0;
@@ -400,13 +401,7 @@ auto ddVr = [&] (const comp & phi)
 			{
 			for (unsigned int l=0; l<N; l++)
 				{
-				double djdk;
-				if (pot[0]=='3')
-					{
-					double rj = r0 + j*a, rk = r0 + k*a;
-					djdk = 4.0*pi*rj*rk*a;			
-					}
-				else djdk=a;
+				double djdk = a;
 				if (j==0 || j==(N-1) || k==0 || k==(N-1)) djdk/=2.0;
 				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
@@ -561,6 +556,20 @@ auto ddVr = [&] (const comp & phi)
 			p = loadVector(loadfile,NT,N,2);
 			printf("%12s%30s\n","input: ",loadfile.c_str());
 			}
+		
+		// killing boundary terms
+		if (pot[0]=='3')
+    	{
+		for (unsigned int j=0;j<NT;j++)
+			{
+			unsigned int l0 = c(j,0,NT);
+			unsigned int m = c(j,N-1,NT);
+			p(2*l0) = 0.0; // p=0 ar r=0
+			p(2*l0+1) = 0.0;
+		    p(2*m) = 0.0; //p=0 ar r=R
+		    p(2*m+1) = 0.0;
+			}
+		}
 			
 		//printing loop name and parameters
 		printf("%12s%12s\n","timeNumber: ",timeNumber.c_str());
@@ -780,6 +789,7 @@ auto ddVr = [&] (const comp & phi)
 					{
 					DDS.insert(2*j,2*j) = 1.0; // p=0 at r=0
 					DDS.insert(2*j+1,2*j+1) = 1.0;
+					if (t>(NT-1)) erg(t) += a*pow(Cp(neighPosX),2.0)/pow(dt,2.0)/2.0;
 					}			
 				else if (t==(NT-1))
 					{
@@ -933,7 +943,13 @@ auto ddVr = [&] (const comp & phi)
 		            }
 		        }
 		    if (pot[0]=='3') DDS.insert(2*N*NT,2*N*NT) = 1.0;
-		    action = kineticT - kineticS - potV - pot_r;   
+		    action = kineticT - kineticS - potV - pot_r;
+		    if (pot[0]=='3') {
+		    	linErg *= 4.0*pi;
+		    	linNum *= 4.0*pi;
+		    	action *= 4.0*pi;
+		    	erg *= 4.0*pi;
+		    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
@@ -969,7 +985,7 @@ auto ddVr = [&] (const comp & phi)
 			//defining E, Num and cW
 			E = linErg(0);
 			Num =linNum(0);
-			E_exact = 0;
+			E_exact = 0.0;
 			for (unsigned int j=1; j<(linearInt+1); j++) E_exact += real(erg(j));
 			E_exact /= (double)linearInt;
 			W = - E*2.0*Tb - theta*Num - bound + 2.0*imag(action);

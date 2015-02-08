@@ -15,7 +15,7 @@ set xtic auto
 set ytic auto
 set title "re(phi)"
 set xlabel "x"
-set ylabel "re(t)-im(t)"
+set ylabel "im(t)-re(t)"
 set zlabel "re(phi)"
 set grid
 set hidden3d

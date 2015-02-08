@@ -45,7 +45,9 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
-bool testTunnel = false, testLinear = false;
+bool testTunnel = false, testLinear = false, changeNa = false;
+double closenessLin = 0.01;
+double linPoint = 0.0;
 
 /* ---------------------------------------------------------------------------------------------
 user inputs
@@ -65,6 +67,8 @@ else if (argc % 2 && argc>1) {
 		else if (id.compare("loop")==0 || id.compare("l")==0) loopIn = argv[2*j+2];
 		else if (id.compare("test")==0 || id.compare("tunnel")==0 || id.compare("tt")==0) testTunnel = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("linearization")==0 || id.compare("lin")==0) testLinear = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("closeness")==0 || id.compare("close")==0) closenessLin = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("changeNa")==0) changeNa = (bool)atoi(argv[2*j+2]);
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -314,7 +318,15 @@ while(j<2) {
 		linErgFieldA = linErgField(Nt-1);
 		if (testLinear) {
 			linearizationA = Eigen::VectorXd::Zero(Nt+1);
-			for (unsigned int k=0; k<(Nt+1); k++) linearizationA(k) = absDiff(erg(k),linErgField(k));
+			bool nonLin = true;
+			for (unsigned int k=0; k<(Nt+1); k++) {
+				linearizationA(k) = absDiff(erg(k),linErgField(k));
+				if (linearizationA(k)>closenessLin) nonLin = true;
+				if (linearizationA(k)<closenessLin && nonLin) {
+					linPoint = k*dt;
+					nonLin = false;
+				}
+			}
 		}
 	}
 	j++;
@@ -323,9 +335,21 @@ while(j<2) {
 
 
 if (testLinear) {
+	vec tVec = Eigen::VectorXd::Zero(Nt+1);
+	for (unsigned int t=0;t<(Nt+1);t++){
+		tVec(t) = t*dt;
+		}
 	string linearizationFile = "data/" + timeNumber + "linearization.dat";
-	simplePrintVector(linearizationFile,linearizationA);
+	simplePrintVector(linearizationFile,tVec);
+	simpleAppendVector(linearizationFile,linearizationA);
+	int linNa = (int)linPoint/dtin;
 	printf("linearization printed:  %39s\n",linearizationFile.c_str());
+	printf("linearization to %6.4f after t = %6.4f\n",closenessLin,linPoint);
+	if (changeNa) {
+		printf("Na changed to = %6i\n",linNa);
+		changeInputs("data/temp","Na",numberToString<int>(linNa),inputsF);
+		copyFile("data/temp",inputsF);
+	}
 }
 else if (!testTunnel) {	
 	vec tVec((Nain+Nbin+Ncin)*Nin), rVec((Nain+Nbin+Ncin)*Nin);

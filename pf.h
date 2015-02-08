@@ -941,7 +941,7 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << j << setw(25) << vecToPrint(j) << endl;
+		F << setw(25) << vecToPrint(j) << endl;
 		}
 	F.close();
 	}
@@ -956,7 +956,7 @@ void simplePrintCVector(const string& printFile, cVec vecToPrint)
 	unsigned int length = vecToPrint.size();
 	for (unsigned int j=0; j<length; j++)
 		{
-		F << setw(25) << j << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
+		F << setw(25) << real(vecToPrint(j)) << setw(25) << imag(vecToPrint(j)) << endl;
 		}
 	F.close();
 	}

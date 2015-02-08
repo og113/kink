@@ -147,20 +147,10 @@ int jacPDE (double t, const double y[], double *dfdy, double dfdt[], void *param
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//gives absolute value of a number
-double absolute (const double& amplitude)
-	{
-	double abs_amplitude;
-	if (amplitude > 0)
-		{
-		abs_amplitude = amplitude;
-		}
-	else
-		{
-		abs_amplitude = -amplitude;
-		}
-	return abs_amplitude;
-	}
+//gives absolute measure of difference between two numbers
+double absDiff (const double& numA, const double& numB) {
+	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+}
 	
 //to convert number to string, usage is string str = NumberToString<number type>(x);
 template <typename T>
@@ -177,6 +167,35 @@ T stringToNumber ( const string &Text ){
 	T result;
 	return ss >> result ? result : 0;
 }
+
+//count non-empty lines of a file
+unsigned int countLines(const string & file_to_count)
+	{
+	ifstream fin;
+	fin.open(file_to_count.c_str());
+	string line;
+	unsigned int counter = 0;
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line.empty())
+			{
+			continue;
+			}
+		counter++;
+		}		
+	fin.close();
+    return counter;
+	}
+
+//copy a file
+void copyFile(const string & inputFile, const string & outputFile)
+	{
+	ifstream  src(inputFile.c_str(), ios::binary);
+	ofstream  dst(outputFile.c_str(), ios::binary);
+
+	dst << src.rdbuf();
+	}
 	
 //string to number
 
@@ -224,7 +243,7 @@ vector<double> vecMultiply(const vector<double> & vecA, const double alpha)
 void simplePrintVector(const string& printFile, vec vecToPrint)
 	{
 	fstream F;
-	F.open((printFile).c_str(), ios::out);
+	F.open((printFile).c_str(),ios::out);
 	F.precision(16);
 	F << left;
 	unsigned int length = vecToPrint.size();
@@ -234,6 +253,32 @@ void simplePrintVector(const string& printFile, vec vecToPrint)
 		}
 	F.close();
 	}
+
+//simple function to append a vector to file	
+void simpleAppendVector(const string& printFile, vec vecToAppend)
+	{
+	ifstream is;
+	is.open((printFile).c_str(),ios::in);
+	ofstream os;
+	os.open("data/temp",ios::out);
+	os.precision(16);
+	os << left;
+	unsigned int lengthOs = vecToAppend.size();
+	unsigned int lengthIs = countLines(printFile);
+	if (lengthOs!=lengthIs)
+		cerr << "simpleAppendVector error: length of vector("<< lengthOs << ") not equal to file length("<< lengthIs << ")" << endl;
+	else {
+		string lineIn;
+		for (unsigned int j=0; j<lengthOs; j++){
+		getline(is,lineIn);
+		os << lineIn << setw(25) << vecToAppend[j] << endl;
+		}
+	}
+	is.close();
+	os.close();
+	copyFile("data/temp",printFile);
+	}	
+
 	
 //simple function to print a vector to file	
 void simplePrintVector(const string& printFile, vector<double> vecToPrint)
@@ -356,26 +401,6 @@ mat loadMat (const string & loadFile, const unsigned int& rows, const unsigned i
 		}
 	F.close();
 	return matOut;
-	}
-	
-//count non-empty lines of a file
-unsigned int countLines(const string & file_to_count)
-	{
-	ifstream fin;
-	fin.open(file_to_count.c_str());
-	string line;
-	unsigned int counter = 0;
-	while(!fin.eof())
-		{
-		getline(fin,line);
-		if(line.empty())
-			{
-			continue;
-			}
-		counter++;
-		}		
-	fin.close();
-    return counter;
 	}
 	
 //load simple vector from file
@@ -655,4 +680,47 @@ const string currentDateTime()
     // for more information about date/time format
     strftime(buf, sizeof(buf), "%y%m%d%H%M%S", &tstruct);
     return buf;
+	}
+	
+//copy inputs with a change
+void changeInputs(string outputFile, string search, string replace, string inputFile = "inputs")
+	{
+	bool found = false;
+	search += " ";
+	ifstream fin;
+	ofstream fout;
+	fin.open(inputFile);
+	fout.open(outputFile.c_str());
+	if (!fin.good()) cerr << "changeInputs error: " << inputFile << " not opened properly." << endl;
+	if (!fout.good()) cerr << "changeInputs error: " << outputFile << " not opened properly." << endl;
+	string line;
+	size_t pos, posEnd, replaceLength = replace.length();
+	while(!fin.eof())
+		{
+		getline(fin,line);
+		if(line[0] == '#' && line[1] == '#')
+			{
+			fout << line << endl;
+			continue;
+			}
+		if (line[0] == '#')
+			{
+			pos = line.find(search);
+			fout << line << endl;
+			getline(fin,line);
+			if (pos != string::npos)
+				{
+				found = true;
+				posEnd = line.find(" ",pos);
+				if ((posEnd-pos)>replaceLength) {
+					for (unsigned int j=0; j<(posEnd-pos-replaceLength); j++) replace += " ";
+				}	
+				line.replace(pos, replace.length(), replace);
+				}
+			}
+		fout << line << endl;
+		}
+	fin.close();
+	fout.close();
+	if (!found) cerr << "changeInputs error: parameter " << search << "not found in " << inputFile << endl;
 	}
