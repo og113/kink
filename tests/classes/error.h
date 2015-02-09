@@ -9,7 +9,7 @@
 using namespace std;
 
 /*-------------------------------------------------------------------------------------------------------------------------
-error handling
+base class for error handling
 -------------------------------------------------------------------------------------------------------------------------*/
 
 class SimpleError {
@@ -19,5 +19,20 @@ public:
 };
 
 ostream& operator<<(ostream& s, const SimpleError& e);
+
+/*-------------------------------------------------------------------------------------------------------------------------
+file related errors
+-------------------------------------------------------------------------------------------------------------------------*/
+
+class FileError {
+public:
+	class StreamNotGood: public SimpleError{
+	public:
+		StreamNotGood(const string& s) : filename(s) {}		// constructor
+		virtual string		message() const;			// message to be passed for printing
+	private:
+		string	filename;
+	};
+};
 
 #endif // __ERROR_H_INCLUDED__

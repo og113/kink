@@ -62,6 +62,7 @@ double Ta;
 double Tc;
 vector<double> minima(2);
 double mass2; //as derived from V''
+double A; //gives parameter in V2, equal to 0.4 in DL
 
 //determining number of runs
 double closenessA; //action
@@ -93,10 +94,9 @@ struct aqStruct
 	unsigned int printRun;
 	};
 aqStruct aq; //struct to hold user responses
+double reg; //small parameter multiplying regulatory term
 string inP; //b for bubble, p for periodic instaton, f for from file
 string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
-double A; //gives parameter in V2, equal to 0.4 in DL
-double reg; //small parameter multiplying regulatory term
 string inF; //file input from where, m for main, p for pi
 int firstLoop, lastLoop; //first and last loop to load from, not unsigned for comparison later
 double alpha; //gives span over which tanh is used
@@ -118,10 +118,7 @@ double r0; //the minimum radius if pot[0]=='3'
 int factorial(const int& f_input)
 	{
 	int f_result = 1;
-	for (int l=0; l<f_input; l++)
-		{
-		f_result *= (l+1);
-		}
+	for (int l=0; l<f_input; l++) f_result *= (l+1);
 	return f_result;
 	}
 	
@@ -251,6 +248,7 @@ double brentMinimum (gsl_function * xF, const double & minimumGuess, const doubl
 	const gsl_min_fminimizer_type *T;
 	gsl_min_fminimizer *s;
 	double m = minimumGuess;
+	double tempLower, tempUpper;
 
 	T = gsl_min_fminimizer_brent;
 	s = gsl_min_fminimizer_alloc (T);
@@ -262,10 +260,10 @@ double brentMinimum (gsl_function * xF, const double & minimumGuess, const doubl
       status = gsl_min_fminimizer_iterate (s);
 
       m = gsl_min_fminimizer_x_minimum (s);
-      a = gsl_min_fminimizer_x_lower (s);
-      b = gsl_min_fminimizer_x_upper (s);
+      tempLower = gsl_min_fminimizer_x_lower (s);
+      tempUpper = gsl_min_fminimizer_x_upper (s);
 
-      status = gsl_min_test_interval (minimumLower, minimumUpper, 1.0e-7, DBL_MIN);
+      status = gsl_min_test_interval (tempLower, tempUpper, 1.0e-12, DBL_MIN);
 
       if (status == GSL_SUCCESS)
       	{
@@ -296,7 +294,8 @@ template <class T> T V1 (const T phi, void * parameters = &paramsV)
 	struct params_for_V * params = (struct params_for_V *)parameters;
 	double epsi = (params->epsi);
 	return pow(pow(phi,2)-1.0,2.0)/8.0 - epsi*(phi-1.0)/2.0;
-	}	
+	}
+
 comp V1c (const comp phi) { return V1(phi); }
 
 //Z, for V2
@@ -570,14 +569,8 @@ unsigned int intCoord(const unsigned int& locNum, const int& direction, const un
 	{
 	unsigned int XintCoord;
 	unsigned int x = floor(locNum/xNt);
-	if (direction==1)
-		{
-		XintCoord = x;
-		}
-	else
-		{
-		XintCoord = locNum - x*xNt;
-		}
+	if (direction==1) 	XintCoord = x;
+	else 				XintCoord = locNum - x*xNt;
 	return XintCoord;	
 	}
 	
@@ -608,37 +601,25 @@ comp simpleTime (const unsigned int& time, const unsigned int& the_Na=Na, const 
 	}
 	
 //simple space functions
-double (*simpleSpace) (const unsigned int& space);	
+double (*simpleSpace) (const unsigned int& space, const double& the_L, const double& the_a);	
 
 //simple space for a box
-double simpleSpaceBox (const unsigned int& space)
+double simpleSpaceBox (const unsigned int& space, const double& the_L, const double& the_a)
 	{
-	double xSpace = -L/2.0 + space*a;
-	return xSpace;
+	return -L/2.0 + space*the_a;;
 	}
 	
 //simple space for a sphere
-double simpleSpaceSphere (const unsigned int& space)
+double simpleSpaceSphere (const unsigned int& space, const double& the_L=L, const double& the_a=a)
 	{
-	double xSpace = space*a;
-	return xSpace;
+	return space*the_a;
 	}
 	
 //gives values of coordinates in whole spacetime
 comp coord(const unsigned int& locNum,const int& direction, const unsigned int& Nt=NT)
 	{
-	comp xCoord;
-	if (direction==0)
-		{
-		unsigned int t = intCoord(locNum,0,NT);
-		xCoord = simpleTime(t);
-		}
-	if (direction==1)
-		{
-		unsigned int x = intCoord(locNum,1,NT);
-		xCoord = simpleSpace(x);
-		}
-	return xCoord;
+	if (direction==0)		return simpleTime(intCoord(locNum,0,NT));
+	if (direction==1)		return simpleSpace(intCoord(locNum,1,NT));
 	}
 
 //gives values of coordinates on section AB
@@ -764,8 +745,7 @@ long int (*neigh) (const lint& locNum, const unsigned int& direction, const sign
 //dt type functions
 comp dtFn (const unsigned int& time)
 	{
-	if (time<(NT-1)) return simpleTime(time+1)-simpleTime(time);
-	else return 0;
+	return (time<(NT-1)? simpleTime(time+1)-simpleTime(time): 0.0);
 	}
 	
 comp DtFn (const unsigned int& time)
@@ -1097,7 +1077,7 @@ void printReducedVector (const string& printFile, vec vecToPrint)
 		F << endl;
 		for (unsigned int j=0; j<(vecToPrint.size()-2*Nx*Nt);j++)
 			{
-			F << setw(25) << vecToPrint(2*Nx*NT+j) << endl;
+			F << setw(25) << vecToPrint(2*Nx*Nt+j) << endl;
 			}
 		}
 	F.close();

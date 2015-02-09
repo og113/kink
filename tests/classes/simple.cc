@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "simple.h"
 
 using namespace std;
@@ -27,5 +28,9 @@ T stringToNumber ( const string& Text )
 	T result;
 	return ss >> result ? result : 0;
 	}
-
+	
+//gives absolute measure of difference between two numbers
+double absDiff (const double& numA, const double& numB) {
+	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+}
 
