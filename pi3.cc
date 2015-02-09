@@ -166,12 +166,49 @@ else {
 	cerr << "File length not correct: " << fileLength << " != " << Nbin*Nin+1 << endl;
 }
 
+
+/* ---------------------------------------------------------------------------------------------
+deterimining omega matrices for fourier transforms in spatial direction
+---------------------------------------------------------------------------------------------*/
+mat h(N+1,N+1);
+h = hFn(N+1,dr,1.0);
+mat omega(N+1,N+1); 	omega = Eigen::MatrixXd::Zero(N+1,N+1);
+mat Eomega(N+1,N+1); 	Eomega = Eigen::MatrixXd::Zero(N+1,N+1);
+vec eigenValues(N+1);
+mat eigenVectors(N+1,N+1); //eigenvectors correspond to columns of this matrix
+Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
+if (eigensolver.info() != Eigen::Success)
+	{
+	cerr << "h eigensolver failed" << endl;
+	}
+else
+	{
+	eigenValues = eigensolver.eigenvalues();
+	eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+	}
+
+//#pragma omp parallel for	
+for (unsigned int j=0; j<(N+1); j++)
+	{
+	for (unsigned int k=0; k<(N+1); k++)
+		{
+		for (unsigned int l=0; l<(N+1); l++)
+			{
+			double djdk = 4.0*pi*dr;
+			if (j==0 || j==N) djdk/=sqrt(2.0);
+			if (k==0 || k==N) djdk/=sqrt(2.0);
+			omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+			Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+			}
+		}
+	}
+
 /* ---------------------------------------------------------------------------------------------
 propagating euclidean solution forwards and/or backwards in time
 ---------------------------------------------------------------------------------------------*/
 
 vec phiA, phiC, linearizationA;
-double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA;
+double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA, linErgA, linNumA;
 
 uint j=0;
 while(j<2) {
@@ -201,6 +238,7 @@ while(j<2) {
 	nonLinErg = Eigen::VectorXd::Zero(Nt+1);
 	erg = Eigen::VectorXd::Zero(Nt+1);
 	linErgContm = 0.0, linNumContm = 0.0;
+	linErgA = 0.0, linNumA = 0.0;
 	
 	vec initial;
 	initial = interpolate(phiBC,Nbin,Nin,Nt+1,N+1);
@@ -328,6 +366,16 @@ while(j<2) {
 				}
 			}
 		}
+		for (unsigned int j=0;j<(N+1);j++){
+			for (unsigned int k=0;k<(N+1);k++){
+				unsigned int l = j*(Nt+1)+Nt;
+				unsigned int m = k*(Nt+1)+Nt;
+				double r = r0 + j*dr;
+				double s = r0 + k*dr;
+				linErgA += Eomega(j,k)*phi(l)*phi(m)*r*s;
+				linNumA += omega(j,k)*phi(l)*phi(m)*r*s;
+			}
+		}
 	}
 	j++;
 		
@@ -407,8 +455,10 @@ else {
 	}
 
 printf("erg(0) = %8.4f\n",ergA);
-printf("linErgFieldA(0) = %8.4f\n",linErgFieldA);
-printf("nonLinErgA(0) = %8.4f\n",nonLinErgA);
+printf("linErgFieldA(0)   = %8.4f\n",linErgFieldA);
+printf("nonLinErgA(0)     = %8.4f\n",nonLinErgA);
+printf("linErgA           = %8.4f\n",linErgA);
+printf("linNumA           = %8.4f\n",linNumA);
 printf("linNumContmA(0) = %8.4f\n",linNumContm);
 printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
 

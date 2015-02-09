@@ -724,3 +724,36 @@ void changeInputs(string outputFile, string search, string replace, string input
 	fout.close();
 	if (!found) cerr << "changeInputs error: parameter " << search << "not found in " << inputFile << endl;
 	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//fourier transform type functions
+
+//h the matrix from dl[7]
+mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
+	{
+	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
+	for (unsigned int l=0; l<xN; l++)
+		{
+		if (l==0)
+			{
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);			
+			}
+		else if (l==(xN-1))
+			{
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);
+			}
+		else
+			{
+			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
+			if ((l+1)==xN)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
+			else			{	xh(l,l+1) = -1.0/pow(xa,2.0);}
+			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);}
+			else			{	xh(l,l-1) = -1.0/pow(xa,2.0);}
+			}
+		}
+	return xh;
+	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

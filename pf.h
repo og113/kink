@@ -75,6 +75,7 @@ double closenessT; //true energy versus linear energy
 double closenessP; //checking lattice small enough for momenta
 double closenessR; //regularization
 double closenessIE; //imaginary part of the energy
+double closenessCL; //continuum approx to linear erg and num
 
 //parameters determining input phi
 //struct to hold answers to questions
@@ -142,6 +143,9 @@ double absolute (const double& amplitude)
 //gives absolute measure of difference between two numbers
 double absDiff (const double& numA, const double& numB) {
 	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+}
+double absDiff (const comp& numA, const comp& numB) {
+	return 2.0*abs(numA-numB)/sqrt(norm(numA)+norm(numB));
 }
 	
 //function giving location of smallest element of a vector of type T
@@ -760,38 +764,27 @@ long int (*neigh) (const lint& locNum, const unsigned int& direction, const sign
 //dt type functions
 comp dtFn (const unsigned int& time)
 	{
-	comp xdt;
-	if (time<(NT-1))
-		{
-		xdt = simpleTime(time+1)-simpleTime(time);
-		}
-	else
-		{
-		xdt = 0;
-		}
-	return xdt;
+	if (time<(NT-1)) return simpleTime(time+1)-simpleTime(time);
+	else return 0;
 	}
 	
 comp DtFn (const unsigned int& time)
 	{
-	return a;
+	if (time==(NT-1)) return (simpleTime(NT-1)-simpleTime(NT-2))/2.0;
+	else if (time==0) return (simpleTime(1)-simpleTime(0))/2.0;
+	else return (simpleTime(time+1)-simpleTime(time-1))/2.0;
 	}
 	
-double dxFn (const unsigned int& time)
+double dxFn (const unsigned int& space)
 	{
-	return a;
+	if (pot[0]!='3') return a;
+	return (space<(N-1)? a: 0.0);
 	}
 	
-double DxFn (const unsigned int& time)
+double DxFn (const unsigned int& space)
 	{
-	if (time==(N-1) || time==0)
-		{
-		return a/2.0;
-		}
-	else
-		{
-		return a;
-		}
+	if (pot[0]!='3') return a;
+	return ((space==(N-1) || space==0)? a/2.0: a);
 	}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1525,7 +1518,7 @@ mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
 		else
 			{
 			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			if ((l+1)==N)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
+			if ((l+1)==xN)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
 			else			{	xh(l,l+1) = -1.0/pow(xa,2.0);}
 			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);}
 			else			{	xh(l,l-1) = -1.0/pow(xa,2.0);}

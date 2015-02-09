@@ -43,7 +43,7 @@ for j in `seq 0 $loops`
 	let Na=300
 	let Nc=4
 	Ta=$(echo "scale=3; $Na*$Tb/($Nb-1.0)" | bc)
-	L=$(echo "scale=3; 4" | bc)
+	L=$(echo "scale=3; 5" | bc)
 	LoR=$(echo "scale=3; $L/10.0" | bc)
 	changeParameter "N" $N
 	changeParameter "Na" $Na
@@ -68,7 +68,7 @@ for j in `seq 0 $loops`
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./pi3 -tn $TIMENUMBER -linearization 1 >> $FILE
+			./pi3 -tn $TIMENUMBER -lin 1 >> $FILE
 			echo "" >> $FILE
 			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
 			echo "" >> $FILE
