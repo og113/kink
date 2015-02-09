@@ -796,15 +796,15 @@ auto ddVr = [&] (const comp & phi)
 					}			
 				else if (t==(NT-1))
 					{
-					kineticS 		+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potV 			+= Dt*Dx*V(Cp(j));
-					pot_r 			+= Dt*Dx*Vr(Cp(j));
-					erg(t) 			+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) 	+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 		+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					kineticS 				+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					potV 					+= Dt*Dx*V(Cp(j));
+					pot_r 					+= Dt*Dx*Vr(Cp(j));
+					erg(t) 					+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					derivErg(t) 			+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					potErg(t) 				+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 				
-					DDS.insert(2*j,2*(j-1)+1) 	= 1.0; //zero imaginary part of time derivative
-					DDS.insert(2*j+1,2*j+1) 	= 1.0; //zero imaginary part
+					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
+					DDS.insert(2*j+1,2*j+1)	  = 1.0; //zero imaginary part
 					}
 				else if (t==0)
 					{
@@ -837,11 +837,12 @@ auto ddVr = [&] (const comp & phi)
 			                }
 			            }
 			        comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
-			        comp temp1 = Dx*Dt*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
+			        comp temp1 = Dx*Dt*( dV(Cp(j)) + dVr(Cp(j))  );//dV terms should be small
+			        comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)) );
 			        
 			        minusDS(2*j+1) 				+= imag(-temp0*Cp(j) + temp1 );
-			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp1 );
-			        DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp1 );
+			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp2 );
+			        DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp2 );
 				    /////////////////////////////////////////////////////////////////////////////////////////
 					if (abs(theta)<DBL_MIN)
 						{
@@ -898,8 +899,8 @@ auto ddVr = [&] (const comp & phi)
 				                }
 				            }
 				        minusDS(2*j) 			+= real(-temp0*Cp(j) + temp1 )*theta;
-			        	DDS.coeffRef(2*j,2*j) 	+= real(temp0 - temp1 )*theta;
-			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp1 )*theta;
+			        	DDS.coeffRef(2*j,2*j) 	+= real(temp0 - temp2 )*theta;
+			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp2 )*theta;
 						}
 					}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
