@@ -36,7 +36,7 @@ main parameters
 ---------------------------------------------------------------------------------------------*/
 
 double r0 = 1.0e-16, r1 = 10.0;
-unsigned int N = 1e3;
+unsigned int N = 300;
 double dr;
 
 double Ta, Tc;
@@ -45,7 +45,7 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
-bool testTunnel = false, testLinear = false, changeNa = false;
+bool testTunnel = false, testLinear = false, changeNa = false, approxOmega = true;
 double closenessLin = 0.01;
 double linPoint = 0.0;
 
@@ -69,6 +69,8 @@ else if (argc % 2 && argc>1) {
 		else if (id.compare("linearization")==0 || id.compare("lin")==0) testLinear = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("closeness")==0 || id.compare("close")==0) closenessLin = stringToNumber<double>(argv[2*j+2]);
 		else if (id.compare("changeNa")==0) changeNa = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("approxOmega")==0) approxOmega = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("N")==0) N = atoi(argv[2*j+2]);
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -170,38 +172,43 @@ else {
 /* ---------------------------------------------------------------------------------------------
 deterimining omega matrices for fourier transforms in spatial direction
 ---------------------------------------------------------------------------------------------*/
-mat h(N+1,N+1);
-h = hFn(N+1,dr,1.0);
-mat omega(N+1,N+1); 	omega = Eigen::MatrixXd::Zero(N+1,N+1);
-mat Eomega(N+1,N+1); 	Eomega = Eigen::MatrixXd::Zero(N+1,N+1);
-vec eigenValues(N+1);
-mat eigenVectors(N+1,N+1); //eigenvectors correspond to columns of this matrix
-Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
-if (eigensolver.info() != Eigen::Success)
-	{
-	cerr << "h eigensolver failed" << endl;
+mat omega(N+1,N+1); 	
+mat Eomega(N+1,N+1);
+if (testLinear) {
+	omega = Eigen::MatrixXd::Zero(N+1,N+1);
+	Eomega = Eigen::MatrixXd::Zero(N+1,N+1);
+	vec eigenValues(N+1);
+	mat eigenVectors(N+1,N+1); //eigenvectors correspond to columns of this matrix
+	if(!approxOmega) {
+		mat h(N+1,N+1);
+		h = hFn(N+1,dr,1.0);
+		Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
+		if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
+		else {
+			eigenValues = eigensolver.eigenvalues();
+			eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+		}
 	}
-else
-	{
-	eigenValues = eigensolver.eigenvalues();
-	eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+	else {
+		double normalisation = sqrt(2.0/(double)N);
+		for (unsigned int l=0; l<(N+1); l++) {
+			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(double)N/2.0)/dr,2.0);
+			for (unsigned int m=0; m<(N+1); m++) eigenVectors(l,m) = normalisation*sin(pi*l*m/(double)N);
+		}
 	}
-
-//#pragma omp parallel for	
-for (unsigned int j=0; j<(N+1); j++)
-	{
-	for (unsigned int k=0; k<(N+1); k++)
-		{
-		for (unsigned int l=0; l<(N+1); l++)
-			{
-			double djdk = 4.0*pi*dr;
-			if (j==0 || j==N) djdk/=sqrt(2.0);
-			if (k==0 || k==N) djdk/=sqrt(2.0);
-			omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-			Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+	double djdk;	
+	for (unsigned int j=0; j<(N+1); j++) {
+		for (unsigned int k=0; k<(N+1); k++) {
+			for (unsigned int l=0; l<(N+1); l++) {
+				djdk = 4.0*pi*dr;
+				if ((j==0 || j==N) && !approxOmega) djdk/=sqrt(2.0);
+				if ((k==0 || k==N) && !approxOmega) djdk/=sqrt(2.0);
+				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 			}
 		}
 	}
+}
 
 /* ---------------------------------------------------------------------------------------------
 propagating euclidean solution forwards and/or backwards in time
@@ -366,14 +373,16 @@ while(j<2) {
 				}
 			}
 		}
-		for (unsigned int j=0;j<(N+1);j++){
-			for (unsigned int k=0;k<(N+1);k++){
-				unsigned int l = j*(Nt+1)+Nt;
-				unsigned int m = k*(Nt+1)+Nt;
-				double r = r0 + j*dr;
-				double s = r0 + k*dr;
-				linErgA += Eomega(j,k)*phi(l)*phi(m)*r*s;
-				linNumA += omega(j,k)*phi(l)*phi(m)*r*s;
+		if (testLinear) {
+			for (unsigned int j=0;j<(N+1);j++){
+				for (unsigned int k=0;k<(N+1);k++){
+					unsigned int l = j*(Nt+1)+Nt;
+					unsigned int m = k*(Nt+1)+Nt;
+					double r = r0 + j*dr;
+					double s = r0 + k*dr;
+					linErgA += Eomega(j,k)*phi(l)*phi(m)*r*s;
+					linNumA += omega(j,k)*phi(l)*phi(m)*r*s;
+				}
 			}
 		}
 	}
@@ -390,7 +399,7 @@ if (testLinear) {
 	string linearizationFile = "data/" + timeNumber + "linearization.dat";
 	simplePrintVector(linearizationFile,tVec);
 	simpleAppendVector(linearizationFile,linearizationA);
-	int linNa = (int)linPoint/dtin;
+	int linNa = (int)(linPoint/dtin);
 	printf("linearization printed:  %39s\n",linearizationFile.c_str());
 	printf("linearization to %6.4f after t = %6.4f\n",closenessLin,linPoint);
 	if (changeNa) {
@@ -455,12 +464,13 @@ else {
 	}
 
 printf("erg(0) = %8.4f\n",ergA);
-printf("linErgFieldA(0)   = %8.4f\n",linErgFieldA);
 printf("nonLinErgA(0)     = %8.4f\n",nonLinErgA);
-printf("linErgA           = %8.4f\n",linErgA);
-printf("linNumA           = %8.4f\n",linNumA);
-printf("linNumContmA(0) = %8.4f\n",linNumContm);
-printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
+printf("linErgFieldA(0)   = %8.4f\n",linErgFieldA);
+if (testLinear) printf("linErgA           = %8.4f\n",linErgA);
+printf("linErgContmA(0) = %8.4f\n",linErgContm);
+if (testLinear) printf("linNumA           = %8.4f\n",linNumA);
+printf("linNumContmA(0) = %8.4f\n\n",linNumContm);
+
 
 
 

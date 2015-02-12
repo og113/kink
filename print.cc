@@ -103,13 +103,13 @@ if (id.compare("linErg")==0 || id.compare("linNum")==0 || id.compare("erg")==0 |
 	{
 	gpSimple(filename);
 	}
-else if (id.compare("tpi")==0 || id.compare("pi")==0 || id.compare("chiX")==0 || id.compare("chiT")==0 || method.compare("v")==0)
-	{
-	gp(filename,"repi.gp");
-	}
 else if (id.compare("minusDS")==0)
 	{
 	gp(filename,"pi.gp");
+	}
+else if (id.compare("tpi")==0 || id.compare("pi")==0 || id.compare("chiX")==0 || id.compare("chiT")==0 || method.compare("v")==0)
+	{
+	gp(filename,"repi.gp");
 	}
 else
 	{

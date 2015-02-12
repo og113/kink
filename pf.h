@@ -612,14 +612,15 @@ double simpleSpaceBox (const unsigned int& space, const double& the_L, const dou
 //simple space for a sphere
 double simpleSpaceSphere (const unsigned int& space, const double& the_L=L, const double& the_a=a)
 	{
-	return space*the_a;
+	return r0+space*the_a;
 	}
 	
 //gives values of coordinates in whole spacetime
 comp coord(const unsigned int& locNum,const int& direction, const unsigned int& Nt=NT)
 	{
 	if (direction==0)		return simpleTime(intCoord(locNum,0,NT));
-	if (direction==1)		return simpleSpace(intCoord(locNum,1,NT));
+	if (direction==1)		return simpleSpace(intCoord(locNum,1,NT),L,a);
+	else return 0.0;
 	}
 
 //gives values of coordinates on section AB
@@ -923,8 +924,8 @@ vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & 
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Ta","Tb","Tc","R","dE","theta","reg", "epsilon");
+	printf("%8s%8i%8i%8i%8i%8.3g%8.3g%8.3g%8.3g%8.3g%8.3g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 
@@ -1404,8 +1405,8 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		if (Tb<R && pot[0]!='3'){
 			angle = asin(Tb/R);
 			if (2.0*(1.5*Tb*tan(angle))<L) L=2.0*(1.5*Tb*tan(angle));
+			a = L/(N-1.0);
 			}
-		a = L/(N-1.0);
 		}
 	else if ( parameterLabel.compare("R")==0) //this parameter changes the initial guess
 		{
@@ -1480,28 +1481,31 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //fourier transform type functions
 
 //h the matrix from dl[7]
-mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
+mat hFn(const unsigned int & xN, const double & xa, const double & xmass2)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
+	double diag = xmass2 + 2.0/pow(xa,2.0);
+	double offDiag1 = -1.0/pow(xa,2.0);
+	double offDiag2 = -pow(2.0,0.5)/pow(xa,2.0);	
 	for (unsigned int l=0; l<xN; l++)
 		{
 		if (l==0)
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);			
+			xh(l,l) = diag;
+			xh(l,l+1) = offDiag2;			
 			}
 		else if (l==(xN-1))
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);
+			xh(l,l) = diag;
+			xh(l,l-1) = offDiag2;
 			}
 		else
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			if ((l+1)==xN)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
-			else			{	xh(l,l+1) = -1.0/pow(xa,2.0);}
-			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);}
-			else			{	xh(l,l-1) = -1.0/pow(xa,2.0);}
+			xh(l,l) = diag;
+			if ((l+1)==(xN-1))	xh(l,l+1) = offDiag2;
+			else				xh(l,l+1) = offDiag1;
+			if ((l-1)==0)		xh(l,l-1) = offDiag2;
+			else				xh(l,l-1) = offDiag1;
 			}
 		}
 	return xh;

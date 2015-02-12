@@ -312,7 +312,7 @@ vector<double> minima0(2);
 		{
 		mass2 = 1.0;
 		minima[0] = 0.0; //only one minimum
-		R = 1.0; alpha = 0.0; //not used
+		R = 10.0; alpha = 0.0; //not used
 		}
 	
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,12 +320,12 @@ vector<double> minima0(2);
 	//other derived quantities
 	NT = Na + Nb + Nc;
 	double twaction;
+	L = LoR*R;
 	if (pot[0]!='3')
 		{
 		R = S1/dE;
 		twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		alpha *= R;
-		L = LoR*R;
 		if (Tb<R)
 			{
 			angle = asin(Tb/R);
@@ -336,12 +336,11 @@ vector<double> minima0(2);
 	else
 		{
 		twaction = 8.0*pow(pi,2.0)/3.0; //massless limit
-		L = LoR*10.0;
 		//no need for R or alpha
 		}
 	Gamma = exp(-theta);
 	vec negVec(2*N*Nb+1);
-	a = L/(N-1.0);
+	a = (L-r0)/(N-1.0);
 	b = Tb/(Nb-1.0);
 	if (a>0.5*pow(mass2,0.5) || b>0.5*pow(mass2,0.5)) {cerr << endl << "a = " << a << " , b = " << b << endl << endl;}
 	Ta = b*Na;
@@ -378,17 +377,16 @@ auto ddVr = [&] (const comp & phi)
 	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
+	mat omega(N,N);
+	mat Eomega(N,N);
+	omega = Eigen::MatrixXd::Zero(N,N);
+	Eomega = Eigen::MatrixXd::Zero(N,N);
 	mat h(N,N);
 	h = hFn(N,a,mass2);
-	mat omega(N,N); 	omega = Eigen::MatrixXd::Zero(N,N);
-	mat Eomega(N,N); 	Eomega = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
 	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
 	Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
-	if (eigensolver.info() != Eigen::Success)
-		{
-		cerr << "h eigensolver failed" << endl;
-		}
+	if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
 	else
 		{
 		eigenValues = eigensolver.eigenvalues();
@@ -490,9 +488,9 @@ auto ddVr = [&] (const comp & phi)
 			{
 			if ((abs(theta-minTheta)>DBL_MIN || abs(Tb-minTb)>DBL_MIN) && loop==0)
 				{
-				cout << "input Tb: " << Tb << endl;
-				cout << "program Tb: " << minTb << endl;
-				cout << "input theta: " << theta << endl;
+				cout << "input Tb     : " << Tb << endl;
+				cout << "program Tb   : " << minTb << endl;
+				cout << "input theta  : " << theta << endl;
 				cout << "program theta: " << minTheta << endl;
 				cout << endl;
 				}
@@ -661,9 +659,8 @@ auto ddVr = [&] (const comp & phi)
 						}
 					}
 				}
-			double normX = chiX.dot(chiX);
-			normX = pow(normX,0.5);
-			double normT = chiT.dot(chiT);
+			double normX = chiX.norm();
+			double normT = chiT.norm();
 			normT = pow(normT,0.5);
 			if (abs(normX)<DBL_MIN || abs(normT)<DBL_MIN)
 				{
@@ -749,15 +746,15 @@ auto ddVr = [&] (const comp & phi)
 					minusDS(2*N*NT) 				+= -Dx*chiX(j)*p(2*j);
 					}
 					
-				if (abs(chiT(j))>DBL_MIN)
+				if (abs(chiT(j))>DBL_MIN && t<(NT-1))
 					{
 					DDS.coeffRef(2*(j+1),2*N*NT+1) 	+= Dx*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) 	+= Dx*chiT(j);
 					DDS.coeffRef(2*j,2*N*NT+1) 		+= -Dx*chiT(j);
 					DDS.coeffRef(2*N*NT+1,2*j) 		+= -Dx*chiT(j);
-		            minusDS(2*(j+1)) 				+= - Dx*chiT(j)*p(2*N*NT+1);
+		            minusDS(2*(j+1)) 				+= -Dx*chiT(j)*p(2*N*NT+1);
 		            minusDS(2*j) 					+= Dx*chiT(j)*p(2*N*NT+1);
-		            minusDS(2*N*NT+1) 				+= - Dx*chiT(j)*(p(2*(j+1))-p(2*j));
+		            minusDS(2*N*NT+1) 				+= -Dx*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
 				if (abs(theta)<DBL_MIN)
@@ -788,23 +785,24 @@ auto ddVr = [&] (const comp & phi)
 					}
 				else if (pot[0]=='3' && x==0)
 					{
-					DDS.insert(2*j,2*j) 	= 1.0; // p=0 at r=0
-					DDS.insert(2*j+1,2*j+1) = 1.0;
 					kineticS 				+= 	Dt*pow(Cp(neighPosX),2.0)/dx/2.0;
 					derivErg(t) 			+= 	pow(Cp(neighPosX),2.0)/dx/2.0; //n.b. the Dt/dt difference is ignored for erg(t)
 					erg(t) 					+= 	pow(Cp(neighPosX),2.0)/dx/2.0;
+					
+					DDS.insert(2*j,2*j) 	= 1.0; // p=0 at r=0
+					DDS.insert(2*j+1,2*j+1) = 1.0;
 					}			
 				else if (t==(NT-1))
 					{
-					kineticS 		+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potV 			+= Dt*Dx*V(Cp(j));
-					pot_r 			+= Dt*Dx*Vr(Cp(j));
-					erg(t) 			+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) 	+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 		+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					kineticS 				+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					potV 					+= Dt*Dx*V(Cp(j));
+					pot_r 					+= Dt*Dx*Vr(Cp(j));
+					erg(t) 					+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					derivErg(t) 			+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					potErg(t) 				+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 				
-					DDS.insert(2*j,2*(j-1)+1) 	= 1.0; //zero imaginary part of time derivative
-					DDS.insert(2*j+1,2*j+1) 	= 1.0; //zero imaginary part
+					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
+					DDS.insert(2*j+1,2*j+1)   = 1.0; //zero imaginary part
 					}
 				else if (t==0)
 					{
@@ -837,11 +835,12 @@ auto ddVr = [&] (const comp & phi)
 			                }
 			            }
 			        comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
-			        comp temp1 = Dx*Dt*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
+			        comp temp1 = Dt*Dx*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
+			        comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
 			        
 			        minusDS(2*j+1) 				+= imag(-temp0*Cp(j) + temp1 );
-			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp1 );
-			        DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp1 );
+			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp2 );
+			        DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp2 );
 				    /////////////////////////////////////////////////////////////////////////////////////////
 					if (abs(theta)<DBL_MIN)
 						{
@@ -898,8 +897,8 @@ auto ddVr = [&] (const comp & phi)
 				                }
 				            }
 				        minusDS(2*j) 			+= real(-temp0*Cp(j) + temp1 )*theta;
-			        	DDS.coeffRef(2*j,2*j) 	+= real(temp0 - temp1 )*theta;
-			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp1 )*theta;
+			        	DDS.coeffRef(2*j,2*j) 	+= real(temp0 - temp2 )*theta;
+			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp2 )*theta;
 						}
 					}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -941,9 +940,9 @@ auto ddVr = [&] (const comp & phi)
                         DDS.insert(2*j+1,2*neighb+1) 	= real(Dt/dxd);
                         }
                     }
-		            comp temp0 = Dx*(1.0/dt + 1.0/dtm);
-		            comp temp1 = Dt*(Cp(j)*(1.0/dx + 1.0/dxm) + Dx*dV(Cp(j)) + Dx*dVr(Cp(j)));
-		            comp temp2 = Dt*(1.0/dx + 1.0/dxm + Dx*ddV(Cp(j)) + Dx*ddVr(Cp(j)));
+		            comp temp0 = Dx*(1.0/dt + 1.0/dtm) - Dt*(1.0/dx + 1.0/dxm);
+		            comp temp1 = Dt*Dx*(dV(Cp(j)) + dVr(Cp(j)));
+		            comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
 		                
 		            minusDS(2*j) 			+= real(temp1 - temp0*Cp(j));
 		            minusDS(2*j+1) 			+= imag(temp1 - temp0*Cp(j));
@@ -956,11 +955,22 @@ auto ddVr = [&] (const comp & phi)
 		    if (pot[0]=='3') DDS.insert(2*N*NT,2*N*NT) = 1.0;
 		    action = kineticT - kineticS - potV - pot_r;
 		    if (pot[0]=='3') {
-		    	action *= 4.0*pi;
+		    	action 		*= 4.0*pi;
+		    	derivErg 	*= 4.0*pi;
+		    	potErg 		*= 4.0*pi;
+		    	erg			*= 4.0*pi;
 		    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
+			
+			//trivial test that erg=potErg+derivErg
+			if (false) {
+				for (unsigned int j=0; j<NT; j++) {
+					double diff = absDiff(erg(j),potErg(j)+derivErg(j));
+					if (diff>1.0e-14) cerr << "erg(" << j << ") != potErg + derivErg. absDiff = " << diff << endl;
+				}
+			}
 			
 			//calculating continuum approx to linErg and linNum on initial time slice
 			if (pot[0]=='3') {
@@ -1070,6 +1080,12 @@ auto ddVr = [&] (const comp & phi)
 				string earlyErgFile = prefix + "mainergE" + suffix;
 				simplePrintCVector(earlyErgFile,erg);
 				//gpSimple(earlyErgFile);
+				string earlyDerivErgFile = prefix + "mainderivErgE"+suffix;
+				//derivErg.conservativeResize(Na);
+				simplePrintCVector(earlyDerivErgFile,derivErg);
+				string earlyPotErgFile = prefix + "mainpotErgE"+suffix;
+				//potErg.conservativeResize(Na);
+				simplePrintCVector(earlyPotErgFile,potErg);
 				}
 			}
 		
@@ -1124,15 +1140,12 @@ auto ddVr = [&] (const comp & phi)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//convergence issues
 			//evaluating norms
-			double normDS = minusDS.dot(minusDS);
-			normDS = pow(normDS,0.5);
+			double normDS = minusDS.norm();
 			double maxDS = minusDS.maxCoeff();
 			double minDS = minusDS.minCoeff();
 			if (-minDS>maxDS) maxDS = -minDS;
-			double normP = p.dot(p);
-			normP = pow(normP,0.5);
-			double normDelta = delta.dot(delta);
-			normDelta = pow(normDelta,0.5);
+			double normP = p.norm();
+			double normDelta = delta.norm();
 		
 			//assigning test values
 			//quantities used to stop newton-raphson loop
@@ -1145,9 +1158,9 @@ auto ddVr = [&] (const comp & phi)
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%10s%10s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest");
+				printf("%10s%10s%14s%14s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest","ergTest","momTest");
 				}
-			printf("%10i%10i%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back());
+			printf("%10i%10i%14g%14g%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back(),erg_test.back(),mom_test.back());
 			
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
@@ -1164,10 +1177,10 @@ auto ddVr = [&] (const comp & phi)
 		if (pot[0]=='3') {
 			comp temp = linErg(0);
 			if (absDiff(temp,linErgContm)>closenessCL) 
-				cout << "linErg(0) = " << temp << " and linErgContm = " << linErgContm << " don't agree" << endl;
+				cout << "linErg(0) = " << temp << " and linErgContm = " << linErgContm << " don't agree. E_exact = " << E_exact << endl;
 			temp = linNum(0);
 			if (absDiff(temp,linNumContm)>closenessCL) 
-				cout << "linNum(0) = " << temp << " and linNumContm = " << linNumContm << " don't agree" << endl;
+				cout << "linNum(0) = " << temp << " and linNumContm = " << linNumContm << " don't agree. " << endl;
 		}
 		
 		//stopping clock
@@ -1236,7 +1249,7 @@ auto ddVr = [&] (const comp & phi)
 		printf("%12s%30s\n"," ",derivErgFile.c_str());
 		
 		//printing potErg
-		string potErgFile = prefix + "mainpotErgField"+suffix;
+		string potErgFile = prefix + "mainpotErg"+suffix;
 		//potErg.conservativeResize(Na);
 		simplePrintCVector(potErgFile,potErg);
 		//gpSimple(linErgFile);
