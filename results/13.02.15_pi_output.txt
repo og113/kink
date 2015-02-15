@@ -1,0 +1,773 @@
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.04     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23508      0.00106777      0.00526128        0.102751
+               0               2       0.0192596     0.000213563     0.000937911       0.0259426
+               0               3       0.0313566     1.44801e-05     7.10683e-05       0.0159136
+               0               4       0.0119327     5.11175e-06     3.60524e-05      0.00391165
+               0               5      0.00252536      3.1947e-07     2.00975e-06     0.000210964
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 16.2402     130     382       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_0
+              ./data/150213170032pip_0.dat
+            ./data/150213170032minusDS_0.dat
+             ./data/150213170032DDSp_0.dat
+             ./data/150213170032ergp_0.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.06   0.805  0.0204      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               1               1         1.22862     5.29569e-06     1.83505e-05       0.0202184
+               1               2       0.0136754     7.42673e-06     5.11279e-05       0.0061283
+               1               3      0.00327367     8.89103e-07     5.20407e-06     0.000862825
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       3 9.65848     130     382       5   0.805    0.05           0       11.34           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_1
+              ./data/150213170032pip_1.dat
+            ./data/150213170032minusDS_1.dat
+             ./data/150213170032DDSp_1.dat
+             ./data/150213170032ergp_1.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.08    0.81  0.0205      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               2               1         1.22715     3.74915e-06     1.23061e-05       0.0202361
+               2               2       0.0109607     8.85019e-06     5.60058e-05       0.0107868
+               2               3      0.00368026     3.22379e-06      1.6844e-05      0.00584797
+               2               4      0.00152368     1.01043e-06     5.01079e-06       0.0024923
+               2               5     0.000528249     1.87265e-07     8.96759e-07     0.000532942
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 15.6012     130     382       5    0.81    0.05           0       11.56           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_2
+              ./data/150213170032pip_2.dat
+            ./data/150213170032minusDS_2.dat
+             ./data/150213170032DDSp_2.dat
+             ./data/150213170032ergp_2.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.09   0.815  0.0206      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               3               1         1.22579     1.17545e-06     3.40351e-06       0.0134618
+               3               2      0.00261667     5.39373e-06     2.61485e-05      0.00336437
+               3               3     0.000593345     2.92888e-07     1.42364e-06      0.00010395
+
+average |dp/dt| integrated over each timeslice:
+1
+1.62188
+0.307387
+0.00668251
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       3 9.87686     130     382       5   0.815    0.05           0       11.65           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_3
+              ./data/150213170032pip_3.dat
+            ./data/150213170032minusDS_3.dat
+             ./data/150213170032DDSp_3.dat
+             ./data/150213170032ergp_3.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.11    0.82  0.0208      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               4               1         1.22717     1.41258e-10     8.03412e-10     3.20569e-08
+               4               2     1.86776e-09     1.47472e-15     5.32907e-15     4.56425e-13
+
+average |dp/dt| integrated over each timeslice:
+1
+1.43523e-06
+1.95939e-11
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.71401     130     382       5    0.82    0.05           0       11.72           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_4
+              ./data/150213170032pip_4.dat
+            ./data/150213170032minusDS_4.dat
+             ./data/150213170032DDSp_4.dat
+             ./data/150213170032ergp_4.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.13   0.825  0.0209      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               5               1         1.22897     2.36666e-15     1.24345e-14     7.37181e-13
+               5               2     5.48615e-13     1.47577e-15     7.10543e-15     3.98613e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+2.73103e-11
+9.68738e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.62225     130     382       5   0.825    0.05           0       11.79           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_5
+              ./data/150213170032pip_5.dat
+            ./data/150213170032minusDS_5.dat
+             ./data/150213170032DDSp_5.dat
+             ./data/150213170032ergp_5.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.15    0.83   0.021      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               6               1         1.23078     2.34134e-15     1.06581e-14     1.93687e-13
+               6               2     1.47952e-13     1.44468e-15     7.10543e-15     6.88189e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+6.00137e-12
+3.98815e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.79041     130     382       5    0.83    0.05           0       11.86           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_6
+              ./data/150213170032pip_6.dat
+            ./data/150213170032minusDS_6.dat
+             ./data/150213170032DDSp_6.dat
+             ./data/150213170032ergp_6.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.17   0.835  0.0211      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               7               1         1.23259      2.3126e-15     1.06581e-14     2.19128e-13
+               7               2     1.88536e-13     1.41328e-15     7.10543e-15      7.0436e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+4.24206e-12
+3.79557e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.51627     130     382       5   0.835    0.05           0       11.93           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_7
+              ./data/150213170032pip_7.dat
+            ./data/150213170032minusDS_7.dat
+             ./data/150213170032DDSp_7.dat
+             ./data/150213170032ergp_7.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.19    0.84  0.0213      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               8               1          1.2344     2.35776e-15     1.06581e-14     1.75649e-13
+               8               2     1.56213e-13     1.41721e-15     7.10543e-15     8.73233e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+3.92755e-12
+2.56651e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.55444     130     382       5    0.84    0.05           0          12           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_8
+              ./data/150213170032pip_8.dat
+            ./data/150213170032minusDS_8.dat
+             ./data/150213170032DDSp_8.dat
+             ./data/150213170032ergp_8.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.21   0.845  0.0214      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               9               1         1.23622     2.27585e-15     1.06581e-14     2.21425e-13
+               9               2     2.59413e-13     1.40755e-15     5.32907e-15     4.77688e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+5.28563e-12
+2.20544e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.52612     130     382       5   0.845    0.05           0       12.07           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:  ./data/150213170032inputsPi_9
+              ./data/150213170032pip_9.dat
+            ./data/150213170032minusDS_9.dat
+             ./data/150213170032DDSp_9.dat
+             ./data/150213170032ergp_9.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.23    0.85  0.0215      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              10               1         1.23805     2.33776e-15     1.06581e-14     3.71651e-13
+              10               2     3.66883e-13     1.37134e-15     5.32907e-15     7.02089e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+4.50357e-12
+1.79896e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.63392     130     382       5    0.85    0.05           0       12.15           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_10
+             ./data/150213170032pip_10.dat
+            ./data/150213170032minusDS_10.dat
+            ./data/150213170032DDSp_10.dat
+            ./data/150213170032ergp_10.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.25   0.855  0.0216      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              11               1         1.23987     2.28404e-15     8.88178e-15     3.80448e-13
+              11               2     2.96106e-13     1.38036e-15     5.32907e-15     4.40907e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+7.76615e-12
+2.64006e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.54961     130     382       5   0.855    0.05           0       12.22           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_11
+             ./data/150213170032pip_11.dat
+            ./data/150213170032minusDS_11.dat
+            ./data/150213170032DDSp_11.dat
+            ./data/150213170032ergp_11.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.27    0.86  0.0218      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              12               1          1.2417     2.32307e-15     1.06581e-14     5.93362e-13
+              12               2     6.12313e-13     1.37684e-15     5.32907e-15     7.16135e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+4.25869e-12
+9.58179e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.65317     130     382       5    0.86    0.05           0       12.29           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_12
+             ./data/150213170032pip_12.dat
+            ./data/150213170032minusDS_12.dat
+            ./data/150213170032DDSp_12.dat
+            ./data/150213170032ergp_12.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.28   0.865  0.0219      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              13               1         1.24354     2.18543e-15     8.88178e-15     6.00214e-14
+              13               2     2.50133e-14     1.38255e-15     7.10543e-15     8.03448e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+3.62738e-12
+1.31012e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.55303     130     382       5   0.865    0.05           0       12.36           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_13
+             ./data/150213170032pip_13.dat
+            ./data/150213170032minusDS_13.dat
+            ./data/150213170032DDSp_13.dat
+            ./data/150213170032ergp_13.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5     3.3    0.87   0.022      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              14               1         1.24537     2.22851e-15     1.06581e-14     7.71024e-14
+              14               2     2.89874e-14     1.37878e-15     5.32907e-15      6.1996e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+4.32351e-12
+1.23758e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.51706     130     382       5    0.87    0.05           0       12.43           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_14
+             ./data/150213170032pip_14.dat
+            ./data/150213170032minusDS_14.dat
+            ./data/150213170032DDSp_14.dat
+            ./data/150213170032ergp_14.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.32   0.875  0.0222      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              15               1         1.24721     2.24635e-15     1.06581e-14     4.19909e-13
+              15               2     4.07458e-13       1.376e-15     5.32907e-15     8.22082e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+6.21481e-12
+1.54509e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.66517     130     382       5   0.875    0.05           0        12.5           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_15
+             ./data/150213170032pip_15.dat
+            ./data/150213170032minusDS_15.dat
+            ./data/150213170032DDSp_15.dat
+            ./data/150213170032ergp_15.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.34    0.88  0.0223      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              16               1         1.24906     2.35355e-15     8.88178e-15     6.70606e-13
+              16               2     5.90737e-13     1.34899e-15     5.32907e-15     6.63462e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+6.27931e-12
+3.28669e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2  6.5625     130     382       5    0.88    0.05           0       12.57           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_16
+             ./data/150213170032pip_16.dat
+            ./data/150213170032minusDS_16.dat
+            ./data/150213170032DDSp_16.dat
+            ./data/150213170032ergp_16.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.36   0.885  0.0224      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              17               1         1.25091     2.20031e-15     1.06581e-14     4.75311e-13
+              17               2     4.12401e-13     1.30445e-15     5.32907e-15     3.44112e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+3.81999e-12
+1.2719e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.55604     130     382       5   0.885    0.05           0       12.65           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_17
+             ./data/150213170032pip_17.dat
+            ./data/150213170032minusDS_17.dat
+            ./data/150213170032DDSp_17.dat
+            ./data/150213170032ergp_17.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.38    0.89  0.0225      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              18               1         1.25276     2.09729e-15     1.06581e-14     1.91869e-13
+              18               2     1.51101e-13     1.35272e-15     5.32907e-15     9.41926e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+3.026e-12
+2.79333e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.69182     130     382       5    0.89    0.05           0       12.72           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_18
+             ./data/150213170032pip_18.dat
+            ./data/150213170032minusDS_18.dat
+            ./data/150213170032DDSp_18.dat
+            ./data/150213170032ergp_18.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5     3.4   0.895  0.0227      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              19               1         1.25462     2.28668e-15     8.88178e-15     6.93397e-13
+              19               2     6.50978e-13     1.31134e-15     5.32907e-15     2.98647e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+2.36609e-12
+2.23769e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.55383     130     382       5   0.895    0.05           0       12.79           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_19
+             ./data/150213170032pip_19.dat
+            ./data/150213170032minusDS_19.dat
+            ./data/150213170032DDSp_19.dat
+            ./data/150213170032ergp_19.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.42     0.9  0.0228      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              20               1         1.25648     2.13932e-15     1.06581e-14     1.49326e-13
+              20               2       2.057e-13     1.30684e-15     5.32907e-15     7.73122e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.34736e-12
+2.48206e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.66828     130     382       5     0.9    0.05           0       12.86           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_20
+             ./data/150213170032pip_20.dat
+            ./data/150213170032minusDS_20.dat
+            ./data/150213170032DDSp_20.dat
+            ./data/150213170032ergp_20.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.44   0.905  0.0229      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              21               1         1.25834      2.1179e-15     1.06581e-14     1.01543e-13
+              21               2      8.5541e-14     1.30559e-15     5.32907e-15     6.47465e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.39354e-12
+2.93319e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.56847     130     382       5   0.905    0.05           0       12.93           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_21
+             ./data/150213170032pip_21.dat
+            ./data/150213170032minusDS_21.dat
+            ./data/150213170032DDSp_21.dat
+            ./data/150213170032ergp_21.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.46    0.91   0.023      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              22               1         1.26021      2.0716e-15     8.88178e-15     5.88457e-14
+              22               2     5.32002e-14     1.26417e-15     5.32907e-15      1.8294e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+2.87485e-12
+1.09581e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.53986     130     382       5    0.91    0.05           0          13           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_22
+             ./data/150213170032pip_22.dat
+            ./data/150213170032minusDS_22.dat
+            ./data/150213170032DDSp_22.dat
+            ./data/150213170032ergp_22.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.47   0.915  0.0232      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              23               1         1.26208     2.06725e-15     1.24345e-14     9.61228e-14
+              23               2     8.26469e-14     1.27743e-15     5.32907e-15     4.52173e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.45566e-12
+1.775e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.51439     130     382       5   0.915    0.05           0       13.07           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_23
+             ./data/150213170032pip_23.dat
+            ./data/150213170032minusDS_23.dat
+            ./data/150213170032DDSp_23.dat
+            ./data/150213170032ergp_23.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.49    0.92  0.0233      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              24               1         1.26396     2.09941e-15     8.88178e-15     3.71251e-13
+              24               2     2.59903e-13      1.2853e-15     5.32907e-15     6.51195e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.79714e-12
+4.06651e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.63971     130     382       5    0.92    0.05           0       13.15           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_24
+             ./data/150213170032pip_24.dat
+            ./data/150213170032minusDS_24.dat
+            ./data/150213170032DDSp_24.dat
+            ./data/150213170032ergp_24.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.51   0.925  0.0234      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              25               1         1.26584     2.05503e-15     8.88178e-15     5.17677e-14
+              25               2     1.56765e-14     1.22297e-15     5.32907e-15      6.6224e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.18905e-12
+1.87425e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.56787     130     382       5   0.925    0.05           0       13.22           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_25
+             ./data/150213170032pip_25.dat
+            ./data/150213170032minusDS_25.dat
+            ./data/150213170032DDSp_25.dat
+            ./data/150213170032ergp_25.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.53    0.93  0.0235      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              26               1         1.26772     2.00416e-15     8.88178e-15     1.26827e-13
+              26               2     1.57867e-13     1.21323e-15     5.32907e-15     2.94729e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+3.53451e-12
+1.61911e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.60088     130     382       5    0.93    0.05           0       13.29           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_26
+             ./data/150213170032pip_26.dat
+            ./data/150213170032minusDS_26.dat
+            ./data/150213170032DDSp_26.dat
+            ./data/150213170032ergp_26.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.55   0.935  0.0237      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              27               1          1.2696     1.95627e-15     8.88178e-15     5.81784e-14
+              27               2     1.39255e-13     1.18177e-15     3.55271e-15     2.51399e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.18074e-12
+1.48314e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.72089     130     382       5   0.935    0.05           0       13.36           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_27
+             ./data/150213170032pip_27.dat
+            ./data/150213170032minusDS_27.dat
+            ./data/150213170032DDSp_27.dat
+            ./data/150213170032ergp_27.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.57    0.94  0.0238      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              28               1         1.27149     2.02198e-15     8.88178e-15     1.02063e-13
+              28               2     1.13551e-13     1.18142e-15     5.32907e-15      1.5725e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.42488e-12
+1.60205e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.55639     130     382       5    0.94    0.05           0       13.43           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_28
+             ./data/150213170032pip_28.dat
+            ./data/150213170032minusDS_28.dat
+            ./data/150213170032DDSp_28.dat
+            ./data/150213170032ergp_28.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.59   0.945  0.0239      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              29               1         1.27339     2.00735e-15     8.88178e-15     1.85751e-13
+              29               2      1.6415e-13     1.17045e-15     5.32907e-15       2.931e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.48668e-12
+1.43354e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.79648     130     382       5   0.945    0.05           0        13.5           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_29
+             ./data/150213170032pip_29.dat
+            ./data/150213170032minusDS_29.dat
+            ./data/150213170032DDSp_29.dat
+            ./data/150213170032ergp_29.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.61    0.95  0.0241      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              30               1         1.27528     1.94438e-15     8.88178e-15     1.35069e-13
+              30               2     1.82562e-13     1.16977e-15     3.55271e-15     1.24573e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+2.16835e-12
+1.03588e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.89155     130     382       5    0.95    0.05           0       13.57           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_30
+             ./data/150213170032pip_30.dat
+            ./data/150213170032minusDS_30.dat
+            ./data/150213170032DDSp_30.dat
+            ./data/150213170032ergp_30.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.63   0.955  0.0242      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              31               1         1.27718     1.97652e-15     8.88178e-15     3.92484e-13
+              31               2     4.25934e-13     1.12157e-15     5.32907e-15     3.18449e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.55971e-12
+2.13166e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.88571     130     382       5   0.955    0.05           0       13.65           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_31
+             ./data/150213170032pip_31.dat
+            ./data/150213170032minusDS_31.dat
+            ./data/150213170032DDSp_31.dat
+            ./data/150213170032ergp_31.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.65    0.96  0.0243      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              32               1         1.27909     1.94162e-15     8.88178e-15     3.54491e-13
+              32               2     3.88946e-13     1.15724e-15     5.32907e-15     4.17179e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.26705e-12
+1.59855e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.82432     130     382       5    0.96    0.05           0       13.72           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_32
+             ./data/150213170032pip_32.dat
+            ./data/150213170032minusDS_32.dat
+            ./data/150213170032DDSp_32.dat
+            ./data/150213170032ergp_32.dat
+timeNumber: 150213170032
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300      80       2       5    3.66   0.965  0.0244      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+              33               1           1.281     1.90313e-15     8.88178e-15      2.5593e-13
+              33               2      2.4587e-13     1.15127e-15     3.55271e-15     4.97426e-14
+
+average |dp/dt| integrated over each timeslice:
+1
+1.50084e-12
+1.59798e-12
+
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       2 6.88302     130     382       5   0.965    0.05           0       13.79           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150213170032inputsPi_33
+             ./data/150213170032pip_33.dat
+            ./data/150213170032minusDS_33.dat
+            ./data/150213170032DDSp_33.dat
+            ./data/150213170032ergp_33.dat
