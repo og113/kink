@@ -699,6 +699,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				{
 				DDS.insert(2*j,2*j) = 1.0; // p=0 at r=0
 				DDS.insert(2*j+1,2*j+1) = 1.0;
+				double csi = ((t==0 || t==(NT-1))? 0.5: 1.0);
+				kineticS +=	csi*b*pow(Cp(neighPosX),2.0)/a/2.0;
 				}
 			else if (t==(Nb-1))
 				{
@@ -913,218 +915,239 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	//propagating solution along minkowskian time paths
 	
-	//propagating solution back in minkowskian time
-    //A1. initialize mp==mphi using last point of ephi and zeros- use complex phi
-    cVec ap(N*(Na+1)); //phi on section "a"
-    ap = Eigen::VectorXcd::Zero(N*(Na+1));
-    //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++) ap(j*(Na+1)) = Cp(j*Nb);
+	if (pot[0]!='3') {
+		//propagating solution back in minkowskian time
+		//A1. initialize mp==mphi using last point of ephi and zeros- use complex phi
+		cVec ap(N*(Na+1)); //phi on section "a"
+		ap = Eigen::VectorXcd::Zero(N*(Na+1));
+		//#pragma omp parallel for
+		for (unsigned int j=0; j<N; j++) ap(j*(Na+1)) = Cp(j*Nb);
 
-    //A2. initialize vel - defined at half steps, first step being at t=-1/2,
-    //vel(t+1/2) := (p(t+1)-p(t))/dt
-    cVec velA (N*(Na+1));
-    velA = Eigen::VectorXcd::Zero(N*(Na+1));
-    double dtau = -b;
-    double Dt0 = dtau; //b/2*(-1+1i); - this is surely wrong!!
-    //#pragma omp parallel for
-    //for (unsigned int j=0; j<N; j++)
-    	//{
-        //velA(j*(Na+1)) = 0; //due to boundary condition
-    	//}
+		//A2. initialize vel - defined at half steps, first step being at t=-1/2,
+		//vel(t+1/2) := (p(t+1)-p(t))/dt
+		cVec velA (N*(Na+1));
+		velA = Eigen::VectorXcd::Zero(N*(Na+1));
+		double dtau = -b;
+		double Dt0 = dtau; //b/2*(-1+1i); - this is surely wrong!!
+		//#pragma omp parallel for
+		//for (unsigned int j=0; j<N; j++)
+			//{
+		    //velA(j*(Na+1)) = 0; //due to boundary condition
+			//}
 
-    
-    //A3. initialize acc using phi and expression from equation of motion and zeros-complex
-    cVec accA(N*(Na+1));
-    accA = Eigen::VectorXcd::Zero(N*(Na+1));
-    //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++)
-    	{
-    	if (pot[0]=='3') 			paramsV  = {r0+j*a, A};
-		unsigned int l = j*(Na+1);
-		if (pot[0]=='3' && j==(N-1)) 	accA(l) = 0.0;
-		else if (pot[0]=='3' && j==0) 	accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
-            								-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
-    	else 							accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))\
-    										+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l))-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
-    	}
-    	
-    //A4.5 starting the energy and that off
-	vec linErgA(Na); linErgA = Eigen::VectorXd::Zero(Na);
-	vec linNumA(Na); linNumA = Eigen::VectorXd::Zero(Na);
+		
+		//A3. initialize acc using phi and expression from equation of motion and zeros-complex
+		cVec accA(N*(Na+1));
+		accA = Eigen::VectorXcd::Zero(N*(Na+1));
+		//#pragma omp parallel for
+		for (unsigned int j=0; j<N; j++)
+			{
+			if (pot[0]=='3') 			paramsV  = {r0+j*a, A};
+			unsigned int l = j*(Na+1);
+			if (pot[0]=='3' && j==(N-1)) 	accA(l) = 0.0;
+			else if (pot[0]=='3' && j==0) 	accA(l) = ((Dt0/pow(a,2.0))*(2.0*ap(neigh(l,1,1,Na+1,N))-2.0*ap(l)) \
+		        								-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+			else 							accA(l) = ((Dt0/pow(a,2.0))*(ap(neigh(l,1,1,Na+1,N))\
+												+ap(neigh(l,1,-1,Na+1,N))-2.0*ap(l))-Dt0*(dV(ap(l))+dVr(ap(l))))/dtau;
+			}
+			
+		//A4.5 starting the energy and that off
+		vec linErgA(Na); linErgA = Eigen::VectorXd::Zero(Na);
+		vec linNumA(Na); linNumA = Eigen::VectorXd::Zero(Na);
 
-    //A7. run loop
-    for (unsigned int t=1; t<(Na+1); t++)
-    	{
-    	//#pragma omp parallel for
-        for (unsigned int x=0; x<N; x++)
-        	{
-            unsigned int m = t+x*(Na+1);
-            velA(m) = velA(m-1) + dtau*accA(m-1);
-            ap(m) = ap(m-1) + dtau*velA(m);
-        	}
-        //#pragma omp parallel for	
-        for (unsigned int x=0; x<N; x++)
-        	{
-        	if (pot[0]=='3') paramsV  = {r0+x*a, A};
-            unsigned int m = t+x*(Na+1);
-            if (pot[0]=='3' && x==(N-1)) accA(m) = 0.0;
-			else if (pot[0]=='3' && x==0)
-				{
-				accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
-            		-dV(ap(m)) - dVr(ap(m));
-            	erg(Na-t) += a*pow(ap(m-1),2.0)/pow((-dtau),2.0)/2.0;
-				}
-			else
-				{
-		    	accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
-            		-dV(ap(m)) - dVr(ap(m));
-            	erg(Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow(-dtau,2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
-            		+ a*V(ap(m)) + a*Vr(ap(m));
-		        }
-            for (unsigned int y=0; y<N; y++)
-            	{
-            	unsigned int n = t + y*(Na+1);
-		        if (absolute(theta)<1.0e-16)
+		//A7. run loop
+		for (unsigned int t=1; t<(Na+1); t++)
+			{
+			//#pragma omp parallel for
+		    for (unsigned int x=0; x<N; x++)
+		    	{
+		        unsigned int m = t+x*(Na+1);
+		        velA(m) = velA(m-1) + dtau*accA(m-1);
+		        ap(m) = ap(m-1) + dtau*velA(m);
+		    	}
+		    //#pragma omp parallel for	
+		    for (unsigned int x=0; x<N; x++)
+		    	{
+		    	if (pot[0]=='3') paramsV  = {r0+x*a, A};
+		        unsigned int m = t+x*(Na+1);
+		        if (pot[0]=='3' && x==(N-1)) accA(m) = 0.0;
+				else if (pot[0]=='3' && x==0)
 					{
-		        	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
-					linNumA (Na-t) += omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
-		        	}
+					accA(m) = (1.0/pow(a,2.0))*(2.0*ap(neigh(m,1,1,Na+1,N))-2.0*ap(m)) \
+		        		-dV(ap(m)) - dVr(ap(m));
+		        	erg(Na-t) += a*pow(ap(m-1),2.0)/pow((-dtau),2.0)/2.0;
+					}
 				else
 					{
-					linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
-					linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+					accA(m) = (1.0/pow(a,2.0))*(ap(neigh(m,1,1,Na+1,N))+ap(neigh(m,1,-1,Na+1,N))-2.0*ap(m)) \
+		        		-dV(ap(m)) - dVr(ap(m));
+		        	erg(Na-t) += a*pow(ap(m-1)-ap(m),2.0)/pow(-dtau,2.0)/2.0 + pow(ap(neigh(m,1,1,Na+1,N))-ap(m),2.0)/a/2.0 \
+		        		+ a*V(ap(m)) + a*Vr(ap(m));
+				    }
+		        for (unsigned int y=0; y<N; y++)
+		        	{
+		        	unsigned int n = t + y*(Na+1);
+				    if (absolute(theta)<1.0e-16)
+						{
+				    	linErgA(Na-t) += Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + Eomega(x,y)*imag(ap(m))*imag(ap(n));
+						linNumA (Na-t) += omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0]) + omega(x,y)*imag(ap(m))*imag(ap(n));
+				    	}
+					else
+						{
+						linErgA(Na-t) += 2.0*Gamma*omega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+						linNumA(Na-t) += 2.0*Gamma*Eomega(x,y)*(real(ap(m))-minima[0])*(real(ap(n))-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,y)*imag(ap(m))*imag(ap(n))/pow(1.0-Gamma,2.0);
+						}
 					}
-				}
-        	}
-    	}
-		
-	//E = 0;
-	//unsigned int linearInt = (unsigned int)(Na/6);
-	//#pragma omp parallel for
-	//for (unsigned int j=0; j<linearInt; j++)
-	//	{
-	//	E += real(erg(j));
-	//	}
-	//E /= linearInt;
-	if (pot[0]=='3') {
-		linErgA *= 4.0*pi;
-		linNumA *= 4.0*pi;
-		erg *= 4.0*pi;
-	}
-	E = linErgA(0);
-	W = - E*2.0*Tb + 2.0*imag(action);
-
-    //now propagating forwards along c
-    //C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
-    cVec ccp(N*(Nc+1)); //phi on section "c"
-    ccp = Eigen::VectorXcd::Zero(N*(Nc+1));
-    //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++) ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
-
-    //C3. initialize vel - defined at half steps, first step being at t=-1/2,
-    //vel(t+1/2) := (p(t+1)-p(t))/dt
-    cVec velC (N*(Nc+1));
-    velC = Eigen::VectorXcd::Zero(N*(Nc+1));
-    dtau = b;
-    Dt0 = dtau; //b/2*(1-1i); - this is surely wrong!!
-    //#pragma omp parallel for
-    //for (unsigned int j=0; j<N; j++)
-    	//{
-        //velC(j*(Nc+1)) = 0; //due to boundary condition
-    	//}
-
-    //C4. initialize acc using phi and expression from equation of motion and zeros-complex
-    cVec accC(N*(Nc+1));
-    accC = Eigen::VectorXcd::Zero(N*(Nc+1));
-    //#pragma omp parallel for
-    for (unsigned int j=0; j<N; j++)
-    	{
-    	unsigned int l = j*(Nc+1);
-    	if (pot[0]=='3') paramsV  = {r0+j*a, A};
-		if (pot[0]=='3' && j==(N-1)) 	accC(l) = 0.0;
-		else if (pot[0]=='3' && j==0) 	accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
-            							-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
-    	else 							accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))\
-    										+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
-    	}
-
-    //C7. run loop
-    for (unsigned int t=1; t<(Nc+1); t++)
-		{
-		//#pragma omp parallel for
-		for (unsigned int x=0; x<N; x++)
-			{
-		    unsigned int l = t+x*(Nc+1);
-		    velC(l) = velC(l-1) + dtau*accC(l-1);
-		    ccp(l) = ccp(l-1) + dtau*velC(l);
-			}
-		//#pragma omp parallel for
-		for (unsigned int x=0; x<N; x++)
-			{
-			if (pot[0]=='3') paramsV  = {r0+x*a, A};
-		    unsigned int l = t+x*(Nc+1);
-		    if (pot[0]=='3' && x==(N-1)) 	accC(l) = 0.0;
-			else if (pot[0]=='3' && x==0) 	accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
-		    									-dV(ccp(l));
-			else 							accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N)) \
-												+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-dV(ccp(l));		    	
-		    if (pot[0]=='3' && t>1 && x!=(N-1) && x!=0)
-		    	{
-				erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\
-				 	+ pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
-	    			+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
 		    	}
-		    else if (pot[0]=='3' && t>1 && x==0) erg (Na+Nb-2+t) += pow(ccp(neigh(l-1,1,1,Nc+1,N)),2.0)/a/2.0;
 			}
-		}
 		
-	//checking energy conserved
-	double ergChange = 0.0;
-	double relErgChange = 0.0;
-	if (absolute(real(erg(0)))>1.0e-16)
-		{
-		ergChange = absolute(real(erg(0))-real(erg(NT-2)));
-		relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
+		//E = 0;
+		//unsigned int linearInt = (unsigned int)(Na/6);
+		//#pragma omp parallel for
+		//for (unsigned int j=0; j<linearInt; j++)
+		//	{
+		//	E += real(erg(j));
+		//	}
+		//E /= linearInt;
+		if (pot[0]=='3') {
+			linErgA *= 4.0*pi;
+			linNumA *= 4.0*pi;
+			erg *= 4.0*pi;
 		}
-	erg_test.push_back(ergChange);
-	if (erg_test.back()>closenessE)
-		{
-		cout << "energy change = " << ergChange << endl;
-		cout << "relative energy change = " << relErgChange << endl;
-		}
-    
+		E = linErgA(0);
+		W = - E*2.0*Tb + 2.0*imag(action);
 
-    //12. combine phi with ap and cp and save combination to file
-    cVec tCp(NT*N);
-    //#pragma omp parallel for
-    for (unsigned int j=0; j<NT*N; j++)
-    	{
-        unsigned int t = intCoord(j,0,NT);
-        unsigned int x = intCoord(j,1,NT);
-        if (t<Na)
-        	{
-            t = Na-t;
-            tCp(j) = ap(t+x*(Na+1));
-            }
-        else if (t<(Na+Nb))
-        	{
-            t = t - Na;
-            tCp(j) = Cp(t+x*Nb);
-            }
-        else
-        	{
-            t = t - Na - Nb + 1;
-            tCp(j) = ccp(t+x*(Nc+1));
-        	}
+		//now propagating forwards along c
+		//C2. initialize mp==mphi using last point of ephi and zeros- use complex phi
+		cVec ccp(N*(Nc+1)); //phi on section "c"
+		ccp = Eigen::VectorXcd::Zero(N*(Nc+1));
+		//#pragma omp parallel for
+		for (unsigned int j=0; j<N; j++) ccp(j*(Nc+1)) = Cp(j*Nb+Nb-1);
+
+		//C3. initialize vel - defined at half steps, first step being at t=-1/2,
+		//vel(t+1/2) := (p(t+1)-p(t))/dt
+		cVec velC (N*(Nc+1));
+		velC = Eigen::VectorXcd::Zero(N*(Nc+1));
+		dtau = b;
+		Dt0 = dtau; //b/2*(1-1i); - this is surely wrong!!
+		//#pragma omp parallel for
+		//for (unsigned int j=0; j<N; j++)
+			//{
+		    //velC(j*(Nc+1)) = 0; //due to boundary condition
+			//}
+
+		//C4. initialize acc using phi and expression from equation of motion and zeros-complex
+		cVec accC(N*(Nc+1));
+		accC = Eigen::VectorXcd::Zero(N*(Nc+1));
+		//#pragma omp parallel for
+		for (unsigned int j=0; j<N; j++)
+			{
+			unsigned int l = j*(Nc+1);
+			if (pot[0]=='3') paramsV  = {r0+j*a, A};
+			if (pot[0]=='3' && j==(N-1)) 	accC(l) = 0.0;
+			else if (pot[0]=='3' && j==0) 	accC(l) = ((Dt0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+		        							-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+			else 							accC(l) = ((Dt0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N))\
+												+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-Dt0*(dV(ccp(l))+dVr(ccp(l))))/dtau;
+			}
+
+		//C7. run loop
+		for (unsigned int t=1; t<(Nc+1); t++)
+			{
+			//#pragma omp parallel for
+			for (unsigned int x=0; x<N; x++)
+				{
+				unsigned int l = t+x*(Nc+1);
+				velC(l) = velC(l-1) + dtau*accC(l-1);
+				ccp(l) = ccp(l-1) + dtau*velC(l);
+				}
+			//#pragma omp parallel for
+			for (unsigned int x=0; x<N; x++)
+				{
+				if (pot[0]=='3') paramsV  = {r0+x*a, A};
+				unsigned int l = t+x*(Nc+1);
+				if (pot[0]=='3' && x==(N-1)) 	accC(l) = 0.0;
+				else if (pot[0]=='3' && x==0) 	accC(l) = (1.0/pow(a,2.0))*(2.0*ccp(neigh(l,1,1,Nc+1,N))-2.0*ccp(l)) \
+													-dV(ccp(l));
+				else 							accC(l) = (1.0/pow(a,2.0))*(ccp(neigh(l,1,1,Nc+1,N)) \
+													+ccp(neigh(l,1,-1,Nc+1,N))-2.0*ccp(l))-dV(ccp(l));		    	
+				if (pot[0]=='3' && t>1 && x!=(N-1) && x!=0)
+					{
+					erg (Na+Nb-2+t) += a*pow(ccp(l)-ccp(l-1),2.0)/pow(dtau,2.0)/2.0\
+					 	+ pow(ccp(neigh(l-1,1,1,Nc+1,N))-ccp(l-1),2.0)/a/2.0\
+						+ a*V(ccp(l-1)) + a*Vr(ccp(l-1));
+					}
+				else if (pot[0]=='3' && t>1 && x==0) erg (Na+Nb-2+t) += pow(ccp(neigh(l-1,1,1,Nc+1,N)),2.0)/a/2.0;
+				}
+			}
+		
+		//checking energy conserved
+		double ergChange = 0.0;
+		double relErgChange = 0.0;
+		if (absolute(real(erg(0)))>1.0e-16)
+			{
+			ergChange = absolute(real(erg(0))-real(erg(NT-2)));
+			relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
+			}
+		erg_test.push_back(ergChange);
+		if (erg_test.back()>closenessE)
+			{
+			cout << "energy change = " << ergChange << endl;
+			cout << "relative energy change = " << relErgChange << endl;
+			}
+		
+
+		//12. combine phi with ap and cp and save combination to file
+		cVec tCp(NT*N);
+		//#pragma omp parallel for
+		for (unsigned int j=0; j<NT*N; j++)
+			{
+		    unsigned int t = intCoord(j,0,NT);
+		    unsigned int x = intCoord(j,1,NT);
+		    if (t<Na)
+		    	{
+		        t = Na-t;
+		        tCp(j) = ap(t+x*(Na+1));
+		        }
+		    else if (t<(Na+Nb))
+		    	{
+		        t = t - Na;
+		        tCp(j) = Cp(t+x*Nb);
+		        }
+		    else
+		    	{
+		        t = t - Na - Nb + 1;
+		        tCp(j) = ccp(t+x*(Nc+1));
+		    	}
+			}
+			
+		//making real vec from complex one
+		vec tp(2*N*NT);
+		tp = vecReal(tCp,NT*N);
+		tp.conservativeResize(2*N*NT+1);
+		tp(2*N*NT) = p(2*N*Nb);
+		
+		string prefix = "./data/" + timeNumber;
+		string suffix = "_" + numberToString<unsigned int>(loop) + ".dat";
+		
+		//printing output phi on whole time contour
+		string tpifile = prefix + "tpi"+inP+suffix;
+		printVector(tpifile,tp);
+		printf("%12s%30s\n"," ",tpifile.c_str());
+		//gp(tpifile,"repi.gp");
+		
+		//printing linErgVec
+		string linErgFile = "./data/" + timeNumber + "linErg"+inP+suffix;
+		simplePrintVector(linErgFile,linErgA);
+		printf("%12s%30s\n"," ",linErgFile.c_str());
+	//	gpSimple(linErgFile);
+
     	}
-    	
+    else {
+    	E = 0.0;
+    	W = 0.0;
+    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    	//misc end of program tasks - mostly printing
-    
-    //making real vec from complex one
-    vec tp(2*N*NT);
-    tp = vecReal(tCp,NT*N);
-    tp.conservativeResize(2*N*NT+1);
-    tp(2*N*NT) = p(2*N*Nb);
     
     //stopping clock
 	time = clock() - time;
@@ -1132,15 +1155,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//printing to terminal
 	printf("\n");
-	printf("%8s%8s%8s%8s%8s%8s%8s%16s%16s\n","runs","time","N","NT","L","Tb","dE","E","W");
-	printf("%8i%8g%8i%8i%8g%8g%8g%16g%16g\n",runs_count,realtime,N,NT,L,Tb,dE,E,W);
+	printf("%8s%8s%8s%8s%8s%8s%8s%12s%12s%12s\n","runs","time","N","NT","L","Tb","dE","E","im(S)","W");
+	printf("%8i%8g%8i%8i%8g%8g%8g%12.4g%12.4g%12.4g\n",runs_count,realtime,N,NT,L,Tb,dE,E,imag(action),W);
 	printf("\n");
 	 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 	//printing action value
 	FILE * actionfile;
 	actionfile = fopen("./data/action.dat","a");
-	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%14g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,E\
+	fprintf(actionfile,"%16s%8i%8i%8g%8g%8g%10.4g%10.4g%10.4g%10.4g%10.4g\n",timeNumber.c_str(),N,NT,L,Tb,dE,E,imag(action)\
 	,W,sol_test.back(),erg_test.back());
 	fclose(actionfile);
 	
@@ -1169,15 +1192,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	printf("%12s%30s\n"," ",pifile.c_str());
 //	gp(pifile,"repi.gp");
 	
-	//printing output phi on whole time contour
-	if (pot[0]!='3')
-		{
-		string tpifile = prefix + "tpi"+inP+suffix;
-		printVector(tpifile,tp);
-		printf("%12s%30s\n"," ",tpifile.c_str());
-		//gp(tpifile,"repi.gp");
-		}
-	
 	//printing output minusDS				
 	string minusDSfile = "./data/" + timeNumber + "minusDS"+suffix;
 	printVectorB(minusDSfile,minusDS);
@@ -1187,12 +1201,6 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	string DDSfile = prefix + "DDS"+inP+suffix;
 	printSpmat(DDSfile,DDS);
 	printf("%12s%30s\n"," ",DDSfile.c_str());
-	
-	//printing linErgVec
-	string linErgFile = "./data/" + timeNumber + "linErg"+inP+suffix;
-	simplePrintVector(linErgFile,linErgA);
-	printf("%12s%30s\n"," ",linErgFile.c_str());
-//	gpSimple(linErgFile);
 	
 	//printing erg
 	string ergFile = prefix + "erg"+inP+suffix;

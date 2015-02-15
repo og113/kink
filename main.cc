@@ -377,38 +377,48 @@ auto ddVr = [&] (const comp & phi)
 	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
-	mat omega(N,N);
-	mat Eomega(N,N);
-	omega = Eigen::MatrixXd::Zero(N,N);
-	Eomega = Eigen::MatrixXd::Zero(N,N);
-	mat h(N,N);
-	h = hFn(N,a,mass2);
+	mat omega_m1(N,N);
+	mat omega_0(N,N);
+	mat omega_1(N,N);
+	mat omega_2(N,N);
+	omega_m1 = Eigen::MatrixXd::Zero(N,N);
+	omega_0 = Eigen::MatrixXd::Zero(N,N);
+	omega_1 = Eigen::MatrixXd::Zero(N,N);
+	omega_2 = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
 	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
-	Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
-	if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
-	else
-		{
-		eigenValues = eigensolver.eigenvalues();
-		eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+	approxOmega = false;
+	if (!approxOmega) {
+		mat h(N,N);
+		h = hFn(N,a,mass2);
+		Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
+		if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
+		else {
+			eigenValues = eigensolver.eigenvalues();
+			eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
 		}
-	
-	//#pragma omp parallel for	
-	for (unsigned int j=0; j<N; j++)
-		{
-		for (unsigned int k=0; k<N; k++)
-			{
-			for (unsigned int l=0; l<N; l++)
-				{
-				double djdk = a;
-				if (pot[0]=='3') djdk *= 4.0*pi;
-				if (j==0 || j==(N-1)) djdk/=sqrt(2.0);
-				if (k==0 || k==(N-1)) djdk/=sqrt(2.0);
-				omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
-				}
+	}
+	else {
+		double normalisation = sqrt(2.0/(N-1.0));
+		for (unsigned int l=0; l<N; l++) {
+			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(N-1.0)/2.0)/dr,2.0);
+			for (unsigned int m=0; m<N; m++) eigenVectors(l,m) = normalisation*sin(pi*l*m/(N-1.0));
+		}
+	}
+	double djdk;	
+	for (unsigned int j=0; j<N; j++) {
+		for (unsigned int k=0; k<N; k++) {
+			for (unsigned int l=0; l<N; l++) {
+				djdk = 4.0*pi*dr;
+				if ((j==0 || j==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
+				if ((k==0 || k==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
+				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_0(j,k) += djdk*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_1(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_2(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 			}
 		}
+	}
 
 	if (zmt[0]=='n' || zmx[0]=='n')
 		{

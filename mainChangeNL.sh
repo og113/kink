@@ -43,7 +43,7 @@ for j in `seq 0 $loops`
 	let Nb=80
 	let Na=300
 	let Nc=2
-	Tb=$(echo "scale=5; 0.805+0.005*j" | bc)
+	Tb=$(echo "scale=5; 0.805+0.005*$j" | bc)
 	Ta=$(echo "scale=5; $Na*$Tb/($Nb-1.0)" | bc)
 	L=$(echo "scale=3; 5" | bc)
 	LoR=$(echo "scale=3; $L/10.0" | bc)
