@@ -42,15 +42,16 @@ return 0;
 
 int main() {
 
-string out_file = "results/13.02.15_pi_assembled.dat";
+string date = "15.02.15";
+string out_file = "results/" + date + "_pi_assembled.dat";
 int 	N 	= 130;
 int 	Nb 	= 80;
 double 	L 	= 5.0;
 double 	Tb 	= 0.8;
-string erg_file = "data/13.02.15_linErgA.txt", num_file = "data/13.02.15_linNumA.txt", action_file = "data/action.dat";
+string erg_file = "data/" + date + "_linErgA.txt", num_file = "data/" + date + "_linNumA.txt", action_file = "data/" + date + "_action.dat";
 
-simpleReader("results/13.02.15_pi_output.txt",erg_file,"linErgA",2);
-simpleReader("results/13.02.15_pi_output.txt",num_file,"linNumA",2);
+simpleReader("results/" + date + "_pi3_output.txt",erg_file,"linErgA",2);
+simpleReader("results/" + date + "_pi3_output.txt",num_file,"linNumA",2);
 
 
 ifstream is_erg, is_num, is_action;

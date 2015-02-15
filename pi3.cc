@@ -419,7 +419,7 @@ if (testLinear) {
 	for (unsigned int t=0;t<(Nt+1);t++){
 		tVec(t) = t*dt;
 		}
-	string linearizationFile = "data/" + timeNumber + "linearization.dat";
+	string linearizationFile = "data/" + timeNumber + "linearization_" + loopIn + ".dat";
 	simplePrintVector(linearizationFile,tVec);
 	simpleAppendVector(linearizationFile,linearizationA);
 	int linNa = (int)(linPoint/dtin);

@@ -2,17 +2,17 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-DATE="13.02.15"
+DATE="15.02.15"
 
-FILE="results/"$DATE"_pi_output.txt"
+FILE="results/"$DATE"_pi3_output.txt"
 SUMMARY="results/"$DATE"_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-#echo "output from piSimple.sh on "$DATE > $FILE
-#echo "" >> $FILE
-#echo "output from piSimple.sh on "$DATE > $SUMMARY
-#echo "" >> $SUMMARY
-#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Tb" "S/F" "E" "Num" "im(S)" >> $SUMMARY
+echo "output from piSimple.sh on "$DATE > $FILE
+echo "" >> $FILE
+echo "output from piSimple.sh on "$DATE > $SUMMARY
+echo "" >> $SUMMARY
+printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Tb" "S/F" "E" "Num" "im(S)" >> $SUMMARY
 
 function getEigenvectors {
 	echo "./sphaleron" >> $FILE
@@ -33,11 +33,11 @@ function changeParameter {
 	echo $1 " = " $2 >> $FILE
 }
 
-#let N=130
-#let Nb=80
-#let Na=300
-#let Nc=2
-#L=$(echo "scale=3; 5" | bc)
+let N=130
+let Nb=80
+let Na=300
+let Nc=2
+L=$(echo "scale=3; 5" | bc)
 #LoR=$(echo "scale=3; $L/10.0" | bc)
 #changeParameter "N" $N
 #changeParameter "Na" $Na
@@ -45,21 +45,23 @@ function changeParameter {
 #changeParameter "Nc" $Nc
 #./changeInputs LoR $LoR
 
-loops=12
+loops=11
 
 for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	#AMP=0.5
-	#echo "./sphaleron4" >> $FILE
-	#echo "" >> $FILE
-	#./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
-	#echo "./pi" >> $FILE
-	#echo "" >> $FILE
-	TIMENUMBER="150213133251"
-	let LOOP=28+$j
-	Tb=$(echo "scale=5; 0.655-0.005*$j" | bc)
+	Tb=$(echo "scale=5; 0.800-0.005*$j" | bc)
 	changeParameter "Tb" $Tb
+	AMP=0.5
+	echo "./sphaleron4" >> $FILE
+	echo "" >> $FILE
+	./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
+	echo "./pi" >> $FILE
+	echo "" >> $FILE
+	#TIMENUMBER="150213133251"
+	let TIMENUMBER=0+j
+	./pi $TIMENUMBER >> $FILE
+	let LOOP=0 #28+$j
 	echo "pi3 output:" >> $FILE
 	echo "" >> $FILE
 	./pi3 -tn $TIMENUMBER -loop $LOOP -test 1 >> $FILE

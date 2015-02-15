@@ -387,7 +387,7 @@ auto ddVr = [&] (const comp & phi)
 	omega_2 = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
 	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
-	approxOmega = false;
+	bool approxOmega = false;
 	if (!approxOmega) {
 		mat h(N,N);
 		h = hFn(N,a,mass2);
@@ -401,7 +401,7 @@ auto ddVr = [&] (const comp & phi)
 	else {
 		double normalisation = sqrt(2.0/(N-1.0));
 		for (unsigned int l=0; l<N; l++) {
-			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(N-1.0)/2.0)/dr,2.0);
+			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(N-1.0)/2.0)/a,2.0);
 			for (unsigned int m=0; m<N; m++) eigenVectors(l,m) = normalisation*sin(pi*l*m/(N-1.0));
 		}
 	}
@@ -409,7 +409,7 @@ auto ddVr = [&] (const comp & phi)
 	for (unsigned int j=0; j<N; j++) {
 		for (unsigned int k=0; k<N; k++) {
 			for (unsigned int l=0; l<N; l++) {
-				djdk = 4.0*pi*dr;
+				djdk = 4.0*pi*a;
 				if ((j==0 || j==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
 				if ((k==0 || k==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
 				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
@@ -527,8 +527,8 @@ auto ddVr = [&] (const comp & phi)
 	
 		//defining energy and number vectors
 		cVec erg(NT);
-		vec linErg(NT);
-		vec linNum(NT);
+		cVec linErg(NT);
+		cVec linNum(NT);
 		cVec derivErg(NT), potErg(NT);
 		comp linErgContm, linNumContm;
 		
@@ -707,8 +707,8 @@ auto ddVr = [&] (const comp & phi)
 			comp pot_r = 0.0;
 			bound = 0.0;
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
-			linErg = Eigen::VectorXd::Zero(NT);
-			linNum = Eigen::VectorXd::Zero(NT);
+			linErg = Eigen::VectorXcd::Zero(NT);
+			linNum = Eigen::VectorXcd::Zero(NT);
 			derivErg = Eigen::VectorXcd::Zero(NT);
 			potErg = Eigen::VectorXcd::Constant(NT,-ergZero);
 			linErgContm = 0.0;
@@ -767,13 +767,15 @@ auto ddVr = [&] (const comp & phi)
 		            minusDS(2*N*NT+1) 				+= -Dx*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
-				if (abs(theta)<DBL_MIN)
+				if (abs(theta)<DBL_MIN && t<(NT-1))
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErg(t) += Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0]) + Eomega(x,k)*p(2*j+1)*p(2*l+1); //middle sign may be negative - check this
-						linNum(t) += omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0]) + omega(x,k)*p(2*j+1)*p(2*l+1);
+						linErg(t) += 0.5*( omega_2(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+										+ omega_0(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
+						linNum(t) += 0.5*(omega_1(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+										+ omega_m1(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
 						}
 					}
 				else
@@ -781,8 +783,10 @@ auto ddVr = [&] (const comp & phi)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*omega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite?
-						linErg(t) += 2.0*Gamma*Eomega(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0) + 2.0*Gamma*Eomega(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
+						linNum(t) += 2.0*Gamma*omega_1(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+								 + 2.0*Gamma*omega_1(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite? also there may be a factor of 0.5, or 2 missing
+						linErg(t) += 2.0*Gamma*omega_2(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+								+ 2.0*Gamma*omega_2(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						}
 					}
 
@@ -861,11 +865,11 @@ auto ddVr = [&] (const comp & phi)
 						/////////////////////////////////////equation R - theta=0//////////////////////////////////////
 						for (unsigned int k=0;k<N;k++)
 							{
-							if (abs(omega(x,k))>DBL_MIN)
+							if (abs(omega_1(x,k))>DBL_MIN)
 								{
 								unsigned int m=k*NT;
-								DDS.coeffRef(2*j,2*m+1) += -2.0*omega(x,k);
-								minusDS(2*j) 			+= 2.0*omega(x,k)*p(2*m+1);
+								DDS.coeffRef(2*j,2*m+1) += -2.0*omega_1(x,k);
+								minusDS(2*j) 			+= 2.0*omega_1(x,k)*p(2*m+1);
 								}
 							}
 						////////////////////////////////////////////////////////////////////////////////////////
@@ -874,16 +878,17 @@ auto ddVr = [&] (const comp & phi)
 						{
 						for (unsigned int k=0;k<N;k++)
 							{
-							if (abs(omega(x,k))>DBL_MIN)
+							if (abs(omega_1(x,k))>DBL_MIN)
 								{
 								/////////////////////equation I - theta!=0//////////////
 								unsigned int m=k*NT;
-								DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega(x,k)/(1.0+Gamma);
-								minusDS(2*j+1) 			+= -(1.0-Gamma)*omega(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
+								DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega_1(x,k)/(1.0+Gamma);
+								minusDS(2*j+1) 			+= -(1.0-Gamma)*omega_1(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
 								/////////////////////equation R - theta!=0//////////////
-								minusDS(2*j) 			+= p(2*m+1)*omega(x,k)*(1+Gamma)*theta/(1-Gamma);
-								DDS.coeffRef(2*j,2*m+1)	+= -omega(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
-								bound 				+= -(1.0-Gamma)*omega(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma) + (1.0+Gamma)*omega(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
+								minusDS(2*j) 			+= p(2*m+1)*omega_1(x,k)*(1+Gamma)*theta/(1-Gamma);
+								DDS.coeffRef(2*j,2*m+1)	+= -omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
+								bound 					+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
+															 + (1.0+Gamma)*omega_1(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
 								}
 							}
 						//////////////////////////////////////equation R - theta!=0//////////////////////////////
@@ -970,6 +975,10 @@ auto ddVr = [&] (const comp & phi)
 		    	potErg 		*= 4.0*pi;
 		    	erg			*= 4.0*pi;
 		    }
+		    if (abs(theta)<DBL_MIN) {
+		    	linErg(NT-1) = linErg(NT-2);
+		    	linNum(NT-1) = linNum(NT-2);
+		    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
@@ -1029,8 +1038,8 @@ auto ddVr = [&] (const comp & phi)
 			erg_test.push_back(ergTest);
 						
 			//defining E, Num and cW
-			E = linErg(0);
-			Num =linNum(0);
+			E = real(linErg(0));
+			Num = real(linNum(0));
 			E_exact = 0.0;
 			for (unsigned int j=1; j<(linearInt+1); j++) E_exact += real(erg(j));
 			E_exact /= (double)linearInt;
@@ -1085,7 +1094,7 @@ auto ddVr = [&] (const comp & phi)
 			if ((print_choice.compare("l")==0 || print_choice.compare("e")==0))
 				{
 				string earlyLinErgFile = prefix + "mainlinErgE"+suffix;
-				simplePrintVector(earlyLinErgFile,linErg);
+				simplePrintCVector(earlyLinErgFile,linErg);
 				//gpSimple(earlyLinErgFile);
 				string earlyErgFile = prefix + "mainergE" + suffix;
 				simplePrintCVector(earlyErgFile,erg);
@@ -1240,14 +1249,14 @@ auto ddVr = [&] (const comp & phi)
 		//printing linNum
 		string linNumFile = prefix + "mainlinNum"+suffix;
 		linNum.conservativeResize(Na);
-		simplePrintVector(linNumFile,linNum);
+		simplePrintCVector(linNumFile,linNum);
 		printf("%12s%30s\n"," ",linNumFile.c_str());
 		//gpSimple(linNumFile);
 	
 		//printing linErg
 		string linErgFile = prefix + "mainlinErg"+suffix;
 		linErg.conservativeResize(Na);
-		simplePrintVector(linErgFile,linErg);
+		simplePrintCVector(linErgFile,linErg);
 		//gpSimple(linErgFile);
 		printf("%12s%30s\n"," ",linErgFile.c_str());
 		
