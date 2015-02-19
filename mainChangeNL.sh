@@ -71,7 +71,7 @@ for j in `seq 0 $loops`
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./pi3 -tn $TIMENUMBER -lin 1 -changeNa 1 -N 300 -approxOmega 0 >> $FILE
+			./pi3 -tn $TIMENUMBER -lin 1 -changeParams 1 -N 300 -approxOmega 0 >> $FILE
 			echo "" >> $FILE
 			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
 			echo "" >> $FILE

@@ -45,9 +45,10 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
-bool testTunnel = false, testLinear = false, changeNa = false, approxOmega = false;
-double closenessLin = 0.01;
-double linPoint = 0.0;
+bool testTunnel = false, testLinear = false, changeParams = false, approxOmega = false;
+double closenessLin = 1.0e-2, Tlin = 0.0;
+double closenessEdge = 1.0e-3, Redge = 0.0;
+double closenessMom = 1.9e-2, momTest;
 
 /* ---------------------------------------------------------------------------------------------
 user inputs
@@ -68,7 +69,7 @@ else if (argc % 2 && argc>1) {
 		else if (id.compare("test")==0 || id.compare("tunnel")==0 || id.compare("tt")==0) testTunnel = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("linearization")==0 || id.compare("lin")==0) testLinear = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("closeness")==0 || id.compare("close")==0) closenessLin = stringToNumber<double>(argv[2*j+2]);
-		else if (id.compare("changeNa")==0) changeNa = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("changeParams")==0) changeParams = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("approxOmega")==0) approxOmega = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("N")==0) N = atoi(argv[2*j+2]);
 		else {
@@ -387,13 +388,15 @@ while(j<2) {
 				linearizationA(k) = absDiff(erg(k),linErgField(k));
 				if (linearizationA(k)>closenessLin) nonLin = true;
 				if (linearizationA(k)<closenessLin && nonLin) {
-					linPoint = k*dt;
+					Tlin = k*dt;
 					nonLin = false;
 				}
 			}
-		}
-		if (testLinear) {
 			for (unsigned int j=0;j<(N+1);j++){
+				unsigned int n = (N-j)*(Nt+1)+(unsigned int)(Tlin/dt);
+				double rj = r0+(N-j)*dr;
+				if (abs(phi(n))>closenessEdge && abs(Redge)<1.0e-16)
+		        	Redge = rj;
 				for (unsigned int k=0;k<(N+1);k++){
 					unsigned int l = j*(Nt+1)+Nt-1;
 					unsigned int m = k*(Nt+1)+Nt-1;
@@ -422,13 +425,26 @@ if (testLinear) {
 	string linearizationFile = "data/" + timeNumber + "linearization_" + loopIn + ".dat";
 	simplePrintVector(linearizationFile,tVec);
 	simpleAppendVector(linearizationFile,linearizationA);
-	int linNa = (int)(linPoint/dtin);
+	momTest = linErgA*dr/linNumA/pi;
 	printf("linearization printed:  %39s\n",linearizationFile.c_str());
-	printf("linearization to %6.4f after t = %6.4f\n",closenessLin,linPoint);
-	if (changeNa) {
-		printf("Na changed to = %6i\n",linNa);
-		changeInputs("data/temp","Na",numberToString<int>(linNa),inputsF);
-		copyFile("data/temp",inputsF);
+	printf("Tlin(%6.4f)          = %6.4f\n",closenessLin,Tlin);
+	printf("Redge(%6.4f)         = %6.4f\n",closenessEdge,Redge);
+	printf("momTest               = %6.4f\n",momTest);
+	if (changeParams) {
+		//string inputsOut = "data/" + timeNumber + "inputsPi3_" + loopIn;
+		string inputsOut = "inputs";
+		int Nmom = (int)(linErgA*Redge/pi/linNumA/closenessMom) + 1;
+		int Nbmom = (int)(Nmom*4*Tbin/Redge);
+		int Nalin = (int)(Nbmom*Tlin/Tbin);
+		printf("L changed to :        %6.4g\n",Redge);
+		printf("N changed to :        %6i\n",Nmom);
+		printf("Na changed to:        %6i\n",Nalin); 
+		printf("Nb changed to:        %6i\n\n",Nbmom); 
+		changeInputs("data/temp1","LoR",numberToString<double>(Redge/10.0),inputsF);
+		changeInputs("data/temp2","N",numberToString<int>(Nmom),"data/temp1");
+		changeInputs("data/temp1","Na",numberToString<int>(Nalin),"data/temp2");
+		changeInputs("data/temp2","Nb",numberToString<int>(Nbmom),"data/temp1");
+		copyFile("data/temp2",inputsOut);
 	}
 }
 else if (!testTunnel) {	
@@ -471,7 +487,7 @@ else if (!testTunnel) {
 				}
 			}
 		}
-	string mainInFile = "data/" + timeNumber + "tpip_0.dat";
+	string mainInFile = "data/" + timeNumber + "tpip_" + loopIn + ".dat";
 	printThreeVectors(mainInFile,tVec,rVec,mainIn);
 	gp(mainInFile,"pi3.gp");
 

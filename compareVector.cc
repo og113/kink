@@ -47,11 +47,15 @@ int colA = 4, colB = 4;
 bool complex = true;
 
 if (argc>1) {
-	for (int j=0; j<(int)(argc/2); j++) {
-		string temp1 = argv[2*j+1];
-		string temp2 = argv[2*j+2];
-		if (temp1[0]=='-') {
-			temp1 = temp1.substr(1);
+	if (argc==3) {
+	fileA = argv[1];
+	fileB = argv[2];
+	}
+	else {
+		for (int j=0; j<(int)(argc/2); j++) {
+			string temp1 = argv[2*j+1];
+			string temp2 = argv[2*j+2];
+			if (temp1[0]=='-') temp1 = temp1.substr(1);
 			if (temp1.compare("fileA")==0) fileA = temp2;
 			else if (temp1.compare("fileB")==0) fileB = temp2;
 			else if (temp1.compare("colA")==0) colA = stringToNumber<int>(temp2);

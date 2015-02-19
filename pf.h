@@ -70,13 +70,17 @@ double closenessS; //solution (i.e. minusDS)
 double closenessSM; //solution max
 double closenessD; //delta
 double closenessC; //calculation
-double closenessE; //energy change
+double closenessCon; //energy conservation
 double closenessL; //linearisation of energy
 double closenessT; //true energy versus linear energy
 double closenessP; //checking lattice small enough for momenta
 double closenessR; //regularization
 double closenessIE; //imaginary part of the energy
 double closenessCL; //continuum approx to linear erg and num
+double closenessON; //on shell vs off shell linear energy
+double closenessAB; //a_k=Gamma*b*_k
+double closenessLR; //p(i,j)->p_lin(i,j) as i->0
+double closenessABNE; //linNum and linErg as calculated by a_k*b*_k agree with other calcs
 
 //parameters determining input phi
 //struct to hold answers to questions
@@ -106,6 +110,7 @@ double negVal; //the negative eigenvalue
 unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 string zmt; //dictates how time zero mode is dealt with
 string zmx; //dictates how x zero mode is dealt with
+string bds; //dictates how boundaries are dealt with in main
 double epsilon0; //the value of epsilon when the minima are degenerate
 double S1;
 double r0; //the minimum radius if pot[0]=='3'
@@ -143,6 +148,22 @@ double absDiff (const double& numA, const double& numB) {
 }
 double absDiff (const comp& numA, const comp& numB) {
 	return 2.0*abs(numA-numB)/sqrt(norm(numA)+norm(numB));
+}
+
+double absDiff(const vec& vecA, const vec& vecB) {
+	double normSqrdA = vecA.squaredNorm();
+	double normSqrdB = vecB.squaredNorm();
+	vec diff = vecA-vecB;
+	double normDiff = diff.norm();
+	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+}
+
+double absDiff(const cVec& vecA, const cVec& vecB) {
+	double normSqrdA = vecA.squaredNorm();
+	double normSqrdB = vecB.squaredNorm();
+	cVec diff = vecA-vecB;
+	double normDiff = diff.norm();
+	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
 }
 	
 //function giving location of smallest element of a vector of type T
@@ -925,7 +946,7 @@ vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & 
 void printParameters()
 	{
 	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Ta","Tb","Tc","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8.3g%8.3g%8.3g%8.3g%8.3g%8.3g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
+	printf("%8s%8i%8i%8i%8i%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 
@@ -1120,7 +1141,7 @@ void gpSimple(const string & readFile)
 	string commandOpenStr = "gnuplot -persistent";
 	const char * commandOpen = commandOpenStr.c_str();
 	FILE * gnuplotPipe = popen (commandOpen,"w");
-	string command1Str = "plot \"" + readFile + "\" using 1:2 with linespoints";
+	string command1Str = "plot \"" + readFile + "\" using 1 with linespoints";
 	string command2Str = "pause -1";
 	const char * command1 = command1Str.c_str();
 	const char * command2 = command2Str.c_str();
@@ -1481,12 +1502,14 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //fourier transform type functions
 
 //h the matrix from dl[7]
-mat hFn(const unsigned int & xN, const double & xa, const double & xmass2)
+mat hFn(const unsigned int & xN, const double & xa, const double & xmass2, const string& potential=pot)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
 	double diag = xmass2 + 2.0/pow(xa,2.0);
 	double offDiag1 = -1.0/pow(xa,2.0);
-	double offDiag2 = -pow(2.0,0.5)/pow(xa,2.0);	
+	double offDiag2;
+	if (pot[0]=='3') offDiag2 = -pow(2.0,0.5)/pow(xa,2.0);	
+	else			 offDiag2 = -1.0/pow(xa,2.0);
 	for (unsigned int l=0; l<xN; l++)
 		{
 		if (l==0)

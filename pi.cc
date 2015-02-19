@@ -155,9 +155,9 @@ string print_choice = aq.printChoice;
 	
 		//evaluating some properties of V
 		mass2 = ddVd(minima[0],&paramsV);
-		cout << "mass2 = " << mass2 << endl;
-		double fn_mass2 = 1.0 + epsilon0*exp(-4.0/pow(A,2.0))*(1.0/A + 1.0/pow(A,3.0) + 1.0/pow(A,5.0));
-		cout << "fn_mass2 = " << fn_mass2 << endl;
+		//cout << "mass2 = " << mass2 << endl;
+		//double fn_mass2 = 1.0 + epsilon0*exp(-4.0/pow(A,2.0))*(1.0/A + 1.0/pow(A,3.0) + 1.0/pow(A,5.0));
+		//cout << "fn_mass2 = " << fn_mass2 << endl;
 	
 		//finding root0 of dV0(phi)=0;
 		if (pot[0]=='1')
@@ -272,7 +272,8 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			cout << "need to run negEig and set negEigDone=1" << endl;
 			return 1;
 			}
-		string eigVecFilename = "./data/stable/eigVec.dat";
+		string tempPot = pot.substr(0,1);
+		string eigVecFilename = "./data/stable/eigVec_" + tempPot + ".dat";
 		unsigned int fileLength = countLines(eigVecFilename);
 		if (fileLength==(N*Nb+1))
 			{
@@ -280,7 +281,7 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			}
 		else if (fileLength % 2) //if its odd
 			{
-			string eigVecInputs = "data/stable/eigVecInputs.dat";
+			string eigVecInputs = "data/stable/eigVecInputs_" + tempPot + ".dat";
 			unsigned int NEig, NtEig;
 			ifstream fin;
 			fin.open(eigVecInputs.c_str());
@@ -307,7 +308,7 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			return 1;
 			}
 		ifstream eigFile;
-		eigFile.open("./data/stable/eigValue.dat", ios::in);
+		eigFile.open(eigVecFilename, ios::in);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		ss >> negP >> negc >> negcheck >> negerror >> negVal;
@@ -676,9 +677,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			if (pot[0]=='3')
 				{
 				paramsV  = {r0+x*a, 0.0};
-				if (t<(Nb-1)) dtTest += abs((p(2*(j+1))-p(2*j))/b);
 				}
-
+			if (t<(Nb-1)) dtTest += abs((p(2*(j+1))-p(2*j))/b);
 			
 			if ((absolute(Chi0(j))>1.0e-16) && pot[0]!='3') //zero mode lagrange constraint
 				{
@@ -869,10 +869,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		
 		//checking pot_r is much smaller than the other potential terms
 		reg_test.push_back(abs(pot_r/pot_0));
-		if (reg_test.back()>closenessR)
-			{
-			cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
-			}
+		if (reg_test.back()>closenessR) cerr << "regularisation term is too large, regTest = " << reg_test.back() << endl;
 		
 		//evaluating norms
 		double normDS = minusDS.dot(minusDS);
@@ -1172,18 +1169,9 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	
 	//copying a version of inputs with timeNumber
 	string runInputs = prefix + "inputsPi" + "_" + numberToString<unsigned int>(loop);
-	if (loop_choice[0] == 'N')
-		{
-		changeInputs(runInputs,loop_choice, numberToString<unsigned int>(intLoopParameter));
-		}
-	else if (loop_choice.compare("n")!=0)
-		{
-		changeInputs(runInputs,loop_choice, numberToString<double>(doubleLoopParameter));
-		}
-	else
-		{
-		copyFile("inputs",runInputs);
-		}
+	if (loop_choice[0] == 'N') 				changeInputs(runInputs,loop_choice, numberToString<unsigned int>(intLoopParameter));
+	else if (loop_choice.compare("n")!=0) 	changeInputs(runInputs,loop_choice, numberToString<double>(doubleLoopParameter));
+	else									copyFile("inputs",runInputs);
 	printf("%12s%30s\n","output: ",runInputs.c_str());
 
 	//printing output phi on Euclidean time part
@@ -1222,12 +1210,11 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 		eigenvalueOut << lastEigLine;
 		eigenvalueOut.close();
 		printf("%12s%30s\n"," ",eigenvaluefile.c_str());
+		//printing eigenvector to file
+		string eigenvectorFile = prefix + "eigVec.dat";
+		copyFile("data/eigVec.dat",eigenvectorFile);
+		printf("%12s%30s\n"," ",eigenvectorFile.c_str());
 		}
-
-	//printing eigenvector to file
-	/*string eigenvectorFile = prefix + "eigVec.dat";
-	copyFile("data/eigVec.dat",eigenvectorFile);
-	printf("%12s%30s\n"," ",eigenvectorFile.c_str());*/
 
 } //closing parameter loop
 

@@ -220,5 +220,20 @@ mat EomegaDiff = Eomega1-Eomega2;
 cout << "EomegaDiff.maxCoeff() = " << EomegaDiff.maxCoeff() << endl;
 cout << endl;
 
+// quick test to see column/row ordering
+double quickTestRow, quickTestColumn;
+vec quickTestRowVec(N), quickTestColumnVec(N), temp(N);
+for (unsigned int j=0; j<N; j++) {
+	quickTestRowVec(j) = eigenVectors1(0,j);
+	quickTestColumnVec(j) = eigenVectors1(j,0);
+}
+temp = h*quickTestRowVec;
+temp -= eigenValues1(0)*quickTestRowVec;
+quickTestRow = temp.norm();
+temp = h*quickTestColumnVec;
+temp -= eigenValues1(0)*quickTestColumnVec;
+quickTestColumn = temp.norm();
+cout << "quickTestRow = " << quickTestRow << endl;
+cout << "quickTestColumn = " << quickTestColumn << endl;
 return 0;
 }

@@ -7,13 +7,14 @@
 #include <string>
 #include <map>
 #include <cmath>
-#include <limits>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_poly.h>
 #include <gsl/gsl_roots.h>
 #include "pf.h"
 #include "files.h"
+
+#define MIN_NUMBER 1.0e-16
 
 int main()
 {
@@ -38,7 +39,7 @@ if (fmainin.is_open()) {
 			lineNumber++;
 		}
 		else if (lineNumber==1) {
-			ss >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx;
+			ss >> minTb >> maxTb >> minTheta >> maxTheta >> loops >> zmt >> zmx >> bds;
 			lineNumber++;
 		}
 	}
@@ -72,7 +73,9 @@ if (inF.compare("p")==0)
 		{
 		cout << "eigen files not available" << endl;
 		cout << "eigenvalueFiles.size() = " << eigenvalueFiles.size() << endl;
+		for (unsigned int j=0; j<eigenvalueFiles.size(); j++) cout << eigenvalueFiles[j] << endl;
 		cout << "eigenvectorFiles.size() = " << eigenvectorFiles.size() << endl;
+		for (unsigned int j=0; j<eigenvectorFiles.size(); j++) cout << eigenvectorFiles[j] << endl;
 		}
 	}
 else if (inF.compare("m")==0)
@@ -214,6 +217,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		ddVd = &ddV1;
 		epsilon0 = 0.0;
 		epsilon = dE;
+		r0 = 0.0;
 		}
 	else if (pot[0]=='2')
 		{
@@ -227,6 +231,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		ddVd = &ddV2;
 		epsilon0 = 0.74507774287199924;
 		epsilon = 0.75;
+		r0 = 0.0;
 		}
 	else if (pot[0]=='3')
 		{
@@ -240,7 +245,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 		ddVd = &ddV3;
 		epsilon0 = 0.0;
 		epsilon = 0.0;
-		r0 = 1.0e-16;
+		r0 = MIN_NUMBER;
 		}
 	else
 		{
@@ -304,7 +309,7 @@ vector<double> minima0(2);
 		S1_integrand.function = &s1Integrand;
 		S1_integrand.params = &paramsV0;
 		gsl_integration_workspace *w = gsl_integration_workspace_alloc(1e4);
-		gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], 1.0e-16, 1.0e-8, 1e4, 4, w, &S1, &S1error);
+		gsl_integration_qag(&S1_integrand, minima0[0], minima0[1], MIN_NUMBER, 1.0e-8, 1e4, 4, w, &S1, &S1error);
 		gsl_integration_workspace_free(w);
 		if (S1error>1.0e-8) { cout << "S1 error = " << S1error << endl;}
 		}
@@ -326,6 +331,7 @@ vector<double> minima0(2);
 		R = S1/dE;
 		twaction = -pi*epsilon*pow(R,2)/2.0 + pi*R*S1;
 		alpha *= R;
+		L = LoR*R;
 		if (Tb<R)
 			{
 			angle = asin(Tb/R);
@@ -354,13 +360,17 @@ vector<double> minima0(2);
 	closenessSM = 1.0e-5;
 	closenessD = 1.0;
 	closenessC = 1.0e-16*N*NT;
-	closenessE = 1.0/3.0;
+	closenessCon = 1.0/3.0;
 	closenessL = 1.0e-2;
 	closenessT = 1.0e-5;
 	closenessP = 0.5;
 	closenessR = 1.0e-2;
 	closenessIE = 1.0e-5;
-	closenessCL = 1.0e-1;
+	closenessCL = 5.0e-2;
+	closenessON = 1.0e-2;
+	closenessAB = 1.0e-16;
+	closenessLR = 1.0e-16;
+	closenessABNE = 1.0e-16;
 	
 	//lambda functions for pot_r
 auto Vr = [&] (const comp & phi)
@@ -386,13 +396,16 @@ auto ddVr = [&] (const comp & phi)
 	omega_1 = Eigen::MatrixXd::Zero(N,N);
 	omega_2 = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
-	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix
+	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix - so the nth eigenvector is v_n(j) = eigenVectors(j,n)
 	bool approxOmega = false;
 	if (!approxOmega) {
 		mat h(N,N);
 		h = hFn(N,a,mass2);
 		Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
-		if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
+		if (eigensolver.info() != Eigen::Success) {
+			cerr << "h eigensolver failed" << endl;
+			cerr << "N = " << N << ", a = " << a << ", mass2 = " << mass2 << endl;
+		}
 		else {
 			eigenValues = eigensolver.eigenvalues();
 			eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
@@ -402,20 +415,24 @@ auto ddVr = [&] (const comp & phi)
 		double normalisation = sqrt(2.0/(N-1.0));
 		for (unsigned int l=0; l<N; l++) {
 			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(N-1.0)/2.0)/a,2.0);
-			for (unsigned int m=0; m<N; m++) eigenVectors(l,m) = normalisation*sin(pi*l*m/(N-1.0));
+			for (unsigned int m=0; m<N; m++) {
+				if (pot[0]=='3') eigenVectors(l,m) = normalisation*sin(pi*l*m/(N-1.0));
+				else			 eigenVectors(l,m) = normalisation*cos(pi*l*m/(N-1.0));
+			}
 		}
 	}
 	double djdk;	
 	for (unsigned int j=0; j<N; j++) {
 		for (unsigned int k=0; k<N; k++) {
 			for (unsigned int l=0; l<N; l++) {
-				djdk = 4.0*pi*a;
-				if ((j==0 || j==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
-				if ((k==0 || k==(N-1)) && !approxOmega) djdk/=sqrt(2.0);
+				if (pot[0]=='3') djdk = 4.0*pi*a;
+				else 			 djdk = a;
+				if ((j==0 || j==(N-1)) && !approxOmega && pot[0]=='3') djdk/=sqrt(2.0);
+				if ((k==0 || k==(N-1)) && !approxOmega && pot[0]=='3') djdk/=sqrt(2.0);
 				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_0(j,k) += djdk*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_1(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_2(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_0(j,k)  += djdk*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_1(j,k)  += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_2(j,k)  += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 			}
 		}
 	}
@@ -437,12 +454,13 @@ auto ddVr = [&] (const comp & phi)
 				cerr << "negEigDone==0, run negEig and then set negEigDone=1" << endl;
 				return 1;
 				}
-		string eigVecFilename = "./data/stable/eigVec.dat";
+		string tempPot = pot.substr(0,1);
+		string eigVecFilename = "./data/stable/eigVec_" + tempPot + ".dat";
 		unsigned int fileLength = countLines(eigVecFilename);
 		if (fileLength==(N*Nb+1)) negVec = loadVector(eigVecFilename,Nb,N,1);
 		else if (fileLength % 2) //if its odd
 			{
-			string eigVecInputs = "data/stable/eigVecInputs.dat";
+			string eigVecInputs = "data/stable/eigVecInputs" + tempPot + ".dat";
 			unsigned int NEig, NtEig;
 			ifstream fin;
 			fin.open(eigVecInputs.c_str());
@@ -496,7 +514,7 @@ auto ddVr = [&] (const comp & phi)
 		{
 		if (loops>1)
 			{
-			if ((abs(theta-minTheta)>DBL_MIN || abs(Tb-minTb)>DBL_MIN) && loop==0)
+			if ((abs(theta-minTheta)>MIN_NUMBER || abs(Tb-minTb)>MIN_NUMBER) && loop==0)
 				{
 				cout << "input Tb     : " << Tb << endl;
 				cout << "program Tb   : " << minTb << endl;
@@ -504,12 +522,12 @@ auto ddVr = [&] (const comp & phi)
 				cout << "program theta: " << minTheta << endl;
 				cout << endl;
 				}
-			if (abs(maxTheta-minTheta)>DBL_MIN)
+			if (abs(maxTheta-minTheta)>MIN_NUMBER)
 				{
 				theta = minTheta + (maxTheta - minTheta)*loop/(loops-1.0);
 				Gamma = exp(-theta);
 				}
-			else if (abs(maxTb-minTb)>DBL_MIN)
+			else if (abs(maxTb-minTb)>MIN_NUMBER)
 				{
 				Tb = minTb + (maxTb - minTb)*loop/(loops-1.0);
 				changeDouble ("Tb",Tb);
@@ -529,6 +547,8 @@ auto ddVr = [&] (const comp & phi)
 		cVec erg(NT);
 		cVec linErg(NT);
 		cVec linNum(NT);
+		cVec linErgOffShell(NT);
+		cVec linNumOffShell(NT);
 		cVec derivErg(NT), potErg(NT);
 		comp linErgContm, linNumContm;
 		
@@ -549,12 +569,16 @@ auto ddVr = [&] (const comp & phi)
 		vector<double> solM_test(1);	solM_test[0] = 1.0;
 		vector<double> delta_test(1); delta_test[0] = 1.0;
 		vector<double> calc_test(1); calc_test[0] = 1.0;
-	 	vector<double> erg_test(1); erg_test[0] = 1.0;
+	 	vector<double> conserv_test(1); conserv_test[0] = 1.0;
 		vector<double> lin_test(1); lin_test[0] = 1.0;
 		vector<double> true_test(1); true_test[0] = 1.0;
 		vector<double> mom_test(1); mom_test[0] = 1.0;
 		vector<double> reg_test(1); reg_test[0] = 1.0;
 		vector<double> imErg_test(1); imErg_test[0] = 1.0;
+		vector<double> onShell_test(1); onShell_test[0] = 1.0;
+		vector<double> AB_test(1); AB_test[0] = 1.0;
+		vector<double> linRep_test(1); linRep_test[0] = 1.0;
+		vector<double> ABNE_test(1); ABNE_test[0] = 1.0;
 
 		//initializing phi (=p)
 		vec p(2*N*NT+2);
@@ -626,7 +650,7 @@ auto ddVr = [&] (const comp & phi)
 						for (unsigned int k=0;k<slicesT;k++)
 							{
 							if (zmt[0]=='n' && pot[0]!='3') 	chiT(posT+k) = negVec(2*(posCe+k));
-							if (zmt[0]=='n' && pot[0]=='3')
+							else if (zmt[0]=='n' && pot[0]=='3')
 								{
 								double r = r0 + j*a;
 								chiT(posT+k) = negVec(j)*r;
@@ -654,12 +678,12 @@ auto ddVr = [&] (const comp & phi)
 						for (unsigned int k=0;k<slicesX;k++)
 							{
 							if (zmx[0]=='n' && pot[0]!='3')		chiX(posX+k) = negVec(2*(posCe+k));
-							if (zmx[0]=='n' && pot[0]=='3')
+							else if (zmx[0]=='n' && pot[0]=='3')
 								{
 								double r = r0 + j*a;
 								chiX(posX+k) = negVec(j)*r;
 								}
-							else if (zmx[0]=='d' && pot[0]!='3')chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
+							else if (zmx[0]=='d' && pot[0]!='3') chiX(posX+k) = p(2*neigh(posX+k,1,1,NT,N))-p(2*neigh(posX+k,1,-1,NT,N));
 							else
 								{
 								cerr << "choice of zmx not allowed" << endl;
@@ -672,7 +696,7 @@ auto ddVr = [&] (const comp & phi)
 			double normX = chiX.norm();
 			double normT = chiT.norm();
 			normT = pow(normT,0.5);
-			if (abs(normX)<DBL_MIN || abs(normT)<DBL_MIN)
+			if (abs(normX)<MIN_NUMBER || abs(normT)<MIN_NUMBER)
 				{
 				cerr << "norm of chiX = " << normX << ", norm of chiT = " << normT << endl;
 				}
@@ -708,7 +732,9 @@ auto ddVr = [&] (const comp & phi)
 			bound = 0.0;
 			erg = Eigen::VectorXcd::Constant(NT,-ergZero);
 			linErg = Eigen::VectorXcd::Zero(NT);
+			linErgOffShell = Eigen::VectorXcd::Zero(NT);
 			linNum = Eigen::VectorXcd::Zero(NT);
+			linNumOffShell = Eigen::VectorXcd::Zero(NT);
 			derivErg = Eigen::VectorXcd::Zero(NT);
 			potErg = Eigen::VectorXcd::Constant(NT,-ergZero);
 			linErgContm = 0.0;
@@ -748,7 +774,7 @@ auto ddVr = [&] (const comp & phi)
 				
 				if (pot[0]=='3') paramsV  = {r0+x*a, 0.0};
 			
-				if (abs(chiX(j))>DBL_MIN && pot[0]!='3') //spatial zero mode lagrange constraint
+				if (abs(chiX(j))>MIN_NUMBER && pot[0]!='3') //spatial zero mode lagrange constraint
 					{
 					DDS.insert(2*j,2*N*NT) 			= Dx*chiX(j); 
 					DDS.insert(2*N*NT,2*j) 			= Dx*chiX(j);
@@ -756,7 +782,7 @@ auto ddVr = [&] (const comp & phi)
 					minusDS(2*N*NT) 				+= -Dx*chiX(j)*p(2*j);
 					}
 					
-				if (abs(chiT(j))>DBL_MIN && t<(NT-1))
+				if (abs(chiT(j))>MIN_NUMBER && t<(NT-1))
 					{
 					DDS.coeffRef(2*(j+1),2*N*NT+1) 	+= Dx*chiT(j); //chiT should be 0 at t=(NT-1) or this line will go wrong
 					DDS.coeffRef(2*N*NT+1,2*(j+1)) 	+= Dx*chiT(j);
@@ -767,24 +793,25 @@ auto ddVr = [&] (const comp & phi)
 		            minusDS(2*N*NT+1) 				+= -Dx*chiT(j)*(p(2*(j+1))-p(2*j));
 					}
 					
-				if (abs(theta)<DBL_MIN && t<(NT-1))
+				if (t<(NT-1))
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErg(t) += 0.5*( omega_2(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+						linErgOffShell(t) += 0.5*( omega_2(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
 										+ omega_0(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
-						linNum(t) += 0.5*(omega_1(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+						linNumOffShell(t) += 0.5*(omega_1(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
 										+ omega_m1(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
 						}
 					}
-				else
+					
+				if (abs(theta)>MIN_NUMBER)
 					{
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
 						linNum(t) += 2.0*Gamma*omega_1(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
-								 + 2.0*Gamma*omega_1(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0); //are signs right? shouldn't this be positive definite? also there may be a factor of 0.5, or 2 missing
+								 + 2.0*Gamma*omega_1(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						linErg(t) += 2.0*Gamma*omega_2(x,k)*(p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
 								+ 2.0*Gamma*omega_2(x,k)*p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0);
 						}
@@ -820,102 +847,188 @@ auto ddVr = [&] (const comp & phi)
 					}
 				else if (t==0)
 					{
-					kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
 					kineticT 	+= Dx*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
-					potV 		+= Dt*Dx*V(Cp(j));
-					pot_r 		+= Dt*Dx*Vr(Cp(j));
-					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
+					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					
-					//////////////////////////////////////equation I - both///////////////////////////////////
-					for (unsigned int k=1; k<2*2; k++)
-			        	{
-			            int sign = pow(-1,k+1);
-			            int direc = (int)(k/2.0);
-			            int neighb = neigh(j,direc,sign,NT,N);
-			            double dxd = (sign==1? dx: dxm);
-			            if (direc == 0)
-			            	{
-			                minusDS(2*j+1) 					+= Dx*imag(Cp(j+sign)/dt);
-			                DDS.coeffRef(2*j+1,2*(j+sign)) 	+= -imag(Dx/dt);
-			                DDS.coeffRef(2*j+1,2*(j+sign)+1)+= -real(Dx/dt);
-			                }
-			            else if (neighb!=-1)
-			            	{
-			                minusDS(2*j+1) 					+= - imag(Dt*Cp(neighb))/dxd;
-			                DDS.coeffRef(2*j+1,2*neighb) 	+= imag(Dt)/dxd;
-			                DDS.coeffRef(2*j+1,2*neighb+1) 	+= real(Dt)/dxd;
-			                }
-			            }
-			        comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
-			        comp temp1 = Dt*Dx*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
-			        comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
-			        
-			        minusDS(2*j+1) 				+= imag(-temp0*Cp(j) + temp1 );
-			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp2 );
-			        DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp2 );
-				    /////////////////////////////////////////////////////////////////////////////////////////
-					if (abs(theta)<DBL_MIN)
+					if (bds.compare("ft")==0) // this actually requires that p(0,x)=p(0,k) (t=0)
 						{
-						//simplest boundary conditions replaced by ones continuously connected to theta!=0 ones
-						//DDS.insert(2*j+1,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
-						//DDS.insert(2*j,2*j+1) = 1.0; //zero imaginary part
-						
-						/////////////////////////////////////equation R - theta=0//////////////////////////////////////
-						for (unsigned int k=0;k<N;k++)
+						if (abs(theta)<MIN_NUMBER)
 							{
-							if (abs(omega_1(x,k))>DBL_MIN)
+							for (unsigned int k=0; k<N; k++)
 								{
-								unsigned int m=k*NT;
-								DDS.coeffRef(2*j,2*m+1) += -2.0*omega_1(x,k);
-								minusDS(2*j) 			+= 2.0*omega_1(x,k)*p(2*m+1);
+								unsigned int m = k*NT;
+								minusDS(2*j)				+= 2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*p(2*m+1);
+								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*(p(2*(m+1)+1)-p(2*m+1))/real(dt);
+								DDS.coeffRef(2*j,2*m+1)		+= -2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k);
+								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
+								DDS.coeffRef(2*j+1,2*m+1) 	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
 								}
 							}
-						////////////////////////////////////////////////////////////////////////////////////////
+						else
+							{
+							for (unsigned int k=0; k<N; k++)
+								{
+								unsigned int m = k*NT;
+								minusDS(2*j)				+= theta*sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1))-p(2*m))/real(dt) \
+																+ ((1.0+Gamma)/(1.0-Gamma))*eigenValues(k)*p(2*m+1));
+								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1)+1)-p(2*m+1))/real(dt) \
+																- ((1.0-Gamma)/(1.0+Gamma))*eigenValues(k)*p(2*m));
+								DDS.coeffRef(2*j,2*m)		+= theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
+								DDS.coeffRef(2*j,2*(m+1))	+= -theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
+								DDS.coeffRef(2*j,2*m+1)		+= -theta*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0+Gamma)/(1.0-Gamma);
+								DDS.coeffRef(2*j+1,2*m+1)	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
+								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
+								DDS.coeffRef(2*j+1,2*m)		+= +sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0-Gamma)/(1.0+Gamma);
+								}
+							}
 						}
-					else
+					else if (bds.compare("jd")==0)
 						{
-						for (unsigned int k=0;k<N;k++)
+						minusDS(2*j+1) 					+= Dx*imag(Cp(j+1)/dt);
+					    DDS.coeffRef(2*j+1,2*(j+1)) 	+= -imag(Dx/dt);
+					    DDS.coeffRef(2*j+1,2*(j+1)+1)	+= -real(Dx/dt);
+					    minusDS(2*j+1) 					+= imag(-Dx*Cp(j)/dt);
+					    DDS.coeffRef(2*j+1,2*j) 		+= imag(Dx/dt);
+					    DDS.coeffRef(2*j+1,2*j+1) 		+= real(Dx/dt);
+					    if (abs(theta)<MIN_NUMBER)
 							{
-							if (abs(omega_1(x,k))>DBL_MIN)
+							/////////////////////////////////////equation R - theta=0//////////////////////////////////////
+							for (unsigned int k=0;k<N;k++)
 								{
-								/////////////////////equation I - theta!=0//////////////
-								unsigned int m=k*NT;
-								DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega_1(x,k)/(1.0+Gamma);
-								minusDS(2*j+1) 			+= -(1.0-Gamma)*omega_1(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
-								/////////////////////equation R - theta!=0//////////////
-								minusDS(2*j) 			+= p(2*m+1)*omega_1(x,k)*(1+Gamma)*theta/(1-Gamma);
-								DDS.coeffRef(2*j,2*m+1)	+= -omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
-								bound 					+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
-															 + (1.0+Gamma)*omega_1(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
+								if (abs(omega_1(x,k))>MIN_NUMBER)
+									{
+									unsigned int m=k*NT;
+									DDS.coeffRef(2*j,2*m+1) += -2.0*omega_1(x,k);
+									minusDS(2*j) 			+= 2.0*omega_1(x,k)*p(2*m+1);
+									}
 								}
+							////////////////////////////////////////////////////////////////////////////////////////
 							}
-						//////////////////////////////////////equation R - theta!=0//////////////////////////////
+						else
+							{
+							for (unsigned int k=0;k<N;k++)
+								{
+								if (abs(omega_1(x,k))>MIN_NUMBER)
+									{
+									/////////////////////equation I - theta!=0//////////////
+									unsigned int m=k*NT;
+									DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega_1(x,k)/(1.0+Gamma);
+									minusDS(2*j+1) 			+= -(1.0-Gamma)*omega_1(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
+									/////////////////////equation R - theta!=0//////////////
+									minusDS(2*j) 			+= p(2*m+1)*omega_1(x,k)*(1+Gamma)*theta/(1-Gamma);
+									DDS.coeffRef(2*j,2*m+1)	+= -omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
+									bound 				+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
+																 + (1.0+Gamma)*omega_1(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
+									}
+								}
+							//////////////////////////////////////equation R - theta!=0//////////////////////////////
+				            minusDS(2*j) 					+= theta*Dx*real(Cp(j+1)/dt);
+			            	DDS.coeffRef(2*j,2*(j+1)) 		+= -theta*real(Dx/dt);
+			            	DDS.coeffRef(2*j,2*(j+1)+1) 	+= theta*imag(Dx/dt);
+						    minusDS(2*j) 					+= theta*real(-Dx*Cp(j)/dt);
+					    	DDS.coeffRef(2*j,2*j) 			+= theta*real(Dx/dt);
+					    	DDS.coeffRef(2*j,2*j+1) 		+= theta*imag(-Dx/dt);
+							}
+						}
+					else ///////////////////////////////// including other terms in action at t=0 ///////////////////////////
+						{
+						kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						potV 		+= Dt*Dx*V(Cp(j));
+						pot_r 		+= Dt*Dx*Vr(Cp(j));
+						derivErg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+						erg(t) 		+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+						//////////////////////////////////////equation I - both///////////////////////////////////
 						for (unsigned int k=1; k<2*2; k++)
-				        	{
-				            int sign = pow(-1,k+1);
-				            int direc = (int)(k/2.0);
-				            double dxd = (sign==1? dx: dxm);
-				            if (direc == 0)
-				            	{
-				                minusDS(2*j) 					+= Dx*real(Cp(j+sign)/dt)*theta;
-			                	DDS.coeffRef(2*j,2*(j+sign)) 	+= -real(Dx/dt)*theta;
-			                	DDS.coeffRef(2*j,2*(j+sign)+1) 	+= imag(Dx/dt)*theta;
-				                }
-				            else
-				            	{
-				                unsigned int neighb = neigh(j,direc,sign,NT,N);
-				                minusDS(2*j) 					+= - real(Dt*Cp(neighb))*theta/dxd;
-				                DDS.coeffRef(2*j,2*neighb) 		+= real(Dt)*theta/dxd;
-			                	DDS.coeffRef(2*j,2*neighb+1) 	+= -imag(Dt)*theta/dxd;
-				                }
-				            }
-				        minusDS(2*j) 			+= real(-temp0*Cp(j) + temp1 )*theta;
-			        	DDS.coeffRef(2*j,2*j) 	+= real(temp0 - temp2 )*theta;
-			        	DDS.coeffRef(2*j,2*j+1) += imag(-temp0 + temp2 )*theta;
+					    	{
+					        int sign = pow(-1,k+1);
+					        int direc = (int)(k/2.0);
+					        int neighb = neigh(j,direc,sign,NT,N);
+					        double dxd = (sign==1? dx: dxm);
+					        if (direc == 0)
+					        	{
+					            minusDS(2*j+1) 					+= Dx*imag(Cp(j+sign)/dt);
+					            DDS.coeffRef(2*j+1,2*(j+sign)) 	+= -imag(Dx/dt);
+					            DDS.coeffRef(2*j+1,2*(j+sign)+1)+= -real(Dx/dt);
+					            }
+					        else if (neighb!=-1)
+					        	{
+					            minusDS(2*j+1) 					+= - imag(Dt*Cp(neighb))/dxd;
+					            DDS.coeffRef(2*j+1,2*neighb) 	+= imag(Dt)/dxd;
+					            DDS.coeffRef(2*j+1,2*neighb+1) 	+= real(Dt)/dxd;
+					            }
+					        }
+					    comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
+					    comp temp1 = Dt*Dx*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
+					    comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
+					    
+					    minusDS(2*j+1) 				+= imag(-temp0*Cp(j) + temp1 );
+					    DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp2 );
+					    DDS.coeffRef(2*j+1,2*j+1) 	+= real(temp0 - temp2 );
+						/////////////////////////////////////////////////////////////////////////////////////////
+						if (abs(theta)<MIN_NUMBER)
+							{
+							//simplest boundary conditions replaced by ones continuously connected to theta!=0 ones
+							//DDS.insert(2*j+1,2*(j+1)+1) = 1.0; //zero imaginary part of time derivative
+							//DDS.insert(2*j,2*j+1) = 1.0; //zero imaginary part
+						
+							/////////////////////////////////////equation R - theta=0//////////////////////////////////////
+							for (unsigned int k=0;k<N;k++)
+								{
+								if (abs(omega_1(x,k))>MIN_NUMBER)
+									{
+									unsigned int m=k*NT;
+									DDS.coeffRef(2*j,2*m+1) += -2.0*omega_1(x,k);
+									minusDS(2*j) 			+= 2.0*omega_1(x,k)*p(2*m+1);
+									}
+								}
+							////////////////////////////////////////////////////////////////////////////////////////
+							}
+						else
+							{
+							for (unsigned int k=0;k<N;k++)
+								{
+								if (abs(omega_1(x,k))>MIN_NUMBER)
+									{
+									/////////////////////equation I - theta!=0//////////////
+									unsigned int m=k*NT;
+									DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega_1(x,k)/(1.0+Gamma);
+									minusDS(2*j+1) 			+= -(1.0-Gamma)*omega_1(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
+									/////////////////////equation R - theta!=0//////////////
+									minusDS(2*j) 			+= p(2*m+1)*omega_1(x,k)*(1+Gamma)*theta/(1-Gamma);
+									DDS.coeffRef(2*j,2*m+1)	+= -omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
+									bound 				+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
+																 + (1.0+Gamma)*omega_1(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
+									}
+								}
+							//////////////////////////////////////equation R - theta!=0//////////////////////////////
+							for (unsigned int k=1; k<2*2; k++)
+						    	{
+						        int sign = pow(-1,k+1);
+						        int direc = (int)(k/2.0);
+						        double dxd = (sign==1? dx: dxm);
+						        if (direc == 0)
+						        	{
+						            minusDS(2*j) 					+= Dx*real(Cp(j+sign)/dt)*theta;
+					            	DDS.coeffRef(2*j,2*(j+sign)) 	+= -real(Dx/dt)*theta;
+					            	DDS.coeffRef(2*j,2*(j+sign)+1) 	+= imag(Dx/dt)*theta;
+						            }
+						        else
+						        	{
+						            unsigned int neighb = neigh(j,direc,sign,NT,N);
+						            minusDS(2*j) 					+= - real(Dt*Cp(neighb))*theta/dxd;
+						            DDS.coeffRef(2*j,2*neighb) 		+= real(Dt)*theta/dxd;
+					            	DDS.coeffRef(2*j,2*neighb+1) 	+= -imag(Dt)*theta/dxd;
+						            }
+						        }
+						    minusDS(2*j) 			+= theta*real(-temp0*Cp(j) + temp1 );
+					    	DDS.coeffRef(2*j,2*j) 	+= theta*real(temp0 - temp2 );
+					    	DDS.coeffRef(2*j,2*j+1) += theta*imag(-temp0 + temp2 );
+							}
 						}
 					}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				//bulk
 				else
@@ -975,10 +1088,14 @@ auto ddVr = [&] (const comp & phi)
 		    	potErg 		*= 4.0*pi;
 		    	erg			*= 4.0*pi;
 		    }
-		    if (abs(theta)<DBL_MIN) {
-		    	linErg(NT-1) = linErg(NT-2);
-		    	linNum(NT-1) = linNum(NT-2);
+		   
+	    	linErgOffShell(NT-1) = linErgOffShell(NT-2);
+	    	linNumOffShell(NT-1) = linNumOffShell(NT-2);
+		    if (abs(theta)<MIN_NUMBER) {
+		    	linErg = linErgOffShell;
+		    	linNum = linNumOffShell;
 		    }
+		    
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//checking linErg, linNum, bound, computing W, E
@@ -992,7 +1109,7 @@ auto ddVr = [&] (const comp & phi)
 			}
 			
 			//calculating continuum approx to linErg and linNum on initial time slice
-			if (pot[0]=='3') {
+			if (pot[0]=='3' && abs(theta)<MIN_NUMBER) {
 				for (unsigned int k=1; k<N; k++) {
 					double momtm = k*pi/(L-r0);
 					double freqSqrd = 1.0+pow(momtm,2.0);
@@ -1009,11 +1126,58 @@ auto ddVr = [&] (const comp & phi)
 				}
 			}
 			
+			//calculating a_k and b*_k
+			cVec a_k(N), b_k(N); //N.b. b_k means b*_k but can't put this in the name
+			a_k = Eigen::VectorXcd::Zero(N);
+			b_k = Eigen::VectorXcd::Zero(N);
+			comp T0 = coord(0,0);
+			comp dt0 = dtFn(0);
+			for (unsigned int n=0; n<N; n++) {
+				for (unsigned int j=0; j<N; j++) {
+					unsigned int m=j*NT;
+					a_k(n) += exp(i*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
+								(Cp(m+1)-Cp(m)*exp(i*eigenValues(n)*dt0))/(exp(-i*eigenValues(n)*dt0)-exp(i*eigenValues(n)*dt0));
+					b_k(n) += exp(-i*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
+								(Cp(m+1)-Cp(m)*exp(-i*eigenValues(n)*dt0))/(exp(i*eigenValues(n)*dt0)-exp(-i*eigenValues(n)*dt0));
+				}
+			}
+			
+			//using a_k and b*_k to check that a_k=Gamma*b*_k and p->p_lin as t->0 and that Sum_k(a_k*b*_k)=linNum
+			// and that Sum_k(w_k*a_k*b*_k)=linErg
+			double ABtest = 0.0, linRepTest, ABNEtest;
+			comp ABlinNum = 0.0, ABlinErg = 0.0;
+			cVec linRep(N), p0(N);
+			linRep = Eigen::VectorXcd::Zero(N);
+			for (unsigned int j=0; j<N; j++) {
+				ABtest += absDiff(a_k(j),b_k(j)*Gamma);
+				p0(j) = Cp(j*NT);
+				ABlinNum += a_k(j)*b_k(j);
+				ABlinErg += eigenValues(j)*a_k(j)*b_k(j);
+				for (unsigned int n=0; n<N; n++) {
+					linRep(j) += eigenVectors(j,n)*(a_k(n)*exp(-i*eigenValues(n)*T0)+b_k(n)*exp(i*eigenValues(n)*T0)) \
+									/sqrt(2.0*eigenValues(n));
+				}
+			}
+			ABtest /= (double)N;
+			linRepTest = absDiff(p0,linRep);
+			double ABNtest = absDiff(ABlinNum,linNum(0));
+			double ABEtest = absDiff(ABlinErg,linErg(0));
+			ABNEtest = (ABNtest>ABEtest? ABNtest: ABEtest);
+			AB_test.push_back(ABtest);
+			linRep_test.push_back(linRepTest);
+			ABNE_test.push_back(ABNEtest);
+			if (AB_test.back()>closenessAB) cerr << "AB_test = " << AB_test.back() << endl;
+			if (linRep_test.back()>closenessLR) cerr << "linRep_test = " << linRep_test.back() << endl;
+			if (ABNE_test.back()>closenessABNE) {
+				cerr << "ABN_test = " << ABNtest << endl;
+				cerr << "ABE_test = " << ABEtest << endl;	
+			}
+			
 			//checking pot_r is much smaller than the other potential terms
 			reg_test.push_back(abs(pot_r/potV));
 			if (reg_test.back()>closenessR)
 				{
-				cout << "regularisation term is too large, regTest = " << reg_test.back() << endl;
+				cerr << "regularisation term is too large, regTest = " << reg_test.back() << endl;
 				}
 			
 			//checking linearisation of linErg and linNum
@@ -1023,19 +1187,23 @@ auto ddVr = [&] (const comp & phi)
 			unsigned int linearInt = (unsigned int)(Na/10);
 			for (unsigned int j=1;j<(linearInt+1);j++)
 				{
-				if (abs(linErg(j))>linEMax) linEMax = abs(linErg(j));
-				if (abs(linErg(j))<linEMin) linEMin = abs(linErg(j));
-				if (abs(linNum(j))>linNMax) linNMax = abs(linNum(j));
-				if (abs(linNum(j))<linNMin) linNMin = abs(linNum(j));
+				if (abs(linErgOffShell(j))>linEMax) linEMax = abs(linErgOffShell(j));
+				if (abs(linErgOffShell(j))<linEMin) linEMin = abs(linErgOffShell(j));
+				if (abs(linNumOffShell(j))>linNMax) linNMax = abs(linNumOffShell(j));
+				if (abs(linNumOffShell(j))<linNMin) linNMin = abs(linNumOffShell(j));
 				}
 			linTestE = absDiff(linEMax,linEMin);
 			linTestN = absDiff(linNMax,linNMin);
 			lin_test.push_back(linTestE);
 			if (linTestN>linTestE) lin_test.back() = linTestN;
 			
+			//checking agreement of on and off shell linear energy at initial time
+			double onShellTest = absDiff(linErg(0),linErgOffShell(0));
+			onShell_test.push_back(onShellTest);
+			
 			//checking conservation of E
-			double ergTest = absDiff(abs(erg(1)),abs(erg(NT-2)));
-			erg_test.push_back(ergTest);
+			double conservTest = absDiff(erg(1),erg(NT-2));
+			conserv_test.push_back(conservTest);
 						
 			//defining E, Num and cW
 			E = real(linErg(0));
@@ -1047,7 +1215,7 @@ auto ddVr = [&] (const comp & phi)
 			
 			//testing imaginary part of energy
 			double imErgTest = 0.0;
-			for (unsigned int j=0; j<NT; j++) if (abs(erg(j))>DBL_MIN) imErgTest += imag(erg(j))/abs(erg(j));
+			for (unsigned int j=0; j<NT; j++) if (abs(erg(j))>MIN_NUMBER) imErgTest += imag(erg(j))/abs(erg(j));
 			imErgTest /= (double)NT;
 			imErg_test.push_back(imErgTest);
 			
@@ -1057,62 +1225,15 @@ auto ddVr = [&] (const comp & phi)
 			if (!isfinite(trueTest)) cout << "E = " << E << ", E_exact = " << E_exact << ", linearInt = " << linearInt << endl;
 			
 			//checking lattice small enough for E, should have parameter for this
-			double momTest = E*b/Num*pi; //perhaps should have a not b here
+			double momTest = E*b/Num/pi; //perhaps should have a not b here
 			mom_test.push_back(momTest);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-		//printing early if desired
-		if (runs_count == aq.printRun || aq.printRun == 0)
-			{
-			string prefix = "./data/" + timeNumber;
-			string suffix = "_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
-			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
-				{
-				string minusDSfile = prefix + "mainminusDSE"+suffix;
-				printVector(minusDSfile,minusDS);
-				}
-			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) || delta_test.back()>0.2)
-				{
-				string piEarlyFile = prefix + "mainpiE"+suffix;
-				printVector(piEarlyFile,p);
-				//gp(piEarlyFile,"repi.gp");
-				}
-			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0))
-				{
-				string DDSfile = prefix + "mainDDSE"+suffix;
-				printSpmat(DDSfile,DDS);
-				}
-			if ((print_choice.compare("z")==0 || print_choice.compare("e")==0))
-				{
-				string earlychiXFile = prefix + "mainchiXE" + suffix;
-				printVector(earlychiXFile,chiX);
-				//gp(earlychiXFile,"repi.gp");
-				string earlychiTFile = prefix + "mainchiTE" + suffix;
-				printVector(earlychiTFile,chiT);
-				//gp(earlychiTFile,"repi.gp");
-				}
-			if ((print_choice.compare("l")==0 || print_choice.compare("e")==0))
-				{
-				string earlyLinErgFile = prefix + "mainlinErgE"+suffix;
-				simplePrintCVector(earlyLinErgFile,linErg);
-				//gpSimple(earlyLinErgFile);
-				string earlyErgFile = prefix + "mainergE" + suffix;
-				simplePrintCVector(earlyErgFile,erg);
-				//gpSimple(earlyErgFile);
-				string earlyDerivErgFile = prefix + "mainderivErgE"+suffix;
-				//derivErg.conservativeResize(Na);
-				simplePrintCVector(earlyDerivErgFile,derivErg);
-				string earlyPotErgFile = prefix + "mainpotErgE"+suffix;
-				//potErg.conservativeResize(Na);
-				simplePrintCVector(earlyPotErgFile,potErg);
-				}
-			}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			//solving for delta in DDS*delta=minusDS, where p' = p + delta		
 			vec delta(2*N*NT+2);
 			delta = Eigen::VectorXd::Zero(2*N*NT+2);
+			DDS.prune(MIN_NUMBER);
 			DDS.makeCompressed();
 			Eigen::SparseLU<spMat> solver;
 		
@@ -1155,6 +1276,59 @@ auto ddVr = [&] (const comp & phi)
 		
 			//passing changes on to complex vector
 			Cp = vecComplex(p,N*NT);
+			
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+		//printing early if desired
+		if (runs_count == aq.printRun || aq.printRun == 0)
+			{
+			string prefix = "./data/" + timeNumber;
+			string suffix = "_" + numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop)+"_"+numberToString<unsigned int>(runs_count)+".dat";
+			if ((print_choice.compare("v")==0 || print_choice.compare("e")==0))
+				{
+				string minusDSfile = prefix + "mainminusDSE"+suffix;
+				printVector(minusDSfile,minusDS);
+				}
+			if ((print_choice.compare("p")==0 || print_choice.compare("e")==0) || delta_test.back()>0.2)
+				{
+				string piEarlyFile = prefix + "mainpiE"+suffix;
+				printVector(piEarlyFile,p);
+				//gp(piEarlyFile,"repi.gp");
+				}
+			if ((print_choice.compare("m")==0 || print_choice.compare("e")==0))
+				{
+				string DDSfile = prefix + "mainDDSE"+suffix;
+				printSpmat(DDSfile,DDS);
+				}
+			if ((print_choice.compare("z")==0 || print_choice.compare("e")==0))
+				{
+				string earlychiXFile = prefix + "mainchiXE" + suffix;
+				printVector(earlychiXFile,chiX);
+				//gp(earlychiXFile,"repi.gp");
+				string earlychiTFile = prefix + "mainchiTE" + suffix;
+				printVector(earlychiTFile,chiT);
+				//gp(earlychiTFile,"repi.gp");
+				}
+			if ((print_choice.compare("d")==0 || print_choice.compare("e")==0))
+				{
+				string earlydeltaFile = prefix + "maindeltaE" + suffix;
+				printVector(earlydeltaFile,delta);
+				}
+			if ((print_choice.compare("l")==0 || print_choice.compare("e")==0))
+				{
+				string earlyLinErgFile = prefix + "mainlinErgE"+suffix;
+				simplePrintCVector(earlyLinErgFile,linErg);
+				//gpSimple(earlyLinErgFile);
+				string earlyErgFile = prefix + "mainergE" + suffix;
+				simplePrintCVector(earlyErgFile,erg);
+				//gpSimple(earlyErgFile);
+				string earlyDerivErgFile = prefix + "mainderivErgE"+suffix;
+				//derivErg.conservativeResize(Na);
+				simplePrintCVector(earlyDerivErgFile,derivErg);
+				string earlyPotErgFile = prefix + "mainpotErgE"+suffix;
+				//potErg.conservativeResize(Na);
+				simplePrintCVector(earlyPotErgFile,potErg);
+				}
+			}
 		
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 			//convergence issues
@@ -1163,29 +1337,32 @@ auto ddVr = [&] (const comp & phi)
 			double maxDS = minusDS.maxCoeff();
 			double minDS = minusDS.minCoeff();
 			if (-minDS>maxDS) maxDS = -minDS;
+			double maxP = p.maxCoeff();
+			double minP = p.minCoeff();
+			if (-minP>maxP) maxP = -minP;
 			double normP = p.norm();
 			double normDelta = delta.norm();
 		
 			//assigning test values
 			//quantities used to stop newton-raphson loop
-			action_test.push_back(abs(action - action_last)/abs(action_last));
+			action_test.push_back(absDiff(action,action_last));
 			action_last = action;
 			sol_test.push_back(normDS/normP);
-			solM_test.push_back(maxDS);
+			solM_test.push_back(maxDS/maxP);
 			delta_test.push_back(normDelta/normP);
 			
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%10s%10s%14s%14s%14s%14s%14s%14s%14s%14s\n","loop","runsCount","actionTest","solTest","solMTest","deltaTest","linTest","trueTest","ergTest","momTest");
+				printf("%6s%6s%14s%14s%14s%14s%14s%14s%14s%14s%14s\n","loop","run","actionTest","solTest","solMTest","deltaTest","linTest","trueTest","conservTest","momTest","onShellTest");
 				}
-			printf("%10i%10i%14g%14g%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back(),erg_test.back(),mom_test.back());
+			printf("%6i%6i%14g%14g%14g%14g%14g%14g%14g%14g%14g\n",loop,runs_count,action_test.back(),sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back(),conserv_test.back(),mom_test.back(),onShell_test.back());
 			
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
 
 		//checking energy conserved
-		if (erg_test.back()>closenessE) cout << endl << "ergTest = " << erg_test.back() << endl;
+		if (conserv_test.back()>closenessCon) cout << endl << "ergTest = " << conserv_test.back() << endl;
 		
 		//checking energy real
 		if (imErg_test.back()>closenessIE) cout << endl << "imErg = "<< imErg_test.back()  << endl;
@@ -1193,7 +1370,7 @@ auto ddVr = [&] (const comp & phi)
 		//checking lattice small enough
 		if (mom_test.back()>closenessP) cout << endl << "momTest = "<< mom_test.back()  << endl;
 		
-		if (pot[0]=='3') {
+		if (pot[0]=='3' && abs(theta)<MIN_NUMBER) {
 			comp temp = linErg(0);
 			if (absDiff(temp,linErgContm)>closenessCL) 
 				cout << "linErg(0) = " << temp << " and linErgContm = " << linErgContm << " don't agree. E_exact = " << E_exact << endl;
@@ -1216,7 +1393,7 @@ auto ddVr = [&] (const comp & phi)
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%14s%6i%6i%8g%8g%8g%6g%14g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
+		fprintf(actionfile,"%12s%6i%6i%8g%8g%8g%8g%14g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
 		,real(W),sol_test.back(),lin_test.back(),true_test.back());
 		fclose(actionfile);
 		
@@ -1225,8 +1402,8 @@ auto ddVr = [&] (const comp & phi)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (abs(maxTheta-minTheta)>DBL_MIN) 	changeInputs(runInputs, "theta", numberToString<double>(theta));
-		else if (abs(maxTb-minTb)>DBL_MIN)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb));
+		if (abs(maxTheta-minTheta)>MIN_NUMBER) 	changeInputs(runInputs, "theta", numberToString<double>(theta),inputsFiles[fileLoop]);
+		else if (abs(maxTb-minTb)>MIN_NUMBER)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb),inputsFiles[fileLoop]);
 		else 										copyFile(inputsFiles[fileLoop],runInputs);
 		printf("%12s%30s\n","output: ",runInputs.c_str());
 	
@@ -1259,6 +1436,13 @@ auto ddVr = [&] (const comp & phi)
 		simplePrintCVector(linErgFile,linErg);
 		//gpSimple(linErgFile);
 		printf("%12s%30s\n"," ",linErgFile.c_str());
+		
+		//printing linErgOffShell
+		string linErgOffShellFile = prefix + "mainlinErgOffShell"+suffix;
+		linErgOffShell.conservativeResize(Na);
+		simplePrintCVector(linErgOffShellFile,linErgOffShell);
+		//gpSimple(linErgFileOffShell);
+		printf("%12s%30s\n"," ",linErgOffShellFile.c_str());
 		
 		//printing derivErg
 		string derivErgFile = prefix + "mainderivErg"+suffix;

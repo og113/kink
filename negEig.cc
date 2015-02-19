@@ -22,13 +22,16 @@
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int main()
+int main(int argc, char** argv)
 {
 //taking in timeNumber
 string timeNumber;
-cout << endl;
-cout << "timeNumber: ";
-cin >> timeNumber;
+if (argc==2) timeNumber = argv[1];
+else {
+	cout << endl;
+	cout << "timeNumber: ";
+	cin >> timeNumber;
+}
 
 //starting clock
 clock_t time;
@@ -56,7 +59,7 @@ if (fin.is_open())
 			}
 		else if (lineNumber==1)
 			{
-			ss >> aq.inputChoice >> aq.inputFile >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
+			ss >> aq.inputChoice >> aq.inputTimeNumber >> aq.inputLoop >> aq.totalLoops >> aq.loopChoice >> aq.minValue >> aq.maxValue >> aq.printChoice >> aq.printRun;
 			lineNumber++;
 			}
 		else if(lineNumber==2)
@@ -201,12 +204,12 @@ cout << endl;
 
 //printing error, and eigenvalue to file
 FILE * scalarFile;
-scalarFile = fopen("./data/eigValue.dat","a");
+scalarFile = fopen("./data/stable/eigValue.dat","a");
 fprintf(scalarFile,"%16i%16g%16g%16g%16g\n",P,c,check,error,eigenvalue);
 fclose(scalarFile);
 
 //printing eigenvector to file
-string vecFile = "./data/eigVec.dat";
+string vecFile = "./data/stable/eigVec_1.dat";
 printVectorB(vecFile,r);
 
 return 0;
