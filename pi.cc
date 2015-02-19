@@ -400,15 +400,15 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 	//defining lambda functions for regularization
 	auto Vr = [&] (const comp & phi)
 		{
-		return -i*reg*VrFn(phi,minima[0],minima[1]);
+		return -ii*reg*VrFn(phi,minima[0],minima[1]);
 		};
 	auto dVr = [&] (const comp & phi)
 		{
-		return -i*reg*dVrFn(phi,minima[0],minima[1]);
+		return -ii*reg*dVrFn(phi,minima[0],minima[1]);
 		};
 	auto ddVr = [&] (const comp & phi)
 		{
-		return -i*reg*ddVrFn(phi,minima[0],minima[1]);
+		return -ii*reg*ddVrFn(phi,minima[0],minima[1]);
 		};
 
 	//deterimining omega matrices for fourier transforms in spatial direction

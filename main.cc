@@ -375,15 +375,15 @@ vector<double> minima0(2);
 	//lambda functions for pot_r
 auto Vr = [&] (const comp & phi)
 	{
-	return -i*reg*VrFn(phi,minima[0],minima[1]);
+	return -ii*reg*VrFn(phi,minima[0],minima[1]);
 	};
 auto dVr = [&] (const comp & phi)
 	{
-	return -i*reg*dVrFn(phi,minima[0],minima[1]);
+	return -ii*reg*dVrFn(phi,minima[0],minima[1]);
 	};
 auto ddVr = [&] (const comp & phi)
 	{
-	return -i*reg*ddVrFn(phi,minima[0],minima[1]);
+	return -ii*reg*ddVrFn(phi,minima[0],minima[1]);
 	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
@@ -553,7 +553,7 @@ auto ddVr = [&] (const comp & phi)
 		comp linErgContm, linNumContm;
 		
 		//defining the action and bound and W
-		comp action = i*twaction;
+		comp action = ii*twaction;
 		double bound;
 		double W;
 		double E;
@@ -1127,7 +1127,7 @@ auto ddVr = [&] (const comp & phi)
 			}
 			
 			//calculating a_k and b*_k
-			cVec a_k(N), b_k(N); //N.b. b_k means b*_k but can't put this in the name
+			cVec a_k(N), b_k(N); //N.b. b_k means b*_k but can't put * in the name
 			a_k = Eigen::VectorXcd::Zero(N);
 			b_k = Eigen::VectorXcd::Zero(N);
 			comp T0 = coord(0,0);
@@ -1135,12 +1135,12 @@ auto ddVr = [&] (const comp & phi)
 			for (unsigned int n=0; n<N; n++) {
 				for (unsigned int j=0; j<N; j++) {
 					unsigned int m=j*NT;
-					a_k(n) += exp(i*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
-								(Cp(m+1)-Cp(m)*exp(i*eigenValues(n)*dt0))/(exp(-i*eigenValues(n)*dt0)-exp(i*eigenValues(n)*dt0));
-					b_k(n) += exp(-i*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
-								(Cp(m+1)-Cp(m)*exp(-i*eigenValues(n)*dt0))/(exp(i*eigenValues(n)*dt0)-exp(-i*eigenValues(n)*dt0));
+					a_k(n) += exp(ii*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
+								(Cp(m+1)-Cp(m)*exp(ii*eigenValues(n)*dt0))/(exp(-ii*eigenValues(n)*dt0)-exp(ii*eigenValues(n)*dt0));
+					b_k(n) += exp(-ii*eigenValues(n)*T0)*sqrt(2.0*eigenValues(n))*eigenVectors(j,n)* \
+								(Cp(m+1)-Cp(m)*exp(-ii*eigenValues(n)*dt0))/(exp(ii*eigenValues(n)*dt0)-exp(-ii*eigenValues(n)*dt0));
 				}
-			}
+			}			
 			
 			//using a_k and b*_k to check that a_k=Gamma*b*_k and p->p_lin as t->0 and that Sum_k(a_k*b*_k)=linNum
 			// and that Sum_k(w_k*a_k*b*_k)=linErg
@@ -1154,7 +1154,7 @@ auto ddVr = [&] (const comp & phi)
 				ABlinNum += a_k(j)*b_k(j);
 				ABlinErg += eigenValues(j)*a_k(j)*b_k(j);
 				for (unsigned int n=0; n<N; n++) {
-					linRep(j) += eigenVectors(j,n)*(a_k(n)*exp(-i*eigenValues(n)*T0)+b_k(n)*exp(i*eigenValues(n)*T0)) \
+					linRep(j) += eigenVectors(j,n)*(a_k(n)*exp(-ii*eigenValues(n)*T0)+b_k(n)*exp(ii*eigenValues(n)*T0)) \
 									/sqrt(2.0*eigenValues(n));
 				}
 			}
@@ -1166,11 +1166,11 @@ auto ddVr = [&] (const comp & phi)
 			AB_test.push_back(ABtest);
 			linRep_test.push_back(linRepTest);
 			ABNE_test.push_back(ABNEtest);
-			if (AB_test.back()>closenessAB) cerr << "AB_test = " << AB_test.back() << endl;
-			if (linRep_test.back()>closenessLR) cerr << "linRep_test = " << linRep_test.back() << endl;
-			if (ABNE_test.back()>closenessABNE) {
-				cerr << "ABN_test = " << ABNtest << endl;
-				cerr << "ABE_test = " << ABEtest << endl;	
+			if (AB_test.back()>closenessAB || !isfinite(AB_test.back())) cerr << "AB_test = " << AB_test.back() << endl;
+			if (linRep_test.back()>closenessLR || !isfinite(linRep_test.back()))cerr << "linRep_test = " << linRep_test.back() << endl;
+			if (ABNE_test.back()>closenessABNE || !isfinite(ABNE_test.back())) {
+				cerr << "ABlinNum = " << ABlinNum << ", linNum(0) = " << linNum(0) << endl;
+				cerr << "ABlinErg = " << ABlinErg << ", linErg(0) = " << linErg(0) << endl;
 			}
 			
 			//checking pot_r is much smaller than the other potential terms
@@ -1327,6 +1327,13 @@ auto ddVr = [&] (const comp & phi)
 				string earlyPotErgFile = prefix + "mainpotErgE"+suffix;
 				//potErg.conservativeResize(Na);
 				simplePrintCVector(earlyPotErgFile,potErg);
+				}
+			if ((print_choice.compare("ab")==0 || print_choice.compare("e")==0))
+				{
+				string earlya_kFile = prefix + "maina_kE"+suffix;
+				simplePrintCVector(earlya_kFile,a_k);
+				string earlyb_kFile = prefix + "mainb_kE" + suffix;
+				simplePrintCVector(earlyb_kFile,b_k);
 				}
 			}
 		

@@ -34,7 +34,7 @@ typedef Eigen::MatrixXcd cMat;
 typedef Eigen::VectorXd vec;
 typedef Eigen::VectorXcd cVec;
 
-complex<double> i(0.0,1.0);
+complex<double> ii(0.0,1.0);
 #define pi 3.14159265359
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -603,13 +603,13 @@ comp simpleTime (const unsigned int& time, const unsigned int& the_Na=Na, const 
 		{
 		double temp = (double)time;
 		temp -= (double)the_Na;
-		xTime = the_b*temp + i*the_Tb;
+		xTime = the_b*temp + ii*the_Tb;
 		}
 	else if (time < (the_Na+the_Nb))
 		{
 		double temp = (double)time;
 		temp -= the_Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
-		xTime = i*the_Tb - i*the_b*temp;
+		xTime = ii*(the_Tb - the_b*temp);
 		}
 	else
 		{
@@ -653,7 +653,7 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 		unsigned int t = intCoord(locNum,0,Na);
 		double temp = (double)t;
 		temp -= (double)Na;
-		XcoordA = b*temp + i*Tb;
+		XcoordA = b*temp + ii*Tb;
 		}
 	if (direction==1)
 		{
@@ -672,7 +672,7 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 		{
 		unsigned int t = intCoord(locNum,0,Nb);
 		double temp = (double)t;
-		XcoordB = i*(Tb - b*temp);
+		XcoordB = ii*(Tb - b*temp);
 		}
 	if (direction==1)
 		{
@@ -1469,7 +1469,7 @@ cVec vecComplex(vec realVec, const unsigned int & tDim)
 		{
 		for (unsigned int l=0; l<tDim; l++)
 			{
-			complexVec(l) = realVec(2*l) + i*realVec(2*l+1);
+			complexVec(l) = realVec(2*l) + ii*realVec(2*l+1);
 			}
 		}
 	else
