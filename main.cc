@@ -1447,9 +1447,9 @@ auto ddVr = [&] (const comp & phi)
 	
 		//copying a version of inputs with timeNumber and theta changed
 		string runInputs = prefix + "inputsM_"+ numberToString<unsigned int>(fileLoop) + "_" + numberToString<unsigned int>(loop); //different suffix
-		if (abs(maxTheta-minTheta)>MIN_NUMBER) 	changeInputs(runInputs, "theta", numberToString<double>(theta),inputsFiles[fileLoop]);
-		else if (abs(maxTb-minTb)>MIN_NUMBER)	 	changeInputs(runInputs, "Tb", numberToString<double>(Tb),inputsFiles[fileLoop]);
-		else 										copyFile(inputsFiles[fileLoop],runInputs);
+		if (abs(maxTheta-minTheta)>MIN_NUMBER) 	changeInputs(runInputs,"theta", numberToString<double>(theta),inputsFiles[fileLoop]);
+		else if (abs(maxTb-minTb)>MIN_NUMBER)	changeInputs(runInputs,"Tb", numberToString<double>(Tb),inputsFiles[fileLoop]);
+		else 									copyFile(inputsFiles[fileLoop],runInputs);
 		printf("%12s%30s\n","output: ",runInputs.c_str());
 	
 		//printing output phi
