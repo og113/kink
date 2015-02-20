@@ -99,6 +99,7 @@ struct aqStruct
 	};
 aqStruct aq; //struct to hold user responses
 double reg; //small parameter multiplying regulatory term
+unsigned int cutoff; //cutoff for momentum integrations
 string inP; //b for bubble, p for periodic instaton, f for from file
 string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 string inF; //file input from where, m for main, p for pi

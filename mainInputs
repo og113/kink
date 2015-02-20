@@ -4,10 +4,52 @@
 ##in the format yymmddhhmmss
 ##
 #inF        minFileNo           maxFileNo         firstLoop     lastLoop		
- m          150219100008        150219100008      0             0
+ m          150220162328        150220162328      1             1
 ##
 #minTb      maxTb      minTheta     maxTheta      loops      zmt      zmx       bds 
- 0.8000     0.8000     0.0010       0.0100        10         nC2      nC9       jd 
+ .800       .800       0.0005       0.0100        20         nC2      nC9       jd 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -179,7 +179,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			else if(lineNumber==2)
 				{
-				ss >> alpha >> open >> amp >> pot >> A >> reg;
+				ss >> alpha >> open >> amp >> pot >> A >> reg >> cutoff;
 				lineNumber++;
 				}
 			else if(lineNumber==3)
@@ -254,6 +254,11 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	paramsV  = {epsilon, A};
 	paramsV0 = {epsilon0, A};
 	paramsVoid = {};
+	
+if (cutoff>N || cutoff<1) {
+	cerr << "cutoff(" << cutoff << ") too small" << endl;
+	return 1;
+}
 
 		
 //finding epsilon and root
@@ -358,19 +363,19 @@ vector<double> minima0(2);
 	closenessA = 1.0;
 	closenessS = 1.0e-6;
 	closenessSM = 1.0e-5;
-	closenessD = 1.0;
+	closenessD = 0.7;
 	closenessC = 1.0e-16*N*NT;
 	closenessCon = 1.0/3.0;
 	closenessL = 1.0e-2;
-	closenessT = 1.0e-5;
+	closenessT = 5.0e-2;
 	closenessP = 0.5;
 	closenessR = 1.0e-2;
 	closenessIE = 1.0e-5;
 	closenessCL = 5.0e-2;
-	closenessON = 1.0e-2;
+	closenessON = 5.0e-2;
 	closenessAB = 1.0e-2;
 	closenessLR = 1.0e-12;
-	closenessABNE = 1.0e-2;
+	closenessABNE = 5.0e-2;
 	
 	//lambda functions for pot_r
 auto Vr = [&] (const comp & phi)
@@ -424,7 +429,7 @@ auto ddVr = [&] (const comp & phi)
 	double djdk;	
 	for (unsigned int j=0; j<N; j++) {
 		for (unsigned int k=0; k<N; k++) {
-			for (unsigned int l=0; l<N; l++) {
+			for (unsigned int l=0; l<cutoff; l++) {
 				if (approxOmega) djdk = a;
 				else 			 djdk = sqrt(DxFn(j)*DxFn(k));
 				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
@@ -549,6 +554,7 @@ auto ddVr = [&] (const comp & phi)
 		cVec linNumOffShell(NT);
 		cVec derivErg(NT), potErg(NT);
 		comp linErgContm, linNumContm;
+		comp linNumAB, linErgAB;
 		
 		//defining the action and bound and W
 		comp action = ii*twaction;
@@ -561,7 +567,7 @@ auto ddVr = [&] (const comp & phi)
 		//defining some quantities used to stop the Newton-Raphson loop when action stops varying
 		comp action_last = action;
 		unsigned int runs_count = 0;
-		unsigned int min_runs = 2;
+		unsigned int min_runs = 3;
 		vector<double> action_test(1);	action_test[0] = 1.0;
 		vector<double> sol_test(1);	sol_test[0] = 1.0;
 		vector<double> solM_test(1);	solM_test[0] = 1.0;
@@ -1113,8 +1119,8 @@ auto ddVr = [&] (const comp & phi)
 			}
 			
 			//calculating continuum approx to linErg and linNum on initial time slice
-			if (pot[0]=='3' && abs(theta)<MIN_NUMBER) {
-				for (unsigned int k=1; k<N; k++) {
+			if (pot[0]=='3') {
+				for (unsigned int k=1; k<cutoff; k++) {
 					double momtm = k*pi/(L-r0);
 					double freqSqrd = 1.0+pow(momtm,2.0);
 					double Asqrd, integral1 = 0.0, integral2 = 0.0;
@@ -1155,14 +1161,16 @@ auto ddVr = [&] (const comp & phi)
 			//using a_k and b*_k to check that a_k=Gamma*b*_k and p->p_lin as t->0 and that Sum_k(a_k*b*_k)=linNum
 			// and that Sum_k(w_k*a_k*b*_k)=linErg
 			double ABtest = 0.0, linRepTest, ABNEtest;
-			comp ABlinNum = 0.0, ABlinErg = 0.0;
+			linNumAB = 0.0, linErgAB = 0.0;
 			cVec linRep(N), p0(N);
 			linRep = Eigen::VectorXcd::Constant(N,minima[0]);
 			for (unsigned int j=0; j<N; j++) {
 				ABtest += absDiff(a_k(j),conj(b_k(j))*Gamma);
 				p0(j) = Cp(j*NT);
-				ABlinNum += a_k(j)*b_k(j);
-				ABlinErg += sqrt(eigenValues(j))*a_k(j)*b_k(j);
+				if (j<cutoff) {
+					linNumAB += a_k(j)*b_k(j);
+					linErgAB += sqrt(eigenValues(j))*a_k(j)*b_k(j);
+				}
 				for (unsigned int n=0; n<N; n++) {
 					double w_n = sqrt(eigenValues(n));
 					double sqrtDj = sqrt(4.0*pi*DxFn(j));
@@ -1174,20 +1182,20 @@ auto ddVr = [&] (const comp & phi)
 			}
 			ABtest /= (double)N;
 			linRepTest = absDiff(p0,linRep);
-			double ABNtest = absDiff(ABlinNum,linNum(0));
-			double ABEtest = absDiff(ABlinErg,linErg(0));
+			double ABNtest = absDiff(linNumAB,linNum(0));
+			double ABEtest = absDiff(linErgAB,linErg(0));
 			ABNEtest = (ABNtest>ABEtest? ABNtest: ABEtest);
 			AB_test.push_back(ABtest);
 			linRep_test.push_back(linRepTest);
 			ABNE_test.push_back(ABNEtest);
-			if (AB_test.back()>closenessAB || !isfinite(AB_test.back())) cerr << "AB_test = " << AB_test.back() << endl;
+			/*if (AB_test.back()>closenessAB || !isfinite(AB_test.back())) cerr << "AB_test = " << AB_test.back() << endl;
 			if (linRep_test.back()>closenessLR || !isfinite(linRep_test.back()))cerr << "linRep_test = " << linRep_test.back() << endl;
 			if (ABNE_test.back()>closenessABNE || !isfinite(ABNE_test.back())) {
-				cerr << "ABlinNum = " << ABlinNum << ", linNum(0) = " << \
+				cerr << "linNumAB = " << linNumAB << ", linNum(0) = " << \
 					linNum(0) << ", linNumOffShell(0) = " << linNumOffShell(0) << endl;
-				cerr << "ABlinErg = " << ABlinErg << ", linErg(0) = " << linErg(0) \
+				cerr << "linErg = " << linErgAB << ", linErg(0) = " << linErg(0) \
 					<< ", linErgOffShell(0) = " << linErgOffShell(0) << endl;
-			}
+			}*/
 			
 			//checking pot_r is much smaller than the other potential terms
 			reg_test.push_back(abs(pot_r/potV));
@@ -1377,12 +1385,26 @@ auto ddVr = [&] (const comp & phi)
 			//printing tests to see convergence
 			if (runs_count==1)
 				{
-				printf("%6s%6s%14s%14s%14s%14s%14s%14s%14s%14s%14s\n","loop","run","solTest","solMTest","deltaTest","linTest","conservTest","momTest","onShellTest","ABTest","ABNETest");
+				printf("%5s%5s%11s%11s%11s%11s%11s%11s%11s%11s%11s%11s\n","loop","run","solTest","solMTest","deltaTest","linTest","trueTest","shellTest","ABTest","ABNETest","cnsrvTest","momTest");
 				}
-			printf("%6i%6i%14g%14g%14g%14g%14g%14g%14g%14g%14g\n",loop,runs_count,sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),conserv_test.back(),mom_test.back(),onShell_test.back(),AB_test.back(),ABNE_test.back());
+			printf("%5i%5i%11.4g%11.4g%11.4g%11.4g%11.4g%11.4g%11.4g%11.4g%11.4g%11.4g\n",loop,runs_count,sol_test.back(),solM_test.back(),delta_test.back(),lin_test.back(),true_test.back(),onShell_test.back(),AB_test.back(),ABNE_test.back(),conserv_test.back(),mom_test.back());
+			
+			if (delta_test.back()>closenessD) {
+				cerr << "deltaTest > " << closenessD << ", stopping NR loop." << endl;
+				break;
+			}
 			
 			} //ending while loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
+
+		//checking different measures of energy agree
+		if (true_test.back()>closenessT || onShell_test.back()>closenessON || ABNE_test.back()>closenessABNE) {
+			cout << "erg(1)             = " << erg(1) << endl;
+			cout << "linErgOffShell(0)  = " << linErgOffShell(0) << endl;
+			cout << "linErgAB           = " << linErgAB << endl;
+			cout << "linErgContm        = " << linErgContm << endl;
+			cout << "linErg(0)          = " << linErg(0) << endl;
+		}
 
 		//checking energy conserved
 		if (conserv_test.back()>closenessCon) cout << endl << "ergTest = " << conserv_test.back() << endl;
