@@ -1,0 +1,6 @@
+some things to do with code:
+	- i think that h, and omega and eomega are wrong. they do not agree with the contm approximation, and the continuum approximation agrees with the lattice field approximation. might this be to do with boundary conditions?
+	- worth writing a bit of code to see what files are out there and check to see if a specific one is, or a set of specific ones are. then packaging this code up into a class or something.
+	- should have some kind of collection of strings which ammount to the different parts of filenames and be able to extract any of those parts, or the whole thing, at any time.
+	- should also have a get filenames function which can get filenames with a certain part of equal to some given string, or within some range of comparable strings
+	- also want a quick and easy way to load vectors which are not the same size as the one we want and interpolate

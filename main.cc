@@ -392,14 +392,18 @@ auto ddVr = [&] (const comp & phi)
 	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
-	mat omega_m1(N,N);
-	mat omega_0(N,N);
-	mat omega_1(N,N);
-	mat omega_2(N,N);
+	mat omega_m1(N,N), 	omega_m1_cutoff(N,N);
+	mat omega_0(N,N), 	omega_0_cutoff(N,N);
+	mat omega_1(N,N), 	omega_1_cutoff(N,N);
+	mat omega_2(N,N), 	omega_2_cutoff(N,N);
 	omega_m1 = Eigen::MatrixXd::Zero(N,N);
 	omega_0 = Eigen::MatrixXd::Zero(N,N);
 	omega_1 = Eigen::MatrixXd::Zero(N,N);
 	omega_2 = Eigen::MatrixXd::Zero(N,N);
+	omega_m1_cutoff = Eigen::MatrixXd::Zero(N,N);
+	omega_0_cutoff = Eigen::MatrixXd::Zero(N,N);
+	omega_1_cutoff = Eigen::MatrixXd::Zero(N,N);
+	omega_2_cutoff = Eigen::MatrixXd::Zero(N,N);
 	vec eigenValues(N);
 	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix - so the nth eigenvector is v_n(j) = eigenVectors(j,n)
 	bool approxOmega = false;
@@ -429,13 +433,19 @@ auto ddVr = [&] (const comp & phi)
 	double djdk;	
 	for (unsigned int j=0; j<N; j++) {
 		for (unsigned int k=0; k<N; k++) {
-			for (unsigned int l=0; l<cutoff; l++) {
+			for (unsigned int l=0; l<N; l++) {
 				if (approxOmega) djdk = a;
 				else 			 djdk = sqrt(DxFn(j)*DxFn(k));
 				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				omega_0(j,k)  += djdk*eigenVectors(j,l)*eigenVectors(k,l);
 				omega_1(j,k)  += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
 				omega_2(j,k)  += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				if (l<cutoff) {
+					omega_m1_cutoff(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+					omega_0_cutoff(j,k)  += djdk*eigenVectors(j,l)*eigenVectors(k,l);
+					omega_1_cutoff(j,k)	 += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+					omega_2_cutoff(j,k)	 += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+				}
 			}
 		}
 	}
@@ -802,10 +812,10 @@ auto ddVr = [&] (const comp & phi)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErgOffShell(t) += 0.5*( omega_2(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
-										+ omega_0(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
-						linNumOffShell(t) += 0.5*(omega_1(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
-										+ omega_m1(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
+						linErgOffShell(t) += 0.5*( omega_2_cutoff(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+										+ omega_0_cutoff(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
+						linNumOffShell(t) += 0.5*(omega_1_cutoff(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
+										+ omega_m1_cutoff(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
 						}
 					}
 					
@@ -814,9 +824,9 @@ auto ddVr = [&] (const comp & phi)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega_1(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+						linNum(t) += 2.0*Gamma*omega_1_cutoff(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
 								 + p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0));
-						linErg(t) += 2.0*Gamma*omega_2(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+						linErg(t) += 2.0*Gamma*omega_2_cutoff(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
 								+ p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0));
 						}
 					}

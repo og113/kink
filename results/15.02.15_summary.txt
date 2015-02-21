@@ -1,0 +1,5 @@
+output from mainChangeNL.sh on 15.02.15
+
+N         Na        Nb        Nc        L         Ta        Tb        Tc        S/F       
+130       300       80        2         5         3.03797   .800      S                   
+130       300       80        2         5         3.01898   .795      S                   
