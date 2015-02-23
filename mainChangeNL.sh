@@ -2,15 +2,15 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-FILE="results/6.02.15_NL_output.txt"
-SUMMARY="results/6.02.15_summary.txt"
+FILE="results/9.02.15_NL_output.txt"
+SUMMARY="results/9.02.15_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-echo "output from mainChangeNL.sh" >> $FILE
+echo "output from mainChangeNL.sh" > $FILE
 echo "" >> $FILE
-#echo "output from mainChangeNL.sh" > $SUMMARY
-#echo "" >> $SUMMARY
-#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
+echo "output from mainChangeNL.sh" > $SUMMARY
+echo "" >> $SUMMARY
+printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "S/F" >> $SUMMARY
 
 function getEigenvectors {
 	echo "./sphaleron" >> $FILE

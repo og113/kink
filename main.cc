@@ -814,7 +814,7 @@ auto ddVr = [&] (const comp & phi)
 					pot_r 		+= Dt*Dx*Vr(Cp(j));
 					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					potErg(t) 	+= Dx*(V(Cp(j)) + Vr(Cp(j)));
 					
 					//////////////////////////////////////equation I - both///////////////////////////////////
 					for (unsigned int k=1; k<2*2; k++)
@@ -838,7 +838,7 @@ auto ddVr = [&] (const comp & phi)
 			            }
 			        comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
 			        comp temp1 = Dx*Dt*( dV(Cp(j)) + dVr(Cp(j))  );//dV terms should be small
-			        comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)) );
+			        comp temp2 = Dx*Dt*(ddV(Cp(j)) + ddVr(Cp(j)) );
 			        
 			        minusDS(2*j+1) 				+= imag(-temp0*Cp(j) + temp1 );
 			        DDS.coeffRef(2*j+1,2*j) 	+= imag(temp0 - temp2 );
@@ -913,7 +913,7 @@ auto ddVr = [&] (const comp & phi)
 					pot_r 		+= Dt*Dx*Vr(Cp(j));
 					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					potErg(t) 	+= Dx*(V(Cp(j)) + Vr(Cp(j)));
 				
 		            for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -957,7 +957,10 @@ auto ddVr = [&] (const comp & phi)
 		    if (pot[0]=='3') DDS.insert(2*N*NT,2*N*NT) = 1.0;
 		    action = kineticT - kineticS - potV - pot_r;
 		    if (pot[0]=='3') {
-		    	action *= 4.0*pi;
+		    	action 	*= 4.0*pi;
+		    	erg 	*= 4.0*pi;
+		    	derivErg*= 4.0*pi;
+		    	potErg	*= 4.0*pi;
 		    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	

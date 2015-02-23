@@ -619,7 +619,8 @@ double simpleSpaceSphere (const unsigned int& space, const double& the_L=L, cons
 comp coord(const unsigned int& locNum,const int& direction, const unsigned int& Nt=NT)
 	{
 	if (direction==0)		return simpleTime(intCoord(locNum,0,NT));
-	if (direction==1)		return simpleSpace(intCoord(locNum,1,NT));
+	else if (direction==1)	return simpleSpace(intCoord(locNum,1,NT),L,a);
+	else return 0.0;
 	}
 
 //gives values of coordinates on section AB
@@ -636,8 +637,7 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Na);
-		double temp = (double)x;
-		XcoordA = -L/2.0 + temp*a;
+		XcoordA = simpleSpace(x,L,a);
 		}
 	return XcoordA;
 	}
@@ -655,8 +655,7 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nb);
-		double temp = (double)x;
-		XcoordB = -L/2.0 + temp*a;
+		XcoordB = simpleSpace(x,L,a);
 		}
 	return XcoordB;
 	}
@@ -673,8 +672,7 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nc);
-		double temp = (double)x;
-		XcoordC = -L/2.0 + temp*a;
+		XcoordC = simpleSpace(x,L,a);
 		}
 	return XcoordC;
 	}
@@ -923,8 +921,8 @@ vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & 
 //print main parameters to terminal
 void printParameters()
 	{
-	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Tb","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Tb,R,dE,theta,reg,epsilon);
+	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Ta","Tb","Tc","R","dE","theta","reg", "epsilon");
+	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 
