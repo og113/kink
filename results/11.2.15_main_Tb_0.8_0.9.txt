@@ -1,0 +1,35 @@
+
+./data/150210174454inputsM_0_0 ./data/150210174454mainpi_0_0.dat
+
+     input: ./data/150210174454mainpi_0_0.dat
+timeNumber: 150211105548
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     150     300      80       2       5    3.04     0.8  0.0203      10    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest       ergTest       momTest
+         0         1      0.587452   0.000247285    0.00489155    0.00521074     0.0535256      0.276907   0.000459231     0.0531109
+         0         2   5.41264e-06   7.14896e-14   2.46555e-12   0.000340576     0.0535287      0.276909   0.000467099     0.0531108
+linErg(0) = (22.8384,0) and linErgContm = (19.1003,0) don't agree. E_exact = 18.7474
+linNum(0) = (13.6803,0) and linNumContm = (10.8186,0) don't agree. 
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       2 82.3815     150     382       5     0.8    0.05       0       13.6803       22.8384       15.1013      -6.33874
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150211105548inputsM_0_0
+            ./data/150211105548mainpi_0_0.dat
+            ./data/150211105548mainminusDS_0_0.dat
+            ./data/150211105548mainDDS_0_0.dat
+            ./data/150211105548mainlinNum_0_0.dat
+            ./data/150211105548mainlinErg_0_0.dat
+            ./data/150211105548mainderivErg_0_0.dat
+            ./data/150211105548mainpotErg_0_0.dat
+            ./data/150211105548mainerg_0_0.dat
+
+     input: ./data/150211105548mainpi_0_0.dat
+timeNumber: 150211105548
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     150     300      80       2       5    3.04   0.805  0.0203      10    0.05       0       0       0
+
+      loop runsCount    actionTest       solTest      solMTest     deltaTest       linTest      trueTest       ergTest       momTest
+         1         1      0.585006    0.00011704    0.00490208      0.836513     0.0536646      0.276979   0.000467379     0.0531129

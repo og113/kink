@@ -1,0 +1,3 @@
+output from mainChangeNL.sh on 11.02.15
+
+N         Na        Nb        Nc        L         Ta        Tb        Tc        S/F       

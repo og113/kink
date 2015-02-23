@@ -36,7 +36,7 @@ main parameters
 ---------------------------------------------------------------------------------------------*/
 
 double r0 = 1.0e-16, r1 = 10.0;
-unsigned int N = 1e3;
+unsigned int N = 300;
 double dr;
 
 double Ta, Tc;
@@ -45,9 +45,10 @@ double dt;
 
 int direction = 1; // direction of time evolution
 double sigma = 1.0; //set sigma=-1 for euclidean evolution
-bool testTunnel = false, testLinear = false, changeNa = false;
-double closenessLin = 0.01;
-double linPoint = 0.0;
+bool testTunnel = false, testLinear = false, changeParams = false, approxOmega = false;
+double closenessLin = 1.0e-2, Tlin = 0.0;
+double closenessEdge = 1.0e-3, Redge = 0.0;
+double closenessMom = 1.9e-2, momTest;
 
 /* ---------------------------------------------------------------------------------------------
 user inputs
@@ -68,7 +69,9 @@ else if (argc % 2 && argc>1) {
 		else if (id.compare("test")==0 || id.compare("tunnel")==0 || id.compare("tt")==0) testTunnel = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("linearization")==0 || id.compare("lin")==0) testLinear = (bool)atoi(argv[2*j+2]);
 		else if (id.compare("closeness")==0 || id.compare("close")==0) closenessLin = stringToNumber<double>(argv[2*j+2]);
-		else if (id.compare("changeNa")==0) changeNa = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("changeParams")==0) changeParams = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("approxOmega")==0) approxOmega = (bool)atoi(argv[2*j+2]);
+		else if (id.compare("N")==0) N = atoi(argv[2*j+2]);
 		else {
 			cerr << "input " << id << " unrecognized" << endl;
 			return 1;
@@ -131,11 +134,11 @@ dt = dr*0.2;
 Na = (unsigned int)(Ta/dt);
 Nc = (unsigned int)(Tc/dt);
 
-if (abs(Ta)>1.1*(r1-r0)) {
+if (abs(Ta)>1.1*(r1-r0) && !testTunnel && !testLinear) {
 	cerr << "R is too small compared to Ta. R = " << r1-r0 << ", Ta = " << Ta << endl;
 	return 1;
 }
-if (abs(Tc)>1.1*(r1-r0)) {
+if (abs(Tc)>1.1*(r1-r0) && !testTunnel && !testLinear) {
 	cerr << "R is too small compared to Tc. R = " << r1-r0 << ", Tc = " << Tc << endl;
 	return 1;
 }
@@ -143,7 +146,7 @@ if (abs(dt)>0.5*dr) {
 	cerr << "dt too large. dt = " << dt << ", dr = " << dr << endl;
 	return 1;
 }
-if (abs(Ta)<2.5) {
+if (abs(Ta)<2.5 && !testTunnel && !testLinear) {
 	cerr << "Ta too small. Ta = " << Ta << endl;
 	return 1;
 }
@@ -170,38 +173,49 @@ else {
 /* ---------------------------------------------------------------------------------------------
 deterimining omega matrices for fourier transforms in spatial direction
 ---------------------------------------------------------------------------------------------*/
-mat h(N+1,N+1);
-h = hFn(N+1,dr,1.0);
-mat omega(N+1,N+1); 	omega = Eigen::MatrixXd::Zero(N+1,N+1);
-mat Eomega(N+1,N+1); 	Eomega = Eigen::MatrixXd::Zero(N+1,N+1);
+mat omega_m1(N+1,N+1); 	
+mat omega_0(N+1,N+1);
+mat omega_1(N+1,N+1);
+mat omega_2(N+1,N+1);
 vec eigenValues(N+1);
 mat eigenVectors(N+1,N+1); //eigenvectors correspond to columns of this matrix
-Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
-if (eigensolver.info() != Eigen::Success)
-	{
-	cerr << "h eigensolver failed" << endl;
+if (testLinear) {
+	omega_m1 = Eigen::MatrixXd::Zero(N+1,N+1);
+	omega_0 = Eigen::MatrixXd::Zero(N+1,N+1);
+	omega_1 = Eigen::MatrixXd::Zero(N+1,N+1);
+	omega_2 = Eigen::MatrixXd::Zero(N+1,N+1);
+	if(!approxOmega) {
+		mat h(N+1,N+1);
+		h = hFn(N+1,dr,1.0);
+		Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
+		if (eigensolver.info() != Eigen::Success) cerr << "h eigensolver failed" << endl;
+		else {
+			eigenValues = eigensolver.eigenvalues();
+			eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+		}
 	}
-else
-	{
-	eigenValues = eigensolver.eigenvalues();
-	eigenVectors = eigensolver.eigenvectors(); //automatically normalised to have unit norm
+	else {
+		double normalisation = sqrt(2.0/(double)N);
+		for (unsigned int l=0; l<(N+1); l++) {
+			eigenValues(l) = 1.0+pow(2.0*sin(pi*l/(double)N/2.0)/dr,2.0);
+			for (unsigned int m=0; m<(N+1); m++) eigenVectors(l,m) = normalisation*sin(pi*l*m/(double)N);
+		}
 	}
-
-//#pragma omp parallel for	
-for (unsigned int j=0; j<(N+1); j++)
-	{
-	for (unsigned int k=0; k<(N+1); k++)
-		{
-		for (unsigned int l=0; l<(N+1); l++)
-			{
-			double djdk = 4.0*pi*dr;
-			if (j==0 || j==N) djdk/=sqrt(2.0);
-			if (k==0 || k==N) djdk/=sqrt(2.0);
-			omega(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-			Eomega(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
+	double djdk;	
+	for (unsigned int j=0; j<(N+1); j++) {
+		for (unsigned int k=0; k<(N+1); k++) {
+			for (unsigned int l=0; l<(N+1); l++) {
+				djdk = 4.0*pi*dr;
+				if ((j==0 || j==N) && !approxOmega) djdk/=sqrt(2.0);
+				if ((k==0 || k==N) && !approxOmega) djdk/=sqrt(2.0);
+				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_0(j,k) += djdk*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_1(j,k) += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
+				omega_2(j,k) += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
 			}
 		}
 	}
+}
 
 /* ---------------------------------------------------------------------------------------------
 propagating euclidean solution forwards and/or backwards in time
@@ -209,6 +223,8 @@ propagating euclidean solution forwards and/or backwards in time
 
 vec phiA, phiC, linearizationA;
 double linErgContm, linNumContm, nonLinErgA, linErgFieldA, ergA, linErgA, linNumA;
+double kineticT, kineticS, massTerm;
+double Tinf = 0.0;
 
 uint j=0;
 while(j<2) {
@@ -239,7 +255,7 @@ while(j<2) {
 	erg = Eigen::VectorXd::Zero(Nt+1);
 	linErgContm = 0.0, linNumContm = 0.0;
 	linErgA = 0.0, linNumA = 0.0;
-	
+	kineticT = 0.0, kineticS = 0.0, massTerm = 0.0;
 	vec initial;
 	initial = interpolate(phiBC,Nbin,Nin,Nt+1,N+1);
 
@@ -259,7 +275,7 @@ while(j<2) {
 		{
 		unsigned int j = x*(Nt+1);
 		double r = r0 + x*dr, eta;
-		(x==0 || x==N) ? eta = 0.5 : eta = 1.0;
+		eta = ((x==0 || x==N) ? 0.5 : 1.0);
 		nonLinErg(0) += 4.0*pi*pow(r,2.0)*eta*0.25*pow(phi(j),4.0)*dr;
 		linErgField(0) += 4.0*pi*pow(r,2.0)*eta*0.5*pow(phi(j),2.0)*dr;
 		if (x<N) linErgField(0) += 4.0*pi*r*(r+dr)*0.5*pow(phi(j+(Nt+1))-phi(j),2.0)/dr;
@@ -298,12 +314,15 @@ while(j<2) {
 	//A7. run loop
 	for (unsigned int u=1; u<(Nt+1); u++)
 		{
-		for (unsigned int x=0; x<N; x++) //don't loop over last x position as fixed by boundary condition 1)
-			{
+		for (unsigned int x=0; x<N; x++) { //don't loop over last x position as fixed by boundary condition 1)
 		    unsigned int m = u+x*(Nt+1);
 		    vel(m) = vel(m-1) + dt*acc(m-1);
 		    phi(m) = phi(m-1) + dt*vel(m);
-			}
+		    if (testTunnel) {
+		    	double testInf = phi(m);
+		    	if (!isfinite(testInf) && abs(Tinf)<1.0e-16) Tinf = u*dt;
+		    }
+		}
 		acc(u) = 2.0*(phi(u+Nt+1) - phi(u))/pow(dr,2.0) - phi(u) + pow(phi(u),3.0);
 		acc(u) *= sigma;
 		linErgField(u-1) += 4.0*pi*dr*pow(r0,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
@@ -328,6 +347,14 @@ while(j<2) {
 		{
 		erg(k) = linErgField(k) + nonLinErg(k);
 		}
+	
+	for (unsigned int k=0; k<(N+1); k++) {
+		unsigned int u = Nt + k*(Nt+1);
+		double r = r0 + k*dr;
+		kineticT += 4.0*pi*dr*pow(r,2.0)*0.5*pow(phi(u)-phi(u-1),2.0)/pow(dt,2.0);
+		if (k<N) kineticS += 4.0*pi*r*(r+dr)*0.5*pow(phi(u+(Nt+1))-phi(u),2.0)/dr;
+		massTerm += 4.0*pi*dr*pow(r,2.0)*0.5*pow(phi(u-1),2.0);
+	}
 	
 	for (unsigned int k=1; k<(N+1); k++)
 		{
@@ -361,19 +388,27 @@ while(j<2) {
 				linearizationA(k) = absDiff(erg(k),linErgField(k));
 				if (linearizationA(k)>closenessLin) nonLin = true;
 				if (linearizationA(k)<closenessLin && nonLin) {
-					linPoint = k*dt;
+					Tlin = k*dt;
 					nonLin = false;
 				}
 			}
-		}
-		for (unsigned int j=0;j<(N+1);j++){
-			for (unsigned int k=0;k<(N+1);k++){
-				unsigned int l = j*(Nt+1)+Nt;
-				unsigned int m = k*(Nt+1)+Nt;
-				double r = r0 + j*dr;
-				double s = r0 + k*dr;
-				linErgA += Eomega(j,k)*phi(l)*phi(m)*r*s;
-				linNumA += omega(j,k)*phi(l)*phi(m)*r*s;
+			for (unsigned int j=0;j<(N+1);j++){
+				unsigned int n = (N-j)*(Nt+1)+(unsigned int)(Tlin/dt);
+				double rj = r0+(N-j)*dr;
+				if (abs(phi(n))>closenessEdge && abs(Redge)<1.0e-16)
+		        	Redge = rj;
+				for (unsigned int k=0;k<(N+1);k++){
+					unsigned int l = j*(Nt+1)+Nt-1;
+					unsigned int m = k*(Nt+1)+Nt-1;
+					double r = r0 + j*dr;
+					double s = r0 + k*dr;
+					// the would be imaginary parts of the following expression cancel as omega and Eomega are symmetric
+					// so wlog we have dropped them
+						linErgA += 0.5*r*s*\
+							(omega_2(j,k)*phi(l)*phi(m)+omega_0(j,k)*(phi(l+1)-phi(l))*(phi(m+1)-phi(m))/pow(dt,2.0));
+						linNumA += 0.5*r*s*\
+							(omega_1(j,k)*phi(l)*phi(m)+omega_m1(j,k)*(phi(l+1)-phi(l))*(phi(m+1)-phi(m))/pow(dt,2.0));
+				}
 			}
 		}
 	}
@@ -387,16 +422,29 @@ if (testLinear) {
 	for (unsigned int t=0;t<(Nt+1);t++){
 		tVec(t) = t*dt;
 		}
-	string linearizationFile = "data/" + timeNumber + "linearization.dat";
+	string linearizationFile = "data/" + timeNumber + "linearization_" + loopIn + ".dat";
 	simplePrintVector(linearizationFile,tVec);
 	simpleAppendVector(linearizationFile,linearizationA);
-	int linNa = (int)linPoint/dtin;
+	momTest = linErgA*dr/linNumA/pi;
 	printf("linearization printed:  %39s\n",linearizationFile.c_str());
-	printf("linearization to %6.4f after t = %6.4f\n",closenessLin,linPoint);
-	if (changeNa) {
-		printf("Na changed to = %6i\n",linNa);
-		changeInputs("data/temp","Na",numberToString<int>(linNa),inputsF);
-		copyFile("data/temp",inputsF);
+	printf("Tlin(%6.4f)          = %6.4f\n",closenessLin,Tlin);
+	printf("Redge(%6.4f)         = %6.4f\n",closenessEdge,Redge);
+	printf("momTest               = %6.4f\n",momTest);
+	if (changeParams) {
+		//string inputsOut = "data/" + timeNumber + "inputsPi3_" + loopIn;
+		string inputsOut = "inputs";
+		int Nmom = (int)(linErgA*Redge/pi/linNumA/closenessMom) + 1;
+		int Nbmom = (int)(Nmom*4*Tbin/Redge);
+		int Nalin = (int)(Nbmom*Tlin/Tbin);
+		printf("L changed to :        %6.4g\n",Redge);
+		printf("N changed to :        %6i\n",Nmom);
+		printf("Na changed to:        %6i\n",Nalin); 
+		printf("Nb changed to:        %6i\n\n",Nbmom); 
+		changeInputs("data/temp1","LoR",numberToString<double>(Redge/10.0),inputsF);
+		changeInputs("data/temp2","N",numberToString<int>(Nmom),"data/temp1");
+		changeInputs("data/temp1","Na",numberToString<int>(Nalin),"data/temp2");
+		changeInputs("data/temp2","Nb",numberToString<int>(Nbmom),"data/temp1");
+		copyFile("data/temp2",inputsOut);
 	}
 }
 else if (!testTunnel) {	
@@ -439,7 +487,7 @@ else if (!testTunnel) {
 				}
 			}
 		}
-	string mainInFile = "data/" + timeNumber + "tpip_0.dat";
+	string mainInFile = "data/" + timeNumber + "tpip_" + loopIn + ".dat";
 	printThreeVectors(mainInFile,tVec,rVec,mainIn);
 	gp(mainInFile,"pi3.gp");
 
@@ -451,19 +499,19 @@ else if (!testTunnel) {
 	printf("tpip printed:                %39s pics/pi3.png\n",mainInFile.c_str());
 }
 else {
-	printf("Input:                  %39s\n",filename.c_str());
+	printf("Input:              %39s\n",filename.c_str());
+	printf("Tinf              = %8.4f\n",Tinf);
 	}
-
-printf("erg(0) = %8.4f\n",ergA);
-printf("linErgFieldA(0)   = %8.4f\n",linErgFieldA);
-printf("nonLinErgA(0)     = %8.4f\n",nonLinErgA);
-printf("linErgA           = %8.4f\n",linErgA);
-printf("linNumA           = %8.4f\n",linNumA);
-printf("linNumContmA(0) = %8.4f\n",linNumContm);
-printf("linErgContmA(0) = %8.4f\n\n",linErgContm);
-
-
-
+				printf("kineticT          = %8.4f\n",kineticT);
+				printf("kineticS          = %8.4f\n",kineticS);
+				printf("massTerm          = %8.4f\n",massTerm);
+				printf("erg(0)            = %8.4f\n",ergA);
+				printf("nonLinErgA(0)     = %8.4f\n",nonLinErgA);
+				printf("linErgFieldA(0)   = %8.4f\n",linErgFieldA);
+				printf("linErgContmA(0)   = %8.4f\n",linErgContm);
+if (testLinear) printf("linErgA           = %8.4f\n",linErgA);
+				printf("linNumContmA(0)   = %8.4f\n",linNumContm);
+if (testLinear) printf("linNumA           = %8.4f\n\n",linNumA);
 
 double finalTest = linErgFieldA;
 if (testTunnel) {

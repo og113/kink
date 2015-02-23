@@ -1,0 +1,733 @@
+output from piSimple.sh on 15.02.15
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .800
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.51     0.8  0.0101      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23421     0.000545474      0.00330746        0.101129
+               0               2       0.0275355     0.000107518      0.00047513       0.0239876
+               0               3       0.0363736     1.08196e-05      6.1417e-05       0.0261667
+               0               4       0.0168363     6.81205e-06     4.67004e-05       0.0100617
+               0               5      0.00534707     1.19245e-06     6.98815e-06      0.00222137
+               0               6      0.00112453      6.3242e-08     3.64791e-07     0.000121187
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       6 48.8628     130     462       5     0.8    0.05           0       11.28           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/0pip_0.dat
+Tinf              =   0.7033
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/0linearization_0.dat
+linearization to 0.0100 after t = 3.3833
+kineticT          =  10.6229
+kineticS          =   5.6384
+massTerm          =   1.9779
+erg(0)            =  18.2747
+nonLinErgA(0)     =   0.0358
+linErgFieldA(0)   =  18.2390
+linErgContmA(0)   =  18.2431
+linErgA           =  18.2390
+linNumContmA(0)   =  10.2645
+linNumA           =  10.4598
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .795
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.795       0     0.5
+
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5     1.5   0.795    0.01      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23325      0.00056018      0.00466045        0.103601
+               0               2       0.0220637      0.00010514     0.000449002       0.0246352
+               0               3       0.0347923     7.52513e-06     3.98005e-05        0.017635
+               0               4       0.0125837     3.02538e-06     2.12785e-05      0.00434702
+               0               5      0.00272922     1.98893e-07     1.23657e-06      0.00026865
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.9864     130     462       5   0.795    0.05           0       11.08           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/1pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/1linearization_0.dat
+linearization to 0.0100 after t = 3.2667
+kineticT          =  10.0367
+kineticS          =   5.4607
+massTerm          =   2.1275
+erg(0)            =  17.6654
+nonLinErgA(0)     =   0.0359
+linErgFieldA(0)   =  17.6295
+linErgContmA(0)   =  17.6332
+linErgA           =  17.6295
+linNumContmA(0)   =   9.8592
+linNumA           =  10.1000
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .790
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16    0.79       0     0.5
+
+./pi
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.49    0.79 0.00994      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.2323      0.00058135      0.00601621        0.106351
+               0               2       0.0166652     0.000103156     0.000429503       0.0276946
+               0               3       0.0328789     5.08449e-06     2.24399e-05       0.0079588
+               0               4      0.00671638     6.76574e-07     4.91934e-06      0.00114741
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       4 32.3312     130     462       5    0.79    0.05           0       10.86           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                        ./data/2ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/2pip_0.dat
+Tinf              =   0.5567
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/2linearization_0.dat
+linearization to 0.0100 after t = 3.1800
+kineticT          =   9.5852
+kineticS          =   5.2498
+massTerm          =   2.1972
+erg(0)            =  17.0756
+nonLinErgA(0)     =   0.0360
+linErgFieldA(0)   =  17.0396
+linErgContmA(0)   =  17.0430
+linErgA           =  17.0396
+linNumContmA(0)   =   9.4716
+linNumA           =   9.7523
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .785
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.785       0     0.5
+
+./pi
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.48   0.785 0.00987      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23134     0.000608421      0.00742114        0.109375
+               0               2       0.0115868     0.000101559     0.000410578       0.0324955
+               0               3       0.0306609      3.6887e-06     1.36941e-05      0.00265976
+               0               4     0.000454999     2.22446e-08     8.44177e-08     0.000113845
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       4 31.7854     130     462       5   0.785    0.05           0       10.66           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                        ./data/3ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/3pip_0.dat
+Tinf              =   0.5200
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/3linearization_0.dat
+linearization to 0.0100 after t = 3.1133
+kineticT          =   9.1917
+kineticS          =   5.0440
+massTerm          =   2.2245
+erg(0)            =  16.5049
+nonLinErgA(0)     =   0.0359
+linErgFieldA(0)   =  16.4690
+linErgContmA(0)   =  16.4721
+linErgA           =  16.4690
+linNumContmA(0)   =   9.1002
+linNumA           =   9.4106
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .780
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16    0.78       0     0.5
+
+./pi
+
+timeNumber:            4
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.47    0.78 0.00981      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23039     0.000640748       0.0088229        0.112667
+               0               2      0.00772424     0.000100341     0.000398042       0.0383724
+               0               3       0.0281674     3.53448e-06     1.20363e-05       0.0134381
+               0               4      0.00862253     1.06917e-06     7.97858e-06     0.000309526
+               0               5     0.000142257     3.80612e-10     2.61632e-09     2.83927e-07
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 40.5442     130     462       5    0.78    0.05           0       10.45           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/4inputsPi_0
+                         ./data/4pip_0.dat
+                     ./data/4minusDS_0.dat
+                        ./data/4DDSp_0.dat
+                        ./data/4ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/4pip_0.dat
+Tinf              =   0.4833
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/4linearization_0.dat
+linearization to 0.0100 after t = 3.0500
+kineticT          =   8.8321
+kineticS          =   4.8490
+massTerm          =   2.2254
+erg(0)            =  15.9517
+nonLinErgA(0)     =   0.0355
+linErgFieldA(0)   =  15.9162
+linErgContmA(0)   =  15.9191
+linErgA           =  15.9162
+linNumContmA(0)   =   8.7435
+linNumA           =   9.0753
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .775
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.775       0     0.5
+
+./pi
+
+timeNumber:            5
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.46   0.775 0.00975      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22944     0.000677671        0.010221        0.116222
+               0               2      0.00756576      9.9489e-05      0.00038884       0.0448738
+               0               3       0.0254289     4.37939e-06     1.33064e-05       0.0244722
+               0               4       0.0175174     3.68319e-06     2.83269e-05     0.000666242
+               0               5     0.000305994     6.04424e-09     2.96776e-08     5.74164e-06
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.7691     130     462       5   0.775    0.05           0       10.24           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/5inputsPi_0
+                         ./data/5pip_0.dat
+                     ./data/5minusDS_0.dat
+                        ./data/5DDSp_0.dat
+                        ./data/5ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/5pip_0.dat
+Tinf              =   0.4567
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/5linearization_0.dat
+linearization to 0.0100 after t = 2.9933
+kineticT          =   8.4973
+kineticS          =   4.6653
+massTerm          =   2.2085
+erg(0)            =  15.4161
+nonLinErgA(0)     =   0.0349
+linErgFieldA(0)   =  15.3812
+linErgContmA(0)   =  15.3840
+linErgA           =  15.3812
+linNumContmA(0)   =   8.4011
+linNumA           =   8.7481
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .770
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16    0.77       0     0.5
+
+./pi
+
+timeNumber:            6
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.45    0.77 0.00969      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22849     0.000718563       0.0116148        0.120032
+               0               2       0.0114139     9.89886e-05     0.000379861       0.0517258
+               0               3       0.0224784     5.89369e-06     1.65704e-05       0.0355002
+               0               4       0.0269254     7.65732e-06     5.99687e-05        0.001477
+               0               5     0.000990118     2.85342e-08     1.43626e-07     2.69154e-05
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.5747     130     462       5    0.77    0.05           0       10.03           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/6inputsPi_0
+                         ./data/6pip_0.dat
+                     ./data/6minusDS_0.dat
+                        ./data/6DDSp_0.dat
+                        ./data/6ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/6pip_0.dat
+Tinf              =   0.4367
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/6linearization_0.dat
+linearization to 0.0100 after t = 2.9400
+kineticT          =   8.1824
+kineticS          =   4.4921
+massTerm          =   2.1791
+erg(0)            =  14.8978
+nonLinErgA(0)     =   0.0341
+linErgFieldA(0)   =  14.8638
+linErgContmA(0)   =  14.8664
+linErgA           =  14.8638
+linNumContmA(0)   =   8.0725
+linNumA           =   8.4301
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .765
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.765       0     0.5
+
+./pi
+
+timeNumber:            7
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.44   0.765 0.00962      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22754     0.000762859        0.013004        0.124092
+               0               2       0.0167951     9.88227e-05     0.000374646       0.0587617
+               0               3       0.0193538     8.05556e-06     2.12461e-05       0.0463987
+               0               4       0.0366885     1.27782e-05     0.000101347      0.00238148
+               0               5      0.00170246     7.18252e-08     3.67706e-07     5.94886e-05
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 40.3641     130     462       5   0.765    0.05           0       9.821           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/7inputsPi_0
+                         ./data/7pip_0.dat
+                     ./data/7minusDS_0.dat
+                        ./data/7DDSp_0.dat
+                        ./data/7ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/7pip_0.dat
+Tinf              =   0.4133
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/7linearization_0.dat
+linearization to 0.0100 after t = 2.8900
+kineticT          =   7.8848
+kineticS          =   4.3281
+massTerm          =   2.1406
+erg(0)            =  14.3969
+nonLinErgA(0)     =   0.0331
+linErgFieldA(0)   =  14.3637
+linErgContmA(0)   =  14.3662
+linErgA           =  14.3637
+linNumContmA(0)   =   7.7573
+linNumA           =   8.1222
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .760
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16    0.76       0     0.5
+
+./pi
+
+timeNumber:            8
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.43    0.76 0.00956      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22659     0.000810064       0.0143879        0.128395
+               0               2       0.0227149     9.89731e-05     0.000372911       0.0658764
+               0               3       0.0161036     1.09631e-05     2.72948e-05       0.0570932
+               0               4       0.0466978     1.88579e-05     0.000150834      0.00324353
+               0               5      0.00229417     1.34533e-07     6.86157e-07     9.18427e-05
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.9938     130     462       5    0.76    0.05           0       9.607           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/8inputsPi_0
+                         ./data/8pip_0.dat
+                     ./data/8minusDS_0.dat
+                        ./data/8DDSp_0.dat
+                        ./data/8ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/8pip_0.dat
+Tinf              =   0.3933
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/8linearization_0.dat
+linearization to 0.0100 after t = 2.8400
+kineticT          =   7.6027
+kineticS          =   4.1725
+massTerm          =   2.0957
+erg(0)            =  13.9130
+nonLinErgA(0)     =   0.0321
+linErgFieldA(0)   =  13.8809
+linErgContmA(0)   =  13.8833
+linErgA           =  13.8809
+linNumContmA(0)   =   7.4551
+linNumA           =   7.8247
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .755
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.755       0     0.5
+
+./pi
+
+timeNumber:            9
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.42   0.755  0.0095      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22565     0.000859755       0.0157661        0.132935
+               0               2       0.0289017     9.94213e-05     0.000371261       0.0729996
+               0               3       0.0128021     1.46973e-05      4.7396e-05       0.0675414
+               0               4       0.0568839     2.57468e-05     0.000206901      0.00401663
+               0               5       0.0026624      2.1532e-07     1.08085e-06      0.00011063
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.6245     130     462       5   0.755    0.05           0       9.392           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/9inputsPi_0
+                         ./data/9pip_0.dat
+                     ./data/9minusDS_0.dat
+                        ./data/9DDSp_0.dat
+                        ./data/9ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/9pip_0.dat
+Tinf              =   0.3800
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:                data/9linearization_0.dat
+linearization to 0.0100 after t = 2.7933
+kineticT          =   7.3348
+kineticS          =   4.0243
+massTerm          =   2.0463
+erg(0)            =  13.4461
+nonLinErgA(0)     =   0.0309
+linErgFieldA(0)   =  13.4152
+linErgContmA(0)   =  13.4175
+linErgA           =  13.4152
+linNumContmA(0)   =   7.1657
+linNumA           =   7.5380
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .750
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16    0.75       0     0.5
+
+./pi
+
+timeNumber:           10
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.42    0.75 0.00943      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1          1.2247     0.000911573        0.017138        0.137704
+               0               2       0.0352633     0.000100149     0.000369698       0.0800817
+               0               3      0.00959651     1.93007e-05     7.33319e-05       0.0777223
+               0               4       0.0672065     3.33347e-05     0.000268193      0.00470394
+               0               5      0.00273853     3.15265e-07     1.54416e-06     0.000104439
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 39.4808     130     462       5    0.75    0.05           0       9.175           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/10inputsPi_0
+                        ./data/10pip_0.dat
+                    ./data/10minusDS_0.dat
+                       ./data/10DDSp_0.dat
+                       ./data/10ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                     data/10pip_0.dat
+Tinf              =   0.3667
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:               data/10linearization_0.dat
+linearization to 0.0100 after t = 2.7467
+kineticT          =   7.0802
+kineticS          =   3.8829
+massTerm          =   1.9936
+erg(0)            =  12.9961
+nonLinErgA(0)     =   0.0297
+linErgFieldA(0)   =  12.9664
+linErgContmA(0)   =  12.9686
+linErgA           =  12.9664
+linNumContmA(0)   =   6.8886
+linNumA           =   7.2622
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .745
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16   0.745       0     0.5
+
+./pi
+
+timeNumber:           11
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     300     160       2       5    1.41   0.745 0.00937      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.22374     0.000965216       0.0185033        0.142697
+               0               2       0.0417611     0.000101139     0.000368223       0.0870866
+               0               3      0.00686838     2.47894e-05     0.000104727       0.0876274
+               0               4       0.0776453     4.15461e-05     0.000337306      0.00534084
+               0               5      0.00247948     4.38117e-07     2.11582e-06      6.9511e-05
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 40.2817     130     462       5   0.745    0.05           0       8.957           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/11inputsPi_0
+                        ./data/11pip_0.dat
+                    ./data/11minusDS_0.dat
+                       ./data/11DDSp_0.dat
+                       ./data/11ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                     data/11pip_0.dat
+Tinf              =   0.3533
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:               data/11linearization_0.dat
+linearization to 0.0100 after t = 2.7000
+kineticT          =   6.8380
+kineticS          =   3.7480
+massTerm          =   1.9389
+erg(0)            =  12.5629
+nonLinErgA(0)     =   0.0285
+linErgFieldA(0)   =  12.5344
+linErgContmA(0)   =  12.5365
+linErgA           =  12.5344
+linNumContmA(0)   =   6.6237
+linNumA           =   6.9973
+
+
+-------------------------------------------------------------------------------------------------------
+

@@ -1,0 +1,1392 @@
+output from piSimple.sh on 13.02.15
+
+N  =  130
+Na  =  300
+Nb  =  80
+Nc  =  2
+-------------------------------------------------------------------------------------------------------
+Tb  =  .800
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_0.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 3.2633
+kineticT          =  10.0287
+kineticS          =   5.4575
+massTerm          =   2.1291
+erg(0)            =  17.6558
+nonLinErgA(0)     =   0.0360
+linErgFieldA(0)   =  17.6199
+linErgContmA(0)   =  17.6236
+linErgA           =  17.6199
+linNumContmA(0)   =   9.8528
+linNumA           =  10.0943
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .795
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_1.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 3.1800
+kineticT          =   9.5816
+kineticS          =   5.2482
+massTerm          =   2.1976
+erg(0)            =  17.0707
+nonLinErgA(0)     =   0.0360
+linErgFieldA(0)   =  17.0347
+linErgContmA(0)   =  17.0381
+linErgA           =  17.0347
+linNumContmA(0)   =   9.4683
+linNumA           =   9.7493
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .790
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_2.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 3.1133
+kineticT          =   9.1909
+kineticS          =   5.0437
+massTerm          =   2.2245
+erg(0)            =  16.5038
+nonLinErgA(0)     =   0.0359
+linErgFieldA(0)   =  16.4679
+linErgContmA(0)   =  16.4710
+linErgA           =  16.4679
+linNumContmA(0)   =   9.0994
+linNumA           =   9.4098
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .785
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_3.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 3.0500
+kineticT          =   8.8338
+kineticS          =   4.8500
+massTerm          =   2.2254
+erg(0)            =  15.9545
+nonLinErgA(0)     =   0.0355
+linErgFieldA(0)   =  15.9190
+linErgContmA(0)   =  15.9219
+linErgA           =  15.9190
+linNumContmA(0)   =   8.7451
+linNumA           =   9.0769
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .780
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_4.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.9933
+kineticT          =   8.5012
+kineticS          =   4.6676
+massTerm          =   2.2087
+erg(0)            =  15.4225
+nonLinErgA(0)     =   0.0349
+linErgFieldA(0)   =  15.3877
+linErgContmA(0)   =  15.3904
+linErgA           =  15.3877
+linNumContmA(0)   =   8.4050
+linNumA           =   8.7519
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .775
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_5.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.9400
+kineticT          =   8.1883
+kineticS          =   4.4955
+massTerm          =   2.1797
+erg(0)            =  14.9078
+nonLinErgA(0)     =   0.0341
+linErgFieldA(0)   =  14.8737
+linErgContmA(0)   =  14.8763
+linErgA           =  14.8737
+linNumContmA(0)   =   8.0785
+linNumA           =   8.4361
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .770
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_6.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.8900
+kineticT          =   7.8925
+kineticS          =   4.3325
+massTerm          =   2.1417
+erg(0)            =  14.4101
+nonLinErgA(0)     =   0.0332
+linErgFieldA(0)   =  14.3769
+linErgContmA(0)   =  14.3794
+linErgA           =  14.3769
+linNumContmA(0)   =   7.7653
+linNumA           =   8.1301
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .765
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_7.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.8400
+kineticT          =   7.6121
+kineticS          =   4.1777
+massTerm          =   2.0973
+erg(0)            =  13.9292
+nonLinErgA(0)     =   0.0321
+linErgFieldA(0)   =  13.8971
+linErgContmA(0)   =  13.8995
+linErgA           =  13.8971
+linNumContmA(0)   =   7.4650
+linNumA           =   7.8345
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .760
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_8.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.7933
+kineticT          =   7.3457
+kineticS          =   4.0304
+massTerm          =   2.0483
+erg(0)            =  13.4652
+nonLinErgA(0)     =   0.0310
+linErgFieldA(0)   =  13.4342
+linErgContmA(0)   =  13.4365
+linErgA           =  13.4342
+linNumContmA(0)   =   7.1772
+linNumA           =   7.5495
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .755
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                               data/150213133251pip_9.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.7467
+kineticT          =   7.0924
+kineticS          =   3.8898
+massTerm          =   1.9961
+erg(0)            =  13.0178
+nonLinErgA(0)     =   0.0298
+linErgFieldA(0)   =  12.9880
+linErgContmA(0)   =  12.9902
+linErgA           =  12.9880
+linNumContmA(0)   =   6.9017
+linNumA           =   7.2753
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .750
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_10.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.7000
+kineticT          =   6.8515
+kineticS          =   3.7556
+massTerm          =   1.9419
+erg(0)            =  12.5870
+nonLinErgA(0)     =   0.0285
+linErgFieldA(0)   =  12.5585
+linErgContmA(0)   =  12.5606
+linErgA           =  12.5585
+linNumContmA(0)   =   6.6381
+linNumA           =   7.0118
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .745
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_11.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.6567
+kineticT          =   6.6223
+kineticS          =   3.6273
+massTerm          =   1.8865
+erg(0)            =  12.1727
+nonLinErgA(0)     =   0.0273
+linErgFieldA(0)   =  12.1454
+linErgContmA(0)   =  12.1474
+linErgA           =  12.1454
+linNumContmA(0)   =   6.3861
+linNumA           =   6.7592
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .740
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_12.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.6133
+kineticT          =   6.4042
+kineticS          =   3.5047
+massTerm          =   1.8306
+erg(0)            =  11.7747
+nonLinErgA(0)     =   0.0261
+linErgFieldA(0)   =  11.7486
+linErgContmA(0)   =  11.7506
+linErgA           =  11.7486
+linNumContmA(0)   =   6.1455
+linNumA           =   6.5173
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .735
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_13.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.5667
+kineticT          =   6.1969
+kineticS          =   3.3875
+massTerm          =   1.7748
+erg(0)            =  11.3930
+nonLinErgA(0)     =   0.0249
+linErgFieldA(0)   =  11.3681
+linErgContmA(0)   =  11.3700
+linErgA           =  11.3681
+linNumContmA(0)   =   5.9160
+linNumA           =   6.2860
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .730
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_14.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.5233
+kineticT          =   5.9999
+kineticS          =   3.2757
+massTerm          =   1.7195
+erg(0)            =  11.0274
+nonLinErgA(0)     =   0.0237
+linErgFieldA(0)   =  11.0038
+linErgContmA(0)   =  11.0056
+linErgA           =  11.0038
+linNumContmA(0)   =   5.6974
+linNumA           =   6.0652
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .725
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_15.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.4800
+kineticT          =   5.8129
+kineticS          =   3.1689
+massTerm          =   1.6651
+erg(0)            =  10.6779
+nonLinErgA(0)     =   0.0225
+linErgFieldA(0)   =  10.6554
+linErgContmA(0)   =  10.6572
+linErgA           =  10.6554
+linNumContmA(0)   =   5.4895
+linNumA           =   5.8548
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .720
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_16.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.4367
+kineticT          =   5.6354
+kineticS          =   3.0672
+massTerm          =   1.6119
+erg(0)            =  10.3443
+nonLinErgA(0)     =   0.0214
+linErgFieldA(0)   =  10.3229
+linErgContmA(0)   =  10.3246
+linErgA           =  10.3229
+linNumContmA(0)   =   5.2918
+linNumA           =   5.6545
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .715
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_17.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.3900
+kineticT          =   5.4674
+kineticS          =   2.9704
+massTerm          =   1.5601
+erg(0)            =  10.0264
+nonLinErgA(0)     =   0.0204
+linErgFieldA(0)   =  10.0061
+linErgContmA(0)   =  10.0078
+linErgA           =  10.0061
+linNumContmA(0)   =   5.1043
+linNumA           =   5.4643
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .710
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_18.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.3467
+kineticT          =   5.3084
+kineticS          =   2.8784
+massTerm          =   1.5099
+erg(0)            =   9.7242
+nonLinErgA(0)     =   0.0194
+linErgFieldA(0)   =   9.7048
+linErgContmA(0)   =   9.7065
+linErgA           =   9.7048
+linNumContmA(0)   =   4.9266
+linNumA           =   5.2839
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .705
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_19.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.3000
+kineticT          =   5.1582
+kineticS          =   2.7911
+massTerm          =   1.4615
+erg(0)            =   9.4373
+nonLinErgA(0)     =   0.0184
+linErgFieldA(0)   =   9.4189
+linErgContmA(0)   =   9.4205
+linErgA           =   9.4189
+linNumContmA(0)   =   4.7586
+linNumA           =   5.1131
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .700
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_20.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.2567
+kineticT          =   5.0166
+kineticS          =   2.7085
+massTerm          =   1.4150
+erg(0)            =   9.1656
+nonLinErgA(0)     =   0.0175
+linErgFieldA(0)   =   9.1481
+linErgContmA(0)   =   9.1497
+linErgA           =   9.1481
+linNumContmA(0)   =   4.5998
+linNumA           =   4.9517
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .695
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_21.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.2100
+kineticT          =   4.8833
+kineticS          =   2.6305
+massTerm          =   1.3704
+erg(0)            =   8.9088
+nonLinErgA(0)     =   0.0166
+linErgFieldA(0)   =   8.8922
+linErgContmA(0)   =   8.8937
+linErgA           =   8.8922
+linNumContmA(0)   =   4.4502
+linNumA           =   4.7994
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .690
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_22.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.1633
+kineticT          =   4.7581
+kineticS          =   2.5570
+massTerm          =   1.3278
+erg(0)            =   8.6668
+nonLinErgA(0)     =   0.0158
+linErgFieldA(0)   =   8.6509
+linErgContmA(0)   =   8.6524
+linErgA           =   8.6509
+linNumContmA(0)   =   4.3093
+linNumA           =   4.6562
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .685
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_23.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.1133
+kineticT          =   4.6409
+kineticS          =   2.4878
+massTerm          =   1.2873
+erg(0)            =   8.4391
+nonLinErgA(0)     =   0.0151
+linErgFieldA(0)   =   8.4240
+linErgContmA(0)   =   8.4255
+linErgA           =   8.4240
+linNumContmA(0)   =   4.1769
+linNumA           =   4.5215
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .680
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_24.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.0600
+kineticT          =   4.5313
+kineticS          =   2.4229
+massTerm          =   1.2488
+erg(0)            =   8.2254
+nonLinErgA(0)     =   0.0144
+linErgFieldA(0)   =   8.2111
+linErgContmA(0)   =   8.2125
+linErgA           =   8.2111
+linNumContmA(0)   =   4.0528
+linNumA           =   4.3954
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .675
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_25.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 2.0033
+kineticT          =   4.4291
+kineticS          =   2.3622
+massTerm          =   1.2124
+erg(0)            =   8.0255
+nonLinErgA(0)     =   0.0137
+linErgFieldA(0)   =   8.0118
+linErgContmA(0)   =   8.0132
+linErgA           =   8.0118
+linNumContmA(0)   =   3.9366
+linNumA           =   4.2773
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .670
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_26.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 1.9400
+kineticT          =   4.3341
+kineticS          =   2.3056
+massTerm          =   1.1780
+erg(0)            =   7.8389
+nonLinErgA(0)     =   0.0131
+linErgFieldA(0)   =   7.8258
+linErgContmA(0)   =   7.8272
+linErgA           =   7.8258
+linNumContmA(0)   =   3.8280
+linNumA           =   4.1671
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .665
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_27.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 1.8567
+kineticT          =   4.2460
+kineticS          =   2.2529
+massTerm          =   1.1456
+erg(0)            =   7.6652
+nonLinErgA(0)     =   0.0125
+linErgFieldA(0)   =   7.6527
+linErgContmA(0)   =   7.6541
+linErgA           =   7.6527
+linNumContmA(0)   =   3.7266
+linNumA           =   4.0644
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .660
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_28.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5300
+kineticT          =   4.1647
+kineticS          =   2.2040
+massTerm          =   1.1150
+erg(0)            =   7.5040
+nonLinErgA(0)     =   0.0120
+linErgFieldA(0)   =   7.4920
+linErgContmA(0)   =   7.4934
+linErgA           =   7.4920
+linNumContmA(0)   =   3.6323
+linNumA           =   3.9690
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .655
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_28.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5300
+kineticT          =   4.1647
+kineticS          =   2.2040
+massTerm          =   1.1150
+erg(0)            =   7.5040
+nonLinErgA(0)     =   0.0120
+linErgFieldA(0)   =   7.4920
+linErgContmA(0)   =   7.4934
+linErgA           =   7.4920
+linNumContmA(0)   =   3.6323
+linNumA           =   3.9690
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .650
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_29.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5233
+kineticT          =   4.0898
+kineticS          =   2.1589
+massTerm          =   1.0864
+erg(0)            =   7.3550
+nonLinErgA(0)     =   0.0116
+linErgFieldA(0)   =   7.3434
+linErgContmA(0)   =   7.3448
+linErgA           =   7.3434
+linNumContmA(0)   =   3.5447
+linNumA           =   3.8806
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .645
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_30.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5167
+kineticT          =   4.0211
+kineticS          =   2.1173
+massTerm          =   1.0596
+erg(0)            =   7.2175
+nonLinErgA(0)     =   0.0111
+linErgFieldA(0)   =   7.2064
+linErgContmA(0)   =   7.2078
+linErgA           =   7.2064
+linNumContmA(0)   =   3.4635
+linNumA           =   3.7989
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .640
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_31.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5133
+kineticT          =   3.9584
+kineticS          =   2.0791
+massTerm          =   1.0345
+erg(0)            =   7.0913
+nonLinErgA(0)     =   0.0107
+linErgFieldA(0)   =   7.0806
+linErgContmA(0)   =   7.0820
+linErgA           =   7.0806
+linNumContmA(0)   =   3.3883
+linNumA           =   3.7235
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .635
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_32.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5067
+kineticT          =   3.9014
+kineticS          =   2.0442
+massTerm          =   1.0110
+erg(0)            =   6.9758
+nonLinErgA(0)     =   0.0103
+linErgFieldA(0)   =   6.9655
+linErgContmA(0)   =   6.9668
+linErgA           =   6.9655
+linNumContmA(0)   =   3.3189
+linNumA           =   3.6541
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .630
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_33.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5033
+kineticT          =   3.8499
+kineticS          =   2.0126
+massTerm          =   0.9892
+erg(0)            =   6.8707
+nonLinErgA(0)     =   0.0100
+linErgFieldA(0)   =   6.8607
+linErgContmA(0)   =   6.8620
+linErgA           =   6.8607
+linNumContmA(0)   =   3.2550
+linNumA           =   3.5906
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .625
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_34.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.5000
+kineticT          =   3.8036
+kineticS          =   1.9840
+massTerm          =   0.9689
+erg(0)            =   6.7754
+nonLinErgA(0)     =   0.0097
+linErgFieldA(0)   =   6.7657
+linErgContmA(0)   =   6.7670
+linErgA           =   6.7657
+linNumContmA(0)   =   3.1962
+linNumA           =   3.5325
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .620
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_35.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4933
+kineticT          =   3.7624
+kineticS          =   1.9583
+massTerm          =   0.9500
+erg(0)            =   6.6895
+nonLinErgA(0)     =   0.0094
+linErgFieldA(0)   =   6.6801
+linErgContmA(0)   =   6.6815
+linErgA           =   6.6801
+linNumContmA(0)   =   3.1424
+linNumA           =   3.4797
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .615
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_36.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4900
+kineticT          =   3.7259
+kineticS          =   1.9355
+massTerm          =   0.9326
+erg(0)            =   6.6127
+nonLinErgA(0)     =   0.0092
+linErgFieldA(0)   =   6.6035
+linErgContmA(0)   =   6.6049
+linErgA           =   6.6035
+linNumContmA(0)   =   3.0933
+linNumA           =   3.4318
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .610
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_37.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4867
+kineticT          =   3.6941
+kineticS          =   1.9153
+massTerm          =   0.9164
+erg(0)            =   6.5445
+nonLinErgA(0)     =   0.0089
+linErgFieldA(0)   =   6.5355
+linErgContmA(0)   =   6.5369
+linErgA           =   6.5355
+linNumContmA(0)   =   3.0485
+linNumA           =   3.3887
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .605
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_38.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4833
+kineticT          =   3.6665
+kineticS          =   1.8978
+massTerm          =   0.9014
+erg(0)            =   6.4845
+nonLinErgA(0)     =   0.0087
+linErgFieldA(0)   =   6.4757
+linErgContmA(0)   =   6.4771
+linErgA           =   6.4757
+linNumContmA(0)   =   3.0080
+linNumA           =   3.3500
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .600
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_39.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4800
+kineticT          =   3.6432
+kineticS          =   1.8827
+massTerm          =   0.8876
+erg(0)            =   6.4323
+nonLinErgA(0)     =   0.0086
+linErgFieldA(0)   =   6.4238
+linErgContmA(0)   =   6.4252
+linErgA           =   6.4238
+linNumContmA(0)   =   2.9713
+linNumA           =   3.3154
+
+
+-------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------
+Tb  =  .595
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                              data/150213133251pip_40.dat
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+pi3 testing linearization
+linearization printed:       data/150213133251linearization.dat
+linearization to 0.0100 after t = 0.4767
+kineticT          =   3.6238
+kineticS          =   1.8700
+massTerm          =   0.8749
+erg(0)            =   6.3877
+nonLinErgA(0)     =   0.0084
+linErgFieldA(0)   =   6.3793
+linErgContmA(0)   =   6.3807
+linErgA           =   6.3793
+linNumContmA(0)   =   2.9383
+linNumA           =   3.2849
+
+
+-------------------------------------------------------------------------------------------------------
+

@@ -13,6 +13,7 @@ set ytic auto
 set title "W(N)"
 set xlabel "N"
 set ylabel "W"
-plot "./data/mainAction.dat" using 9:10 with points
-
+plot "results/15.02.15_pi_assembled.dat" using 6:(2.0*($7-$5*$4)/26.31894507) with points, \
+	"results/13.02.15_pi_assembled.dat" using 6:(2.0*($7-$5*$4)/26.31894507) with points, \
+	"results/16.02.15_main_Tb_0.8_0.796.dat" using 9:($7/26.31894507) with points
 pause -1

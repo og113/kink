@@ -128,7 +128,7 @@ for (unsigned int k=0;k<Nt_print;k++) {
 phiToPrint = interpolate(phi,Nt,N,Nt_print,N_print);
 phiToPrint = reverseTime(phiToPrint,Nt_print,N_print);
 printThreeVectors(filename,tVec,rVec,phiToPrint);
-gp(filename,"repi.gp");
+//gp(filename,"repi.gp");
 
 return 0;
 }

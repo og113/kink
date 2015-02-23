@@ -1,0 +1,9 @@
+ok so after a very unproductive day here are my thoughts
+	- writing some kind of map for parameters is a waste of time as to write ["string"] is a waste of time
+	- better to have classes for primary parameters and secondary parameters and a class for both derived publically
+	- the parameters can be initialized from the primary and secondary ones
+	- one can then write load and save functions for the primary parameters, a print function for the parameters and a set function for the secondary parameters
+	- no need to bother with find or assign functions as the parameters will just be public variables
+	- will also need a change parameters function
+	- likewise, there is no point really bothering with a map for loading from argv. you would only have to afterwards convert it back to the parameter.
+	- worth writing an options.h and options.cc for loading options from inputs and from argv.

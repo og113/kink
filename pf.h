@@ -34,7 +34,7 @@ typedef Eigen::MatrixXcd cMat;
 typedef Eigen::VectorXd vec;
 typedef Eigen::VectorXcd cVec;
 
-complex<double> i(0.0,1.0);
+complex<double> ii(0.0,1.0);
 #define pi 3.14159265359
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,13 +70,17 @@ double closenessS; //solution (i.e. minusDS)
 double closenessSM; //solution max
 double closenessD; //delta
 double closenessC; //calculation
-double closenessE; //energy change
+double closenessCon; //energy conservation
 double closenessL; //linearisation of energy
 double closenessT; //true energy versus linear energy
 double closenessP; //checking lattice small enough for momenta
 double closenessR; //regularization
 double closenessIE; //imaginary part of the energy
 double closenessCL; //continuum approx to linear erg and num
+double closenessON; //on shell vs off shell linear energy
+double closenessAB; //a_k=Gamma*b*_k
+double closenessLR; //p(i,j)->p_lin(i,j) as i->0
+double closenessABNE; //linNum and linErg as calculated by a_k*b*_k agree with other calcs
 
 //parameters determining input phi
 //struct to hold answers to questions
@@ -95,6 +99,7 @@ struct aqStruct
 	};
 aqStruct aq; //struct to hold user responses
 double reg; //small parameter multiplying regulatory term
+unsigned int cutoff; //cutoff for momentum integrations
 string inP; //b for bubble, p for periodic instaton, f for from file
 string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 string inF; //file input from where, m for main, p for pi
@@ -106,6 +111,7 @@ double negVal; //the negative eigenvalue
 unsigned int negEigDone; //has the negEig been found before? 1 if yes, 0 if no
 string zmt; //dictates how time zero mode is dealt with
 string zmx; //dictates how x zero mode is dealt with
+string bds; //dictates how boundaries are dealt with in main
 double epsilon0; //the value of epsilon when the minima are degenerate
 double S1;
 double r0; //the minimum radius if pot[0]=='3'
@@ -143,6 +149,22 @@ double absDiff (const double& numA, const double& numB) {
 }
 double absDiff (const comp& numA, const comp& numB) {
 	return 2.0*abs(numA-numB)/sqrt(norm(numA)+norm(numB));
+}
+
+double absDiff(const vec& vecA, const vec& vecB) {
+	double normSqrdA = vecA.squaredNorm();
+	double normSqrdB = vecB.squaredNorm();
+	vec diff = vecA-vecB;
+	double normDiff = diff.norm();
+	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+}
+
+double absDiff(const cVec& vecA, const cVec& vecB) {
+	double normSqrdA = vecA.squaredNorm();
+	double normSqrdB = vecB.squaredNorm();
+	cVec diff = vecA-vecB;
+	double normDiff = diff.norm();
+	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
 }
 	
 //function giving location of smallest element of a vector of type T
@@ -582,13 +604,13 @@ comp simpleTime (const unsigned int& time, const unsigned int& the_Na=Na, const 
 		{
 		double temp = (double)time;
 		temp -= (double)the_Na;
-		xTime = the_b*temp + i*the_Tb;
+		xTime = the_b*temp + ii*the_Tb;
 		}
 	else if (time < (the_Na+the_Nb))
 		{
 		double temp = (double)time;
 		temp -= the_Na; //as complex doesn't support (complex double)*integer (though it does support double*integer added to a complex double) - and as int to double seems to cock up here (perhaps because the integers are unsigned)
-		xTime = i*the_Tb - i*the_b*temp;
+		xTime = ii*(the_Tb - the_b*temp);
 		}
 	else
 		{
@@ -612,7 +634,7 @@ double simpleSpaceBox (const unsigned int& space, const double& the_L, const dou
 //simple space for a sphere
 double simpleSpaceSphere (const unsigned int& space, const double& the_L=L, const double& the_a=a)
 	{
-	return space*the_a;
+	return r0+space*the_a;
 	}
 	
 //gives values of coordinates in whole spacetime
@@ -632,7 +654,7 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 		unsigned int t = intCoord(locNum,0,Na);
 		double temp = (double)t;
 		temp -= (double)Na;
-		XcoordA = b*temp + i*Tb;
+		XcoordA = b*temp + ii*Tb;
 		}
 	if (direction==1)
 		{
@@ -650,7 +672,7 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 		{
 		unsigned int t = intCoord(locNum,0,Nb);
 		double temp = (double)t;
-		XcoordB = i*(Tb - b*temp);
+		XcoordB = ii*(Tb - b*temp);
 		}
 	if (direction==1)
 		{
@@ -922,7 +944,7 @@ vec interpolate1d(vec vec_old, const unsigned int & N_old, const unsigned int & 
 void printParameters()
 	{
 	printf("%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s%8s\n","inP","N","Na","Nb","Nc","L","Ta","Tb","Tc","R","dE","theta","reg", "epsilon");
-	printf("%8s%8i%8i%8i%8i%8g%8g%8g%8g%8g%8g%8g%8g%8g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
+	printf("%8s%8i%8i%8i%8i%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g%8.4g\n",inP.c_str(),N,Na,Nb,Nc,L,Ta,Tb,Tc,R,dE,theta,reg,epsilon);
 	printf("\n");
 	}	
 
@@ -1402,8 +1424,8 @@ void changeDouble (const string & parameterLabel, const double & newParameter)
 		if (Tb<R && pot[0]!='3'){
 			angle = asin(Tb/R);
 			if (2.0*(1.5*Tb*tan(angle))<L) L=2.0*(1.5*Tb*tan(angle));
+			a = L/(N-1.0);
 			}
-		a = L/(N-1.0);
 		}
 	else if ( parameterLabel.compare("R")==0) //this parameter changes the initial guess
 		{
@@ -1445,7 +1467,7 @@ cVec vecComplex(vec realVec, const unsigned int & tDim)
 		{
 		for (unsigned int l=0; l<tDim; l++)
 			{
-			complexVec(l) = realVec(2*l) + i*realVec(2*l+1);
+			complexVec(l) = realVec(2*l) + ii*realVec(2*l+1);
 			}
 		}
 	else
@@ -1478,28 +1500,33 @@ vec vecReal(cVec complexVec, const unsigned int &  tDim)
 //fourier transform type functions
 
 //h the matrix from dl[7]
-mat hFn(const unsigned int & xN, const double & xa, const double & mass2)
+mat hFn(const unsigned int & xN, const double & xa, const double & xmass2, const string& potential=pot)
 	{
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
+	double diag = xmass2 + 2.0/pow(xa,2.0);
+	double offDiag1 = -1.0/pow(xa,2.0);
+	double offDiag2;
+	if (pot[0]=='3') offDiag2 = -pow(2.0,0.5)/pow(xa,2.0);	
+	else			 offDiag2 = -1.0/pow(xa,2.0);
 	for (unsigned int l=0; l<xN; l++)
 		{
 		if (l==0)
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);			
+			xh(l,l) = diag;
+			xh(l,l+1) = offDiag2;			
 			}
 		else if (l==(xN-1))
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);
+			xh(l,l) = diag;
+			xh(l,l-1) = offDiag2;
 			}
 		else
 			{
-			xh(l,l) = mass2 + 2.0/pow(xa,2.0);
-			if ((l+1)==xN)	{	xh(l,l+1) = -pow(2.0,0.5)/pow(xa,2.0);}
-			else			{	xh(l,l+1) = -1.0/pow(xa,2.0);}
-			if ((l-1)==0)	{	xh(l,l-1) = -pow(2.0,0.5)/pow(xa,2.0);}
-			else			{	xh(l,l-1) = -1.0/pow(xa,2.0);}
+			xh(l,l) = diag;
+			if ((l+1)==(xN-1))	xh(l,l+1) = offDiag2;
+			else				xh(l,l+1) = offDiag1;
+			if ((l-1)==0)		xh(l,l-1) = offDiag2;
+			else				xh(l,l-1) = offDiag1;
 			}
 		}
 	return xh;
