@@ -2,17 +2,95 @@
 ##the following are input to pi.cc:
 ##
 #N      Na      Nb      Nc      dE        LoR        Tb      theta 
- 130    300     80      2       0.050     .500       .800    0.0 
+ 130    320     80      2       0.050     .500       0.8     0.0 
 ##
 #inputChoice    fileNumberIn    loopIn    totalLoops  loopChoice  minValue    maxValue    printChoice     printRun 
  p              150120093931    0         1           n           0.80        1.00        n               0       
 ##
 #alpha     open     amp     pot     A         reg     cutoff  
- 0.4       1.0      0.4     3n      0.4       0.00    60     
+ 0.4       1.0      0.4     3n      0.4       0.00    10     
 ##
 ##negEig inputs
 #P          c           done 
  20000      2.6e-3      1 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

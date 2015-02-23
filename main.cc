@@ -1408,7 +1408,7 @@ auto ddVr = [&] (const comp & phi)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	    		//misc end of program tasks - mostly printing
 
 		//checking different measures of energy agree
-		if (true_test.back()>closenessT || onShell_test.back()>closenessON || ABNE_test.back()>closenessABNE) {
+		if (true_test.back()>closenessT || onShell_test.back()>closenessON || ABNE_test.back()>closenessABNE || true) {
 			cout << "erg(1)             = " << erg(1) << endl;
 			cout << "linErgOffShell(0)  = " << linErgOffShell(0) << endl;
 			cout << "linErgAB           = " << linErgAB << endl;
