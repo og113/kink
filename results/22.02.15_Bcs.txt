@@ -1,0 +1,29 @@
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 130
