@@ -4,10 +4,10 @@
 
 #note that this has been written wrongly as only main needs to be repeated for each value of cutoff, not pi or pi3 - should rewrite if reusing
 
-DATE="22.02.15"
+DATE="23.02.15"
 FILE="results/"$DATE"_cutoff.txt"
 echo "output to" $FILE
-echo "output from mainChangeCutoff.sh" >> $FILE
+echo "output from mainChangeCutoff.sh" > $FILE
 echo "" >> $FILE
 
 ./changeInputs -f mainInputs -n inF -v p
@@ -48,12 +48,12 @@ echo "./sphaleron4" >> $FILE
 echo "" >> $FILE
 ./sphaleron4 -t1 $Tb -r1 $L -amp $AMP  >> $FILE
 
-loops=4
+loops=0
 
 for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
-	let CUTOFF=18-j*2
+	let CUTOFF=130-j*10
 	echo "CUTOFF = $CUTOFF" >> $FILE
 	./changeInputs cutoff $CUTOFF
 	echo "./pi" >> $FILE

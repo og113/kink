@@ -2,7 +2,7 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-DATE="20.02.15"
+DATE="24.02.15"
 
 FILE="results/"$DATE"_Tb_output.txt"
 SUMMARY="results/"$DATE"_summary.txt"

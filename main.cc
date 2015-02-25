@@ -865,39 +865,7 @@ auto ddVr = [&] (const comp & phi)
 					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					
-					if (bds.compare("ft")==0) // this actually requires that p(0,x)=p(0,k) (t=0)
-						{
-						if (abs(theta)<MIN_NUMBER)
-							{
-							for (unsigned int k=0; k<N; k++)
-								{
-								unsigned int m = k*NT;
-								minusDS(2*j)				+= 2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*p(2*m+1);
-								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*(p(2*(m+1)+1)-p(2*m+1))/real(dt);
-								DDS.coeffRef(2*j,2*m+1)		+= -2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k);
-								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*m+1) 	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								}
-							}
-						else
-							{
-							for (unsigned int k=0; k<N; k++)
-								{
-								unsigned int m = k*NT;
-								minusDS(2*j)				+= theta*sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1))-p(2*m))/real(dt) \
-																+ ((1.0+Gamma)/(1.0-Gamma))*eigenValues(k)*p(2*m+1));
-								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1)+1)-p(2*m+1))/real(dt) \
-																- ((1.0-Gamma)/(1.0+Gamma))*eigenValues(k)*p(2*m));
-								DDS.coeffRef(2*j,2*m)		+= theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j,2*(m+1))	+= -theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j,2*m+1)		+= -theta*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0+Gamma)/(1.0-Gamma);
-								DDS.coeffRef(2*j+1,2*m+1)	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*m)		+= +sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0-Gamma)/(1.0+Gamma);
-								}
-							}
-						}
-					else if (bds.compare("jd")==0)
+					if (bds.compare("jd")==0)
 						{
 						minusDS(2*j+1) 					+= Dx*imag(Cp(j+1)/dt);
 					    DDS.coeffRef(2*j+1,2*(j+1)) 	+= -imag(Dx/dt);
@@ -930,9 +898,9 @@ auto ddVr = [&] (const comp & phi)
 									DDS.coeffRef(2*j+1,2*m) += (1.0-Gamma)*omega_1(x,k)/(1.0+Gamma);
 									minusDS(2*j+1) 			+= -(1.0-Gamma)*omega_1(x,k)*(p(2*m)-minima[0])/(1.0+Gamma);
 									/////////////////////equation R - theta!=0//////////////
-									minusDS(2*j) 			+= p(2*m+1)*omega_1(x,k)*(1+Gamma)*theta/(1-Gamma);
-									DDS.coeffRef(2*j,2*m+1)	+= -omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
-									bound 				+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
+									minusDS(2*j) 			+= theta*p(2*m+1)*omega_1(x,k)*(1+Gamma)/(1-Gamma);
+									DDS.coeffRef(2*j,2*m+1)	+= -theta*omega_1(x,k)*(1.0+Gamma)*theta/(1.0-Gamma);
+									bound 		+= -(1.0-Gamma)*omega_1(x,k)*(p(2*j)-minima[0])*(p(2*m)-minima[0])/(1.0+Gamma)\
 																 + (1.0+Gamma)*omega_1(x,k)*p(2*j+1)*p(2*m+1)/(1.0-Gamma);
 									}
 								}
@@ -1441,14 +1409,14 @@ auto ddVr = [&] (const comp & phi)
 		//printing to terminal
 		printf("\n");
 		printf("%8s%8s%8s%8s%8s%8s%8s%8s%14s%14s%14s%14s\n","runs","time","N","NT","L","Tb","dE","theta","Num","E","im(action)","W");
-		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14g%14g%14g%14g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
+		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14.4g%14.4g%14.4g%14.4g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%12s%6i%6i%8g%8g%8g%8g%14g%14g%12g%14g%14g%14g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num\
+		fprintf(actionfile,"%12s%6i%6i%8g%8g%8g%8g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num,imag(action)\
 		,real(W),sol_test.back(),lin_test.back(),true_test.back());
 		fclose(actionfile);
 		

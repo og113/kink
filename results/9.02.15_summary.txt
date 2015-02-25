@@ -1,0 +1,4 @@
+output from mainChangeNL.sh
+
+N         Na        Nb        Nc        L         Ta        S/F       
+150       300       80        4         5         3.037     FM        
