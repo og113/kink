@@ -342,7 +342,7 @@ closenessS = 1.0e-6;
 closenessSM = 1.0e-5;
 closenessD = 1.0;
 closenessC = 1.0e-16*N*NT;
-closenessE = 1.0e-2;
+closenessCon = 1.0e-2;
 closenessR = 1.0e-2;
 double closenessDT = 1.0e-2;
 
@@ -704,7 +704,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (t==(Nb-1))
 				{
-				comp Dt = -b*i/2.0;
+				comp Dt = -b*ii/2.0;
 				erg(t+Na) += pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0 + a*V(Cp(j)) + a*Vr(Cp(j));
 				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0; //n.b. no contribution from time derivative term at the final time boundary	
 				pot_0 += Dt*a*V(Cp(j));
@@ -717,8 +717,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 				}
 			else if (t==0)
 				{
-				comp dt = -b*i;
-				comp Dt = -b*i/2.0;
+				comp dt = -b*ii;
+				comp Dt = -b*ii/2.0;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 				pot_0 += Dt*a*V(Cp(j));
@@ -741,8 +741,8 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			//bulk
 			else
 				{
-				comp dt = -b*i;
-				comp Dt = -b*i;
+				comp dt = -b*ii;
+				comp Dt = -b*ii;
 				kineticT += a*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 				kineticS += Dt*pow(Cp(neighPosX)-Cp(j),2.0)/a/2.0;
 				pot_0 += Dt*a*V(Cp(j));
@@ -1087,7 +1087,7 @@ for (unsigned int loop=0; loop<aq.totalLoops; loop++)
 			relErgChange = absolute((real(erg(0))-real(erg(NT-2)))/real(erg(0)));
 			}
 		erg_test.push_back(ergChange);
-		if (erg_test.back()>closenessE)
+		if (erg_test.back()>closenessCon)
 			{
 			cout << "energy change = " << ergChange << endl;
 			cout << "relative energy change = " << relErgChange << endl;

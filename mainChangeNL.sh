@@ -2,17 +2,17 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-DATE="11.02.15"
+DATE="27.02.15"
 
 FILE="results/"$DATE"_NL_output.txt"
 SUMMARY="results/"$DATE"_summary.txt"
 echo "output to" $FILE
 echo "summary to" $SUMMARY
-echo "output from mainChangeNL.sh on "$DATE >> $FILE
+echo "output from mainChangeNL.sh on "$DATE > $FILE
 echo "" >> $FILE
-#echo "output from mainChangeNL.sh on "$DATE > $SUMMARY
-#echo "" >> $SUMMARY
-#printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "Tb" "Tc" "S/F" >> $SUMMARY
+echo "output from mainChangeNL.sh on "$DATE > $SUMMARY
+echo "" >> $SUMMARY
+printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' "N" "Na" "Nb" "Nc" "L" "Ta" "Tb" "Tc" "S/F" >> $SUMMARY
 
 function getEigenvectors {
 	echo "./sphaleron" >> $FILE
@@ -34,16 +34,16 @@ function changeParameter {
 }
 
 ./changeInputs -f mainInputs -n inF -v p
-loops=5
+loops=6
 
 for j in `seq 0 $loops`
 	do
 	echo "-------------------------------------------------------------------------------------------------------" >> $FILE
 	let N=130
 	let Nb=80
-	let Na=300
+	let Na=300+20*j
 	let Nc=2
-	Tb=$(echo "scale=5; 0.805+0.005*$j" | bc)
+	Tb=$(echo "scale=5; 0.800" | bc)
 	Ta=$(echo "scale=5; $Na*$Tb/($Nb-1.0)" | bc)
 	L=$(echo "scale=3; 5" | bc)
 	LoR=$(echo "scale=3; $L/10.0" | bc)
@@ -71,7 +71,7 @@ for j in `seq 0 $loops`
 		if [ "$?" = "0" ]; then
 			echo "success: solution tunnelled" >> $FILE
 			echo "" >> $FILE
-			./pi3 -tn $TIMENUMBER -lin 1 -changeParams 1 -N 300 -approxOmega 0 >> $FILE
+			./pi3 -tn $TIMENUMBER -lin 1 -changeParams 0 -N 300 -approxOmega 0 >> $FILE
 			echo "" >> $FILE
 			./pi3 -tn $TIMENUMBER -test 0 >> $FILE
 			echo "" >> $FILE
@@ -80,20 +80,20 @@ for j in `seq 0 $loops`
 			echo "#################################################################################################" >> $FILE
 			./main >> $FILE
 			if [ "$?" = "0" ]; then
-				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "S" >> $SUMMARY
+				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "S" >> $SUMMARY
 			else
-				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FM" >> $SUMMARY
+				printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FM" >> $SUMMARY
 			fi
 			echo "#################################################################################################" >> $FILE
 		else
 			echo "solution didn't tunnel" >> $FILE
 			echo "" >> $FILE
-			printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FT" >> $SUMMARY
+			printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FT" >> $SUMMARY
 		fi
 	else
 		echo pi failed, value returned is $? >> $FILE
 		echo "" >> $FILE
-		printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FP" >> $SUMMARY
+		printf '%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n' $N $Na $Nb $Nc $L $Ta $Tb $Tc "FP" >> $SUMMARY
 	fi
 	echo "" >> $FILE
 	done

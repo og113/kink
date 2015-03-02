@@ -36,6 +36,7 @@ typedef Eigen::VectorXcd cVec;
 
 complex<double> ii(0.0,1.0);
 #define pi 3.14159265359
+#define MIN_NUMBER 1.0e-16
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +100,6 @@ struct aqStruct
 	};
 aqStruct aq; //struct to hold user responses
 double reg; //small parameter multiplying regulatory term
-unsigned int cutoff; //cutoff for momentum integrations
 string inP; //b for bubble, p for periodic instaton, f for from file
 string pot; //pot[0] gives 1 or 2, pot[1] gives r (regularised) or n (not)
 string inF; //file input from where, m for main, p for pi
@@ -145,10 +145,12 @@ double absolute (const double& amplitude)
 	
 //gives absolute measure of difference between two numbers
 double absDiff (const double& numA, const double& numB) {
-	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+	if (abs(numA)>MIN_NUMBER || abs(numB)>MIN_NUMBER) return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
+	else return 0.0;
 }
 double absDiff (const comp& numA, const comp& numB) {
-	return 2.0*abs(numA-numB)/sqrt(norm(numA)+norm(numB));
+	if (abs(numA)>MIN_NUMBER || abs(numB)>MIN_NUMBER) return 2.0*abs(numA-numB)/sqrt(norm(numA)+norm(numB));
+	else return 0.0;
 }
 
 double absDiff(const vec& vecA, const vec& vecB) {
@@ -156,7 +158,8 @@ double absDiff(const vec& vecA, const vec& vecB) {
 	double normSqrdB = vecB.squaredNorm();
 	vec diff = vecA-vecB;
 	double normDiff = diff.norm();
-	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+	if (normSqrdA>MIN_NUMBER || normSqrdB>MIN_NUMBER ) return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+	else return 0.0;
 }
 
 double absDiff(const cVec& vecA, const cVec& vecB) {
@@ -164,7 +167,8 @@ double absDiff(const cVec& vecA, const cVec& vecB) {
 	double normSqrdB = vecB.squaredNorm();
 	cVec diff = vecA-vecB;
 	double normDiff = diff.norm();
-	return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+	if (normSqrdA>MIN_NUMBER || normSqrdB>MIN_NUMBER ) return 2.0*normDiff/pow(normSqrdA+normSqrdB,0.5);
+	else return 0.0;
 }
 	
 //function giving location of smallest element of a vector of type T
@@ -1508,28 +1512,26 @@ mat hFn(const unsigned int & xN, const double & xa, const double & xmass2, const
 	mat xh(xN,xN);	xh = Eigen::MatrixXd::Zero(xN,xN);
 	double diag = xmass2 + 2.0/pow(xa,2.0);
 	double offDiag1 = -1.0/pow(xa,2.0);
-	double offDiag2;
-	if (pot[0]=='3') offDiag2 = -pow(2.0,0.5)/pow(xa,2.0);	
-	else			 offDiag2 = -1.0/pow(xa,2.0);
+	double offDiag2 = (pot[0]=='3'? -pow(2.0,0.5)/pow(xa,2.0): -1.0/pow(xa,2.0) );
 	for (unsigned int l=0; l<xN; l++)
 		{
 		if (l==0)
 			{
-			xh(l,l) = diag;
-			xh(l,l+1) = offDiag2;			
+			xh(l,l) = 1.0; // taking into account boundary conditions
+			//xh(l,l) = diag;
+			//xh(l,l+1) = offDiag2;			
 			}
 		else if (l==(xN-1))
 			{
-			xh(l,l) = diag;
-			xh(l,l-1) = offDiag2;
+			xh(l,l) = 1.0; // taking into account boundary conditions
+			//xh(l,l) = diag;
+			//xh(l,l-1) = offDiag2;
 			}
 		else
 			{
 			xh(l,l) = diag;
-			if ((l+1)==(xN-1))	xh(l,l+1) = offDiag2;
-			else				xh(l,l+1) = offDiag1;
-			if ((l-1)==0)		xh(l,l-1) = offDiag2;
-			else				xh(l,l-1) = offDiag1;
+			xh(l,l+1) = ((l+1)==(xN-1)? offDiag2: offDiag1);
+			xh(l,l-1) = ((l-1)==0?		offDiag2: offDiag1);
 			}
 		}
 	return xh;

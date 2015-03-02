@@ -14,8 +14,6 @@
 #include "pf.h"
 #include "files.h"
 
-#define MIN_NUMBER 1.0e-16
-
 int main()
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
@@ -179,7 +177,7 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 				}
 			else if(lineNumber==2)
 				{
-				ss >> alpha >> open >> amp >> pot >> A >> reg >> cutoff;
+				ss >> alpha >> open >> amp >> pot >> A >> reg;
 				lineNumber++;
 				}
 			else if(lineNumber==3)
@@ -254,12 +252,6 @@ for (unsigned int fileLoop=0; fileLoop<piFiles.size(); fileLoop++)
 	paramsV  = {epsilon, A};
 	paramsV0 = {epsilon0, A};
 	paramsVoid = {};
-	
-if (cutoff>N || cutoff<1) {
-	cerr << "cutoff(" << cutoff << ") too small" << endl;
-	return 1;
-}
-
 		
 //finding epsilon and root
 vector<double> minima0(2);
@@ -363,7 +355,7 @@ vector<double> minima0(2);
 	closenessA = 1.0;
 	closenessS = 1.0e-6;
 	closenessSM = 1.0e-5;
-	closenessD = 0.7;
+	closenessD = 1.0;
 	closenessC = 1.0e-16*N*NT;
 	closenessCon = 1.0/3.0;
 	closenessL = 1.0e-2;
@@ -392,25 +384,22 @@ auto ddVr = [&] (const comp & phi)
 	};
 
 	//deterimining omega matrices for fourier transforms in spatial direction
-	mat omega_m1(N,N), 	omega_m1_cutoff(N,N);
-	mat omega_0(N,N), 	omega_0_cutoff(N,N);
-	mat omega_1(N,N), 	omega_1_cutoff(N,N);
-	mat omega_2(N,N), 	omega_2_cutoff(N,N);
+	mat omega_m1(N,N);
+	mat omega_0(N,N);
+	mat omega_1(N,N);
+	mat omega_2(N,N);
 	omega_m1 = Eigen::MatrixXd::Zero(N,N);
 	omega_0 = Eigen::MatrixXd::Zero(N,N);
 	omega_1 = Eigen::MatrixXd::Zero(N,N);
 	omega_2 = Eigen::MatrixXd::Zero(N,N);
-	omega_m1_cutoff = Eigen::MatrixXd::Zero(N,N);
-	omega_0_cutoff = Eigen::MatrixXd::Zero(N,N);
-	omega_1_cutoff = Eigen::MatrixXd::Zero(N,N);
-	omega_2_cutoff = Eigen::MatrixXd::Zero(N,N);
-	vec eigenValues(N);
-	mat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix - so the nth eigenvector is v_n(j) = eigenVectors(j,n)
+	cVec eigenValues(N);
+	vec w_n_exp(N);
+	cMat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix - so the nth eigenvector is v_n(j) = eigenVectors(j,n)
 	bool approxOmega = false;
 	if (!approxOmega) {
 		mat h(N,N);
 		h = hFn(N,a,mass2);
-		Eigen::SelfAdjointEigenSolver<mat> eigensolver(h);
+		Eigen::EigenSolver<mat> eigensolver(h);
 		if (eigensolver.info() != Eigen::Success) {
 			cerr << "h eigensolver failed" << endl;
 			cerr << "N = " << N << ", a = " << a << ", mass2 = " << mass2 << endl;
@@ -432,20 +421,15 @@ auto ddVr = [&] (const comp & phi)
 	}
 	double djdk;	
 	for (unsigned int j=0; j<N; j++) {
+		w_n_exp(j) = (2.0/b)*asin(b*sqrt(eigenValues(j))/2.0);
 		for (unsigned int k=0; k<N; k++) {
 			for (unsigned int l=0; l<N; l++) {
 				if (approxOmega) djdk = a;
 				else 			 djdk = sqrt(DxFn(j)*DxFn(k));
-				omega_m1(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_0(j,k)  += djdk*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_1(j,k)  += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-				omega_2(j,k)  += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
-				if (l<cutoff) {
-					omega_m1_cutoff(j,k) += djdk*pow(eigenValues(l),-0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-					omega_0_cutoff(j,k)  += djdk*eigenVectors(j,l)*eigenVectors(k,l);
-					omega_1_cutoff(j,k)	 += djdk*pow(eigenValues(l),0.5)*eigenVectors(j,l)*eigenVectors(k,l);
-					omega_2_cutoff(j,k)	 += djdk*eigenValues(l)*eigenVectors(j,l)*eigenVectors(k,l);
-				}
+				omega_m1(j,k) += djdk*pow(real(eigenValues(l)),-0.5)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
+				omega_0(j,k)  += djdk*real(eigenVectors(j,l))*real(eigenVectors(k,l));
+				omega_1(j,k)  += djdk*pow(eigenValues(l),0.5)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
+				omega_2(j,k)  += djdk*eigenValues(l)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
 			}
 		}
 	}
@@ -777,7 +761,8 @@ auto ddVr = [&] (const comp & phi)
 				{		
 				unsigned int t 			= intCoord(j,0,NT); //coordinates
 				unsigned int x 			= intCoord(j,1,NT);
-				unsigned int neighPosX 	= neigh(j,1,1,NT,N);
+				int neighPosX 			= neigh(j,1,1,NT,N);
+				int neighNegX  			= neigh(j,1,-1,NT,N);
 				
 				comp Dt 		= DtFn(t);
 				comp dt 		= dtFn(t);
@@ -812,10 +797,10 @@ auto ddVr = [&] (const comp & phi)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linErgOffShell(t) += 0.5*( omega_2_cutoff(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
-										+ omega_0_cutoff(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
-						linNumOffShell(t) += 0.5*(omega_1_cutoff(x,k)*( p(2*l)-minima[0] )*( p(2*j)-minima[0] ) \
-										+ omega_m1_cutoff(x,k)*( p(2*(l+1))-p(2*l) )*( p(2*(j+1))-p(2*j) )/pow(dt,2.0));
+						linErgOffShell(t) += 0.5*( omega_2(x,k)*( Cp(l)-minima[0] )*( Cp(j)-minima[0] ) \
+										+ omega_0(x,k)*( Cp(l+1)-Cp(l) )*( Cp(j+1)-Cp(j) )/pow(dt,2.0));
+						linNumOffShell(t) += 0.5*(omega_1(x,k)*( Cp(l)-minima[0] )*( Cp(j)-minima[0] ) \
+										+ omega_m1(x,k)*( Cp(l+1)-Cp(l) )*( Cp(j+1)-Cp(j) )/pow(dt,2.0));
 						}
 					}
 					
@@ -824,10 +809,10 @@ auto ddVr = [&] (const comp & phi)
 					for (unsigned int k=0;k<N;k++)
 						{
 						unsigned int l = k*NT+t;
-						linNum(t) += 2.0*Gamma*omega_1_cutoff(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
-								 + p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0));
-						linErg(t) += 2.0*Gamma*omega_2_cutoff(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
-								+ p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0));
+						linNum(t) += 2.0*Gamma*omega_1(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+								 + p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0) );
+						linErg(t) += 2.0*Gamma*omega_2(x,k)*( (p(2*l)-minima[0])*(p(2*j)-minima[0])/pow(1.0+Gamma,2.0)\
+								+ p(2*j+1)*p(2*l+1)/pow(1.0-Gamma,2.0) );
 						}
 					}
 
@@ -849,11 +834,14 @@ auto ddVr = [&] (const comp & phi)
 					}			
 				else if (t==(NT-1))
 					{
-					kineticS 				+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					if (neighPosX!=-1) {
+						kineticS			+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						derivErg(t) 		+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						erg(t) 				+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					}			
 					potV 					+= Dt*Dx*V(Cp(j));
 					pot_r 					+= Dt*Dx*Vr(Cp(j));
-					erg(t) 					+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) 			+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					erg(t) 					+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 					potErg(t) 				+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 				
 					DDS.insert(2*j,2*(j-1)+1) = 1.0; //zero imaginary part of time derivative
@@ -865,39 +853,7 @@ auto ddVr = [&] (const comp & phi)
 					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					
-					if (bds.compare("ft")==0) // this actually requires that p(0,x)=p(0,k) (t=0)
-						{
-						if (abs(theta)<MIN_NUMBER)
-							{
-							for (unsigned int k=0; k<N; k++)
-								{
-								unsigned int m = k*NT;
-								minusDS(2*j)				+= 2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*p(2*m+1);
-								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*(p(2*(m+1)+1)-p(2*m+1))/real(dt);
-								DDS.coeffRef(2*j,2*m+1)		+= -2.0*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k);
-								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*m+1) 	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								}
-							}
-						else
-							{
-							for (unsigned int k=0; k<N; k++)
-								{
-								unsigned int m = k*NT;
-								minusDS(2*j)				+= theta*sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1))-p(2*m))/real(dt) \
-																+ ((1.0+Gamma)/(1.0-Gamma))*eigenValues(k)*p(2*m+1));
-								minusDS(2*j+1)				+= sqrt(Dx)*eigenVectors(x,k)*((p(2*(m+1)+1)-p(2*m+1))/real(dt) \
-																- ((1.0-Gamma)/(1.0+Gamma))*eigenValues(k)*p(2*m));
-								DDS.coeffRef(2*j,2*m)		+= theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j,2*(m+1))	+= -theta*sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j,2*m+1)		+= -theta*sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0+Gamma)/(1.0-Gamma);
-								DDS.coeffRef(2*j+1,2*m+1)	+= sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*(m+1)+1)+= -sqrt(Dx)*eigenVectors(x,k)/real(dt);
-								DDS.coeffRef(2*j+1,2*m)		+= +sqrt(Dx)*eigenVectors(x,k)*eigenValues(k)*(1.0-Gamma)/(1.0+Gamma);
-								}
-							}
-						}
-					else if (bds.compare("jd")==0)
+					if (bds.compare("jd")==0)
 						{
 						minusDS(2*j+1) 					+= Dx*imag(Cp(j+1)/dt);
 					    DDS.coeffRef(2*j+1,2*(j+1)) 	+= -imag(Dx/dt);
@@ -947,12 +903,15 @@ auto ddVr = [&] (const comp & phi)
 						}
 					else ///////////////////////////////// including other terms in action at t=0 ///////////////////////////
 						{
-						kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						if (neighPosX!=-1) {
+							kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+							derivErg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+							erg(t) 		+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						}
 						potV 		+= Dt*Dx*V(Cp(j));
 						pot_r 		+= Dt*Dx*Vr(Cp(j));
-						derivErg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
 						potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-						erg(t) 		+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+						erg(t) 		+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 						//////////////////////////////////////equation I - both///////////////////////////////////
 						for (unsigned int k=1; k<2*2; k++)
 					    	{
@@ -974,6 +933,8 @@ auto ddVr = [&] (const comp & phi)
 					            }
 					        }
 					    comp temp0 = Dx/dt - Dt*(1.0/dx+1.0/dxm);
+					    if (neighPosX==-1) 		temp0 += Dt/dx;
+					    else if (neighNegX==-1) temp0 += Dt/dxm;
 					    comp temp1 = Dt*Dx*( dV(Cp(j)) + dVr(Cp(j)) );//dV terms should be small
 					    comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
 					    
@@ -1021,6 +982,7 @@ auto ddVr = [&] (const comp & phi)
 						    	{
 						        int sign = pow(-1,k+1);
 						        int direc = (int)(k/2.0);
+						        int neighb = neigh(j,direc,sign,NT,N);
 						        double dxd = (sign==1? dx: dxm);
 						        if (direc == 0)
 						        	{
@@ -1028,9 +990,8 @@ auto ddVr = [&] (const comp & phi)
 					            	DDS.coeffRef(2*j,2*(j+sign)) 	+= -real(Dx/dt)*theta;
 					            	DDS.coeffRef(2*j,2*(j+sign)+1) 	+= imag(Dx/dt)*theta;
 						            }
-						        else
+						        else if (neighb!=-1)
 						        	{
-						            unsigned int neighb = neigh(j,direc,sign,NT,N);
 						            minusDS(2*j) 					+= - real(Dt*Cp(neighb))*theta/dxd;
 						            DDS.coeffRef(2*j,2*neighb) 		+= real(Dt)*theta/dxd;
 					            	DDS.coeffRef(2*j,2*neighb+1) 	+= -imag(Dt)*theta/dxd;
@@ -1047,18 +1008,24 @@ auto ddVr = [&] (const comp & phi)
 				//bulk
 				else
 					{
-					kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					if (neighPosX!=-1) {
+						kineticS 	+= Dt*pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						erg(t) 	 	+= pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+						derivErg(t) += pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					}
+					
 					kineticT 	+= Dx*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					potV 		+= Dt*Dx*V(Cp(j));
 					pot_r 		+= Dt*Dx*Vr(Cp(j));
-					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
+					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
+					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 				
 		            for (unsigned int k=0; k<2*2; k++)
                 	{
                     int sign = pow(-1,k);
                     int direc = (int)(k/2.0);
+                    int neighb = neigh(j,direc,sign,NT,N);
                     comp dtd = (sign==1? dt: dtm);
                     double dxd = (sign==1? dx: dxm);
                     if (direc == 0)
@@ -1070,10 +1037,8 @@ auto ddVr = [&] (const comp & phi)
                         DDS.insert(2*j+1,2*(j+sign)) 	= -imag(Dx/dtd);
                         DDS.insert(2*j+1,2*(j+sign)+1) 	= -real(Dx/dtd);
                         }
-                    else
-                    	{
-                        unsigned int neighb = neigh(j,direc,sign,NT,N);
-                        
+                    else if (neighb!=-1)
+                    	{                        
                         minusDS(2*j) 					+= -real(Dt*Cp(neighb)/dxd);
                         minusDS(2*j+1) 					+= -imag(Dt*Cp(neighb)/dxd);
                         DDS.insert(2*j,2*neighb) 		= real(Dt/dxd);
@@ -1083,6 +1048,8 @@ auto ddVr = [&] (const comp & phi)
                         }
                     }
 		            comp temp0 = Dx*(1.0/dt + 1.0/dtm) - Dt*(1.0/dx + 1.0/dxm);
+		            if (neighPosX==-1) temp0 += Dt/dx;
+		            else if (neighNegX==-1) temp0 += Dt/dxm;
 		            comp temp1 = Dt*Dx*(dV(Cp(j)) + dVr(Cp(j)));
 		            comp temp2 = Dt*Dx*(ddV(Cp(j)) + ddVr(Cp(j)));
 		                
@@ -1130,7 +1097,7 @@ auto ddVr = [&] (const comp & phi)
 			
 			//calculating continuum approx to linErg and linNum on initial time slice
 			if (pot[0]=='3') {
-				for (unsigned int k=1; k<cutoff; k++) {
+				for (unsigned int k=1; k<N; k++) {
 					double momtm = k*pi/(L-r0);
 					double freqSqrd = 1.0+pow(momtm,2.0);
 					double Asqrd, integral1 = 0.0, integral2 = 0.0;
@@ -1150,20 +1117,21 @@ auto ddVr = [&] (const comp & phi)
 			cVec a_k(N), b_k(N); //N.b. b_k means b*_k but can't put * in the name
 			a_k = Eigen::VectorXcd::Zero(N);
 			b_k = Eigen::VectorXcd::Zero(N);
-			double T0 = real(coord(0,0));
+			double T0 = real(coord(0,0))+Ta;
 			comp dt0 = dtFn(0);
 			for (unsigned int n=0; n<N; n++) {
 				double w_n = sqrt(eigenValues(n));
+				double w_n_e = w_n_exp(n);
 				for (unsigned int j=0; j<N; j++) {
 					unsigned int m=j*NT;
 					double sqrtDj = sqrt(4.0*pi*DxFn(j));
-					if (abs(eigenValues(n))>1.0e-16) {
-						a_k(n) += exp(ii*w_n*T0)*sqrt(2.0*w_n)*eigenVectors(j,n)* \
-									sqrtDj*((Cp(m+1)-minima[0])-(Cp(m)-minima[0])*exp(ii*w_n*dt0)) \
-										/(exp(-ii*w_n*dt0)-exp(ii*w_n*dt0));
-						b_k(n) += exp(-ii*w_n*T0)*sqrt(2.0*w_n)*eigenVectors(j,n)* \
-									sqrtDj*((Cp(m+1)-minima[0])-(Cp(m)-minima[0])*exp(-ii*w_n*dt0)) \
-										/(exp(ii*w_n*dt0)-exp(-ii*w_n*dt0));
+					if (abs(w_n)>1.0e-16 && abs(w_n_e)>1.0e-16) {
+						a_k(n) += exp(ii*w_n_e*T0)*sqrt(2.0*w_n)*eigenVectors(j,n)* \
+									sqrtDj*((Cp(m+1)-minima[0])-(Cp(m)-minima[0])*exp(ii*w_n_e*dt0)) \
+										/(exp(-ii*w_n_e*dt0)-exp(ii*w_n_e*dt0));
+						b_k(n) += exp(-ii*w_n_e*T0)*sqrt(2.0*w_n)*eigenVectors(j,n)* \
+									sqrtDj*((Cp(m+1)-minima[0])-(Cp(m)-minima[0])*exp(-ii*w_n_e*dt0)) \
+										/(exp(ii*w_n_e*dt0)-exp(-ii*w_n_e*dt0));
 					}
 				}
 			}			
@@ -1177,15 +1145,16 @@ auto ddVr = [&] (const comp & phi)
 			for (unsigned int j=0; j<N; j++) {
 				ABtest += absDiff(a_k(j),conj(b_k(j))*Gamma);
 				p0(j) = Cp(j*NT);
-				if (j<cutoff) {
+				if (j<N) {
 					linNumAB += a_k(j)*b_k(j);
 					linErgAB += sqrt(eigenValues(j))*a_k(j)*b_k(j);
 				}
 				for (unsigned int n=0; n<N; n++) {
 					double w_n = sqrt(eigenValues(n));
+					double w_n_e = w_n_exp(n);
 					double sqrtDj = sqrt(4.0*pi*DxFn(j));
 					if (abs(w_n)>1.0e-16) {
-						linRep(j) += eigenVectors(j,n)*(a_k(n)*exp(-ii*w_n*T0)+b_k(n)*exp(ii*w_n*T0)) \
+						linRep(j) += eigenVectors(j,n)*(a_k(n)*exp(-ii*w_n_e*T0)+b_k(n)*exp(ii*w_n_e*T0)) \
 										/sqrt(2.0*w_n)/sqrtDj;
 					}
 				}
@@ -1520,6 +1489,10 @@ auto ddVr = [&] (const comp & phi)
 		//gpSimple(ergFile);
 		printf("%12s%30s\n"," ",ergFile.c_str());
 		cout << endl;
+		
+		if (delta_test.back()>closenessD) {
+				return 1;
+			}
 		
 		} //ending parameter loop
 	} //ending file loop

@@ -2,7 +2,7 @@
 
 #tmux new -s matlab "matlab -nodesktop -nojvm"
 
-DATE="20.02.15"
+DATE="02.03.15"
 
 FILE="results/"$DATE"_Tb_output.txt"
 SUMMARY="results/"$DATE"_summary.txt"
@@ -55,7 +55,7 @@ echo "L =" $L >> $FILE
 echo "" >> $FILE
 getEigenvectors $L
 
-loops=20
+loops=0
 
 for j in `seq 0 $loops`
 	do
