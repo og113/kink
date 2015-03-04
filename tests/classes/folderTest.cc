@@ -26,5 +26,16 @@ cout << g << endl;
 Filename h(f());
 h.Timenumber = "0";
 cout << h << endl;
+Filename p("data/data1.dat");
+cout << p << " " << p.Directory << " " << p.Timenumber << " " << p.ID << " " << p.Suffix << endl;
+FilenameAttributes j, k;
+k.Timenumber = "40";
+Folder folder1(j), folder2(k);
+folder2.set(j);
+folder2.update();
+if (folder2.isPresent(p)) cout << "Present" << endl;
+cout << folder1.size() << " " << folder2.size() << endl;
+cout << "Folders: " << endl << folder1 << endl << folder2 << endl;
+cout << j << endl << k << endl;
 return 0;
 }

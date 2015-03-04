@@ -17,6 +17,7 @@ using namespace std;
 		- pair<string,string> typedef
 		- FilenameAttributes
 		- <<
+		- ==
 */
 
 typedef pair<string,string> StringPair;
@@ -38,10 +39,13 @@ private:
 
 ostream& operator<<(ostream&, const FilenameAttributes&);
 
+bool operator==(const FilenameAttributes&, const FilenameAttributes&);
+
 /*
 	declarations for the Filename class.
 		- Filename
 		- <<
+		- >>
 */
 
 class Filename: public FilenameAttributes{
@@ -50,11 +54,16 @@ public:
 	Filename(const Filename& f): FilenameAttributes(f) {}
 	Filename(const string&);
 	Filename& operator=(const Filename&);
+	Filename& operator=(const string&);
 	~Filename() {}
 	string operator()() const;
+private:
+	void set(const string&);
 };
 
 ostream& operator<<(ostream&, const Filename&);
+
+istream& operator>>(istream&, Filename&);
 
 /*
 	declarations for the FilenameComparator class, which is used by the Folder class. Comparator sees the ugly details.
@@ -79,7 +88,7 @@ public:
 private:
 	FilenameAttributes Lower;
 	FilenameAttributes Upper;
-	bool check(const FilenameComparator&,const FilenameComparator&);
+	bool check(const FilenameAttributes&,const FilenameAttributes&) const;
 	void copy(const FilenameComparator&);
 };
 
@@ -96,17 +105,18 @@ public:
 	Folder(const FilenameComparator&);
 	Folder(const Folder&);
 	Folder& operator=(const Folder&);
+	~Folder() {}
 	void set(const FilenameComparator&);
-	int size();
+	unsigned int size() const;
 	void update();
-	Filename& operator[](const int&);
+	Filename operator[](const int&) const;
 	bool isPresent(const Filename&);
 private:
 	FilenameComparator Comparator;
 	vector<Filename> Filenames;
 	void copy(const Folder&);
 	void refresh();
-}
+};
 
 ostream& operator<<(ostream&, const Folder&);
 
