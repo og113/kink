@@ -395,7 +395,7 @@ auto ddVr = [&] (const comp & phi)
 	cVec eigenValues(N);
 	vec w_n_exp(N);
 	cMat eigenVectors(N,N); //eigenvectors correspond to columns of this matrix - so the nth eigenvector is v_n(j) = eigenVectors(j,n)
-	bool approxOmega = false;
+	bool approxOmega = true;
 	if (!approxOmega) {
 		mat h(N,N);
 		h = hFn(N,a,mass2);
@@ -418,18 +418,19 @@ auto ddVr = [&] (const comp & phi)
 				else			 eigenVectors(l,m) = normalisation*cos(pi*l*m/(N-1.0));
 			}
 		}
+		eigenValues(N-1) = 1.0;		
 	}
 	double djdk;	
 	for (unsigned int j=0; j<N; j++) {
-		w_n_exp(j) = (2.0/b)*asin(b*sqrt(eigenValues(j))/2.0);
+		w_n_exp(j) = (2.0/b)*asin(b*sqrt(real(eigenValues(j)))/2.0);
 		for (unsigned int k=0; k<N; k++) {
 			for (unsigned int l=0; l<N; l++) {
 				if (approxOmega) djdk = a;
 				else 			 djdk = sqrt(DxFn(j)*DxFn(k));
 				omega_m1(j,k) += djdk*pow(real(eigenValues(l)),-0.5)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
 				omega_0(j,k)  += djdk*real(eigenVectors(j,l))*real(eigenVectors(k,l));
-				omega_1(j,k)  += djdk*pow(eigenValues(l),0.5)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
-				omega_2(j,k)  += djdk*eigenValues(l)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
+				omega_1(j,k)  += djdk*pow(real(eigenValues(l)),0.5)*real(eigenVectors(j,l))*real(eigenVectors(k,l));
+				omega_2(j,k)  += djdk*real(eigenValues(l))*real(eigenVectors(j,l))*real(eigenVectors(k,l));
 			}
 		}
 	}
@@ -1120,7 +1121,7 @@ auto ddVr = [&] (const comp & phi)
 			double T0 = real(coord(0,0))+Ta;
 			comp dt0 = dtFn(0);
 			for (unsigned int n=0; n<N; n++) {
-				double w_n = sqrt(eigenValues(n));
+				double w_n = sqrt(real(eigenValues(n)));
 				double w_n_e = w_n_exp(n);
 				for (unsigned int j=0; j<N; j++) {
 					unsigned int m=j*NT;
@@ -1150,7 +1151,7 @@ auto ddVr = [&] (const comp & phi)
 					linErgAB += sqrt(eigenValues(j))*a_k(j)*b_k(j);
 				}
 				for (unsigned int n=0; n<N; n++) {
-					double w_n = sqrt(eigenValues(n));
+					double w_n = sqrt(real(eigenValues(n)));
 					double w_n_e = w_n_exp(n);
 					double sqrtDj = sqrt(4.0*pi*DxFn(j));
 					if (abs(w_n)>1.0e-16) {

@@ -70,7 +70,7 @@ double rhoIntegrand (double x, void * parameters)
 		- epsilonFn
 -------------------------------------------------------------------------------------------------------------------------*/
 
-//program to find epsilon given gsls function df and dE
+//program to find epsilon given gsl functions df and dE
 void epsilonFn (gsl_function * xF, gsl_function * xEC, double * xdE, double * xEpsilon, vector<double>* xMinima)
 	{
 	double closenessdE = 1.0e-14;

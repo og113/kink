@@ -112,7 +112,7 @@ printf("%12i%12g%12g\n\n",N,L,dr);
 ---------------------------------------------------------------------------------------------*/
 mat h(N,N);
 h = hFn(N,dr,1.0);
-cout << "h = " << endl << h << endl << endl;
+//cout << "h = " << endl << h << endl << endl;
 omega1 = Eigen::MatrixXd::Zero(N,N);
 Eomega1 = Eigen::MatrixXd::Zero(N,N);
 vec eigenValues1(N);
