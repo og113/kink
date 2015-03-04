@@ -1,0 +1,2477 @@
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 130
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.39343     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/0pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/0pip_0.dat
+tpip printed:                                       data/0tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/0inputsPi_0 ./data/0tpip_0.dat
+
+     input:             ./data/0tpip_0.dat
+timeNumber: 150222111259
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01273     0.0129          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01205    0.01279          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01734    0.01624          0  3.818e-13   0.001224     0.1001   0.005681
+    0    4  1.714e-05  7.145e-05    0.09978    0.02108    0.01856          0          0   0.001082     0.0425   0.005648
+    0    5  1.883e-05  7.662e-05     0.0571    0.02475    0.02163          0  1.249e-13  0.0009795    0.05048   0.005682
+    0    6  5.735e-06   2.41e-05    0.01658    0.02694    0.02345          0   1.58e-13   0.000917    0.01466   0.005663
+    0    7  4.694e-07   1.94e-06   0.001163    0.02769    0.02409          0  6.405e-14  0.0008968  0.0007226   0.005651
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.167,0)
+linErgAB           = (19.1792,1.34734e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.167,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7  218.07     130     402       5     0.8    0.05       0       10.9321        19.167       15.0946      -0.47805
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222111259inputsM_0_0
+            ./data/150222111259mainpi_0_0.dat
+            ./data/150222111259mainminusDS_0_0.dat
+            ./data/150222111259mainDDS_0_0.dat
+            ./data/150222111259mainlinNum_0_0.dat
+            ./data/150222111259mainlinErg_0_0.dat
+            ./data/150222111259mainlinErgOffShell_0_0.dat
+            ./data/150222111259mainderivErg_0_0.dat
+            ./data/150222111259mainpotErg_0_0.dat
+            ./data/150222111259mainerg_0_0.dat
+
+     input: ./data/150222111259mainpi_0_0.dat
+timeNumber: 150222111259
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02775     0.6801     0.7008  0.0007071     0.7015  0.0005562   0.005344
+    1    2  1.949e-08  7.656e-08    0.04263    0.02783     0.1018    0.07759   0.004428     0.0767  0.0004912    0.00601
+    1    3  3.544e-06  1.424e-05   0.006879    0.02629     0.1047    0.08193   0.004891    0.08098     0.0107   0.006026
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02663     0.1045    0.08158   0.004805    0.08063  0.0004465   0.006015
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1276,0)
+linErgAB           = (19.1404,-0.00014462)
+linErgContm        = (19.1314,0)
+linErg(0)          = (20.2642,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 159.281     130     402       5     0.8    0.05  0.0005       10.8599       20.2642       15.0966      -2.23482
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222111259inputsM_0_1
+            ./data/150222111259mainpi_0_1.dat
+            ./data/150222111259mainminusDS_0_1.dat
+            ./data/150222111259mainDDS_0_1.dat
+            ./data/150222111259mainlinNum_0_1.dat
+            ./data/150222111259mainlinErg_0_1.dat
+            ./data/150222111259mainlinErgOffShell_0_1.dat
+            ./data/150222111259mainderivErg_0_1.dat
+            ./data/150222111259mainpotErg_0_1.dat
+            ./data/150222111259mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 120
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.27084     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/1pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/1pip_0.dat
+tpip printed:                                       data/1tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 1
+eigVec_1.dat
+
+./data/1inputsPi_0 ./data/1tpip_0.dat
+
+     input:             ./data/1tpip_0.dat
+timeNumber: 150222111951
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933     0.0127     0.0129          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01205    0.01278          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01734    0.01622          0  3.818e-13   0.001224     0.1001   0.005681
+    0    4  1.714e-05  7.145e-05    0.09978    0.02109    0.01853          0          0   0.001079     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02475    0.02159          0  1.249e-13  0.0009754    0.05048   0.005681
+    0    6  5.735e-06   2.41e-05    0.01658    0.02695    0.02339          0   1.58e-13  0.0009118    0.01466   0.005663
+    0    7  4.694e-07   1.94e-06   0.001163    0.02769    0.02403          0  6.405e-14  0.0008912  0.0007226   0.005651
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1662,0)
+linErgAB           = (19.1783,1.34264e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1662,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 219.162     130     402       5     0.8    0.05       0       10.9321       19.1662       15.0946     -0.476719
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222111951inputsM_0_0
+            ./data/150222111951mainpi_0_0.dat
+            ./data/150222111951mainminusDS_0_0.dat
+            ./data/150222111951mainDDS_0_0.dat
+            ./data/150222111951mainlinNum_0_0.dat
+            ./data/150222111951mainlinErg_0_0.dat
+            ./data/150222111951mainlinErgOffShell_0_0.dat
+            ./data/150222111951mainderivErg_0_0.dat
+            ./data/150222111951mainpotErg_0_0.dat
+            ./data/150222111951mainerg_0_0.dat
+
+     input: ./data/150222111951mainpi_0_0.dat
+timeNumber: 150222111951
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02775     0.6802     0.7008  0.0007071     0.7016  0.0005562   0.005344
+    1    2  1.949e-08  7.656e-08    0.04263    0.02783    0.09626    0.07214   0.004428    0.07125  0.0004912   0.005988
+    1    3  3.544e-06  1.424e-05   0.006879    0.02629    0.09889    0.07618   0.004891    0.07524     0.0107   0.006003
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02663    0.09877    0.07585   0.004805    0.07491  0.0004465   0.005991
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1269,0)
+linErgAB           = (19.1396,-0.000140235)
+linErgContm        = (19.1314,0)
+linErg(0)          = (20.1814,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4  153.12     130     402       5     0.8    0.05  0.0005       10.8583       20.1814       15.0966      -2.10233
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222111951inputsM_0_1
+            ./data/150222111951mainpi_0_1.dat
+            ./data/150222111951mainminusDS_0_1.dat
+            ./data/150222111951mainDDS_0_1.dat
+            ./data/150222111951mainlinNum_0_1.dat
+            ./data/150222111951mainlinErg_0_1.dat
+            ./data/150222111951mainlinErgOffShell_0_1.dat
+            ./data/150222111951mainderivErg_0_1.dat
+            ./data/150222111951mainpotErg_0_1.dat
+            ./data/150222111951mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 110
+./pi
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.89124     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                        ./data/2ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/2pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/2pip_0.dat
+tpip printed:                                       data/2tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/2inputsPi_0 ./data/2tpip_0.dat
+
+     input:             ./data/2tpip_0.dat
+timeNumber: 150222112654
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01266     0.0129          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01206    0.01277          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01734     0.0162          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02109     0.0185          0          0   0.001076     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02476    0.02154          0  1.249e-13  0.0009709    0.05048   0.005681
+    0    6  5.735e-06   2.41e-05    0.01658    0.02695    0.02333          0   1.58e-13  0.0009062    0.01466   0.005662
+    0    7  4.694e-07   1.94e-06   0.001163     0.0277    0.02397          0  6.405e-14  0.0008852  0.0007226   0.005651
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1653,0)
+linErgAB           = (19.1773,1.34308e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1653,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 212.786     130     402       5     0.8    0.05       0       10.9321       19.1653       15.0946     -0.475262
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222112654inputsM_0_0
+            ./data/150222112654mainpi_0_0.dat
+            ./data/150222112654mainminusDS_0_0.dat
+            ./data/150222112654mainDDS_0_0.dat
+            ./data/150222112654mainlinNum_0_0.dat
+            ./data/150222112654mainlinErg_0_0.dat
+            ./data/150222112654mainlinErgOffShell_0_0.dat
+            ./data/150222112654mainderivErg_0_0.dat
+            ./data/150222112654mainpotErg_0_0.dat
+            ./data/150222112654mainerg_0_0.dat
+
+     input: ./data/150222112654mainpi_0_0.dat
+timeNumber: 150222112654
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02776     0.6803     0.7008  0.0007071     0.7016  0.0005562   0.005343
+    1    2  1.949e-08  7.656e-08    0.04263    0.02784    0.09028    0.06622   0.004428    0.06534  0.0004912   0.005963
+    1    3  3.544e-06  1.424e-05   0.006879    0.02629    0.09259    0.06994   0.004891      0.069     0.0107   0.005977
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02663     0.0925    0.06963   0.004805     0.0687  0.0004465   0.005965
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1261,0)
+linErgAB           = (19.1387,-0.000135475)
+linErgContm        = (19.1314,0)
+linErg(0)          = (20.0919,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 156.271     130     402       5     0.8    0.05  0.0005       10.8565       20.0919       15.0966      -1.95907
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222112654inputsM_0_1
+            ./data/150222112654mainpi_0_1.dat
+            ./data/150222112654mainminusDS_0_1.dat
+            ./data/150222112654mainDDS_0_1.dat
+            ./data/150222112654mainlinNum_0_1.dat
+            ./data/150222112654mainlinErg_0_1.dat
+            ./data/150222112654mainlinErgOffShell_0_1.dat
+            ./data/150222112654mainderivErg_0_1.dat
+            ./data/150222112654mainpotErg_0_1.dat
+            ./data/150222112654mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 100
+./pi
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.36347     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                        ./data/3ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/3pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/3pip_0.dat
+tpip printed:                                       data/3tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 1
+eigVec_3.dat
+
+./data/3inputsPi_0 ./data/3tpip_0.dat
+
+     input:             ./data/3tpip_0.dat
+timeNumber: 150222113334
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01263    0.01289          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01206    0.01277          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01735    0.01619          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02109    0.01847          0          0   0.001073     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02476    0.02149          0  1.249e-13  0.0009664    0.05048   0.005681
+    0    6  5.735e-06   2.41e-05    0.01658    0.02695    0.02326          0   1.58e-13  0.0009006    0.01466   0.005662
+    0    7  4.694e-07   1.94e-06   0.001163     0.0277    0.02389          0  6.405e-14  0.0008792  0.0007226   0.005651
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1643,0)
+linErgAB           = (19.1762,1.33139e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1643,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 208.009     130     402       5     0.8    0.05       0       10.9321       19.1643       15.0946     -0.473715
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222113334inputsM_0_0
+            ./data/150222113334mainpi_0_0.dat
+            ./data/150222113334mainminusDS_0_0.dat
+            ./data/150222113334mainDDS_0_0.dat
+            ./data/150222113334mainlinNum_0_0.dat
+            ./data/150222113334mainlinErg_0_0.dat
+            ./data/150222113334mainlinErgOffShell_0_0.dat
+            ./data/150222113334mainderivErg_0_0.dat
+            ./data/150222113334mainpotErg_0_0.dat
+            ./data/150222113334mainerg_0_0.dat
+
+     input: ./data/150222113334mainpi_0_0.dat
+timeNumber: 150222113334
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02776     0.6804     0.7009  0.0007071     0.7016  0.0005562   0.005343
+    1    2  1.949e-08  7.656e-08    0.04263    0.02784    0.08426    0.06026   0.004428    0.05939  0.0004912   0.005939
+    1    3  3.544e-06  1.424e-05   0.006879     0.0263    0.08626    0.06366   0.004891    0.06273     0.0107   0.005951
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02664    0.08619    0.06338   0.004805    0.06245  0.0004465    0.00594
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1252,0)
+linErgAB           = (19.1378,-0.000130601)
+linErgContm        = (19.1314,0)
+linErg(0)          = (20.0022,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 154.133     130     402       5     0.8    0.05  0.0005       10.8547       20.0022       15.0966      -1.81566
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222113334inputsM_0_1
+            ./data/150222113334mainpi_0_1.dat
+            ./data/150222113334mainminusDS_0_1.dat
+            ./data/150222113334mainDDS_0_1.dat
+            ./data/150222113334mainlinNum_0_1.dat
+            ./data/150222113334mainlinErg_0_1.dat
+            ./data/150222113334mainlinErgOffShell_0_1.dat
+            ./data/150222113334mainderivErg_0_1.dat
+            ./data/150222113334mainpotErg_0_1.dat
+            ./data/150222113334mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 90
+./pi
+
+timeNumber:            4
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5  8.3554     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/4inputsPi_0
+                         ./data/4pip_0.dat
+                     ./data/4minusDS_0.dat
+                        ./data/4DDSp_0.dat
+                        ./data/4ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/4pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/4pip_0.dat
+tpip printed:                                       data/4tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/4inputsPi_0 ./data/4tpip_0.dat
+
+     input:             ./data/4tpip_0.dat
+timeNumber: 150222114005
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01258    0.01288          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01206    0.01276          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01735    0.01616          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02109    0.01843          0          0    0.00107     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02476    0.02143          0  1.249e-13  0.0009618    0.05048   0.005681
+    0    6  5.735e-06   2.41e-05    0.01658    0.02696    0.02319          0   1.58e-13  0.0008949    0.01466   0.005662
+    0    7  4.694e-07   1.94e-06   0.001163    0.02771    0.02382          0  6.405e-14   0.000873  0.0007226    0.00565
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1633,0)
+linErgAB           = (19.1751,1.32598e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1633,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 213.424     130     402       5     0.8    0.05       0       10.9321       19.1633       15.0946     -0.472021
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222114005inputsM_0_0
+            ./data/150222114005mainpi_0_0.dat
+            ./data/150222114005mainminusDS_0_0.dat
+            ./data/150222114005mainDDS_0_0.dat
+            ./data/150222114005mainlinNum_0_0.dat
+            ./data/150222114005mainlinErg_0_0.dat
+            ./data/150222114005mainlinErgOffShell_0_0.dat
+            ./data/150222114005mainderivErg_0_0.dat
+            ./data/150222114005mainpotErg_0_0.dat
+            ./data/150222114005mainerg_0_0.dat
+
+     input: ./data/150222114005mainpi_0_0.dat
+timeNumber: 150222114005
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02776     0.6806     0.7009  0.0007071     0.7017  0.0005562   0.005342
+    1    2  1.949e-08  7.656e-08    0.04263    0.02785     0.0782    0.05428   0.004428    0.05341  0.0004912   0.005914
+    1    3  3.544e-06  1.424e-05   0.006879     0.0263    0.07989    0.05735   0.004891    0.05642     0.0107   0.005925
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02664    0.07984     0.0571   0.004805    0.05617  0.0004465   0.005914
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1243,0)
+linErgAB           = (19.1368,-0.000125539)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.9125,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 156.334     130     402       5     0.8    0.05  0.0005       10.8528       19.9125       15.0966      -1.67202
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222114005inputsM_0_1
+            ./data/150222114005mainpi_0_1.dat
+            ./data/150222114005mainminusDS_0_1.dat
+            ./data/150222114005mainDDS_0_1.dat
+            ./data/150222114005mainlinNum_0_1.dat
+            ./data/150222114005mainlinErg_0_1.dat
+            ./data/150222114005mainlinErgOffShell_0_1.dat
+            ./data/150222114005mainderivErg_0_1.dat
+            ./data/150222114005mainpotErg_0_1.dat
+            ./data/150222114005mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 80
+./pi
+
+timeNumber:            5
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.34298     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/5inputsPi_0
+                         ./data/5pip_0.dat
+                     ./data/5minusDS_0.dat
+                        ./data/5DDSp_0.dat
+                        ./data/5ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/5pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/5pip_0.dat
+tpip printed:                                       data/5tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/5inputsPi_0 ./data/5tpip_0.dat
+
+     input:             ./data/5tpip_0.dat
+timeNumber: 150222114647
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01255    0.01286          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01206    0.01275          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01735    0.01614          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978     0.0211    0.01839          0          0   0.001066     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02477    0.02137          0  1.249e-13  0.0009571    0.05048    0.00568
+    0    6  5.735e-06   2.41e-05    0.01658    0.02697    0.02311          0   1.58e-13  0.0008889    0.01466   0.005662
+    0    7  4.694e-07   1.94e-06   0.001163    0.02771    0.02373          0  6.405e-14  0.0008667  0.0007226    0.00565
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1621,0)
+linErgAB           = (19.1738,1.32237e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1621,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 210.066     130     402       5     0.8    0.05       0        10.932       19.1621       15.0946     -0.470096
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222114647inputsM_0_0
+            ./data/150222114647mainpi_0_0.dat
+            ./data/150222114647mainminusDS_0_0.dat
+            ./data/150222114647mainDDS_0_0.dat
+            ./data/150222114647mainlinNum_0_0.dat
+            ./data/150222114647mainlinErg_0_0.dat
+            ./data/150222114647mainlinErgOffShell_0_0.dat
+            ./data/150222114647mainderivErg_0_0.dat
+            ./data/150222114647mainpotErg_0_0.dat
+            ./data/150222114647mainerg_0_0.dat
+
+     input: ./data/150222114647mainpi_0_0.dat
+timeNumber: 150222114647
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02777     0.6807      0.701  0.0007071     0.7017  0.0005562   0.005342
+    1    2  1.949e-08  7.656e-08    0.04263    0.02785     0.0721    0.04826   0.004428     0.0474  0.0004912    0.00589
+    1    3  3.544e-06  1.424e-05   0.006879    0.02631    0.07347      0.051   0.004891    0.05008     0.0107   0.005899
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02665    0.07345    0.05078   0.004805    0.04986  0.0004465   0.005889
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1232,0)
+linErgAB           = (19.1356,-0.0001202)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.8225,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 155.766     130     402       5     0.8    0.05  0.0005       10.8507       19.8225       15.0966      -1.52801
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222114647inputsM_0_1
+            ./data/150222114647mainpi_0_1.dat
+            ./data/150222114647mainminusDS_0_1.dat
+            ./data/150222114647mainDDS_0_1.dat
+            ./data/150222114647mainlinNum_0_1.dat
+            ./data/150222114647mainlinErg_0_1.dat
+            ./data/150222114647mainlinErgOffShell_0_1.dat
+            ./data/150222114647mainderivErg_0_1.dat
+            ./data/150222114647mainpotErg_0_1.dat
+            ./data/150222114647mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 70
+./pi
+
+timeNumber:            6
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 9.15161     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/6inputsPi_0
+                         ./data/6pip_0.dat
+                     ./data/6minusDS_0.dat
+                        ./data/6DDSp_0.dat
+                        ./data/6ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/6pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/6pip_0.dat
+tpip printed:                                       data/6tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/6inputsPi_0 ./data/6tpip_0.dat
+
+     input:             ./data/6tpip_0.dat
+timeNumber: 150222115326
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01251    0.01285          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01206    0.01274          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01736    0.01611          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978     0.0211    0.01834          0          0   0.001063     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02478    0.02129          0  1.249e-13  0.0009521    0.05048    0.00568
+    0    6  5.735e-06   2.41e-05    0.01658    0.02697    0.02301          0   1.58e-13  0.0008828    0.01466   0.005661
+    0    7  4.694e-07   1.94e-06   0.001163    0.02772    0.02362          0  6.405e-14  0.0008601  0.0007226    0.00565
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1606,0)
+linErgAB           = (19.1723,1.33695e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1606,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 220.821     130     402       5     0.8    0.05       0        10.932       19.1606       15.0946     -0.467817
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222115326inputsM_0_0
+            ./data/150222115326mainpi_0_0.dat
+            ./data/150222115326mainminusDS_0_0.dat
+            ./data/150222115326mainDDS_0_0.dat
+            ./data/150222115326mainlinNum_0_0.dat
+            ./data/150222115326mainlinErg_0_0.dat
+            ./data/150222115326mainlinErgOffShell_0_0.dat
+            ./data/150222115326mainderivErg_0_0.dat
+            ./data/150222115326mainpotErg_0_0.dat
+            ./data/150222115326mainerg_0_0.dat
+
+     input: ./data/150222115326mainpi_0_0.dat
+timeNumber: 150222115326
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02778     0.6808      0.701  0.0007071     0.7018  0.0005562   0.005341
+    1    2  1.949e-08  7.656e-08    0.04263    0.02786    0.06594    0.04221   0.004428    0.04135  0.0004912   0.005865
+    1    3  3.544e-06  1.424e-05   0.006879    0.02632    0.06699    0.04461   0.004891    0.04369     0.0107   0.005874
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02665      0.067    0.04441   0.004805     0.0435  0.0004465   0.005863
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1219,0)
+linErgAB           = (19.1343,-0.00011446)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.7321,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 162.402     130     402       5     0.8    0.05  0.0005       10.8485       19.7321       15.0966      -1.38343
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222115326inputsM_0_1
+            ./data/150222115326mainpi_0_1.dat
+            ./data/150222115326mainminusDS_0_1.dat
+            ./data/150222115326mainDDS_0_1.dat
+            ./data/150222115326mainlinNum_0_1.dat
+            ./data/150222115326mainlinErg_0_1.dat
+            ./data/150222115326mainlinErgOffShell_0_1.dat
+            ./data/150222115326mainderivErg_0_1.dat
+            ./data/150222115326mainpotErg_0_1.dat
+            ./data/150222115326mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 60
+./pi
+
+timeNumber:            7
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.56272     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/7inputsPi_0
+                         ./data/7pip_0.dat
+                     ./data/7minusDS_0.dat
+                        ./data/7DDSp_0.dat
+                        ./data/7ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/7pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/7pip_0.dat
+tpip printed:                                       data/7tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/7inputsPi_0 ./data/7tpip_0.dat
+
+     input:             ./data/7tpip_0.dat
+timeNumber: 150222120015
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01245    0.01285          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01207    0.01273          0  3.022e-13   0.001457    0.03699   0.005591
+    0    3  3.859e-05  0.0001489     0.1016    0.01736    0.01608          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02111    0.01828          0          0   0.001059     0.0425   0.005647
+    0    5  1.883e-05  7.662e-05     0.0571    0.02478     0.0212          0  1.249e-13  0.0009468    0.05048    0.00568
+    0    6  5.735e-06   2.41e-05    0.01658    0.02698    0.02289          0   1.58e-13  0.0008761    0.01466   0.005661
+    0    7  4.694e-07   1.94e-06   0.001163    0.02773    0.02349          0  6.405e-14   0.000853  0.0007226   0.005649
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1589,0)
+linErgAB           = (19.1704,1.33179e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1589,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 213.569     130     402       5     0.8    0.05       0        10.932       19.1589       15.0946     -0.464986
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222120015inputsM_0_0
+            ./data/150222120015mainpi_0_0.dat
+            ./data/150222120015mainminusDS_0_0.dat
+            ./data/150222120015mainDDS_0_0.dat
+            ./data/150222120015mainlinNum_0_0.dat
+            ./data/150222120015mainlinErg_0_0.dat
+            ./data/150222120015mainlinErgOffShell_0_0.dat
+            ./data/150222120015mainderivErg_0_0.dat
+            ./data/150222120015mainpotErg_0_0.dat
+            ./data/150222120015mainerg_0_0.dat
+
+     input: ./data/150222120015mainpi_0_0.dat
+timeNumber: 150222120015
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02779      0.681     0.7011  0.0007071     0.7018  0.0005562    0.00534
+    1    2  1.949e-08  7.656e-08    0.04263    0.02787    0.05971     0.0361   0.004428    0.03526  0.0004912   0.005841
+    1    3  3.544e-06  1.424e-05   0.006879    0.02633    0.06045    0.03817   0.004891    0.03726     0.0107   0.005848
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02666    0.06047      0.038   0.004805     0.0371  0.0004465   0.005837
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1203,0)
+linErgAB           = (19.1326,-0.000108145)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.6412,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 157.598     130     402       5     0.8    0.05  0.0005        10.846       19.6412       15.0966      -1.23796
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222120015inputsM_0_1
+            ./data/150222120015mainpi_0_1.dat
+            ./data/150222120015mainminusDS_0_1.dat
+            ./data/150222120015mainDDS_0_1.dat
+            ./data/150222120015mainlinNum_0_1.dat
+            ./data/150222120015mainlinErg_0_1.dat
+            ./data/150222120015mainlinErgOffShell_0_1.dat
+            ./data/150222120015mainderivErg_0_1.dat
+            ./data/150222120015mainpotErg_0_1.dat
+            ./data/150222120015mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 50
+./pi
+
+timeNumber:            8
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.31642     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/8inputsPi_0
+                         ./data/8pip_0.dat
+                     ./data/8minusDS_0.dat
+                        ./data/8DDSp_0.dat
+                        ./data/8ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/8pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/8pip_0.dat
+tpip printed:                                       data/8tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/8inputsPi_0 ./data/8tpip_0.dat
+
+     input:             ./data/8tpip_0.dat
+timeNumber: 150222120655
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01237    0.01284          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01207    0.01271          0  3.022e-13   0.001457    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01737    0.01603          0  3.818e-13   0.001224     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02112     0.0182          0          0   0.001055     0.0425   0.005646
+    0    5  1.883e-05  7.662e-05     0.0571     0.0248    0.02107          0  1.249e-13  0.0009408    0.05048   0.005679
+    0    6  5.735e-06   2.41e-05    0.01658      0.027    0.02273          0   1.58e-13  0.0008688    0.01466    0.00566
+    0    7  4.694e-07   1.94e-06   0.001163    0.02775    0.02332          0  6.405e-14  0.0008452  0.0007226   0.005649
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1565,0)
+linErgAB           = (19.168,1.3376e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1565,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 213.769     130     402       5     0.8    0.05       0       10.9319       19.1565       15.0946     -0.461248
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222120655inputsM_0_0
+            ./data/150222120655mainpi_0_0.dat
+            ./data/150222120655mainminusDS_0_0.dat
+            ./data/150222120655mainDDS_0_0.dat
+            ./data/150222120655mainlinNum_0_0.dat
+            ./data/150222120655mainlinErg_0_0.dat
+            ./data/150222120655mainlinErgOffShell_0_0.dat
+            ./data/150222120655mainderivErg_0_0.dat
+            ./data/150222120655mainpotErg_0_0.dat
+            ./data/150222120655mainerg_0_0.dat
+
+     input: ./data/150222120655mainpi_0_0.dat
+timeNumber: 150222120655
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286     0.0278     0.6813     0.7012  0.0007071     0.7019  0.0005562   0.005339
+    1    2  1.949e-08  7.656e-08    0.04263    0.02789    0.05338    0.02995   0.004428    0.02911  0.0004912   0.005816
+    1    3  3.544e-06  1.424e-05   0.006879    0.02634    0.05381    0.03167   0.004891    0.03077     0.0107   0.005822
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02668    0.05385    0.03153   0.004805    0.03063  0.0004465   0.005812
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1183,0)
+linErgAB           = (19.1304,-0.000100985)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.5494,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 152.957     130     402       5     0.8    0.05  0.0005       10.8432       19.5494       15.0966      -1.09105
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222120655inputsM_0_1
+            ./data/150222120655mainpi_0_1.dat
+            ./data/150222120655mainminusDS_0_1.dat
+            ./data/150222120655mainDDS_0_1.dat
+            ./data/150222120655mainlinNum_0_1.dat
+            ./data/150222120655mainlinErg_0_1.dat
+            ./data/150222120655mainlinErgOffShell_0_1.dat
+            ./data/150222120655mainderivErg_0_1.dat
+            ./data/150222120655mainpotErg_0_1.dat
+            ./data/150222120655mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 40
+./pi
+
+timeNumber:            9
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.32622     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/9inputsPi_0
+                         ./data/9pip_0.dat
+                     ./data/9minusDS_0.dat
+                        ./data/9DDSp_0.dat
+                        ./data/9ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/9pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/9pip_0.dat
+tpip printed:                                       data/9tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/9inputsPi_0 ./data/9tpip_0.dat
+
+     input:             ./data/9tpip_0.dat
+timeNumber: 150222121332
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01226    0.01283          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01208    0.01268          0  3.022e-13   0.001456    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01739    0.01597          0  3.818e-13   0.001223     0.1001    0.00568
+    0    4  1.714e-05  7.145e-05    0.09978    0.02114    0.01808          0          0    0.00105     0.0425   0.005646
+    0    5  1.883e-05  7.662e-05     0.0571    0.02482    0.02089          0  1.249e-13  0.0009337    0.05048   0.005679
+    0    6  5.735e-06   2.41e-05    0.01658    0.02702     0.0225          0   1.58e-13  0.0008602    0.01466   0.005659
+    0    7  4.694e-07   1.94e-06   0.001163    0.02777    0.02307          0  6.405e-14  0.0008361  0.0007226   0.005648
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1532,0)
+linErgAB           = (19.1645,1.3341e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1532,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 206.809     130     402       5     0.8    0.05       0       10.9317       19.1532       15.0946     -0.455895
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222121332inputsM_0_0
+            ./data/150222121332mainpi_0_0.dat
+            ./data/150222121332mainminusDS_0_0.dat
+            ./data/150222121332mainDDS_0_0.dat
+            ./data/150222121332mainlinNum_0_0.dat
+            ./data/150222121332mainlinErg_0_0.dat
+            ./data/150222121332mainlinErgOffShell_0_0.dat
+            ./data/150222121332mainderivErg_0_0.dat
+            ./data/150222121332mainpotErg_0_0.dat
+            ./data/150222121332mainerg_0_0.dat
+
+     input: ./data/150222121332mainpi_0_0.dat
+timeNumber: 150222121332
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02783     0.6816     0.7014  0.0007071     0.7021  0.0005562   0.005338
+    1    2  1.949e-08  7.656e-08    0.04263    0.02791     0.0469    0.02371   0.004428    0.02288  0.0004912   0.005791
+    1    3  3.544e-06  1.424e-05   0.006879    0.02637    0.04702    0.02509   0.004891    0.02419     0.0107   0.005796
+    1    4  7.031e-08  2.904e-07  0.0001384     0.0267    0.04709    0.02498   0.004805    0.02409  0.0004465   0.005786
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1153,0)
+linErgAB           = (19.1273,-9.25296e-05)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.4559,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 152.067     130     402       5     0.8    0.05  0.0005       10.8397       19.4559       15.0966     -0.941565
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222121332inputsM_0_1
+            ./data/150222121332mainpi_0_1.dat
+            ./data/150222121332mainminusDS_0_1.dat
+            ./data/150222121332mainDDS_0_1.dat
+            ./data/150222121332mainlinNum_0_1.dat
+            ./data/150222121332mainlinErg_0_1.dat
+            ./data/150222121332mainlinErgOffShell_0_1.dat
+            ./data/150222121332mainderivErg_0_1.dat
+            ./data/150222121332mainpotErg_0_1.dat
+            ./data/150222121332mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 30
+./pi
+
+timeNumber:           10
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5  8.2691     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:            ./data/10inputsPi_0
+                        ./data/10pip_0.dat
+                    ./data/10minusDS_0.dat
+                       ./data/10DDSp_0.dat
+                       ./data/10ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                     data/10pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                         data/10pip_0.dat
+tpip printed:                                      data/10tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/10inputsPi_0 ./data/10tpip_0.dat
+
+     input:            ./data/10tpip_0.dat
+timeNumber: 150222121959
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006058   0.007055    0.07933    0.01208    0.01281          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01211    0.01264          0  3.022e-13   0.001456    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01742    0.01587          0  3.818e-13   0.001223     0.1001   0.005679
+    0    4  1.714e-05  7.145e-05    0.09978    0.02118     0.0179          0          0   0.001043     0.0425   0.005645
+    0    5  1.883e-05  7.662e-05     0.0571    0.02487    0.02061          0  1.249e-13  0.0009244    0.05048   0.005678
+    0    6  5.735e-06   2.41e-05    0.01658    0.02708    0.02213          0   1.58e-13  0.0008489    0.01466   0.005658
+    0    7  4.694e-07   1.94e-06   0.001163    0.02783    0.02267          0  6.405e-14  0.0008241  0.0007226   0.005646
+erg(1)             = (18.8381,-8.74864e-17)
+linErgOffShell(0)  = (19.1478,0)
+linErgAB           = (19.1589,1.3056e-15)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1478,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 206.475     130     402       5     0.8    0.05       0       10.9315       19.1478       15.0946     -0.447261
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222121959inputsM_0_0
+            ./data/150222121959mainpi_0_0.dat
+            ./data/150222121959mainminusDS_0_0.dat
+            ./data/150222121959mainDDS_0_0.dat
+            ./data/150222121959mainlinNum_0_0.dat
+            ./data/150222121959mainlinErg_0_0.dat
+            ./data/150222121959mainlinErgOffShell_0_0.dat
+            ./data/150222121959mainderivErg_0_0.dat
+            ./data/150222121959mainpotErg_0_0.dat
+            ./data/150222121959mainerg_0_0.dat
+
+     input: ./data/150222121959mainpi_0_0.dat
+timeNumber: 150222121959
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.006286    0.02789     0.6822     0.7016  0.0007071     0.7023  0.0005562   0.005336
+    1    2  1.949e-08  7.656e-08    0.04263    0.02797    0.04013    0.01734   0.004428    0.01653  0.0004912   0.005766
+    1    3  3.544e-06  1.424e-05   0.006879    0.02642    0.03996    0.01837   0.004891    0.01749     0.0107    0.00577
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02676    0.04004    0.01829   0.004805    0.01741  0.0004465   0.005759
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1105,0)
+linErgAB           = (19.1224,-8.19247e-05)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.3592,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 153.101     130     402       5     0.8    0.05  0.0005       10.8351       19.3592       15.0966     -0.786856
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222121959inputsM_0_1
+            ./data/150222121959mainpi_0_1.dat
+            ./data/150222121959mainminusDS_0_1.dat
+            ./data/150222121959mainDDS_0_1.dat
+            ./data/150222121959mainlinNum_0_1.dat
+            ./data/150222121959mainlinErg_0_1.dat
+            ./data/150222121959mainlinErgOffShell_0_1.dat
+            ./data/150222121959mainderivErg_0_1.dat
+            ./data/150222121959mainpotErg_0_1.dat
+            ./data/150222121959mainerg_0_1.dat
+
+#################################################################################################
+
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 25
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.90586     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/0pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/0pip_0.dat
+tpip printed:                                       data/0tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/0inputsPi_0 ./data/0tpip_0.dat
+
+     input:             ./data/0tpip_0.dat
+timeNumber: 150222131320
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01194    0.01279          0          0   0.001492    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01213     0.0126          0  4.399e-13   0.001456    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01745    0.01577          0  4.178e-13   0.001223     0.1001   0.005679
+    0    4  1.714e-05  7.145e-05    0.09978    0.02122    0.01774          0    1.2e-13   0.001038     0.0425   0.005645
+    0    5  1.883e-05  7.662e-05     0.0571    0.02492    0.02036          0  1.271e-13  0.0009178    0.05048   0.005677
+    0    6  5.735e-06   2.41e-05    0.01658    0.02713    0.02182          0   3.95e-13  0.0008411    0.01466   0.005657
+    0    7  4.694e-07   1.94e-06   0.001163    0.02789    0.02234          0  2.053e-14  0.0008158  0.0007226   0.005645
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1433,0)
+linErgAB           = (19.1543,-2.66568e-16)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1433,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 220.367     130     402       5     0.8    0.05       0       10.9312       19.1433       15.0946     -0.440089
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222131320inputsM_0_0
+            ./data/150222131320mainpi_0_0.dat
+            ./data/150222131320mainminusDS_0_0.dat
+            ./data/150222131320mainDDS_0_0.dat
+            ./data/150222131320mainlinNum_0_0.dat
+            ./data/150222131320mainlinErg_0_0.dat
+            ./data/150222131320mainlinErgOffShell_0_0.dat
+            ./data/150222131320mainderivErg_0_0.dat
+            ./data/150222131320mainpotErg_0_0.dat
+            ./data/150222131320mainerg_0_0.dat
+
+     input: ./data/150222131320mainpi_0_0.dat
+timeNumber: 150222131320
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02794     0.6827     0.7018  0.0007071     0.7025  0.0005562   0.005334
+    1    2  1.949e-08  7.656e-08    0.04263    0.02803     0.0362    0.01375   0.004428    0.01306  0.0004912   0.005752
+    1    3  3.544e-06  1.424e-05   0.006879    0.02647    0.03589    0.01459   0.004891    0.01394     0.0107   0.005755
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02681    0.03598    0.01452   0.004805    0.01384  0.0004465   0.005745
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1065,0)
+linErgAB           = (19.1183,-7.47615e-05)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.3036,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 163.884     130     402       5     0.8    0.05  0.0005       10.8317       19.3036       15.0966     -0.697897
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222131320inputsM_0_1
+            ./data/150222131320mainpi_0_1.dat
+            ./data/150222131320mainminusDS_0_1.dat
+            ./data/150222131320mainDDS_0_1.dat
+            ./data/150222131320mainlinNum_0_1.dat
+            ./data/150222131320mainlinErg_0_1.dat
+            ./data/150222131320mainlinErgOffShell_0_1.dat
+            ./data/150222131320mainderivErg_0_1.dat
+            ./data/150222131320mainpotErg_0_1.dat
+            ./data/150222131320mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 20
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.48269     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/1pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/1pip_0.dat
+tpip printed:                                       data/1tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 1
+eigVec_1.dat
+
+./data/1inputsPi_0 ./data/1tpip_0.dat
+
+     input:             ./data/1tpip_0.dat
+timeNumber: 150222132015
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01174    0.01277          0          0   0.001491    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434    0.01216    0.01255          0  4.399e-13   0.001456    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016     0.0175    0.01565          0  4.178e-13   0.001222     0.1001   0.005678
+    0    4  1.714e-05  7.145e-05    0.09978    0.02129    0.01753          0    1.2e-13   0.001032     0.0425   0.005644
+    0    5  1.883e-05  7.662e-05     0.0571    0.02501    0.02005          0  1.271e-13  0.0009099    0.05048   0.005676
+    0    6  5.735e-06   2.41e-05    0.01658    0.02723    0.02141          0   3.95e-13  0.0008309    0.01466   0.005655
+    0    7  4.694e-07   1.94e-06   0.001163    0.02799     0.0219          0  2.053e-14  0.0008049  0.0007226   0.005643
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1373,0)
+linErgAB           = (19.1482,-2.61554e-16)
+linErgContm        = (19.1709,0)
+linErg(0)          = (19.1373,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 219.227     130     402       5     0.8    0.05       0       10.9308       19.1373       15.0946     -0.430436
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222132015inputsM_0_0
+            ./data/150222132015mainpi_0_0.dat
+            ./data/150222132015mainminusDS_0_0.dat
+            ./data/150222132015mainDDS_0_0.dat
+            ./data/150222132015mainlinNum_0_0.dat
+            ./data/150222132015mainlinErg_0_0.dat
+            ./data/150222132015mainlinErgOffShell_0_0.dat
+            ./data/150222132015mainderivErg_0_0.dat
+            ./data/150222132015mainpotErg_0_0.dat
+            ./data/150222132015mainerg_0_0.dat
+
+     input: ./data/150222132015mainpi_0_0.dat
+timeNumber: 150222132015
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02804     0.6833      0.702  0.0007071     0.7027  0.0005562   0.005331
+    1    2  1.949e-08  7.656e-08    0.04263    0.02813    0.03267    0.01068   0.004428    0.01347  0.0004912   0.005739
+    1    3  3.544e-06  1.424e-05   0.006879    0.02657    0.03228    0.01136   0.004891    0.01436     0.0107   0.005742
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02691    0.03237     0.0113   0.004805    0.01426  0.0004465   0.005732
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.1012,0)
+linErgAB           = (19.1128,-6.72888e-05)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.2544,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 157.984     130     402       5     0.8    0.05  0.0005       10.8281       19.2544       15.0966     -0.619142
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222132015inputsM_0_1
+            ./data/150222132015mainpi_0_1.dat
+            ./data/150222132015mainminusDS_0_1.dat
+            ./data/150222132015mainDDS_0_1.dat
+            ./data/150222132015mainlinNum_0_1.dat
+            ./data/150222132015mainlinErg_0_1.dat
+            ./data/150222132015mainlinErgOffShell_0_1.dat
+            ./data/150222132015mainderivErg_0_1.dat
+            ./data/150222132015mainpotErg_0_1.dat
+            ./data/150222132015mainerg_0_1.dat
+
+#################################################################################################
+
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 18
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.23218     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/0pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/0pip_0.dat
+tpip printed:                                       data/0tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/0inputsPi_0 ./data/0tpip_0.dat
+
+     input:             ./data/0tpip_0.dat
+timeNumber: 150222133055
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01161    0.01275          0          0   0.001491    0.00377   0.005606
+    0    2  1.747e-05  0.0001114     0.1434     0.0122    0.01253          0  4.399e-13   0.001456    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01755    0.01559          0  4.178e-13   0.001222     0.1001   0.005678
+    0    4  1.714e-05  7.145e-05    0.09978    0.02133     0.0174          0    1.2e-13   0.001027     0.0425   0.005643
+    0    5  1.883e-05  7.662e-05     0.0571    0.02504    0.01981          0  1.271e-13  0.0009032    0.05048   0.005675
+    0    6  5.735e-06   2.41e-05    0.01658    0.02728    0.02113          0   3.95e-13  0.0008254    0.01466   0.005654
+    0    7  4.694e-07   1.94e-06   0.001163    0.02804     0.0216          0  2.053e-14  0.0007996  0.0007226   0.005642
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1333,0)
+linErgAB           = (19.1441,-2.41821e-16)
+linErgContm        = (19.1708,0)
+linErg(0)          = (19.1333,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 210.485     130     402       5     0.8    0.05       0       10.9304       19.1333       15.0946     -0.424018
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222133055inputsM_0_0
+            ./data/150222133055mainpi_0_0.dat
+            ./data/150222133055mainminusDS_0_0.dat
+            ./data/150222133055mainDDS_0_0.dat
+            ./data/150222133055mainlinNum_0_0.dat
+            ./data/150222133055mainlinErg_0_0.dat
+            ./data/150222133055mainlinErgOffShell_0_0.dat
+            ./data/150222133055mainderivErg_0_0.dat
+            ./data/150222133055mainpotErg_0_0.dat
+            ./data/150222133055mainerg_0_0.dat
+
+     input: ./data/150222133055mainpi_0_0.dat
+timeNumber: 150222133055
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815     0.0281     0.6837     0.7022  0.0007071     0.7029  0.0005562    0.00533
+    1    2  1.949e-08  7.656e-08    0.04263    0.02818    0.03099   0.009288   0.004428    0.01368  0.0004912   0.005734
+    1    3  3.544e-06  1.424e-05   0.006879    0.02661    0.03052   0.009866   0.004891    0.01459     0.0107   0.005736
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02696    0.03062   0.009815   0.004805    0.01448  0.0004465   0.005726
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.0976,0)
+linErgAB           = (19.1091,-6.32345e-05)
+linErgContm        = (19.1314,0)
+linErg(0)          = (19.2306,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 157.356     130     402       5     0.8    0.05  0.0005       10.8261       19.2306       15.0966     -0.580956
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222133055inputsM_0_1
+            ./data/150222133055mainpi_0_1.dat
+            ./data/150222133055mainminusDS_0_1.dat
+            ./data/150222133055mainDDS_0_1.dat
+            ./data/150222133055mainlinNum_0_1.dat
+            ./data/150222133055mainlinErg_0_1.dat
+            ./data/150222133055mainlinErgOffShell_0_1.dat
+            ./data/150222133055mainderivErg_0_1.dat
+            ./data/150222133055mainpotErg_0_1.dat
+            ./data/150222133055mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 16
+./pi
+
+timeNumber:            1
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5  8.2146     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/1inputsPi_0
+                         ./data/1pip_0.dat
+                     ./data/1minusDS_0.dat
+                        ./data/1DDSp_0.dat
+                        ./data/1ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/1pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/1pip_0.dat
+tpip printed:                                       data/1tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 1
+eigVec_1.dat
+
+./data/1inputsPi_0 ./data/1tpip_0.dat
+
+     input:             ./data/1tpip_0.dat
+timeNumber: 150222133727
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01153    0.01271          0          0   0.001491    0.00377   0.005605
+    0    2  1.747e-05  0.0001114     0.1434    0.01221    0.01244          0  4.399e-13   0.001455    0.03699    0.00559
+    0    3  3.859e-05  0.0001489     0.1016    0.01757    0.01542          0  4.178e-13   0.001221     0.1001   0.005678
+    0    4  1.714e-05  7.145e-05    0.09978    0.02142    0.01724          0    1.2e-13   0.001027     0.0425   0.005643
+    0    5  1.883e-05  7.662e-05     0.0571    0.02518    0.01965          0  1.271e-13  0.0009023    0.05048   0.005674
+    0    6  5.735e-06   2.41e-05    0.01658    0.02741     0.0209          0   3.95e-13  0.0008193    0.01466   0.005654
+    0    7  4.694e-07   1.94e-06   0.001163    0.02817    0.02134          0  2.053e-14   0.000792  0.0007226   0.005642
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1297,0)
+linErgAB           = (19.1404,-2.42743e-16)
+linErgContm        = (19.1706,0)
+linErg(0)          = (19.1297,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 212.607     130     402       5     0.8    0.05       0       10.9301       19.1297       15.0946     -0.418282
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222133727inputsM_0_0
+            ./data/150222133727mainpi_0_0.dat
+            ./data/150222133727mainminusDS_0_0.dat
+            ./data/150222133727mainDDS_0_0.dat
+            ./data/150222133727mainlinNum_0_0.dat
+            ./data/150222133727mainlinErg_0_0.dat
+            ./data/150222133727mainlinErgOffShell_0_0.dat
+            ./data/150222133727mainderivErg_0_0.dat
+            ./data/150222133727mainpotErg_0_0.dat
+            ./data/150222133727mainerg_0_0.dat
+
+     input: ./data/150222133727mainpi_0_0.dat
+timeNumber: 150222133727
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02823     0.6841     0.7023  0.0007071      0.703  0.0005562   0.005328
+    1    2  1.949e-08  7.656e-08    0.04263    0.02831    0.02921   0.007784   0.004428    0.01393  0.0004912   0.005728
+    1    3  3.544e-06  1.424e-05   0.006879    0.02674    0.02881   0.008364   0.004891    0.01485     0.0107    0.00573
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02709    0.02888   0.008307   0.004805    0.01474  0.0004465    0.00572
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.0945,0)
+linErgAB           = (19.106,-5.95398e-05)
+linErgContm        = (19.1312,0)
+linErg(0)          = (19.207,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 158.837     130     402       5     0.8    0.05  0.0005       10.8238        19.207       15.0966     -0.543293
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222133727inputsM_0_1
+            ./data/150222133727mainpi_0_1.dat
+            ./data/150222133727mainminusDS_0_1.dat
+            ./data/150222133727mainDDS_0_1.dat
+            ./data/150222133727mainlinNum_0_1.dat
+            ./data/150222133727mainlinErg_0_1.dat
+            ./data/150222133727mainlinErgOffShell_0_1.dat
+            ./data/150222133727mainderivErg_0_1.dat
+            ./data/150222133727mainpotErg_0_1.dat
+            ./data/150222133727mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 14
+./pi
+
+timeNumber:            2
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.46214     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/2inputsPi_0
+                         ./data/2pip_0.dat
+                     ./data/2minusDS_0.dat
+                        ./data/2DDSp_0.dat
+                        ./data/2ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/2pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/2pip_0.dat
+tpip printed:                                       data/2tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/2inputsPi_0 ./data/2tpip_0.dat
+
+     input:             ./data/2tpip_0.dat
+timeNumber: 150222134404
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01157    0.01259          0          0   0.001492    0.00377   0.005605
+    0    2  1.747e-05  0.0001114     0.1434    0.01232    0.01232          0  4.399e-13   0.001456    0.03699   0.005589
+    0    3  3.859e-05  0.0001489     0.1016     0.0177    0.01513          0  4.178e-13   0.001219     0.1001   0.005677
+    0    4  1.714e-05  7.145e-05    0.09978    0.02144    0.01673          0    1.2e-13   0.001011     0.0425   0.005641
+    0    5  1.883e-05  7.662e-05     0.0571    0.02514    0.01889          0  1.271e-13  0.0008891    0.05048   0.005672
+    0    6  5.735e-06   2.41e-05    0.01658     0.0274    0.02013          0   3.95e-13  0.0008131    0.01466   0.005651
+    0    7  4.694e-07   1.94e-06   0.001163    0.02818     0.0206          0  2.053e-14   0.000787  0.0007226   0.005639
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1197,0)
+linErgAB           = (19.1303,-2.17806e-16)
+linErgContm        = (19.1693,0)
+linErg(0)          = (19.1197,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 205.056     130     402       5     0.8    0.05       0        10.929       19.1197       15.0946      -0.40229
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222134404inputsM_0_0
+            ./data/150222134404mainpi_0_0.dat
+            ./data/150222134404mainminusDS_0_0.dat
+            ./data/150222134404mainDDS_0_0.dat
+            ./data/150222134404mainlinNum_0_0.dat
+            ./data/150222134404mainlinErg_0_0.dat
+            ./data/150222134404mainlinErgOffShell_0_0.dat
+            ./data/150222134404mainderivErg_0_0.dat
+            ./data/150222134404mainpotErg_0_0.dat
+            ./data/150222134404mainerg_0_0.dat
+
+     input: ./data/150222134404mainpi_0_0.dat
+timeNumber: 150222134404
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02824     0.6851     0.7027  0.0007071     0.7033  0.0005562   0.005325
+    1    2  1.949e-08  7.656e-08    0.04263    0.02832    0.02708   0.006395   0.004428     0.0142  0.0004912   0.005721
+    1    3  3.544e-06  1.424e-05   0.006879    0.02673    0.02647   0.006742   0.004891    0.01516     0.0107   0.005723
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02708    0.02658   0.006713   0.004805    0.01504  0.0004465   0.005712
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.085,0)
+linErgAB           = (19.0964,-5.3327e-05)
+linErgContm        = (19.1299,0)
+linErg(0)          = (19.1758,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 153.241     130     402       5     0.8    0.05  0.0005       10.8204       19.1758       15.0966     -0.493331
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222134404inputsM_0_1
+            ./data/150222134404mainpi_0_1.dat
+            ./data/150222134404mainminusDS_0_1.dat
+            ./data/150222134404mainDDS_0_1.dat
+            ./data/150222134404mainlinNum_0_1.dat
+            ./data/150222134404mainlinErg_0_1.dat
+            ./data/150222134404mainlinErgOffShell_0_1.dat
+            ./data/150222134404mainderivErg_0_1.dat
+            ./data/150222134404mainpotErg_0_1.dat
+            ./data/150222134404mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 12
+./pi
+
+timeNumber:            3
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.27653     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/3inputsPi_0
+                         ./data/3pip_0.dat
+                     ./data/3minusDS_0.dat
+                        ./data/3DDSp_0.dat
+                        ./data/3ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/3pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/3pip_0.dat
+tpip printed:                                       data/3tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 1
+eigVec_3.dat
+
+./data/3inputsPi_0 ./data/3tpip_0.dat
+
+     input:             ./data/3tpip_0.dat
+timeNumber: 150222135027
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822     0.0115    0.01189          0          0   0.001492    0.00377   0.005603
+    0    2  1.747e-05  0.0001114     0.1434    0.01226    0.01152          0  4.399e-13   0.001455    0.03699   0.005587
+    0    3  3.859e-05  0.0001489     0.1016    0.01775    0.01408          0  4.178e-13   0.001218     0.1001   0.005673
+    0    4  1.714e-05  7.145e-05    0.09978    0.02182    0.01611          0    1.2e-13   0.001027     0.0425   0.005639
+    0    5  1.883e-05  7.662e-05     0.0571    0.02577    0.01837          0  1.271e-13  0.0009057    0.05048    0.00567
+    0    6  5.735e-06   2.41e-05    0.01658    0.02806    0.01957          0   3.95e-13  0.0008083    0.01466   0.005649
+    0    7  4.694e-07   1.94e-06   0.001163    0.02882       0.02          0  2.053e-14  0.0007752  0.0007226   0.005637
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.1117,0)
+linErgAB           = (19.1221,-2.15106e-16)
+linErgContm        = (19.1619,0)
+linErg(0)          = (19.1117,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 222.165     130     402       5     0.8    0.05       0       10.9279       19.1117       15.0946     -0.389454
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222135027inputsM_0_0
+            ./data/150222135027mainpi_0_0.dat
+            ./data/150222135027mainminusDS_0_0.dat
+            ./data/150222135027mainDDS_0_0.dat
+            ./data/150222135027mainlinNum_0_0.dat
+            ./data/150222135027mainlinErg_0_0.dat
+            ./data/150222135027mainlinErgOffShell_0_0.dat
+            ./data/150222135027mainderivErg_0_0.dat
+            ./data/150222135027mainpotErg_0_0.dat
+            ./data/150222135027mainerg_0_0.dat
+
+     input: ./data/150222135027mainpi_0_0.dat
+timeNumber: 150222135027
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02887     0.6852     0.7023  0.0007071      0.703  0.0005562   0.005324
+    1    2  1.949e-08  7.656e-08    0.04263    0.02896    0.02451   0.004433   0.004428    0.01464  0.0004912   0.005713
+    1    3  3.544e-06  1.424e-05   0.006879    0.02736    0.02427   0.005025   0.004891    0.01555     0.0107   0.005716
+    1    4  7.031e-08  2.904e-07  0.0001384     0.0277    0.02435   0.004954   0.004805    0.01544  0.0004465   0.005705
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.0785,0)
+linErgAB           = (19.0899,-5.07695e-05)
+linErgContm        = (19.1226,0)
+linErg(0)          = (19.1455,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 162.796     130     402       5     0.8    0.05  0.0005       10.8165       19.1455       15.0966     -0.444836
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222135027inputsM_0_1
+            ./data/150222135027mainpi_0_1.dat
+            ./data/150222135027mainminusDS_0_1.dat
+            ./data/150222135027mainDDS_0_1.dat
+            ./data/150222135027mainlinNum_0_1.dat
+            ./data/150222135027mainlinErg_0_1.dat
+            ./data/150222135027mainlinErgOffShell_0_1.dat
+            ./data/150222135027mainderivErg_0_1.dat
+            ./data/150222135027mainpotErg_0_1.dat
+            ./data/150222135027mainerg_0_1.dat
+
+#################################################################################################
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 10
+./pi
+
+timeNumber:            4
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5    3.24     0.8  0.0203      10    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.23533      0.00108749      0.00566461        0.103323
+               0               2       0.0220375     0.000211683     0.000923354       0.0251294
+               0               3       0.0332672     1.46795e-05     7.49276e-05        0.016694
+               0               4       0.0123587     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00263204     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE           E       im(S)           W
+       5 8.27517     130     402       5     0.8    0.05           0       11.14           0
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/4inputsPi_0
+                         ./data/4pip_0.dat
+                     ./data/4minusDS_0.dat
+                        ./data/4DDSp_0.dat
+                        ./data/4ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                      data/4pip_0.dat
+Tinf              =   0.6100
+kineticT          =     -nan
+kineticS          =     -nan
+massTerm          =     -nan
+erg(0)            =     -nan
+nonLinErgA(0)     =     -nan
+linErgFieldA(0)   =     -nan
+linErgContmA(0)   =     -nan
+linNumContmA(0)   =     -nan
+success: solution tunnelled
+
+       N      Na      Nb      Nc       L      Tb
+     130     320      80       2       5     0.8
+
+Input:                                          data/4pip_0.dat
+tpip printed:                                       data/4tpip_0.dat pics/pi3.png
+kineticT          =   8.3535
+kineticS          =   5.5657
+massTerm          =   3.7993
+erg(0)            =  17.8531
+nonLinErgA(0)     =   0.1315
+linErgFieldA(0)   =  17.7216
+linErgContmA(0)   =  17.7254
+linNumContmA(0)   =   9.9414
+
+#################################################################################################
+eigen files not available
+eigenvalueFiles.size() = 0
+eigenvectorFiles.size() = 0
+
+./data/4inputsPi_0 ./data/4tpip_0.dat
+
+     input:             ./data/4tpip_0.dat
+timeNumber: 150222135727
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05       0       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    0    1  0.0006212   0.007055    0.07822    0.01202   0.008789          0          0    0.00149    0.00377   0.005594
+    0    2  1.747e-05  0.0001114     0.1434    0.01278   0.008003          0  4.399e-13   0.001441    0.03699   0.005577
+    0    3  3.859e-05  0.0001489     0.1016    0.01803   0.008664          0  4.178e-13   0.001195     0.1001   0.005658
+    0    4  1.714e-05  7.145e-05    0.09978    0.02146    0.01054          0    1.2e-13   0.001006     0.0425   0.005623
+    0    5  1.883e-05  7.662e-05     0.0571    0.02487    0.01219          0  1.271e-13    0.00091    0.05048   0.005652
+    0    6  5.735e-06   2.41e-05    0.01658    0.02709    0.01412          0   3.95e-13  0.0008271    0.01466   0.005633
+    0    7  4.694e-07   1.94e-06   0.001163    0.02789    0.01494          0  2.053e-14  0.0007958  0.0007226   0.005622
+erg(1)             = (18.8381,4.12262e-16)
+linErgOffShell(0)  = (19.0434,0)
+linErgAB           = (19.0541,-1.89085e-16)
+linErgContm        = (19.1229,0)
+linErg(0)          = (19.0434,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       7 205.795     130     402       5     0.8    0.05       0       10.9177       19.0434       15.0946     -0.280253
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222135727inputsM_0_0
+            ./data/150222135727mainpi_0_0.dat
+            ./data/150222135727mainminusDS_0_0.dat
+            ./data/150222135727mainDDS_0_0.dat
+            ./data/150222135727mainlinNum_0_0.dat
+            ./data/150222135727mainlinErg_0_0.dat
+            ./data/150222135727mainlinErgOffShell_0_0.dat
+            ./data/150222135727mainderivErg_0_0.dat
+            ./data/150222135727mainpotErg_0_0.dat
+            ./data/150222135727mainerg_0_0.dat
+
+     input: ./data/150222135727mainpi_0_0.dat
+timeNumber: 150222135727
+     inP       N      Na      Nb      Nc       L      Ta      Tb      Tc       R      dE   theta     reg epsilon
+       p     130     320      80       2       5   3.241     0.8 0.02025      10    0.05  0.0005       0       0
+
+ loop  run    solTest   solMTest  deltaTest    linTest   trueTest  shellTest     ABTest   ABNETest  cnsrvTest    momTest
+    1    1   6.76e-05    0.00112   0.005815    0.02795     0.6903      0.703  0.0007071     0.7037  0.0005562   0.005308
+    1    2  1.949e-08  7.656e-08    0.04263    0.02804    0.01859   0.003527   0.004428    0.01487  0.0004912   0.005695
+    1    3  3.544e-06  1.424e-05   0.006879    0.02645    0.01736   0.003426   0.004891    0.01596     0.0107   0.005695
+    1    4  7.031e-08  2.904e-07  0.0001384    0.02681    0.01775   0.003448   0.004805    0.01583  0.0004465   0.005686
+erg(1)             = (18.8138,-0.000106405)
+linErgOffShell(0)  = (19.0099,0)
+linErgAB           = (19.0215,-3.70479e-05)
+linErgContm        = (19.084,0)
+linErg(0)          = (19.0563,0)
+
+    runs    time       N      NT       L      Tb      dE   theta           Num             E    im(action)             W
+       4 156.535     130     402       5     0.8    0.05  0.0005       10.8034       19.0563       15.0966     -0.302211
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output: ./data/150222135727inputsM_0_1
+            ./data/150222135727mainpi_0_1.dat
+            ./data/150222135727mainminusDS_0_1.dat
+            ./data/150222135727mainDDS_0_1.dat
+            ./data/150222135727mainlinNum_0_1.dat
+            ./data/150222135727mainlinErg_0_1.dat
+            ./data/150222135727mainlinErgOffShell_0_1.dat
+            ./data/150222135727mainderivErg_0_1.dat
+            ./data/150222135727mainpotErg_0_1.dat
+            ./data/150222135727mainerg_0_1.dat
+
+#################################################################################################
+
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+output from mainChangeCutoff.sh
+
+Tb = 0.8
+L = 5
+N = 130
+Na = 320
+Nb = 80
+Nc = 2
+
+r1 = 5
+
+             run               N           y(r1)            yMin           F-aim           Y0Old           Y0New           -F/dF
+               1            1001      0.00456708      0.00456708      0.00456708           4.337   4.33894300412        0.001943
+               2            1001    -2.11158e-06     3.44772e-05    -2.11158e-06   4.33894300412    4.3389421066    -8.97516e-07
+               3            1001    -4.44279e-13     3.65803e-05    -4.44279e-13    4.3389421066    4.3389421066    -1.88839e-13
+
+Solution printed: ./data/sphaleron.dat ./pics/sphaleron.png
+
+E = 18.9014
+
+Matrices printed: ./data/D1.dat ./data/D2.dat
+
+From Matlab: D1 gives omega^2_- = -15.31,
+             D2 gives omega^2_- = -15.34
+
+./sphaleron4
+
+       N      Nt      r1      r0      t1      t0     amp
+    1000    1000       5   1e-16     0.8       0     0.5
+
+-------------------------------------------------------------------------------------------------------
+CUTOFF = 130
+./pi
+
+timeNumber:            0
+     inP       N      Na      Nb      Nc       L      Tb       R      dE   theta     reg epsilon
+       p     130     320      80       2       5     0.8       1    0.05       0       0       0
+
+            loop       runsCount      actionTest         solTest        solMTest       deltaTest
+               0               1         1.07643      0.00108749      0.00566461        0.103323
+               0               2       0.0224364     0.000211683     0.000923354       0.0251294
+               0               3       0.0270142     1.46795e-05     7.49276e-05        0.016694
+               0               4      0.00943056     5.52162e-06     3.90135e-05      0.00407497
+               0               5      0.00199709     3.48066e-07     2.18364e-06     0.000231703
+
+    runs    time       N      NT       L      Tb      dE               E               W
+       5    3.69     130     402       5     0.8    0.05            -nan             nan
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    output:             ./data/0inputsPi_0
+                         ./data/0pip_0.dat
+                     ./data/0minusDS_0.dat
+                        ./data/0DDSp_0.dat
+                     ./data/0linErgp_0.dat
+                        ./data/0ergp_0.dat
+pi3 output:
+
+pi3 testing if tunnelled
+Input:                                          data/0pip_0.dat
+erg(0) =     -nan
+linErgFieldA(0)   =     -nan
+nonLinErgA(0)     =      nan
+linErgA           =     -nan
+linNumA           =     -nan
+linNumContmA(0) =     -nan
+linErgContmA(0) =     -nan
+
+success: solution tunnelled
+

@@ -645,7 +645,7 @@ double simpleSpaceSphere (const unsigned int& space, const double& the_L=L, cons
 comp coord(const unsigned int& locNum,const int& direction, const unsigned int& Nt=NT)
 	{
 	if (direction==0)		return simpleTime(intCoord(locNum,0,NT));
-	if (direction==1)		return simpleSpace(intCoord(locNum,1,NT),L,a);
+	else if (direction==1)	return simpleSpace(intCoord(locNum,1,NT),L,a);
 	else return 0.0;
 	}
 
@@ -663,8 +663,7 @@ complex<double> coordA(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Na);
-		double temp = (double)x;
-		XcoordA = -L/2.0 + temp*a;
+		XcoordA = simpleSpace(x,L,a);
 		}
 	return XcoordA;
 	}
@@ -682,8 +681,7 @@ complex<double> coordB(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nb);
-		double temp = (double)x;
-		XcoordB = -L/2.0 + temp*a;
+		XcoordB = simpleSpace(x,L,a);
 		}
 	return XcoordB;
 	}
@@ -700,8 +698,7 @@ complex<double> coordC(const unsigned int& locNum,const int& direction)
 	if (direction==1)
 		{
 		unsigned int x = intCoord(locNum,1,Nc);
-		double temp = (double)x;
-		XcoordC = -L/2.0 + temp*a;
+		XcoordC = simpleSpace(x,L,a);
 		}
 	return XcoordC;
 	}
