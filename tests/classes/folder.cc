@@ -1,6 +1,6 @@
-/*
+/*-------------------------------------------------------------------------------------------------------------------------
  	definitions for the Folder class and dependencies
- */
+ -------------------------------------------------------------------------------------------------------------------------*/
 
 #include <string>
 #include <fstream>
@@ -8,17 +8,39 @@
 #include <vector>
 #include <utility> // for pair
 #include <cstdlib> // for system
+#include <algorithm> // for sort
+#include <iterator>
 #include "simple.h"
 #include "folder.h"
 
-/*
-	declarations for the FilenameAttributes class, a base class to be inherited from.
+/*-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+CONTENTS
+	1. FilenameAttributes
+	2. Errors
+	3. Filename
+	4. FilenameComparator
+	5. Folder
+	6. functions (reduceTo)
+	
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------------------------------------------------------------
+	1. defintions for the FilenameAttributes class, a base class to be inherited from.
 		- copy
 		- copy constructor
 		- operator=
-		- <<
+		- operator<<
 		- operator==
-*/
+-------------------------------------------------------------------------------------------------------------------------*/
+
+// pair
+template <class T, class U>
+ostream& operator<<(ostream& os, const pair<T,U>& p) {
+	os << "(" << p.first << "," << p.second << ")";
+	return os;
+}
 
 // copy
 void FilenameAttributes::copy(const FilenameAttributes& fa) {
@@ -40,6 +62,7 @@ FilenameAttributes& FilenameAttributes::operator=(const FilenameAttributes& rhs)
 	return *this;
 }
 
+// operator<<
 ostream& operator<<(ostream& os, const FilenameAttributes& fa) {
 	os << "Directory:  " << fa.Directory << endl;
 	os << "Timenumber: " << fa.Timenumber << endl;
@@ -55,6 +78,7 @@ ostream& operator<<(ostream& os, const FilenameAttributes& fa) {
 	return os;
 }
 
+// operator==
 bool operator==(const FilenameAttributes& lhs, const FilenameAttributes& rhs) {
 	if ((lhs.Directory).compare(rhs.Directory)!=0) return false;
 	if ((lhs.Timenumber).compare(rhs.Timenumber)!=0) return false;
@@ -72,14 +96,35 @@ bool operator==(const FilenameAttributes& lhs, const FilenameAttributes& rhs) {
 	return true;
 }
 
-/*
-	declarations for the Filename class, publicly inherited from FilenameAttributes.
+/*-------------------------------------------------------------------------------------------------------------------------
+	2. definitions for Filename etc errors Errors
+		- FilenameError::Extras
+		- FilenameComparatorError::LU
+		- FolderError::System
+-------------------------------------------------------------------------------------------------------------------------*/
+
+string FilenameError::Extras::message() const {
+	return "Filename error: Extras not in pairs in " + Filename;
+}
+
+string FilenameComparatorError::LU::message() const {
+	return "FilenameComparator error: Lower." + Property + " = " + Lower + ", Upper." + Property + " = " + Upper;
+}
+
+string FolderError::System::message() const {
+	return "Folder error: system call failure, finding dataFiles.";
+}
+
+/*-------------------------------------------------------------------------------------------------------------------------
+	3. declarations for the Filename class, publicly inherited from FilenameAttributes.
 		- set
 		- operator=
 		- constructor(const string& filename)
 		- operator()
-		- <<
-*/
+		- operator<<
+		- operator<
+		- operator>
+-------------------------------------------------------------------------------------------------------------------------*/
 
 // set
 void Filename::set(const string& f) {
@@ -105,8 +150,8 @@ void Filename::set(const string& f) {
 		while (stop!=string::npos && temp[stop]!='.') {
 			stop = temp.find("_");
 			if (stop==string::npos) {
-				cerr << "Filename error: Extras not in pairs." << endl;
-				break;
+				FilenameError::Extras e(f);
+				throw f;
 			}
 			StringPair sp;
 			sp.first = temp.substr(0,stop);
@@ -138,8 +183,6 @@ Filename::Filename(const string& f): FilenameAttributes() {
 	set(f);
 }
 
-// operator
-
 // operator()
 string Filename::operator()() const {
 	string filename = Directory + "/" + Timenumber + ID;
@@ -150,7 +193,7 @@ string Filename::operator()() const {
 	return filename;
 }
 
-// <<
+// operator<<
 ostream& operator<<(ostream& os, const Filename& f) {
 	os << f();
 	return os;
@@ -162,8 +205,18 @@ istream& operator>>(istream& is, Filename& f) {
 	f = filename;
 }
 
-/*
-	defintions for the FilenameComparator class, which is used by the Folder class. FilenameComparator sees the ugly details of Filename.
+// operator<
+bool operator<(const Filename& lhs, const Filename& rhs) {
+	return lhs()<rhs();
+}
+
+// operator>
+bool operator>(const Filename& lhs, const Filename& rhs) {
+	return lhs()>rhs();
+}
+
+/*-------------------------------------------------------------------------------------------------------------------------
+	4. defintions for the FilenameComparator class, which is used by the Folder class. FilenameComparator sees the ugly details of Filename.
 		- copy
 		- copy constructor
 		- check
@@ -174,7 +227,7 @@ istream& operator>>(istream& is, Filename& f) {
 		- setUpper
 		- operator(Filename)
 		- <<
-*/
+-------------------------------------------------------------------------------------------------------------------------*/
 
 // copy
 void FilenameComparator::copy(const FilenameComparator& fc) {
@@ -190,20 +243,24 @@ FilenameComparator::FilenameComparator(const FilenameComparator& fc) {
 // check
 bool FilenameComparator::check(const FilenameAttributes& low, const FilenameAttributes& u) const {
 	if ((low.Directory).compare(u.Directory)!=0) {
-		cerr << "FilenameComparator error: Lower.Directory = " << low.Directory << ", Upper.Directory = " << u.Directory << endl;
+		FilenameComparatorError::LU e("Directory",low.Directory,u.Directory);
+		cerr << e;
 		return false;
 		}
 	if ((low.ID).compare(u.ID)!=0) {
-		cerr << "FilenameComparator error: Lower.ID = " << low.ID << ", Upper.ID = " << u.ID << endl;
+		FilenameComparatorError::LU e("ID",low.ID,u.ID);
+		cerr << e;
 		return false;
 	}
 	if ((low.Suffix).compare(u.Suffix)!=0) {
-		cerr << "FilenameComparator error: Lower.Suffix = " << low.Suffix << ", Upper.Suffix = " << u.Suffix << endl;
+		FilenameComparatorError::LU e("Suffix",low.Suffix,u.Suffix);
+		cerr << e;
 		return false;
 	}
 	if ((low.Extras).size()!=(u.Extras).size()) {
-		cerr << "FilenameComparator error: Lower.Extras.size() = " << (low.Extras).size() << ", Upper.Extras.size = "\
-			 << (u.Extras).size() << endl;
+		FilenameComparatorError::LU e("Extras.size()",numberToString<unsigned int>((low.Extras).size())\
+								,numberToString<unsigned int>((u.Extras).size()));
+		cerr << e;
 		return false;
 	}
 	bool ExtraOK;
@@ -212,7 +269,11 @@ bool FilenameComparator::check(const FilenameAttributes& low, const FilenameAttr
 		for (unsigned int m=0; m<(low.Extras).size(); m++) {
 			if (((low.Extras[m]).first).compare(((u.Extras[n]).first))==0) ExtraOK = true;
 		}
-		if (!ExtraOK) return false;
+		if (!ExtraOK) {
+			FilenameComparatorError::LU e("Extras",(low.Extras[n]).first,u.Extras[n].first);
+			cerr << e;
+			return false;
+		}
 	}
 	return true;
 }
@@ -282,16 +343,20 @@ bool FilenameComparator::operator()(const Filename& f) const{
 	return true;
 }
 
-// <<
+// operator<<
 ostream& operator<<(ostream& os, const FilenameComparator& fc){
 	os << "Lower: " << endl << fc.Lower << endl << "Upper: " << fc.Upper << endl;
 }
 
-/*
-	definitions for the Folder class.
+/*-------------------------------------------------------------------------------------------------------------------------
+	5. definitions for the Folder class.
 		- isPresent(Filename)
 		- refresh
+		- sort
 		- update
+		- begin
+		- end
+		- erase
 		- copy
 		- copy constructor
 		- constructor(FilenameComparator)
@@ -300,7 +365,7 @@ ostream& operator<<(ostream& os, const FilenameComparator& fc){
 		- size
 		- operator[]
 		- <<
-*/
+-------------------------------------------------------------------------------------------------------------------------*/
 
 // isPresent(Filename)
 bool Folder::isPresent(const Filename& f) {
@@ -310,11 +375,38 @@ bool Folder::isPresent(const Filename& f) {
 	return false;
 }
 
+// begin
+FolderIterator Folder::begin() {
+	return Filenames.begin();
+}
+
+// begin
+ConstFolderIterator Folder::begin() const{
+	return Filenames.begin();
+}
+
+// end
+FolderIterator Folder::end() {
+	return Filenames.end();
+}
+
+// end
+ConstFolderIterator Folder::end() const{
+	return Filenames.end();
+}
+
+// sort
+void Folder::sort() {
+	std::sort(Filenames.begin(),Filenames.end());
+}
+
 // refresh
 void Folder::refresh() {
 	int systemCall = system("find data/* -type f > dataFiles");
-	if (systemCall==-1)
-		cerr << "Folder error: system call failure, finding dataFiles." << endl;
+	if (systemCall==-1) {
+		FolderError::System e;
+		cerr << e;
+	}
 	ifstream is;
 	Filename f;
     is.open ("dataFiles");
@@ -323,11 +415,17 @@ void Folder::refresh() {
 		if (!isPresent(f) && Comparator(f)) Filenames.push_back(f);
 	}
     is.close();
+    sort();
 }
 
 // update
 void Folder::update() {
 	refresh();
+}
+
+// erase
+void Folder::erase(FolderIterator it) {
+	Filenames.erase(it);
 }
 
 // copy
@@ -366,13 +464,34 @@ unsigned int Folder::size() const{
 
 // operator[]
 Filename Folder::operator[](const int& index) const {
-	if (index<0 || index>(size()-1)) cerr << "Folder error: index(" << index << ") out of range." << endl;
+	if (index<0 || index>(size()-1)) {
+		IndexError::OutOfBounds e(index,size(),0);
+		cerr << e;
+	}
 	return Filenames[index];
 }
 
-// <<
+// operator<<
 ostream& operator<<(ostream& os, const Folder& f) {
 	for (unsigned int l=0; l<f.size(); l++)
 		os << f[l] << endl;
 	return os;
 }
+
+/*-------------------------------------------------------------------------------------------------------------------------
+	6. functions acting on Filenames and Folders
+		- reduceTo
+-------------------------------------------------------------------------------------------------------------------------*/
+
+// reduceTo
+void reduceTo(Folder& toReduce,const Folder& toCompare) {
+	if (toCompare.size()<toReduce.size() && toCompare.size()>0) {
+		for (unsigned int j=0;j<toReduce.size();j++) {
+			if(find(toCompare.begin(), toCompare.end(), toReduce[j]) == toCompare.end()) {
+				toReduce.erase(toReduce.begin()+j);
+			}
+		}
+	}
+	else if (toCompare.size()==0) toReduce = toCompare;
+}
+

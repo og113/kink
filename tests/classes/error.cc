@@ -1,6 +1,7 @@
 //defintions of error classes and functions
 
 #include <string>
+#include "simple.h"
 #include "error.h"
 
 using namespace std;
@@ -20,5 +21,14 @@ file related errors
 -------------------------------------------------------------------------------------------------------------------------*/
 
 string FileError::StreamNotGood::message() const{
-	return "Stream for " + filename + " not good.";
+	return "Stream for " + Filename + " not good.";
+}
+
+/*-------------------------------------------------------------------------------------------------------------------------
+index related errors
+-------------------------------------------------------------------------------------------------------------------------*/
+
+string IndexError::OutOfBounds::message() const{
+	return "Index error: Out of Bounds. " + numberToString<unsigned int>(Index) + " not in (" \
+		 + numberToString<unsigned int>(Min) + "," + numberToString<unsigned int>(Max) + ").";
 }

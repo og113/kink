@@ -8,7 +8,7 @@
 using namespace std;
 
 template <class T>
-string numberToString ( T Number );
+string numberToString ( const T& Number );
 
 template <class T>
 T stringToNumber ( const string& Text );

@@ -13,7 +13,7 @@ generic functions
 
 //to convert number to string, usage is string str = NumberToString<number type>(x);
 template <class T>
-string numberToString ( T Number )
+string numberToString ( const T& Number )
 	{
 	stringstream ss;
 	ss << Number;
@@ -33,4 +33,16 @@ T stringToNumber ( const string& Text )
 double absDiff (const double& numA, const double& numB) {
 	return 2.0*abs(numA-numB)/sqrt(numA*numA+numB*numB);
 }
+
+/*-------------------------------------------------------------------------------------------------------------------------
+explicit template instantiation
+-------------------------------------------------------------------------------------------------------------------------*/
+
+template string numberToString<int>(const int&);
+template string numberToString<unsigned int>(const unsigned int&);
+template string numberToString<double>(const double&);
+
+template int stringToNumber<int>(const string&);
+template unsigned int stringToNumber<unsigned int>(const string&);
+template double stringToNumber<double>(const string&);
 
