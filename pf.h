@@ -173,18 +173,15 @@ double absDiff(const cVec& vecA, const cVec& vecB) {
 	
 //function giving location of smallest element of a vector of type T
 template <typename T>
-unsigned int smallestLoc(const vector <T> & inVector)
-	{
-	unsigned int loc = 0;
-	for(unsigned int l=1;l<inVector.size();l++)
-		{
-		if (absolute(inVector[l])<absolute(inVector[loc]))
-			{
+uint smallestLoc(const vector <T> & inVector) {
+	uint loc = 0;
+	for(uint l=1;l<inVector.size();l++) {
+		if (absolute(inVector[l])<absolute(inVector[loc])) {
 			loc = l;
-			}
 		}
-	return loc;
 	}
+	return loc;
+}
 	
 //count non-empty lines of a file
 unsigned int countLines(const string & file_to_count)

@@ -308,7 +308,7 @@ if ((inP.compare("p") == 0 || inP.compare("f") == 0) && pot[0]!='3')
 			return 1;
 			}
 		ifstream eigFile;
-		eigFile.open(eigVecFilename, ios::in);
+		eigFile.open("data/stable/eigVal.dat", ios::in);
 		string lastLine = getLastLine(eigFile);
 		istringstream ss(lastLine);
 		ss >> negP >> negc >> negcheck >> negerror >> negVal;

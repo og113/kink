@@ -1018,15 +1018,9 @@ auto ddVr = [&] (const comp & phi)
 					kineticT 	+= Dx*pow(Cp(j+1)-Cp(j),2.0)/dt/2.0;
 					potV 		+= Dt*Dx*V(Cp(j));
 					pot_r 		+= Dt*Dx*Vr(Cp(j));
-<<<<<<< HEAD
 					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
 					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0;
 					potErg(t) 	+= Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-=======
-					erg(t) 		+= Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0 + Dx*V(Cp(j)) + Dx*Vr(Cp(j));
-					derivErg(t) += Dx*pow(Cp(j+1)-Cp(j),2.0)/pow(dt,2.0)/2.0 + pow(Cp(neighPosX)-Cp(j),2.0)/dx/2.0;
-					potErg(t) 	+= Dx*(V(Cp(j)) + Vr(Cp(j)));
->>>>>>> 3502b10cf58fbb10751d0562ef85a0f133e7ed72
 				
 		            for (unsigned int k=0; k<2*2; k++)
                 	{
@@ -1424,7 +1418,7 @@ auto ddVr = [&] (const comp & phi)
 		//printing action value
 		FILE * actionfile;
 		actionfile = fopen("./data/mainAction.dat","a");
-		fprintf(actionfile,"%12s%6i%6i%8g%8g%8g%8g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num,imag(action)\
+		fprintf(actionfile,"%12s%6i%6i%8.4g%8.4g%8.4g%8.4g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g%10.4g\n",timeNumber.c_str(),N,NT,L,Tb,dE,theta,E,Num,imag(action)\
 		,real(W),sol_test.back(),lin_test.back(),true_test.back());
 		fclose(actionfile);
 		

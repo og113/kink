@@ -1,12 +1,18 @@
+SDIR		= src
+HDIR		= include
+ODIR		= objects
 CC 			= g++
 OPTIM 		= 
 CFLAGS 		= -Wall -g
 LFLAGS 		= 
-INCLUDES	= 
+INCLUDES	= -I$(HDIR)
 LIBS 		= 
-SRC			= simple.cc error.cc bag.cc test.cc
-HEADERS 	= simple.h error.h bag.h
-OBJS 		= $(SRC:.cc=.o)
+_SRC		= simple.cc error.cc bag.cc test.cc
+_HEADERS 	= simple.h error.h bag.h
+_OBJS 		= $(_SRC:.cc=.o)
+SRC			= $(patsubst %,$(SDIR)/%,$(_SRC))
+HEADERS		= $(patsubst %,$(HDIR)/%,$(_HEADERS))
+OBJS		= $(patsubst %,$(ODIR)/%,$(_OBJS))
 MAIN 		= main
 
 all:	$(MAIN)
@@ -15,7 +21,7 @@ all:	$(MAIN)
 $(MAIN): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LIBS)
     
-%.o: %.cc
+$(ODIR)/%.o: $(SDIR)/%.cc
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
