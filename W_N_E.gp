@@ -15,6 +15,6 @@ set xlabel "N"
 set ylabel "E"
 set zlabel "W"
 set grid
-splot "./data/mainAction.dat" using 9:8:10 with points
+splot "results/main_data.dat" using 9:8:10 with points
 
 pause -1

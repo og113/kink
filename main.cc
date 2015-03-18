@@ -14,7 +14,7 @@
 #include "pf.h"
 #include "files.h"
 
-int main()
+int main(int argc, char** argv)
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //getting data from mainInputs
@@ -47,6 +47,41 @@ else {
 	return 1;
 }
 fmainin.close();
+
+/* ---------------------------------------------------------------------------------------------
+user inputs
+and labels for input and output
+---------------------------------------------------------------------------------------------*/
+
+if (argc % 2 && argc>1) {
+	for (uint j=0; j<(int)(argc/2); j++) {
+		string id = argv[2*j+1];
+		if (id[0]=='-') id = id.substr(1);
+		if (id.compare("inF")==0) inF = argv[2*j+2];
+		else if (id.compare("minFile")==0) minFile = stringToNumber<unsigned long long>(argv[2*j+2]);
+		else if (id.compare("maxFile")==0) maxFile = stringToNumber<unsigned long long>(argv[2*j+2]);
+		else if (id.compare("firstLoop")==0 ) firstLoop = stringToNumber<int>(argv[2*j+2]);
+		else if (id.compare("lastLoop")==0 ) lastLoop = stringToNumber<int>(argv[2*j+2]);
+		else if (id.compare("minTb")==0) minTb = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("maxTb")==0) maxTb = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("minTheta")==0) minTheta = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("maxTheta")==0) maxTheta = stringToNumber<double>(argv[2*j+2]);
+		else if (id.compare("loops")==0) loops = stringToNumber<uint>(argv[2*j+2]);
+		else if (id.compare("zmt")==0) zmt = argv[2*j+2];
+		else if (id.compare("zmx")==0) zmx = argv[2*j+2];
+		else if (id.compare("bds")==0) bds = argv[2*j+2];
+		else {
+			cerr << "input " << id << " unrecognized" << endl;
+			return 1;
+		}
+	}
+}
+else if (argc>1) {
+	cerr << "must provide an even number of inputs in format '-name value':" << endl;
+	for (int j=1; j<argc; j++) cerr << argv[j] << " ";
+	cerr << endl;
+	return 1;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 //sorting out files to load
@@ -1411,7 +1446,7 @@ auto ddVr = [&] (const comp & phi)
 		//printing to terminal
 		printf("\n");
 		printf("%8s%8s%8s%8s%8s%8s%8s%8s%14s%14s%14s%14s\n","runs","time","N","NT","L","Tb","dE","theta","Num","E","im(action)","W");
-		printf("%8i%8g%8i%8i%8g%8g%8g%8g%14.4g%14.4g%14.4g%14.4g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
+		printf("%8i%8g%8i%8i%8.4g%8.4g%8.4g%8.4g%14.4g%14.4g%14.4g%14.4g\n",runs_count,realtime,N,NT,L,Tb,dE,theta,Num,E,imag(action),real(W));
 		printf("\n");
 		 printf("%60s\n","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 

@@ -15,6 +15,6 @@ set xlabel "T"
 set ylabel "theta"
 set zlabel "W"
 set grid
-splot "./data/mainAction.dat" using 5:7:10 with points
+splot "results/main_data.dat" using 5:7:11 with points
 
 pause -1

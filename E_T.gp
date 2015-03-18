@@ -13,7 +13,7 @@ set ytic auto
 set title "E vs T"
 set xlabel "T"
 set ylabel "E"
-plot "data/mainAction_Tb_0.8_0.79.dat" using 5:($8/18.9) with points
+plot "results/main_data.dat" using 5:($8/18.9) with points
 #plot "results/13.02.15_pi_assembled.dat" using 4:($5/18.9) with points, \
 #	"results/16.02.15_main_Tb_0.8_0.796.dat" using 5:($8/18.9) with points
 
