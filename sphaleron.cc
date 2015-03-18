@@ -157,7 +157,8 @@ while (absolute(F-aim)>closeness)
 	}
 
 //printing solution
-string filename = "./data/" + timeNumber + "sphaleron.dat", picname = "./pics/sphaleron.png";
+string filename = "./data/"+timeNumber+"sphaleron_L_"+numberToString<double>(r1)+".dat";
+picname = "./pics/sphaleron_L_"+numberToString<double>(r1)+".png";
 simplePrintVector(filename,y0Vec);
 printf("\n%16s%20s %20s\n\n","Solution printed: ",filename.c_str(),picname.c_str());
 gpSimple(filename,picname);

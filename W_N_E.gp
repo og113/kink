@@ -15,6 +15,8 @@ set xlabel "N"
 set ylabel "E"
 set zlabel "W"
 set grid
+unset dgrid3d
+#set hidden3d
 splot "results/main_data.dat" using 9:8:10 with points
 
 pause -1
